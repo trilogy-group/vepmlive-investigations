@@ -36,6 +36,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.caseId = 745091;
 
         StepLogger.stepId(1);
+        await MyWorkPageSubHelper.searchItem(item);
         await MyWorkPageSubHelper.clickOnItem(item);
         await MyWorkPageHelper.verifyEditItemButtonEnabled();
 
@@ -47,6 +48,8 @@ describe(SuiteNames.endToEndSuite, () => {
         const editedItemTitle = await MyWorkPageHelper.editTitle();
         item = editedItemTitle[1];
         await MyWorkPageHelper.clickSaveButton();
+        await MyWorkPageHelper.navigateToMyWork();
+        await MyWorkPageSubHelper.searchItem(item);
         await MyWorkPageSubHelper.verifyItemPresent(item);
 
         StepLogger.stepId(4);
@@ -63,6 +66,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.caseId = 745095;
 
         StepLogger.stepId(1);
+        await MyWorkPageSubHelper.searchItem(item);
         await MyWorkPageSubHelper.clickOnItem(item);
         await MyWorkPageHelper.verifyEditItemButtonEnabled();
 
@@ -80,6 +84,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.caseId = 745098;
 
         StepLogger.stepId(1);
+        await MyWorkPageSubHelper.searchItem(item);
         await MyWorkPageSubHelper.clickOnItem(item);
         await MyWorkPageHelper.verifyCommentButtonEnabled();
 

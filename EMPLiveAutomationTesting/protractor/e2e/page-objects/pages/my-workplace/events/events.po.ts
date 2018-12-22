@@ -36,7 +36,7 @@ export class EventsPage {
     static get calenderTomorrow() {
         const currentDate = Date.now();
         let tomorrow = moment(currentDate).add(1, 'days');
-        tomorrow = moment(tomorrow).format('M/DD/YYYY');
+        tomorrow = moment(tomorrow).format('M/D/YYYY');
         return element(By.css(`td[date='${tomorrow}']`));
     }
 
@@ -133,5 +133,13 @@ export class EventsPage {
 
     static get seeMoreLinks() {
         return element.all(By.css('a.ms-cal-nav'));
+    }
+
+    static eventBox(titleNewEvent: string) {
+        return element(By.xpath(`//a[contains(text(),'${titleNewEvent}')]//parent::div[contains(@class,'ms-acal')]`));
+    }
+
+    static get deleteEventButton() {
+        return element(By.css('span[id*=Manage-LargeMedium-1-2]'));
     }
 }

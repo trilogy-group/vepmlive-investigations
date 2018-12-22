@@ -502,71 +502,7 @@ namespace EPMLiveCore.API
 
         public bool EnsureWebInitFeature(string sWebId, SPSite cSite, SPWeb cWeb, SPSite cESite, SPWeb cEWeb)
         {
-            bool success = true;
-
-            if (sWebId != null)
-            {
-                try
-                {
-                    bool workEngineListEventsFeatEnabled = false;
-
-                    if (sWebId.Equals(cWeb.ID))
-                    {
-                        foreach (SPFeature feat in cWeb.Features)
-                        {
-                            if (feat.DefinitionId.Equals(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61")))
-                            {
-                                workEngineListEventsFeatEnabled = true;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (SPWeb w = cSite.OpenWeb(new Guid(sWebId)))
-                        {
-                            foreach (SPFeature feat in w.Features)
-                            {
-                                if (feat.DefinitionId.Equals(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61")))
-                                {
-                                    workEngineListEventsFeatEnabled = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!workEngineListEventsFeatEnabled)
-                    {
-                        using (SPWeb tempWeb = cESite.OpenWeb(new Guid(sWebId)))
-                        {
-                            tempWeb.Site.AllowUnsafeUpdates = true;
-                            tempWeb.Site.RootWeb.AllowUnsafeUpdates = true;
-                            tempWeb.AllowUnsafeUpdates = true;
-                            tempWeb.Features.Add(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61"));
-                            tempWeb.Update();
-                        }
-                    }
-                    else
-                    {
-                        using (SPWeb tempWeb = cESite.OpenWeb(new Guid(sWebId)))
-                        {
-                            tempWeb.Site.AllowUnsafeUpdates = true;
-                            tempWeb.Site.RootWeb.AllowUnsafeUpdates = true;
-                            tempWeb.AllowUnsafeUpdates = true;
-                            tempWeb.Features.Remove(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61"));
-                            tempWeb.Features.Add(new Guid("f78dc45f-b6bb-4d59-8f45-c73bbcd28a61"));
-                            tempWeb.Update();
-                        }
-                    }
-                }
-                catch
-                {
-                    success = false;
-                }
-            }
-
-            return success;
+            return WebInitHelper.EeEnsureWebInitFeature(sWebId, cSite, cWeb, cESite);
         }
 
         public bool EnsureFieldsInRequestItem()

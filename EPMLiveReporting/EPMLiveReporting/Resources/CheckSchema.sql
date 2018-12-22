@@ -551,7 +551,7 @@ BEGIN
 			CREATE TABLE #RPT_Groups (col1 varchar(60))
 
 			insert into #RPT_Groups (col1) SELECT distinct  CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20))
-			FROM dbo.RPTITEMGROUPS INNER JOIN
+			FROM dbo.RPTITEMGROUPS LEFT JOIN
             #Groups as gps ON gps.GROUPID = dbo.rptitemgroups.GROUPID 
      		''
 

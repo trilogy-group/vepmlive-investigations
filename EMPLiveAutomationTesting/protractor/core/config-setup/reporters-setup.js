@@ -73,14 +73,18 @@ const commonConfigSetup = {
         });
     },
     testRailSetup: function () {
-        trReporter = new TestRailReporter.Reporter(
-            configSetup.params.testrail.host,
-            configSetup.params.testrail.user, // AdUserName or email Id
-            configSetup.params.testrail.password, // Password with Ad Username and Token with email Id
-            configSetup.params.testrail.projectId, // Testrail Project Id
-            configSetup.params.testrail.versionName, // process.env.version || browser.params.version which can be passed using --params.version
-            platform, // e.g. Windows - Linux
-            browserName); // e.g. Chrome/Mozilla,
+        trReporter = new TestRailReporter.Reporter({
+            hostname: configSetup.params.testrail.host,
+            username: configSetup.params.testrail.user, // AdUserName or email Id
+            password: configSetup.params.testrail.password, // Password with Ad Username and Token with email Id
+            projectId: configSetup.params.testrail.projectId, // Testrail Project Id
+            versionName: configSetup.params.testrail.versionName, // process.env.version || browser.params.version which can be passed using --params.version
+            osName: platform, // e.g. Windows - Linux
+            browserName: browserName,// e.g. Chrome/Mozilla
+            planId: configSetup.params.testrail.planId,   // In Case if you want to update a specific plan
+            milestoneNamePrefix: configSetup.params.testrail.milestoneNamePrefix, // Default - 'Automation milestone week'
+            planNamePrefix: configSetup.params.testrail.planNamePrefix, // Default - 'Automation Test Plan'
+        }); // e.g. Chrome/Mozilla,
         jasmine.getEnv().addReporter(trReporter);
     },
     testRailSetupOnComplete: function () {

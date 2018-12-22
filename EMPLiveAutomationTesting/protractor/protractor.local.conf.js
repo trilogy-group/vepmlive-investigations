@@ -15,5 +15,4 @@ exports.config = {
     onPrepare: function () {
         reportersSetup.configureAllReporters();
     },
-    onComplete: reportersSetup.testRailSetupOnComplete
 };

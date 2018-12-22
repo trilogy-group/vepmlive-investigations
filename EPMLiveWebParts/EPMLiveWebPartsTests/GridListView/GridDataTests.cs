@@ -20,7 +20,7 @@ namespace EPMLiveWebParts.Tests
 {
     [TestClass]
     [ExcludeFromCodeCoverage]
-    public class GridDataTests
+    public partial class GridDataTests
     {
         private GridData testObject;
         private PrivateObject privateObject;
@@ -87,6 +87,17 @@ namespace EPMLiveWebParts.Tests
         private const string InternalNameColumn = "InternalName";
         private const string TrueStringLowerCase = "true";
         private const string IsHyperLinkColumn = "IsHyperLink";
+        private const string XmlDocFieldName = "_xmlDoc";
+        private const string GlobalIndexFieldName = "_globalIndex";
+        private const string ImagesHashTableFieldName = "_htImages";
+        private const string GanttMilestonePropertyName = "GanttMilestone";
+        private const string NameString = "name";
+        private const string PctCompletePropertyName = "PctComplete";
+        private const string GanttStartFieldName = "ganttStart";
+        private const string ViewUrlColumnName = "viewUrl";
+        private const string SiteUrlColumnName = "siteUrl";
+        private const string GanttFinishColumnName = "ganttFinish";
+        private const string CompleteThroughColumnName = "completeThrough";
         private const string GetListIDMethodName = "GetListID";
         private const string UsePopupMethodName = "UsePopup";
         private const string GetActionMethodName = "GetAction";
@@ -106,7 +117,23 @@ namespace EPMLiveWebParts.Tests
         private const string AddReqdFieldsToViewMethodName = "AddReqdFieldsToView";
         private const string RemoveReqdFieldsFromViewMethodName = "RemoveReqdFieldsFromView";
         private const string InitializeColumnDefsMethodName = "InitializeColumnDefs";
-        
+        private const string LoadDataMethodName = "LoadData";
+        private const string PopulateViewFieldValuesMethodName = "PopulateViewFieldValues";
+        private const string PopulateDefaultFieldValuesMethodName = "PopulateDefaultFieldValues";
+        private const string CalcPercentCompleteMethodName = "CalcPercentComplete";
+        private const string GetGanttStartDateMethodName = "GetGanttStartDate";
+        private const string GetGanttFinishDateMethodName = "GetGanttFinishDate";
+        private const string ApplyGanttStyleMethodName = "ApplyGanttStyle";
+        private const string ApplyGanttStylesMethodName = "ApplyGanttStyles";
+        private const string GetNodeByNameMethodName = "GetNodeByName";
+        private const string ProcessChildRowsMethodName = "ProcessChildRows";
+        private const string IsHyperLinkMethodName = "IsHyperLink";
+        private const string InitViewFieldNamesMethodName = "InitViewFieldNames";
+        private const string RemoveNonViewFieldsMethodName = "RemoveNonViewFields";
+        private const string GetTaskIdMethodName = "GetTaskId";
+        private const string GetLinkTypeMethodName = "GetLinkType";
+        private const string GetPredecessorsMethodName = "GetPredecessors";
+
         [TestInitialize]
         public void Setup()
         {
@@ -123,7 +150,7 @@ namespace EPMLiveWebParts.Tests
         {
             shimsContext = ShimsContext.Create();
             SetupVariables();
-            
+
             ShimSPSite.ConstructorString = (_, __) => new ShimSPSite();
             ShimSPSite.ConstructorGuid = (_, __) => new ShimSPSite();
             ShimSPSite.AllInstances.AllWebsGet = _ => new ShimSPWebCollection();
@@ -1159,17 +1186,18 @@ namespace EPMLiveWebParts.Tests
         public void InitializeGanttStartAndFinish_WhenCalled_InitializesGanttStartAndFinish()
         {
             // Arrange
+            const string format = "yyyy-MM-dd HH:mm:ss";
             currentDateTime = currentDateTime.Date;
 
             var row = default(DataRow);
             var dataTable = new DataTable();
             var rows = new string[]
             {
-                currentDateTime.AddDays(-1).ToString(),
-                currentDateTime.AddDays(-2).ToString(),
-                currentDateTime.ToString(),
-                currentDateTime.AddDays(1).ToString(),
-                currentDateTime.AddDays(2).ToString()
+                currentDateTime.AddDays(-1).ToString(format),
+                currentDateTime.AddDays(-2).ToString(format),
+                currentDateTime.ToString(format),
+                currentDateTime.AddDays(1).ToString(format),
+                currentDateTime.AddDays(2).ToString(format)
             };
 
             dataTable.Columns.Add(DummyString);
@@ -1480,6 +1508,1490 @@ namespace EPMLiveWebParts.Tests
                 () => actual.Rows[0][IsHyperLinkColumn].ToString().ShouldBe(TrueStringLowerCase),
                 () => actual.Rows[0][IsImageColumn].ToString().ShouldBe(TrueStringLowerCase),
                 () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void LoadData_WhenCalled_ProcessesNodeData()
+        {
+            // Arrange
+            const string xmlString = @"
+                <Rows>
+                    <row/>
+                    <row/>
+                </Rows>";
+            var xmlDocument = new XmlDocument();
+            var parameters = new object[]
+            {
+                new DataTable()
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            ShimGridData.AllInstances.ProcessChildRowsXmlNodeDataTable = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.PopulateViewFieldValuesXmlNodeDataRow = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+            ShimGridData.AllInstances.PopulateDefaultFieldValuesXmlNodeDataRowDataTable = (_, _1, _2, _3) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty(XmlDocFieldName, nonPublicInstance, xmlDocument);
+            privateObject.SetFieldOrProperty(GlobalIndexFieldName, nonPublicInstance, One);
+
+            // Act
+            privateObject.Invoke(LoadDataMethodName, nonPublicInstance, parameters);
+            var actual = (DataTable)parameters[0];
+            var nodeData = (Hashtable)privateObject.GetFieldOrProperty(NodeDataFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Rows.Count.ShouldBe(2),
+                () => nodeData.Count.ShouldBe(2),
+                () => validations.ShouldBe(6));
+        }
+
+        [TestMethod]
+        public void PopulateViewFieldValues_WhenCalled_PopulatesViewFieldValues()
+        {
+            // Arrange
+            const string workspaceurlString = "workspaceurl";
+            var xmlString = $@"
+                <Fields>
+                    <cell></cell>
+                    <cell>Field1</cell>
+                    <cell>Field2</cell>
+                    <cell>{workspaceurlString}</cell>
+                    <cell>{DummyString}</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                workspaceurlString,
+                One.ToString(),
+                Two.ToString(),
+                Three.ToString(),
+                Four.ToString()
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(DisplayNameColumn);
+            dataTable.Columns.Add(IsImageColumn);
+            dataTable.Columns.Add(IsHyperLinkColumn);
+            dataTable.Columns.Add(workspaceurlString);
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            dataTable.Columns.Add(Four.ToString());
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = workspaceurlString;
+            row[IsImageColumn] = $"not{TrueStringLowerCase}";
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = One;
+            row[IsImageColumn] = $"not{TrueStringLowerCase}";
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Two;
+            row[IsImageColumn] = $"not{TrueStringLowerCase}";
+            row[IsHyperLinkColumn] = TrueStringLowerCase;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Three;
+            row[IsImageColumn] = TrueStringLowerCase;
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Four;
+            row[IsImageColumn] = TrueStringLowerCase;
+            row[IsHyperLinkColumn] = $"not{TrueStringLowerCase}";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+
+            var parameters = new object[]
+            {
+                xmlDocument.FirstChild,
+                row
+            };
+
+            privateObject.SetFieldOrProperty(ColumnDefinitionsFieldName, nonPublicInstance, dataTable);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+            privateObject.SetFieldOrProperty(ImagesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(PopulateViewFieldValuesMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[1];
+            var images = (List<string>)privateObject.GetFieldOrProperty(ImagesFieldName, nonPublicInstance);
+            var imagesHashTable = (Hashtable)privateObject.GetFieldOrProperty(ImagesHashTableFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[fieldNames[0]].ToString().ShouldBe(string.Empty),
+                () => actual[fieldNames[1]].ToString().ShouldBe("Field1"),
+                () => actual[fieldNames[2]].ToString().ShouldBe("Field2"),
+                () => actual[fieldNames[3]].ToString().ShouldBe("0"),
+                () => actual[fieldNames[4]].ToString().ShouldBe("5"),
+                () => images.Count.ShouldBe(6),
+                () => images[5].ShouldBe(DummyString),
+                () => imagesHashTable.Count.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void PopulateDefaultFieldValues_WhenCalled_PopulatesDefaultFieldValues()
+        {
+            // Arrange
+            var xmlString = $@"
+                <Fields id=""{Five}"">
+                    <userdata name=""{One}"">{guid}</userdata>
+                    <userdata name=""{Two}"">{Two}</userdata>
+                    <userdata name=""{Three}"">{DummyString}</userdata>
+                    <userdata name=""{Four}""></userdata>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(DisplayNameColumn);
+            dataTable.Columns.Add(ColumnTypeColumn);
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add(ViewUrlColumnName);
+            dataTable.Columns.Add(SiteUrlColumnName);
+            dataTable.Columns.Add(RowIdString);
+            dataTable.Columns.Add(GanttStartFieldName);
+            dataTable.Columns.Add(GanttFinishColumnName);
+            dataTable.Columns.Add(CompleteThroughColumnName);
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            dataTable.Columns.Add(Four.ToString());
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = One;
+            row[ColumnTypeColumn] = "guid";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Two;
+            row[ColumnTypeColumn] = "int";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Three;
+            row[ColumnTypeColumn] = "string";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[DisplayNameColumn] = Four;
+            row[ColumnTypeColumn] = "datetime";
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+
+            spView.UrlGet = () => SampleUrl;
+            spSite.UrlGet = () => SampleUrl;
+
+            ShimGridData.AllInstances.GetGanttStartDateXmlNode = (_, __) =>
+            {
+                validations += 1;
+                return currentDateTime;
+            };
+            ShimGridData.AllInstances.GetGanttFinishDateXmlNode = (_, __) =>
+            {
+                validations += 1;
+                return currentDateTime;
+            };
+            ShimGridData.AllInstances.CalcPercentCompleteDataRow = (_, __) =>
+            {
+                validations += 1;
+                return currentDateTime;
+            };
+            ShimGridData.AllInstances.ApplyGanttStyleDataRowXmlNode = (_, input, _2) =>
+            {
+                validations += 1;
+            };
+
+            var parameters = new object[]
+            {
+                xmlDocument.FirstChild,
+                row,
+                default(DataTable)
+            };
+
+            privateObject.SetFieldOrProperty(SPViewFieldName, nonPublicInstance, spView.Instance);
+            privateObject.SetFieldOrProperty(ColumnDefinitionsFieldName, nonPublicInstance, dataTable);
+
+            // Act
+            privateObject.Invoke(PopulateDefaultFieldValuesMethodName, nonPublicInstance, parameters);
+            var actual = ((DataRow)parameters[1]);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[One.ToString()].ToString().ShouldBe($"{guid}"),
+                () => actual[Two.ToString()].ToString().ShouldBe($"{Two}"),
+                () => actual[Three.ToString()].ToString().ShouldBe(DummyString),
+                () => actual[GanttStartFieldName].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual[GanttFinishColumnName].ToString().ShouldBe($"{currentDateTime}"),
+                () => actual[CompleteThroughColumnName].ToString().ShouldBe($"{currentDateTime}"),
+                () => validations.ShouldBe(7));
+        }
+
+        [TestMethod]
+        public void CalcPercentComplete_WhenCalled_ReturnsCompleteThruDateTime()
+        {
+            // Arrange
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add(PctCompletePropertyName);
+            dataTable.Columns.Add(GanttStartFieldPropertyName);
+            dataTable.Columns.Add(GanttFinishFieldPropertyName);
+            row = dataTable.NewRow();
+            row[PctCompletePropertyName] = One;
+            row[GanttStartFieldPropertyName] = currentDateTime.Date;
+            row[GanttFinishFieldPropertyName] = currentDateTime.Date.AddDays(100);
+
+            var parameters = new object[]
+            {
+                row
+            };
+
+            spFieldCollection.GetFieldString = input =>
+            {
+                spField.TitleGet = () => input;
+                return spField;
+            };
+
+            privateObject.SetFieldOrProperty(PctCompletePropertyName, publicInstance, PctCompletePropertyName);
+            privateObject.SetFieldOrProperty(GanttStartFieldPropertyName, publicInstance, GanttStartFieldPropertyName);
+            privateObject.SetFieldOrProperty(GanttFinishFieldPropertyName, publicInstance, GanttFinishFieldPropertyName);
+
+            // Act
+            var actual = (DateTime)privateObject.Invoke(CalcPercentCompleteMethodName, nonPublicInstance, parameters);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBe(currentDateTime.Date.AddDays(100)),
+                () => ((DataRow)parameters[0])[PctCompletePropertyName].ToString().ShouldBe("100"));
+        }
+
+        [TestMethod]
+        public void GetGanttStartDate_WhenCalled_ReturnsGanttStartDate()
+        {
+            // Arrange
+            var xmlString = $@"
+                <Fields>
+                    <cell>{DummyString}</cell>
+                    <cell>{currentDateTime.Date}</cell>
+                    <cell>{One}</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var fieldNames = new List<string>()
+            {
+                Zero.ToString(),
+                DummyString,
+                One.ToString(),
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (DateTime)privateObject.Invoke(
+                GetGanttStartDateMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    xmlDocument.FirstChild
+                });
+
+            // Assert
+            actual.ShouldBe(currentDateTime.Date);
+        }
+
+        [TestMethod]
+        public void GetGanttFinishDate_WhenCalled_ReturnsGanttStartDate()
+        {
+            // Arrange
+            var xmlString = $@"
+                <Fields>
+                    <cell>{DummyString}</cell>
+                    <cell>{currentDateTime.Date}</cell>
+                    <cell>{One}</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var fieldNames = new List<string>()
+            {
+                Zero.ToString(),
+                DummyString,
+                One.ToString(),
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            var actual = (DateTime)privateObject.Invoke(
+                GetGanttFinishDateMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    xmlDocument.FirstChild
+                });
+
+            // Assert
+            actual.ShouldBe(currentDateTime.Date);
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseOne_AppliesGroupHeaderStyle()
+        {
+            // Arrange
+            const string expectedStyle = "groupheader";
+            const string expected = "H1";
+            const string xmlString = @"
+                <Fields style=""font-weight:bold;"">
+                    <cell>1</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = string.Empty;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(expected),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseTwo_AppliesCriticalSummaryStyle()
+        {
+            // Arrange
+            const string expectedStyle = "critical summary";
+            const string expected = "H1";
+            const string xmlString = @"
+                <Fields style=""font-weight:bold;"">
+                    <cell>yes</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(expected),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseThree_AppliesSummaryStyle()
+        {
+            // Arrange
+            const string expectedStyle = "summary";
+            const string expected = "H1";
+            const string xmlString = @"
+                <Fields style=""font-weight:bold;"">
+                    <cell>no</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(expected),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseFour_AppliesCriticalStyle()
+        {
+            // Arrange
+            const string expectedStyle = "critical";
+            const string xmlString = @"
+                <Fields style=""none"">
+                    <cell>yes</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            row[GridSerializer.DefaultGridRowStyleIdColumnName] = DummyString;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyle_CaseFive_AppliesStandardStyle()
+        {
+            // Arrange
+            const string expectedStyle = "standard";
+            const string xmlString = @"
+                <Fields style=""none"">
+                    <cell>no</cell>
+                </Fields>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var fieldNames = new List<string>()
+            {
+                "Critical"
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[IDStringCaps] = One;
+            row[GridSerializer.DefaultGridRowStyleIdColumnName] = DummyString;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                xmlDocument.FirstChild
+            };
+
+            ShimGridData.AllInstances.ApplyGanttStylesDataRowString = (_, _1, input) =>
+            {
+                if (input.Equals(expectedStyle))
+                {
+                    validations += 1;
+                }
+            };
+
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStyleMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual[GridSerializer.DefaultGridRowStyleIdColumnName].ShouldBe(DummyString),
+                () => validations.ShouldBe(1));
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypeGroupHeader_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "groupheader";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_Typesummary_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "summary";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypestandardMilestoneTrue_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "standard";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypestandardMilestoneFalse_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "no";
+            const string type = "standard";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypecriticalMilestoneTrue_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "critical";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_TypecriticalMilestoneFalse_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "no";
+            const string type = "critical";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplyGanttStyles_Typecriticalsummary_ReturnsCustomBarStyleArray()
+        {
+            // Arrange
+            const string yesString = "yes";
+            const string type = "critical summary";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var expected = new GanttUtilities.CustomBarStyle[]
+            {
+                0
+            };
+
+            dataTable.Columns.Add(DummyString);
+            dataTable.Columns.Add(GridSerializer.DefaultGanttBarStyleIdsColumnName);
+            row = dataTable.NewRow();
+            row[DummyString] = yesString;
+            row[GridSerializer.DefaultGanttBarStyleIdsColumnName] = null;
+            dataTable.Rows.Add(row);
+
+            var parameters = new object[]
+            {
+                row,
+                type
+            };
+
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            privateObject.SetFieldOrProperty(GanttMilestonePropertyName, publicInstance, DummyString);
+
+            // Act
+            privateObject.Invoke(ApplyGanttStylesMethodName, publicInstance, parameters);
+            var actual = ((DataRow)parameters[0])[GridSerializer.DefaultGanttBarStyleIdsColumnName];
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [TestMethod]
+        public void GetNodeByName_WhenCalled_ReturnsMatchingNode()
+        {
+            // Arrange
+            const string name = "NodeName";
+            var xmlString = $@"
+                <nodes>
+                    <node name=""{name}"" {DummyString}=""{DummyString}""/>
+                    <node name=""{DummyString}"" {DummyString}=""""/>
+                </nodes>";
+            var xmlDocument = new XmlDocument();
+
+            xmlDocument.LoadXml(xmlString);
+
+            // Act
+            var actual = (XmlNode)privateObject.Invoke(
+                GetNodeByNameMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    name,
+                    xmlDocument.FirstChild.ChildNodes
+                });
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Attributes[NameString].Value.ShouldBe(name),
+                () => actual.Attributes[DummyString].Value.ShouldBe(DummyString));
+        }
+
+        [TestMethod]
+        public void ProcessChildRows_WhenCalled_ProcessesNodes()
+        {
+            // Arrange
+            const string xmlString = @"
+                <rows>
+                    <row name=""1""/>
+                    <row name=""2""/>
+                    <row name=""3""/>
+                </rows>";
+            var xmlDocument = new XmlDocument();
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            xmlDocument.LoadXml(xmlString);
+            dataTable.Columns.Add(GridSerializer.DefaultGridRowStyleIdColumnName);
+            row = dataTable.NewRow();
+            row[GridSerializer.DefaultGridRowStyleIdColumnName] = "H1";
+            dataTable.Rows.Add(row);
+
+            ShimGridData.AllInstances.ProcessNodeXmlNodeDataTable = (_, _1, _2) =>
+            {
+                validations += 1;
+            };
+
+            privateObject.SetFieldOrProperty(GlobalIndexFieldName, nonPublicInstance, Zero);
+
+            // Act
+            privateObject.Invoke(
+                ProcessChildRowsMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    xmlDocument.FirstChild,
+                    dataTable
+                });
+            var globalIndex = (int)privateObject.GetFieldOrProperty(GlobalIndexFieldName, nonPublicInstance);
+            var nodeData = (Hashtable)privateObject.GetFieldOrProperty(NodeDataFieldName, nonPublicInstance);
+
+            // Assert
+            globalIndex.ShouldSatisfyAllConditions(
+                () => globalIndex.ShouldBe(3),
+                () => nodeData.Count.ShouldBe(3),
+                () => ((XmlNode)nodeData[One]).Attributes[NameString].Value.ShouldBe(One.ToString()),
+                () => ((XmlNode)nodeData[Two]).Attributes[NameString].Value.ShouldBe(Two.ToString()),
+                () => ((XmlNode)nodeData[Three]).Attributes[NameString].Value.ShouldBe(Three.ToString()),
+                () => validations.ShouldBe(Three));
+        }
+
+        [TestMethod]
+        public void IsHyperLink_FieldNameNotEdit_ChecksHyperlink()
+        {
+            // Arrange
+            var fieldsToTest = new Dictionary<string, string>()
+            {
+                ["linktitle"] = "LinkTitle",
+                ["linktitlenomenu"] = "LinkTitleNoMenu",
+                ["linktitleedit"] = "LinkTitleNoMenu",
+                ["workspaceurl"] = "WorkspaceUrl",
+                ["assignedto"] = "AssignedTo",
+            };
+            var fieldNames = new List<string>()
+            {
+                "master_checkbox2"
+            };
+            var isHyperLink = true;
+            var actual = true;
+            var check = string.Empty;
+            var viewFields = new StringCollection();
+            var index = 0;
+
+            viewFields.AddRange(fieldsToTest.Keys.ToArray());
+
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            foreach (var pair in fieldsToTest)
+            {
+                index += 1;
+                isHyperLink = isHyperLink && (bool)privateObject.Invoke(IsHyperLinkMethodName, nonPublicInstance, new object[] { DummyString, index });
+                check = (string)privateObject.GetFieldOrProperty(pair.Value, publicInstance);
+                actual = actual && check.Equals(DummyString);
+            }
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.ShouldBeTrue(),
+                () => isHyperLink.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void InitViewFieldNames_WhenCalled_InitializesFieldNames()
+        {
+            // Arrange
+            var xmlString = $@"
+                <columns>
+                    <column>{One}</column>
+                    <column>{DummyString}</column>
+                </columns>";
+            var xmlDocument = new XmlDocument();
+            var fieldNames = new List<string>()
+            {
+                One.ToString()
+            };
+            var expectedNames = new List<string>()
+            {
+                One.ToString(),
+                $"{One}|{Zero}",
+                DummyString
+            };
+
+            xmlDocument.LoadXml(xmlString);
+
+            privateObject.SetFieldOrProperty(XmlDocFieldName, nonPublicInstance, xmlDocument);
+            privateObject.SetFieldOrProperty(FieldNamesFieldName, nonPublicInstance, fieldNames);
+
+            // Act
+            privateObject.Invoke(InitViewFieldNamesMethodName, nonPublicInstance, new object[] { });
+            var actual = (List<string>)privateObject.GetFieldOrProperty(FieldNamesFieldName, nonPublicInstance);
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => actual.Count.ShouldBe(3),
+                () => expectedNames.Any(x => !actual.Contains(x)).ShouldBeFalse());
+        }
+
+        [TestMethod]
+        public void RemoveNonViewFields_WhenCalled_Returns()
+        {
+            // Arrange
+            const string title = "My Work";
+            const string orderByField = "orderByField";
+            var dataTable = new DataTable();
+            var viewFields = new StringCollection()
+            {
+                "linktitle",
+                DummyString
+            };
+            var groupByFields = new string[]
+            {
+                DummyString
+            };
+
+            foreach (var field in viewFields)
+            {
+                dataTable.Columns.Add(field);
+            }
+            dataTable.Columns.Add(One.ToString());
+            dataTable.Columns.Add(Two.ToString());
+            dataTable.Columns.Add(Three.ToString());
+            dataTable.Columns.Add(Four.ToString());
+            dataTable.Columns.Add(Five.ToString());
+            dataTable.Columns.Add(6.ToString());
+            dataTable.Columns.Add(7.ToString());
+            dataTable.Columns.Add(8.ToString());
+
+            spList.TitleGet = () => title;
+
+            ShimGridData.AllInstances.GetInternalNameString = (_, input) => input;
+            ShimGridData.AllInstances.GetDisplayNameString = (_, input) => input;
+
+            privateObject.SetFieldOrProperty(SPListFieldName, nonPublicInstance, spList.Instance);
+            privateObject.SetFieldOrProperty(SPViewFieldsFieldName, nonPublicInstance, viewFields);
+            privateObject.SetFieldOrProperty("GroupByFields", publicInstance, groupByFields);
+            privateObject.SetFieldOrProperty("OrderByField", publicInstance, orderByField);
+
+            // Act
+            var actual = (DataTable)privateObject.Invoke(RemoveNonViewFieldsMethodName, nonPublicInstance, new object[] { dataTable });
+
+            // Assert
+            actual.Columns.Count.ShouldBe(9);
+        }
+
+        [TestMethod]
+        public void GetTaskId_SFCharactersPresent_ReturnsTaskId()
+        {
+            // Arrange
+            var predecessorString = $"{Five}FS";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTaskIdMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(Five.ToString());
+        }
+
+        [TestMethod]
+        public void GetTaskId_PlusMinusCharactersPresent_ReturnsTaskId()
+        {
+            // Arrange
+            var predecessorString = $"{Five}+";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTaskIdMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(Five.ToString());
+        }
+
+        [TestMethod]
+        public void GetTaskId_CharactersNotPresent_ReturnsTaskId()
+        {
+            // Arrange
+            var predecessorString = $"{Five}zzzz";
+
+            // Act
+            var actual = (string)privateObject.Invoke(GetTaskIdMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(predecessorString);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeFS_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.FinishStart;
+            var predecessorString = $"{Five}zzzz";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeSS_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.StartStart;
+            var predecessorString = $"{Five}SS";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeSF_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.StartFinish;
+            var predecessorString = $"{Five}SF";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetLinkType_TypeFF_ReturnsLinkType()
+        {
+            // Arrange
+            const LinkType expected = LinkType.FinishFinish;
+            var predecessorString = $"{Five}FF";
+
+            // Act
+            var actual = (LinkType)privateObject.Invoke(GetLinkTypeMethodName, nonPublicInstance, new object[] { predecessorString });
+
+            // Assert
+            actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNotNullFieldsCollectionContainsProjectFalse_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rollupLists = new string[]
+            {
+                DummyString
+            };
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, rollupLists);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNotNullFieldsCollectionContainsProjectTrueAndProjectNotNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rollupLists = new string[]
+            {
+                DummyString
+            };
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, rollupLists);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNotNullFieldsCollectionContainsProjectTrueAndProjectNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+            var rollupLists = new string[]
+            {
+                DummyString
+            };
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = null;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = string.Empty;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, rollupLists);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNullFieldsCollectionContainsProjectFalse_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNullFieldsCollectionContainsProjectTrueAndProjectNotNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = DummyString;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
+        }
+
+        [TestMethod]
+        public void GetPredecessors_RollupListNullFieldsCollectionContainsProjectTrueAndProjectNull_GetsPredecessors()
+        {
+            // Arrange
+            const string predecessors = "1";
+            var row = default(DataRow);
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("Predecessors");
+            dataTable.Columns.Add("task id");
+            dataTable.Columns.Add("ListId");
+            dataTable.Columns.Add("Project");
+            dataTable.Columns.Add(KeyString);
+            dataTable.Columns.Add("DependencyType", typeof(Dependency[]));
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["task id"] = One;
+            row["ListId"] = Five;
+            row["Project"] = null;
+            row[KeyString] = DummyString;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row["Predecessors"] = predecessors;
+            row["ListId"] = Five;
+            row["Project"] = string.Empty;
+
+            var parameters = new object[]
+            {
+                row,
+                dataTable
+            };
+
+            spFieldCollection.ContainsFieldString = _ => false;
+
+            ShimGridData.AllInstances.GetTaskIdString = (_, __) => One.ToString();
+            ShimGridData.AllInstances.GetLinkTypeString = (_, __) => LinkType.StartFinish;
+
+            privateObject.SetFieldOrProperty("_rollupLists", nonPublicInstance, null);
+
+            // Act
+            privateObject.Invoke(GetPredecessorsMethodName, nonPublicInstance, parameters);
+            var actual = (DataRow)parameters[0];
+
+            // Assert
+            actual.ShouldSatisfyAllConditions(
+                () => ((Dependency[])actual["DependencyType"]).Length.ShouldBe(One),
+                () => ((Dependency[])actual["DependencyType"])[0].Key.ShouldBe(DummyString),
+                () => ((Dependency[])actual["DependencyType"])[0].Type.ShouldBe(LinkType.StartFinish));
         }
     }
 }

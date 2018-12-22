@@ -31,7 +31,7 @@ describe(SuiteNames.smokeTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927] [BUG:SKYVERA-1584]', async () => {
+    it('To Verify My Shared Documents Upload Functionality from Social Stream - [743927]', async () => {
         StepLogger.caseId = 743927;
 
         StepLogger.step('Click on +new document link under My Shared Documents on the right side bottom of the page');

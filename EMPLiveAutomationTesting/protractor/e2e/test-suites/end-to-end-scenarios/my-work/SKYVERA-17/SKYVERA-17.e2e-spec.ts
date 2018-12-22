@@ -69,9 +69,8 @@ describe(SuiteNames.endToEndSuite, () => {
         await MyWorkPageHelper.verifyExtraRowAdded();
 
         StepLogger.stepId(2);
-        const filterText = await MyWorkPageHelper.getFirstWorkType();
-        await MyWorkPageHelper.enterTextOnFilterFields(filterText);
-        await MyWorkPageHelper.verifySearchResults(filterText);
+        await MyWorkPageHelper.enterTextOnFilterFields(item);
+        await MyWorkPageHelper.verifySearchResults(item);
     });
 
     it('Clear sorting via Clear Sorting button. - [745115]', async () => {

@@ -8,22 +8,7 @@ namespace WorkEnginePPM.Layouts.ppm2
 {
     public partial class grouppermissionform : LayoutsPageBase
     {
-        protected string DialogTitle = "";
-        private int c_id = 0;
-        public int id
-        {
-            get { return c_id; }
-        }
-        private string c_name = "";
-        public string Name
-        {
-            get { return c_name; }
-        }
-        private string c_desc = "";
-        public string Desc
-        {
-            get { return c_desc; }
-        }
+        public BasicDialogProperties BasicDialogProperties { get; } = new BasicDialogProperties();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -36,24 +21,20 @@ namespace WorkEnginePPM.Layouts.ppm2
                     string m_sId = Request.QueryString["id"].ToString();
                     string m_sMode = Request.QueryString["mode"].ToString();
 
-                    //if (!PPM.WebAdmin.HasPagePermission("CustomFieldForm", m_sMode))
-                    //    HttpContext.Current.Response.Redirect("NoPermForm.aspx");
-
-                    //lblMode.Text = "Unknown Mode";
                     switch (m_sMode)
                     {
                         case "Add":
-                            DialogTitle = "Add a Permission Group";
+                            BasicDialogProperties.DialogTitle = "Add a Permission Group";
                             btnOK.Visible = true;
                             btnDelete.Visible = false;
                             break;
                         case "Modify":
-                            DialogTitle = "Modify a Permission Group";
+                            BasicDialogProperties.DialogTitle = "Modify a Permission Group";
                             btnOK.Visible = true;
                             btnDelete.Visible = false;
                             break;
                         case "Delete":
-                            DialogTitle = "Delete Permission Group";
+                            BasicDialogProperties.DialogTitle = "Delete Permission Group";
                             btnOK.Visible = false;
                             btnDelete.Visible = true;
                             txtName.Enabled = false;
@@ -254,7 +235,11 @@ namespace WorkEnginePPM.Layouts.ppm2
         protected void btnDelete_Click(object sender, EventArgs e)
         {
             DBAccess dba = null;
-            Int32.TryParse(txtId.Text, out c_id);
+            int id;
+            if (int.TryParse(txtId.Text, out id))
+            {
+                BasicDialogProperties.Id = id;
+            }
 
             string basePath = hiddenData.Value;
             string sDBConnect = WebAdmin.GetConnectionString(basePath);
@@ -288,9 +273,14 @@ namespace WorkEnginePPM.Layouts.ppm2
                 return;
             }
 
-            Int32.TryParse(txtId.Text, out c_id);
-            c_name = txtName.Text;
-            c_desc = txtDesc.Text;
+            int id;
+            if (int.TryParse(txtId.Text, out id))
+            {
+                BasicDialogProperties.Id = id;
+            }
+
+            BasicDialogProperties.Name = txtName.Text;
+            BasicDialogProperties.Desc = txtDesc.Text;
 
             //// Stick clicked permissions into collection
             //DataTable dtResult = treetable1.GetData();

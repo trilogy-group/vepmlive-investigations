@@ -852,18 +852,29 @@
                     $el.toolbarItemsAll.append(templates.toolbarItem(creatable));
                 };
 
-                var _handleCreationAction = function(result, target, listInfo) {
+                var _handleCreationAction = function (result, target, listInfo) {
+                    var svcUrl = "";
+                    if (listInfo.name == "Link") {
+                        svcUrl = _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbyid('" + listInfo.id + "')/Items?$select=ID,Title,Created,FileLeafRef,URL&$orderby=Created desc&$top=1";
+                    }
+                    else {
+                        svcUrl = _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbyid('" + listInfo.id + "')/Items?$select=ID,Title,Created,FileLeafRef&$orderby=Created desc&$top=1";
+                    }
                     if (result === 1) {
                         $.ajax({
-                            url: _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbyid('" + listInfo.id + "')/Items?$select=ID,Title,Created,FileLeafRef&$orderby=Created desc&$top=1",
+                            url: svcUrl,
                             type: 'GET',
                             headers: { accept: 'application/json;odata=verbose' },
-                        }).then(function(response) {
+                        }).then(function (response) {
                             if (!response || !response.d || !response.d.results || !response.d.results.length) return;
                             
                             var item = response.d.results[0];
 
                             var title = item.__metadata.type === 'SP.Data.DocumentsItem' ? item.FileLeafRef : item.Title;
+                            
+                            if (listInfo.name === "Link" && item.URL.Description != "") {
+                                title = item.URL.Description;
+                            }
 
                             //EPML-4329 : if title is null then assign it to file name
                             if (title == null || title == '') {

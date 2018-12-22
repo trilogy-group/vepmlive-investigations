@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
+using EPMLiveWebParts.WebPageCode;
 using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts
@@ -862,45 +863,7 @@ namespace EPMLiveWebParts
                             catch { }
                             if (newgroup == "")
                                 newgroup = " No " + field.Title;
-                            if (field.Type == SPFieldType.User || field.Type == SPFieldType.MultiChoice)
-                            {
-                                string[] sGroups = newgroup.Split('\n');
-                                string[] tmpGroups = new string[group.Length * sGroups.Length];
-
-                                //group = new string[sGroups.Length];
-                                int tmpCounter = 0;
-                                foreach (string g in group)
-                                {
-                                    foreach (string sGroup in sGroups)
-                                    {
-                                        if (g == null)
-                                            tmpGroups[tmpCounter] = sGroup.Trim();
-                                        else
-                                            tmpGroups[tmpCounter] = g + "\n" + sGroup.Trim();
-
-                                        if (!arrGTemp.Contains(tmpGroups[tmpCounter]))
-                                        {
-                                            arrGTemp.Add(tmpGroups[tmpCounter], "");
-                                        }
-                                        tmpCounter++;
-                                    }
-                                }
-                                group = tmpGroups;
-                            }
-                            else
-                            {
-                                for (int i = 0; i < group.Length; i++)
-                                {
-                                    if (group[i] == null)
-                                        group[i] = newgroup;
-                                    else
-                                        group[i] += "\n" + newgroup;
-                                    if (!arrGTemp.Contains(group[i]))
-                                    {
-                                        arrGTemp.Add(group[i], "");
-                                    }
-                                }
-                            }
+                            GroupHelper.ProcessTempGroups(arrGTemp, field, newgroup, ref group);
                             //}
 
                         }

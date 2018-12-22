@@ -14,9 +14,11 @@ using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
+using EPMLiveWebParts;
 using Microsoft.SharePoint;
 using TimeSheets.Log;
 using TimeSheets.Models;
+using TimeSheets.Properties;
 using CoreReportHelper = EPMLiveCore.ReportHelper;
 using EpmCoreFunctions = EPMLiveCore.CoreFunctions;
 using EpmWorkReportData = EPMLiveCore.ReportHelper.MyWorkReportData;
@@ -524,7 +526,7 @@ namespace TimeSheets
                             var bLocked = false;
                             var approval = 0;
                             using (var command = new SqlCommand(
-                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid", 
+                                "SELECT LOCKED,APPROVAL_STATUS FROM TSTIMESHEET where TS_UID=@tsuid",
                                 connection))
                             {
                                 command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -650,7 +652,7 @@ namespace TimeSheets
                                 }
                                 transaction.Commit();
                             }
-                            catch(Exception exception)
+                            catch (Exception exception)
                             {
                                 if (transaction != null)
                                 {
@@ -724,7 +726,7 @@ namespace TimeSheets
             Guid webGuid = Guid.Empty;
             Guid listGuid = Guid.Empty;
 
-            if(ds.Tables.Count > 0)
+            if (ds.Tables.Count > 0)
             {
                 try
                 {
@@ -753,19 +755,19 @@ namespace TimeSheets
 
                             listGuid = iList.ID;
                         }
-                        
+
                         try
                         {
                             // This will throw error if task is deleted
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
-                        catch(ArgumentException ex)
+                        catch (ArgumentException ex)
                         {
                             //The item is deleted and not found in SPList
                             Logger.WriteLog(Logger.Category.Unexpected, "Timesheet submission", ex.ToString());
                         }
-                        
+
                     }
                 }
                 finally
@@ -781,7 +783,7 @@ namespace TimeSheets
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-			
+
             timeSheetItems = GetTimeSheetItems(data, cn);
             qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn);
 
@@ -1162,12 +1164,12 @@ namespace TimeSheets
                 SqlConnection connection = null;
                 try
                 {
-					string connectionString = null;
+                    string connectionString = null;
 
-					SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-						connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id); 
-						connection = new SqlConnection(connectionString);
+                        connectionString = EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id);
+                        connection = new SqlConnection(connectionString);
                         connection.Open();
                     });
 
@@ -1205,7 +1207,24 @@ namespace TimeSheets
                             // [EPMLCID-9648] Begin: Checking if resource is allocating time to a project he/she is not member of
                             if (bool.Parse(EpmCoreFunctions.getConfigSetting(oWeb, "EPMLiveEnableNonTeamNotf")))
                             {
-                                CheckNonTeamMemberAllocation(oWeb, tsuid, connectionString, data);
+                                using (var command = new SqlCommand(
+                                 "DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=33",
+                                 connection))
+                                {
+                                    command.Parameters.AddWithValue("@tsuid", tsuid);
+                                    command.ExecuteNonQuery();
+                                }
+
+                                using (var command = new SqlCommand(
+                                   @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) 
+                              VALUES(@tsuid,0,33,@USERID,@JOBDATA)",
+                                   connection))
+                                {
+                                    command.Parameters.AddWithValue("@tsuid", tsuid);
+                                    command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                    command.Parameters.AddWithValue("@JOBDATA", data);
+                                    command.ExecuteNonQuery();
+                                }
                             }
 
                             using (var command = new SqlCommand(
@@ -1276,10 +1295,10 @@ namespace TimeSheets
                 try
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
-                        {
-                            connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
-                            connection.Open();
-                        });
+                    {
+                        connection = new SqlConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        connection.Open();
+                    });
 
                     var user = GetUser(oWeb, userid);
 
@@ -1287,7 +1306,7 @@ namespace TimeSheets
                         @"SELECT * FROM dbo.TSITEM 
                          INNER JOIN dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID 
                          INNER JOIN dbo.TSSW ON dbo.TSITEM.TS_ITEM_UID = dbo.TSSW.TSITEMUID 
-                         where USER_ID=@userid and site_uid=@siteid", 
+                         where USER_ID=@userid and site_uid=@siteid",
                         connection))
                     {
                         command.Parameters.AddWithValue("@userid", user.ID);
@@ -1701,7 +1720,7 @@ namespace TimeSheets
                 {
                     approvalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Trace.TraceError(exception.ToString());
                 }
@@ -1745,12 +1764,12 @@ namespace TimeSheets
                                         command.Parameters.AddWithValue("@notes", timesheetNode.InnerText);
                                         command.Parameters.AddWithValue("@status", approvalStatus);
 
-                                        command.ExecuteNonQuery(); 
+                                        command.ExecuteNonQuery();
                                     }
 
                                     if (!liveHours)
                                     {
-                                        using(var command = new SqlCommand(
+                                        using (var command = new SqlCommand(
                                             "SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30",
                                             connection))
                                         {
@@ -1775,7 +1794,7 @@ namespace TimeSheets
                                                 command.ExecuteNonQuery();
                                             }
 
-                                            using (var command = 
+                                            using (var command =
                                                 new SqlCommand(
                                                     "INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)",
                                                     connection))
@@ -2125,7 +2144,7 @@ namespace TimeSheets
 
                         if (starts.Count > 0)
                         {
-                            nodeRDef.Attributes["CalcOrder"].Value = 
+                            nodeRDef.Attributes["CalcOrder"].Value =
                                 string.Concat(nodeRDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
                             nodeGroupDef.Attributes["CalcOrder"].Value =
                                 string.Concat(nodeGroupDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
@@ -2494,95 +2513,12 @@ namespace TimeSheets
 
         private static string getFormat(SPField oField, XmlDocument oDoc, SPWeb oWeb)
         {
-            string format = "";
-
-            switch (oField.Type)
-            {
-                case SPFieldType.DateTime:
-                    try
-                    {
-
-                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
-                        {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-                        }
-                        else
-                        {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
-                        }
-                    }
-                    catch { }
-                    break;
-                case SPFieldType.Number:
-                    if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
-                    {
-                        format = "0\\%;0\\%;0\\%";
-                    }
-                    else
-                    {
-                        int decCount = 0;
-                        string decimals = "";
-                        try
-                        {
-                            decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
-                        }
-                        catch { }
-
-                        for (int i = 0; i < decCount; i++)
-                        {
-                            decimals += "0";
-                        }
-
-                        if (decCount > 0)
-                            decimals = "." + decimals;
-
-                        format = ",0" + decimals;
-                        break;
-                    }
-                    break;
-                case SPFieldType.Currency:
-                    SPFieldCurrency c = (SPFieldCurrency)oField;
-                    System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
-                    format = nInfo.CurrencySymbol + nInfo.CurrencyGroupSeparator + "0" + nInfo.CurrencyDecimalSeparator + "00";
-                    break;
-                case SPFieldType.Calculated:
-                    switch (oDoc.FirstChild.Attributes["ResultType"].Value)
-                    {
-                        case "Currency":
-                            format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
-                            break;
-                        case "Number":
-                            if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
-                            {
-                                format = "0\\%;0\\%;0\\%";
-                            }
-                            else
-                            {
-                                int decCount = 0;
-                                string decimals = "";
-                                try
-                                {
-                                    decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
-                                }
-                                catch { }
-
-                                for (int i = 0; i < decCount; i++)
-                                {
-                                    decimals += "0";
-                                }
-
-                                if (decCount > 0)
-                                    decimals = "." + decimals;
-
-                                format = ",0" + decimals;
-                            }
-                            break;
-                    };
-                    break;
-
-            };
-
-            return format;
+            return FormatHelper.GetFormat(
+                oField,
+                oDoc,
+                oWeb,
+                nInfo => $"{nInfo.CurrencySymbol}{nInfo.CurrencyGroupSeparator}0{nInfo.CurrencyDecimalSeparator}00",
+                "0\\%;0\\%;0\\%");
         }
 
         private static void PopulateTimesheetGridLayout(SPWeb web, ref XmlDocument docLayout, TimesheetSettings settings, ref int MidWidth, Dictionary<string, string> viewInfo, bool isWork, string InputList)
@@ -3711,7 +3647,7 @@ namespace TimeSheets
                             }
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Trace.TraceError(exception.ToString());
                     }
@@ -3927,9 +3863,9 @@ namespace TimeSheets
 
                         if (dtTSItem != null)
                         {
-                            string project = Regex.Replace(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]), @"(\s+|@|&|'|\(|\)|<|>|#)", " ");
+                            string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
                             string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
-                            sql = string.Format(@"select '" + Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]) + "' SiteId,'" + Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]) + "' WebId,'" + Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]) + "' ListId," + Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]) + " ItemId,null WebUrl,null Commenters,null CommentersRead,null CommentCount,null WorkspaceUrl,null ID,null Title,null _UIVersionString,null Attachments,null ItemChildCountID,null ItemChildCountText,null FolderChildCountID,null FolderChildCountText,null AppAuthorID,null AppAuthorText,null AppEditorID,null AppEditorText," + projectID + " ProjectID, '" + project + "' ProjectText,null AssignedToID,null AssignedToText,null OwnerID,null OwnerText,null Status,null Priority,null Body,null ScheduleStatus,null PercentComplete,null Due,null StartDate,null ActualStart,null DueDate,null ActualFinish,null Work,null ActualWork,null RemainingWork,null TimesheetHours,null RemainingHours,null WorkPercentSpent,null WorkStatus,null taskorder,null TaskHierarchy,null Site,null DaysOverdue,null Complete,null Timesheet,0 IsAssignment,null ContentType,null Modified,null Created,null AuthorID,null AuthorText,null EditorID,null EditorText,'" + dtTSItem.Rows[0]["LIST"] + "' WorkType, null DataSource,'true' IsDeleted ");
+                            sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
                             myWorkDataTable = rptData.ExecuteSql(sql);
 
                             if (myWorkDataTable.Rows.Count > 0)
@@ -3947,6 +3883,7 @@ namespace TimeSheets
                                     }
                                     catch (Exception ex)
                                     {
+                                        dr[item.ColumnName] = DBNull.Value;
                                         Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
                                     }
                                 }
@@ -4121,7 +4058,7 @@ namespace TimeSheets
                             }
                         }
                     }
-                    catch(Exception exception)
+                    catch (Exception exception)
                     {
                         Logger.WriteLog(
                             Logger.Category.Unexpected,
@@ -4145,298 +4082,448 @@ namespace TimeSheets
 
         public static string GetWork(string data, SPWeb oWeb)
         {
-            XmlDocument docOut = new XmlDocument();
-            docOut.LoadXml(Properties.Resources.txtMyTimesheetWork_GridLayout);
-            var currenvyCultureInfo = new CultureInfo(1033);
+            var docOut = new XmlDocument();
+            docOut.LoadXml(Resources.txtMyTimesheetWork_GridLayout);
+            var currencyCultureInfo = new CultureInfo(1033);
 
             try
             {
-                XmlDocument docIn = new XmlDocument();
-                docIn.LoadXml(data);
+                bool otherWork;
+                DataSet dataSet;
+                ArrayList arrLookups;
+                string userId;
+                Dictionary<string, string> viewInfo;
+                TimesheetSettings settings;
+                int temp;
+                string searchText;
+                string searchField;
+                string TSID;
+                bool nonWork;
 
-                bool bOtherWork = false;
-                bool bNonWork = false;
-                string TSID = docIn.FirstChild.Attributes["TSID"].Value;
+                GetAttributes(
+                    data,
+                    oWeb,
+                    out nonWork,
+                    out TSID,
+                    out searchField,
+                    out searchText,
+                    out temp,
+                    out settings,
+                    out viewInfo,
+                    out userId,
+                    out arrLookups,
+                    out dataSet,
+                    docOut,
+                    out otherWork);
 
-                string SearchField = "";
+                SPSecurity.RunWithElevatedPrivileges(
+                    delegate
+                    {
+                        PopulateAction(
+                            oWeb,
+                            TSID,
+                            dataSet,
+                            nonWork,
+                            settings,
+                            viewInfo,
+                            arrLookups,
+                            ref docOut,
+                            ref temp,
+                            ref searchField,
+                            out userId);
+                    });
+
+                ProcessNode(
+                    oWeb,
+                    userId,
+                    docOut,
+                    otherWork,
+                    nonWork,
+                    settings,
+                    searchField,
+                    searchText,
+                    dataSet,
+                    arrLookups,
+                    currencyCultureInfo);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                docOut.LoadXml(Resources.txtMyTimesheetWork_GridLayout);
+
+                var nodeBod = docOut.SelectSingleNode("//B");
+
+                var nodeCol = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
+                var title = docOut.CreateAttribute("Title");
+                title.Value = "Data Error: " + ex.Message;
+                nodeCol.Attributes.Append(title);
+
+                nodeBod.AppendChild(nodeCol);
+            }
+
+            return docOut.OuterXml;
+        }
+
+        private static void PopulateAction(
+            SPWeb oWeb,
+            string TSID,
+            DataSet dataSet,
+            bool nonWork,
+            TimesheetSettings settings,
+            Dictionary<string, string> viewInfo,
+            ArrayList arrLookups,
+            ref XmlDocument docOut,
+            ref int temp,
+            ref string searchField,
+            out string userId)
+        {
+            userId = GetUserIdFromDb(oWeb, TSID, dataSet);
+            GetUserIdFromXml(oWeb, ref userId, docOut);
+
+            if (userId != string.Empty)
+            {
+                var inputList = "My Work";
+                if (nonWork)
+                {
+                    inputList = settings.NonWorkList;
+                }
+
+                using (var spSite = new SPSite(oWeb.Site.ID))
+                {
+                    using (var spWeb = spSite.OpenWeb(oWeb.ID))
+                    {
+                        var lWebGuid = EpmCoreFunctions.getLockedWeb(spWeb);
+                        PopulateTimeSheetLayout(lWebGuid, spWeb, spSite, ref docOut, settings, viewInfo, inputList, ref temp);
+                    }
+
+                    GetSearchField(spSite, ref searchField, arrLookups);
+                }
+            }
+        }
+
+        private static void ProcessNode(
+            SPWeb oWeb,
+            string userId,
+            XmlDocument docOut,
+            bool otherWork,
+            bool nonWork,
+            TimesheetSettings settings,
+            string searchField,
+            string searchText,
+            DataSet dataSet,
+            ArrayList arrLookups,
+            CultureInfo currencyCultureInfo)
+        {
+            if (userId != string.Empty)
+            {
+                var nodeBody = docOut.SelectSingleNode("//Body/B");
+
+                var work = GetWorkDT(oWeb, otherWork, nonWork, userId, settings, searchField, searchText);
+
+                foreach (DataRow dataRow in work.Rows)
+                {
+                    var ndRow = PopulateAttributes(oWeb, docOut, nonWork, dataRow, settings, dataSet);
+                    ProcessFeatures(work, arrLookups, docOut, dataRow, currencyCultureInfo, ndRow);
+                    nodeBody.AppendChild(ndRow);
+                }
+            }
+        }
+
+        private static void GetAttributes(
+            string data,
+            SPWeb oWeb,
+            out bool nonWork,
+            out string TSID,
+            out string searchField,
+            out string searchText,
+            out int temp,
+            out TimesheetSettings settings,
+            out Dictionary<string, string> viewInfo,
+            out string userId,
+            out ArrayList arrLookups,
+            out DataSet dataSet,
+            XmlDocument docOut,
+            out bool otherWork)
+        {
+            var docIn = new XmlDocument();
+            docIn.LoadXml(data);
+
+            TSID = docIn.FirstChild.Attributes["TSID"].Value;
+
+            searchField = string.Empty;
+            try
+            {
+                searchField = docIn.FirstChild.Attributes["SearchField"].Value;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            searchText = string.Empty;
+            try
+            {
+                searchText = HttpUtility.UrlDecode(docIn.FirstChild.Attributes["SearchText"].Value).Trim();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            bool.TryParse(docIn.FirstChild.Attributes["OtherWork"].Value, out otherWork);
+            bool.TryParse(docIn.FirstChild.Attributes["NonWork"].Value, out nonWork);
+
+            var nodeCfg = docOut.FirstChild.SelectSingleNode("//Cfg");
+            temp = 0;
+            settings = new TimesheetSettings(oWeb);
+            viewInfo = new Dictionary<string, string>();
+
+            var views = nonWork
+                ? GetNonWorkViews(oWeb)
+                : GetWorkViews(oWeb);
+
+            AddSorting(views, docOut, nodeCfg, ref viewInfo);
+
+            userId = string.Empty;
+            arrLookups = new ArrayList();
+            dataSet = new DataSet();
+        }
+
+        private static void AddSorting(ViewManager views, XmlDocument docOut, XmlNode ndCfg, ref Dictionary<string, string> viewInfo)
+        {
+            foreach (var key in views.Views)
+            {
                 try
                 {
-                    SearchField = docIn.FirstChild.Attributes["SearchField"].Value;
-                }
-                catch { }
-
-                string SearchText = "";
-                try
-                {
-                    SearchText = System.Web.HttpUtility.UrlDecode(docIn.FirstChild.Attributes["SearchText"].Value).Trim();
-                }
-                catch { }
-
-                try
-                {
-                    bOtherWork = bool.Parse(docIn.FirstChild.Attributes["OtherWork"].Value);
-                }
-                catch { }
-                try
-                {
-                    bNonWork = bool.Parse(docIn.FirstChild.Attributes["NonWork"].Value);
-                }
-                catch { }
-
-                XmlNode ndCfg = docOut.FirstChild.SelectSingleNode("//Cfg");
-
-                int temp = 0;
-
-                TimesheetSettings settings = new TimesheetSettings(oWeb);
-
-                Dictionary<string, string> viewInfo = new Dictionary<string, string>();
-
-                ViewManager views = null;
-
-                if (bNonWork)
-                {
-                    views = GetNonWorkViews(oWeb);
-                }
-                else
-                {
-                    views = GetWorkViews(oWeb);
-                }
-
-                foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
-                {
-                    try
+                    if (string.Equals(key.Value["Default"], "true", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (key.Value["Default"].ToLower() == "true")
+                        var attribute = docOut.CreateAttribute("Group");
+                        attribute.Value = key.Value["Group"];
+                        ndCfg.Attributes.Append(attribute);
+
+                        attribute = docOut.CreateAttribute("Sort");
+                        attribute.Value = key.Value["Sort"];
+                        ndCfg.Attributes.Append(attribute);
+
+                        viewInfo = key.Value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+        }
+
+        private static string GetUserIdFromDb(SPWeb oWeb, string TSID, DataSet dataSet)
+        {
+            var userId = string.Empty;
+            using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
+            {
+                using (var command = new SqlCommand(
+                    "SELECT USER_ID, PERIOD_ID FROM dbo.TSTIMESHEET "
+                    + "INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID where TS_UID=@uid",
+                    connection))
+                {
+                    command.Parameters.AddWithValue("@uid", TSID);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
                         {
-                            XmlAttribute attr = docOut.CreateAttribute("Group");
-                            attr.Value = key.Value["Group"];
-                            ndCfg.Attributes.Append(attr);
-
-                            attr = docOut.CreateAttribute("Sort");
-                            attr.Value = key.Value["Sort"];
-                            ndCfg.Attributes.Append(attr);
-
-                            viewInfo = key.Value;
+                            userId = reader.GetInt32(0).ToString();
                         }
                     }
-                    catch { }
                 }
 
-                string sUser = "";
+                FillTimesheetItemsDataset(TSID, dataSet, connection);
+            }
+            return userId;
+        }
 
-                ArrayList arrLookups = new ArrayList();
+        private static void GetUserIdFromXml(SPWeb oWeb, ref string userId, XmlDocument docOut)
+        {
+            if (userId == string.Empty)
+            {
+                docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>");
+            }
+            else
+            {
+                var user = GetUser(oWeb, userId);
 
-                DataSet dsCur = new DataSet();
-
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                if (!string.Equals(user.ID.ToString(), userId, StringComparison.Ordinal))
                 {
-                    using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
+                    userId = string.Empty;
+                    docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"User mismatch or access denied\"/></Grid>");
+                }
+            }
+        }
+
+        private static void PopulateTimeSheetLayout(
+            Guid lWebGuid,
+            SPWeb spWeb,
+            SPSite spSite,
+            ref XmlDocument docOut,
+            TimesheetSettings settings,
+            Dictionary<string, string> viewInfo,
+            string inputList,
+            ref int temp)
+        {
+            if (lWebGuid != spWeb.ID)
+            {
+                using (var web = spSite.OpenWeb(lWebGuid))
+                {
+                    PopulateTimesheetGridLayout(web, ref docOut, settings, ref temp, viewInfo, true, inputList);
+                }
+            }
+            else
+            {
+                PopulateTimesheetGridLayout(spWeb, ref docOut, settings, ref temp, viewInfo, true, inputList);
+            }
+        }
+
+        private static void GetSearchField(SPSite spSite, ref string searchField, ArrayList arrLookups)
+        {
+            try
+            {
+                var lstMyWork = spSite.RootWeb.Lists.TryGetList("My Work");
+
+                if (lstMyWork != null)
+                {
+                    var searchFieldStringBuilder = new StringBuilder(searchField);
+                    foreach (SPField field in lstMyWork.Fields)
                     {
-                        using (var command = new SqlCommand(
-                            "SELECT USER_ID, PERIOD_ID FROM dbo.TSTIMESHEET " +
-                            "INNER JOIN dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID where TS_UID=@uid",
-                            connection))
+                        if (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User)
                         {
-                            command.Parameters.AddWithValue("@uid", TSID);
-                            using (var reader = command.ExecuteReader())
+                            if (field.InternalName == searchField)
                             {
-                                if (reader.Read())
-                                {
-                                    sUser = reader.GetInt32(0).ToString();
-                                }
-                            }
-                        }
-
-                        FillTimesheetItemsDataset(TSID, dsCur, connection);
-                    }
-
-                    if (sUser == "")
-                    {
-                        sUser = "";
-                        docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"Could not determine user\"/></Grid>");
-                    }
-                    else
-                    {
-                        SPUser user = GetUser(oWeb, sUser);
-
-                        if (user.ID.ToString() != sUser)
-                        {
-                            sUser = "";
-                            docOut.LoadXml("<Grid><IO Result=\"-1\" Message=\"User mismatch or access denied\"/></Grid>");
-                        }
-                    }
-
-
-                    if (sUser != "")
-                    {
-                        string InputList = "My Work";
-                        if (bNonWork)
-                            InputList = settings.NonWorkList;
-
-                        using (SPSite rsite = new SPSite(oWeb.Site.ID))
-                        {
-                            using (SPWeb rweb = rsite.OpenWeb(oWeb.ID))
-                            {
-                                Guid lWebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
-                                if (lWebGuid != rweb.ID)
-                                {
-                                    using (SPWeb lweb = rsite.OpenWeb(lWebGuid))
-                                    {
-                                        PopulateTimesheetGridLayout(lweb, ref docOut, settings, ref temp, viewInfo, true, InputList);
-                                    }
-                                }
-                                else
-                                {
-                                    PopulateTimesheetGridLayout(rweb, ref docOut, settings, ref temp, viewInfo, true, InputList);
-                                }
+                                searchFieldStringBuilder.Append("Text");
                             }
 
-                            try
-                            {
-                                SPList lstMyWork = rsite.RootWeb.Lists.TryGetList("My Work");
-
-                                if (lstMyWork != null)
-                                {
-                                    foreach (SPField field in lstMyWork.Fields)
-                                    {
-                                        if (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User)
-                                        {
-                                            if (field.InternalName == SearchField)
-                                                SearchField += "Text";
-
-                                            arrLookups.Add(field.InternalName + "Text");
-
-                                        }
-                                    }
-                                }
-                            }
-                            catch { }
+                            arrLookups.Add(string.Format("{0}Text", field.InternalName));
                         }
                     }
-                });
-
-                if (sUser != "")
-                {
-                    XmlNode ndBody = docOut.SelectSingleNode("//Body/B");
-
-                    DataTable work = GetWorkDT(oWeb, bOtherWork, bNonWork, sUser, settings, SearchField, SearchText);
-
-                    foreach (DataRow dr in work.Rows)
-                    {
-
-                        XmlNode ndRow = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
-
-                        XmlAttribute attr = docOut.CreateAttribute("WorkTypeField");
-
-                        if (!bNonWork)
-                            attr.Value = dr["WorkType"].ToString();
-                        else
-                            attr.Value = settings.NonWorkList;
-
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("UID");
-                        attr.Value = Guid.NewGuid().ToString();
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("Title");
-                        attr.Value = dr["Title"].ToString();
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("SiteID");
-                        attr.Value = oWeb.Site.ID.ToString();
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("WebID");
-                        attr.Value = dr["WebID"].ToString();
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("ListID");
-                        attr.Value = dr["ListID"].ToString();
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("ItemID");
-                        attr.Value = dr["ItemID"].ToString();
-                        ndRow.Attributes.Append(attr);
-
-
-
-                        attr = docOut.CreateAttribute("TSEnabled");
-                        attr.Value = "1";
-                        ndRow.Attributes.Append(attr);
-
-                        attr = docOut.CreateAttribute("ItemTypeID");
-                        if (bNonWork)
-                            attr.Value = "2";
-                        else
-                            attr.Value = "1";
-                        ndRow.Attributes.Append(attr);
-
-                        DataRow[] drCurrent = dsCur.Tables[0].Select("LIST_UID='" + dr["listid"].ToString() + "' and ITEM_ID='" + dr["itemid"].ToString() + "'");
-                        if (drCurrent.Length > 0)
-                        {
-                            attr = docOut.CreateAttribute("Current");
-                            attr.Value = "1";
-                            ndRow.Attributes.Append(attr);
-                        }
-
-                        foreach (DataColumn dc in work.Columns)
-                        {
-                            string GoodFieldname = dc.ColumnName;
-
-                            if (GoodFieldname.EndsWith("Type"))
-                                GoodFieldname += GoodFieldname;
-
-                            if (arrLookups.Contains(GoodFieldname))
-                            {
-                                GoodFieldname = GoodFieldname.Substring(0, GoodFieldname.Length - 4);
-                            }
-
-                            if (isValidMyWorkColumn(GoodFieldname))
-                            {
-                                attr = docOut.CreateAttribute(GoodFieldname);
-                                if (GoodFieldname == "PercentComplete" && dr[dc.ColumnName] != DBNull.Value)
-                                {
-                                    attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]) * 100, currenvyCultureInfo.NumberFormat);
-                                }
-                                else
-                                {
-                                    if (dc.DataType == typeof(Double) && dr[dc.ColumnName] != DBNull.Value)
-                                    {
-                                        attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]), currenvyCultureInfo.NumberFormat);
-                                    }
-                                    else if (dc.DataType == typeof(DateTime) && !String.IsNullOrEmpty(Convert.ToString(dr[dc.ColumnName])))
-                                    {
-                                        attr.Value = DateTime.Parse(Convert.ToString(dr[dc.ColumnName])).ToString("u");
-                                    }
-                                    else
-                                    {
-                                        attr.Value = Convert.ToString(dr[dc.ColumnName]);
-                                    }
-                                }
-                                ndRow.Attributes.Append(attr);
-                            }
-                        }
-
-                        ndBody.AppendChild(ndRow);
-                    }
+                    searchField = searchFieldStringBuilder.ToString();
                 }
             }
             catch (Exception ex)
             {
-                docOut.LoadXml(Properties.Resources.txtMyTimesheetWork_GridLayout);
-
-                XmlNode ndBod = docOut.SelectSingleNode("//B");
-
-                XmlNode ndCol = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
-                XmlAttribute attr1 = docOut.CreateAttribute("Title");
-                attr1.Value = "Data Error: " + ex.Message;
-                ndCol.Attributes.Append(attr1);
-
-                ndBod.AppendChild(ndCol);
+                Trace.TraceError("Exception Suppressed {0}", ex);
             }
+        }
 
-            return docOut.OuterXml;
+        private static XmlNode PopulateAttributes(
+            SPWeb oWeb,
+            XmlDocument docOut,
+            bool nonWork,
+            DataRow dataRow,
+            TimesheetSettings settings,
+            DataSet dataSet)
+        {
+            var ndRow = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
+
+            var attribute = docOut.CreateAttribute("WorkTypeField");
+
+            attribute.Value = !nonWork
+                ? dataRow["WorkType"].ToString()
+                : settings.NonWorkList;
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("UID");
+            attribute.Value = Guid.NewGuid().ToString();
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("Title");
+            attribute.Value = dataRow["Title"].ToString();
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("SiteID");
+            attribute.Value = oWeb.Site.ID.ToString();
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("WebID");
+            attribute.Value = dataRow["WebID"].ToString();
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("ListID");
+            attribute.Value = dataRow["ListID"].ToString();
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("ItemID");
+            attribute.Value = dataRow["ItemID"].ToString();
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("TSEnabled");
+            attribute.Value = "1";
+            ndRow.Attributes.Append(attribute);
+
+            attribute = docOut.CreateAttribute("ItemTypeID");
+            attribute.Value = nonWork
+                ? "2"
+                : "1";
+            ndRow.Attributes.Append(attribute);
+
+            var drCurrent = dataSet.Tables[0]
+                .Select("LIST_UID='" + dataRow["listid"] + "' and ITEM_ID='" + dataRow["itemid"] + "'");
+            if (drCurrent.Length > 0)
+            {
+                attribute = docOut.CreateAttribute("Current");
+                attribute.Value = "1";
+                ndRow.Attributes.Append(attribute);
+            }
+            return ndRow;
+        }
+
+        private static void ProcessFeatures(
+            DataTable work,
+            ArrayList arrLookups,
+            XmlDocument docOut,
+            DataRow dataRow,
+            CultureInfo currencyCultureInfo,
+            XmlNode ndRow)
+        {
+            XmlAttribute attribute;
+            foreach (DataColumn dataColumn in work.Columns)
+            {
+                var goodFieldName = dataColumn.ColumnName;
+
+                if (goodFieldName.EndsWith("Type"))
+                {
+                    goodFieldName += goodFieldName;
+                }
+
+                if (arrLookups.Contains(goodFieldName))
+                {
+                    goodFieldName = goodFieldName.Substring(0, goodFieldName.Length - 4);
+                }
+
+                if (isValidMyWorkColumn(goodFieldName))
+                {
+                    attribute = docOut.CreateAttribute(goodFieldName);
+                    if (goodFieldName == "PercentComplete" && dataRow[dataColumn.ColumnName] != DBNull.Value)
+                    {
+                        attribute.Value = Convert.ToString(
+                            Convert.ToDouble(dataRow[dataColumn.ColumnName]) * 100,
+                            currencyCultureInfo.NumberFormat);
+                    }
+                    else
+                    {
+                        if (dataColumn.DataType == typeof(double) && dataRow[dataColumn.ColumnName] != DBNull.Value)
+                        {
+                            attribute.Value = Convert.ToString(
+                                Convert.ToDouble(dataRow[dataColumn.ColumnName]),
+                                currencyCultureInfo.NumberFormat);
+                        }
+                        else
+                        {
+                            attribute.Value = dataColumn.DataType == typeof(DateTime)
+                                && !string.IsNullOrWhiteSpace(Convert.ToString(dataRow[dataColumn.ColumnName]))
+                                    ? DateTime.Parse(Convert.ToString(dataRow[dataColumn.ColumnName])).ToString("u")
+                                    : Convert.ToString(dataRow[dataColumn.ColumnName]);
+                        }
+                    }
+                    ndRow.Attributes.Append(attribute);
+                }
+            }
         }
 
         private static void FillTimesheetItemsDataset(string id, DataSet dataSet, SqlConnection connection)

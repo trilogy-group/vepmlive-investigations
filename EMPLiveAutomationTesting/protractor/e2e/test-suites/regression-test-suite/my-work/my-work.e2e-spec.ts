@@ -38,7 +38,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Verify that View should be saved - [744288]', async () => {
+    it('Verify that View should be saved - [744288][BUG:SKYVERA-2366]', async () => {
         StepLogger.caseId = 744288;
         // Step 1 and Step 2 are inside below function
         StepLogger.stepId(1);
@@ -72,7 +72,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await LoginPageHelper.logout();
     });
 
-    it('Verify that View should be renamed - [744291]', async () => {
+    it('Verify that View should be renamed - [744291][BUG:SKYVERA-2366]', async () => {
         StepLogger.caseId = 744291;
         // Step 1 are inside below function
         StepLogger.stepId(1);
@@ -109,7 +109,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             MyWorkPageConstants.currentView, viewNewName);
     });
 
-    it('Message while renaming the default view - [744293]', async () => {
+    it('Message while renaming the default view - [744293][BUG:SKYVERA-2366]', async () => {
         StepLogger.caseId = 744293;
         // preConditions are inside below function
         StepLogger.step('preCondition - click on My Workplace>> Click on My Work >> Views tab');

@@ -225,6 +225,7 @@
     <Compile Include="API\Template\Template.cs" />
     <Compile Include="API\Timer.cs" />
     <Compile Include="API\ViewManager.cs" />
+    <Compile Include="API\WebInitHelper.cs" />
     <Compile Include="API\WorkspaceCenter\WorkspaceCenter.cs" />
     <Compile Include="AppNavFixUp.cs" />
     <Compile Include="AppSettingsHelper.cs" />
@@ -249,12 +250,17 @@
     </Compile>
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="Helpers\Guard.cs" />
+    <Compile Include="Infrastructure\ResourceManagement\ReportXmlBuilder.cs" />
+    <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\WebServicesHelper.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\703Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\702Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\701Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
+    <Compile Include="JsonUtilHelper.cs" />
     <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
     <Compile Include="Layouts\epmlive\XmlDataSimplifier.cs" />
+    <Compile Include="Layouts\epmlive\WebSettingsAdditionalInfo.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
     <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />

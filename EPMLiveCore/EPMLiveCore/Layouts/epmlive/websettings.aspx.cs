@@ -3,339 +3,243 @@ using System.Data.SqlClient;
 using System.Web;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
+using SysTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
     public partial class websettings : LayoutsPageBase
     {
-        protected string strSiteUrl;
-        protected string strCurrentTemplate;
+        protected string SiteUrl { get; set; }
+        protected string CurrentTemplate { get; set; }
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                SPWeb web = SPContext.Current.Web;
+                var web = SPContext.Current.Web;
+                lblSiteId.Text = web.Site.ID.ToString();
+                lblWebId.Text = web.ID.ToString();
+                AddMasterPages(web);
+
+                chkDisablePublishing.Checked = CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing") == bool.TrueString
+                    ? true
+                    : false;
+                TrySetCheckedProperty(web, chkDisablePlanners, "EPMLiveDisablePlanners");
+                TrySetCheckedProperty(web, chkDisableContextualSlideouts, "EPMLiveDisableContextualSlideouts");
+
+                try
                 {
-                    lblSiteId.Text = web.Site.ID.ToString();
-                    lblWebId.Text = web.ID.ToString();
-                    SPList oList;
-                    oList = web.Lists["Master Page Gallery"] as SPList;
-                    if (oList != null)
+                    tbPublicCommentDefaultTxt.Text = CoreFunctions.getConfigSetting(web, "EPMLivePublicCommentText");
+                }
+                catch (Exception ex)
+                {
+                    SysTrace.WriteLine(ex);
+                }
+
+                SetProductAdditionalInfo(web);
+                UpdateAllowSynch(web);
+
+                foreach (SPList list in web.Lists)
+                {
+                    if (!list.Hidden)
                     {
-                        string sFullFileNameAndPath = "";
-                        string sFileName = "";
-                        strSiteUrl = web.Url;
-                        foreach (SPListItem liMP in oList.Items)
+                        ddlResources.Items.Add(list.Title);
+                    }
+                }
+                try
+                {
+                    ddlResources.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool");
+                }
+                catch (Exception ex)
+                {
+                    SysTrace.WriteLine(ex);
+                }
+
+                if (web.ServerRelativeUrl.Equals(CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    pnlResources.Visible = true;
+                }
+
+                if (web.Properties.ContainsKey("TemplateVersion"))
+                {
+                    txtVersion.Text = $"v {web.Properties["TemplateVersion"]}";
+                }
+
+                MarkArchivedPersonalizationsChecked(web);
+                cbDisableMyWorkspaces.Checked = GetConfigSettingIfNotEmpty(web, "EPMLiveDisableMyWorkspaces");
+                cbDisableCommonActions.Checked = GetConfigSettingIfNotEmpty(web, "EPMLiveDisableCommonActions");
+                cbDisableCreateNew.Checked = GetConfigSettingIfNotEmpty(web, "EPMLiveDisableCreateNew");
+            }
+        }
+
+        private void TrySetCheckedProperty(SPWeb web, CheckBox checkBox, string settingKey)
+        {
+            try
+            {
+                checkBox.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, settingKey));
+            }
+            catch (Exception ex)
+            {
+                SysTrace.WriteLine(ex);
+            }
+        }
+
+        private void MarkArchivedPersonalizationsChecked(SPWeb web)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                {
+                    connection.Open();
+
+                    using (var command = new SqlCommand(
+                        "SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid",
+                        connection))
+                    {
+                        command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                        command.Parameters.AddWithValue("@webid", web.ID);
+                        using (var dataReader = command.ExecuteReader())
                         {
-                            SPField fldFullFileNameAndPath = liMP.Fields.GetFieldByInternalName("FileRef");
-                            if (liMP[fldFullFileNameAndPath.Id] != null)
+                            if (dataReader.Read())
                             {
-                                sFullFileNameAndPath = liMP[fldFullFileNameAndPath.Id].ToString();
-                            }
-
-                            SPField fldFileName = liMP.Fields.GetFieldByInternalName("FilenameNoLink");
-                            if (liMP[fldFileName.Id] != null)
-                            {
-                                sFileName = liMP[fldFileName.Id].ToString();
-                            }
-
-                            if (sFileName.ToUpper().Contains(".master") || sFileName.ToUpper().Contains(".MASTER"))
-                            {
-                                ListItem li = new ListItem(sFileName.Replace(".master", "").Replace(".MASTER", ""), sFullFileNameAndPath);
-                                ddlMasterPages.Items.Add(li);
+                                chkArchive.Checked = true;
                             }
                         }
-                        ddlMasterPages.SelectedValue = web.MasterUrl;
                     }
+                }
+            });
+        }
 
-                    if (CoreFunctions.getConfigSetting(web, "EPMLiveDisablePublishing") == "True")
-                        chkDisablePublishing.Checked = true;
-                    else
-                        chkDisablePublishing.Checked = false;
-
-                    try
+        private void UpdateAllowSynch(SPWeb web)
+        {
+            if (!web.CurrentUser.IsSiteAdmin)
+            {
+                pnlAllowSynch.Visible = false;
+            }
+            else
+            {
+                chkAllowSynch.Checked = CoreFunctions.getConfigSetting(web, "EPMLiveAllowListSynch")
+                    .Equals("true", StringComparison.InvariantCultureIgnoreCase)
+                    ? true
+                    : false;
+                if (web.Properties.ContainsKey("EPMLiveTemplateID"))
+                {
+                    var childSiteTemplateID = web.Properties["EPMLiveTemplateID"].ToString();
+                    var site = SPContext.Current.Site;
+                    foreach (SPWeb subWeb in site.AllWebs)
                     {
-                        chkDisablePlanners.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, "EPMLiveDisablePlanners"));
-                    }
-                    catch { }
-
-                    try
-                    {
-                        chkDisableContextualSlideouts.Checked = bool.Parse(CoreFunctions.getConfigSetting(web, "EPMLiveDisableContextualSlideouts"));
-                    }
-                    catch { }
-
-                    try
-                    {
-                        ////EPML-5445
-                        //var supportIntegration = CoreFunctions.getConfigSetting(web, "SupportIntegration");
-                        //chkSupportIntegration.Checked = !string.IsNullOrEmpty(supportIntegration) && Convert.ToBoolean(supportIntegration);
-                        ////EPML-5445
-                    }
-                    catch { }
-
-                    try
-                    {
-                        tbPublicCommentDefaultTxt.Text = CoreFunctions.getConfigSetting(web, "EPMLivePublicCommentText");
-                    }
-                    catch { }
-
-                    // Set additional information on product including versions and DB names
-                    SetProductAdditionalInfo(web);
-
-                    if (!web.CurrentUser.IsSiteAdmin)
-                    {
-                        pnlAllowSynch.Visible = false;
-                        ////EPML-5445
-                        //ifsSupportIntegration.Visible = false;
-                        ////EPML-5445
-                    }
-                    else
-                    {
-                        if (CoreFunctions.getConfigSetting(web, "EPMLiveAllowListSynch").ToLower() == "true")
-                            chkAllowSynch.Checked = true;
-                        else
-                            chkAllowSynch.Checked = false;
-                        if (web.Properties.ContainsKey("EPMLiveTemplateID"))
+                        try
                         {
-                            string sChildSiteTemplateID = web.Properties["EPMLiveTemplateID"].ToString();
-                            SPSite site = SPContext.Current.Site;
+                            if (subWeb.Properties.ContainsKey("EPMLiveTemplateID"))
                             {
-                                string sTemplateID;
-                                foreach (SPWeb subWeb in site.AllWebs)
+                                var idCheck = subWeb.Properties["EPMLiveTemplateID"].ToString();
+                                if (childSiteTemplateID == idCheck)
                                 {
-                                    try
+                                    var templateId = subWeb.ID.ToString();
+                                    var Ids = web.Site.RootWeb.Properties["EPMLiveSiteTemplateIDs"];
+                                    if (Ids != null && Ids.Contains(templateId))
                                     {
-                                        if (subWeb.Properties.ContainsKey("EPMLiveTemplateID"))
-                                        {
-                                            string sIDCheck = subWeb.Properties["EPMLiveTemplateID"].ToString();
-                                            if (sChildSiteTemplateID == sIDCheck)
-                                            {
-                                                sTemplateID = subWeb.ID.ToString();
-                                                string sIDs = web.Site.RootWeb.Properties["EPMLiveSiteTemplateIDs"];
-                                                if (sIDs != null && sIDs.Contains(sTemplateID))
-                                                {
-                                                    lblSelectedTemplate.Text = subWeb.Title;
-                                                    strCurrentTemplate = sTemplateID;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    catch { }
-                                    subWeb.Close();
-                                    subWeb.Dispose();
-                                }
-                            }
-                        }
-
-                        //EPML-5445
-                        //ifsSupportIntegration.Visible = true;
-                        //EPML-5445
-                    }
-                    foreach (SPList list in web.Lists)
-                    {
-                        if (!list.Hidden)
-                        {
-                            ddlResources.Items.Add(list.Title);
-                        }
-                    }
-                    try
-                    {
-                        ddlResources.SelectedValue = CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool");
-                    }
-                    catch { }
-
-                    if (web.ServerRelativeUrl.ToLower() == CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL").ToLower())
-                    {
-                        pnlResources.Visible = true;
-                    }
-
-                    if (web.Properties.ContainsKey("TemplateVersion"))
-                    {
-                        txtVersion.Text = "v " + web.Properties["TemplateVersion"];
-                    }
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
-                    {
-                        using (var connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
-                        {
-                            connection.Open();
-
-                            using (var cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
-                            {
-                                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                cmd.Parameters.AddWithValue("@webid", web.ID);
-                                using (var dataReader = cmd.ExecuteReader())
-                                {
-                                    if (dataReader.Read())
-                                    {
-                                        chkArchive.Checked = true;
+                                        lblSelectedTemplate.Text = subWeb.Title;
+                                        CurrentTemplate = templateId;
                                     }
                                 }
                             }
                         }
-                    });
-
-                    string disableMyWorkspaces = CoreFunctions.getConfigSetting(web, "EPMLiveDisableMyWorkspaces");
-                    cbDisableMyWorkspaces.Checked = !string.IsNullOrEmpty(disableMyWorkspaces) ? bool.Parse(disableMyWorkspaces) : false;
-                    string disableCommonActions = CoreFunctions.getConfigSetting(web, "EPMLiveDisableCommonActions");
-                    cbDisableCommonActions.Checked = !string.IsNullOrEmpty(disableCommonActions) ? bool.Parse(disableCommonActions) : false;
-                    string disableCreateNew = CoreFunctions.getConfigSetting(web, "EPMLiveDisableCreateNew");
-                    cbDisableCreateNew.Checked = !string.IsNullOrEmpty(disableCreateNew) ? bool.Parse(disableCreateNew) : false;
-
+                        catch (Exception ex)
+                        {
+                            SysTrace.WriteLine(ex);
+                        }
+                        subWeb.Close();
+                        subWeb.Dispose();
+                    }
                 }
             }
         }
 
+        private void AddMasterPages(SPWeb web)
+        {
+            var masterPageGallerList = web.Lists["Master Page Gallery"] as SPList;
+            if (masterPageGallerList != null)
+            {
+                var fullFileNameAndPath = string.Empty;
+                var fileName = string.Empty;
+                SiteUrl = web.Url;
+                foreach (SPListItem masterPageItem in masterPageGallerList.Items)
+                {
+                    var fldFullFileNameAndPath = masterPageItem.Fields.GetFieldByInternalName("FileRef");
+                    if (masterPageItem[fldFullFileNameAndPath.Id] != null)
+                    {
+                        fullFileNameAndPath = masterPageItem[fldFullFileNameAndPath.Id].ToString();
+                    }
+
+                    var fieldFileName = masterPageItem.Fields.GetFieldByInternalName("FilenameNoLink");
+                    if (masterPageItem[fieldFileName.Id] != null)
+                    {
+                        fileName = masterPageItem[fieldFileName.Id].ToString();
+                    }
+
+                    if (fileName.IndexOf(".master", 0, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                    {
+                        var listItem = new ListItem(
+                            fileName.Replace(".master", string.Empty).Replace(".MASTER", string.Empty),
+                            fullFileNameAndPath);
+                        ddlMasterPages.Items.Add(listItem);
+                    }
+                }
+                ddlMasterPages.SelectedValue = web.MasterUrl;
+            }
+        }
+
+        private bool GetConfigSettingIfNotEmpty(SPWeb web, string settingKey)
+        {
+            var settingValue = CoreFunctions.getConfigSetting(web, settingKey);
+            if (!string.IsNullOrWhiteSpace(settingValue))
+            {
+                bool settingBooleanValue;
+                if (!bool.TryParse(settingValue, out settingBooleanValue))
+                {
+                    throw new InvalidOperationException($"A valid bool is expected in {settingValue}");
+                }
+
+                return settingBooleanValue;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Set additional information on product including versions and DB names
+        /// </summary>
         private void SetProductAdditionalInfo(SPWeb web)
         {
-            #region EPMLive Version
-
-            lblEPMLVersion.Text = CoreFunctions.GetFullAssemblyVersion();
-
-            #endregion
-
-            #region SharePoint Version
-
-            try
-            {
-                lblSPVersion.Text = Convert.ToString(web.Site.WebApplication.Farm.BuildVersion);
-            }
-            catch 
-            { }
- 
-            #endregion
-
-            #region EPMLive Database
-
-            string epmliveConnection = string.Empty;
-            string errMsg = "Cannot get EPMLive database information.";
-            try
-            {
-                epmliveConnection = CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
-                if (!string.IsNullOrEmpty(epmliveConnection))
-                {
-                    using (SqlConnection conn = new SqlConnection(epmliveConnection))
-                    {
-                        lblEMPLDB.Text = string.Format("Name: {0}", conn.Database);
-                        lblEPMLDBServer.Text = string.Format("Server: {0}", conn.DataSource);
-                    }
-                }
-                else 
-                {
-                    lblEMPLDB.Text = errMsg;
-                }
-            }
-            catch
-            {
-                lblEMPLDB.Text = errMsg;
-            } 
-            #endregion
-
-            #region Reporting Database
-            
-            errMsg = "Cannot get Reporting database information.";
-            if (!string.IsNullOrEmpty(epmliveConnection))
-            {
-                string info = Utilities.GetReportingDbConnectionString(epmliveConnection, web.Site.ID, web.Site.WebApplication.Id);
-                if (!string.IsNullOrEmpty(info))
-                {
-                    try
-                    {
-                        using (SqlConnection reportingConn = new SqlConnection(info))
-                        {
-                            lblReportingDB.Text = string.Format("Name: {0}", reportingConn.Database);
-                            lblReportingDBServer.Text = string.Format("Server: {0}", reportingConn.DataSource);
-                        }
-                    }
-                    catch
-                    {
-                        lblReportingDB.Text = errMsg;
-                    }
-                }
-                else
-                {
-                    lblReportingDB.Text = errMsg;
-                }
-            }
-            else
-            {
-                lblReportingDB.Text = errMsg;
-            }
-
-            #endregion
-
-            #region PFE Database
-
-            string basePath = GetBasePath();
-            errMsg = "Cannot get PFE database information.";
-            if (!string.IsNullOrEmpty(basePath))
-            {
-                string pfeConnection = Utilities.GetPFEDBConnectionString(basePath);
-                if (!string.IsNullOrEmpty(pfeConnection))
-                {
-                    try
-                    {
-                        if (pfeConnection.StartsWith("provider", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            // Removing "Provider" part from connection string
-                            pfeConnection = pfeConnection.Substring(pfeConnection.IndexOf(';') + 1);
-                        }
-                        using (SqlConnection pfeConn = new SqlConnection(pfeConnection))
-                        {
-                            lblPFEDB.Text = string.Format("Name: {0}", pfeConn.Database);
-                            lblPFEDBServer.Text = string.Format("Server: {0}", pfeConn.DataSource);
-                        }
-                    }
-                    catch
-                    {
-                        lblPFEDB.Text = errMsg;
-                    }
-                }
-                else
-                {
-                    lblPFEDB.Text = errMsg;
-                }
-            }
-            else
-            {
-                lblPFEDB.Text = errMsg;
-            }
-
-            #endregion
-        }
-
-        private string GetBasePath()
-        {
-            try
-            {
-                string basePath = CoreFunctions.getConfigSetting(SPContext.Current.Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
-                return basePath;
-            }
-            catch { return ""; }
+            var webSettingsAdditionalInfo = new WebSettingsAdditionalInfo(web);
+            webSettingsAdditionalInfo.SetEPMLiveVersion(lblEPMLVersion);
+            webSettingsAdditionalInfo.SetSharePointVersion(lblSPVersion);
+            webSettingsAdditionalInfo.SetEPMLiveDatabase(lblEMPLDB, lblEPMLDBServer);
+            webSettingsAdditionalInfo.SetReportingDatabase(lblReportingDB, lblReportingDBServer);
+            webSettingsAdditionalInfo.SetPFEDatabase(lblPFEDB, lblPFEDBServer);
         }
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            SPWeb web = SPContext.Current.Web;
+            var web = SPContext.Current.Web;
             web.Site.CatchAccessDeniedException = false;
             web.AllowUnsafeUpdates = true;
 
             CoreFunctions.setConfigSetting(web, "EPMLiveDisablePublishing", chkDisablePublishing.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveDisablePlanners", chkDisablePlanners.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveDisableContextualSlideouts", chkDisableContextualSlideouts.Checked.ToString());
-            ////EPML-5445
-            //CoreFunctions.setConfigSetting(web, "SupportIntegration", chkSupportIntegration.Checked.ToString());
-            ////EPML-5445
             CoreFunctions.setConfigSetting(web, "EPMLivePublicCommentText", tbPublicCommentDefaultTxt.Text.ToString());
 
             if (web.CurrentUser.IsSiteAdmin)
             {
                 CoreFunctions.setConfigSetting(web, "EPMLiveAllowListSynch", chkAllowSynch.Checked.ToString());
-                if(Request["TemplateSelected"] == "true")
+                if (Request["TemplateSelected"] == "true")
+                {
                     CoreFunctions.setConfigSetting(web, "EPMLiveTemplateID", Request["selectedWebID"]);
+                }
             }
 
             CoreFunctions.setConfigSetting(web, "EPMLiveResourcePool", ddlResources.SelectedValue);
@@ -345,7 +249,21 @@ namespace EPMLiveCore
 
             web.MasterUrl = ddlMasterPages.SelectedValue.ToString();
             web.Update();
+            UpdatePersonalizations(web);
 
+            var requestSource = Request["Source"];
+            if (!string.IsNullOrWhiteSpace(requestSource))
+            {
+                Response.Redirect(requestSource);
+            }
+            else
+            {
+                SPUtility.Redirect("settings.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+            }
+        }
+
+        private void UpdatePersonalizations(SPWeb web)
+        {
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
@@ -355,47 +273,42 @@ namespace EPMLiveCore
                     if (chkArchive.Checked)
                     {
                         var recordExists = true;
-                        using (var cmd = new SqlCommand("SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
+                        using (var command = new SqlCommand(
+                            "SELECT * FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid",
+                            connection))
                         {
-                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                            cmd.Parameters.AddWithValue("@webid", web.ID);
-                            using (var dataReader = cmd.ExecuteReader())
+                            command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                            command.Parameters.AddWithValue("@webid", web.ID);
+                            using (var dataReader = command.ExecuteReader())
                             {
                                 recordExists = dataReader.Read();
                             }
                         }
                         if (!recordExists)
                         {
-                            using (var cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS ([Key],SiteId,webid) Values ('webarchived', @siteId, @webid)", connection))
+                            using (var command = new SqlCommand(
+                                "INSERT INTO PERSONALIZATIONS ([Key],SiteId,webid) Values ('webarchived', @siteId, @webid)",
+                                connection))
                             {
-                                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                cmd.Parameters.AddWithValue("@webid", web.ID);
-                                cmd.ExecuteNonQuery();
+                                command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                command.Parameters.AddWithValue("@webid", web.ID);
+                                command.ExecuteNonQuery();
                             }
                         }
-
                     }
                     else
                     {
-                        using (var cmd = new SqlCommand("DELETE FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid", connection))
+                        using (var command = new SqlCommand(
+                            "DELETE FROM PERSONALIZATIONS WHERE ([Key] = 'webarchived') AND (SiteId = @siteId) and WebId=@webid",
+                            connection))
                         {
-                            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                            cmd.Parameters.AddWithValue("@webid", web.ID);
-                            cmd.ExecuteNonQuery();
+                            command.Parameters.AddWithValue("@siteid", web.Site.ID);
+                            command.Parameters.AddWithValue("@webid", web.ID);
+                            command.ExecuteNonQuery();
                         }
                     }
                 }
             });
-
-            if(!String.IsNullOrEmpty(Request["Source"]))
-            {
-                Response.Redirect(Request["Source"]);
-            }
-            else
-            {
-                Microsoft.SharePoint.Utilities.SPUtility.Redirect("settings.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-            }
         }
-
     }
 }

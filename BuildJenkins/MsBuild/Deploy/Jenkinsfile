@@ -8,6 +8,7 @@ pipeline {
 	options {
 		skipDefaultCheckout true
 		timestamps()
+		timeout(time: 2, unit: 'HOURS') 
 	}
 	parameters {
 		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')

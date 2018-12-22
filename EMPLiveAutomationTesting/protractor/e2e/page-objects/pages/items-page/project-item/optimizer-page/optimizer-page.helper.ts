@@ -152,12 +152,18 @@ export class OptimizerPageHelper {
 
     static async clickOKonDeleteStrategyPopup() {
         StepLogger.step('Click on Ok');
-        await ElementHelper.clickUsingJs(OptimizerPage.getDeleteStrategyPopup.ok);
+        await PageHelper.click(OptimizerPage.getDeleteStrategyPopup.ok);
+        if (await PageHelper.isElementDisplayed(OptimizerPage.getDeleteStrategyPopup.ok)) {
+            await ElementHelper.clickUsingJs(OptimizerPage.getDeleteStrategyPopup.ok);
+        }
     }
 
     static async clickOKonSaveStrategyPopup() {
         StepLogger.step('Click on Ok');
-        await ElementHelper.clickUsingJs(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+        await PageHelper.click(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+        if (await PageHelper.isElementDisplayed(OptimizerPage.getOptimierSaveStrategyPopup.ok)) {
+            await ElementHelper.clickUsingJs(OptimizerPage.getOptimierSaveStrategyPopup.ok);
+        }
     }
 
     static async verifyDeletedStrategy(deletedStrategyName: string) {

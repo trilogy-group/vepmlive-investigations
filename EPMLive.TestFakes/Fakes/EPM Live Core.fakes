@@ -52,6 +52,7 @@
     <Add FullName="EPMLiveCore.GenericEntityPickerPropertyBag"/>
     <Add FullName="EPMLiveCore.API.CommentManager!"/>
     <Add FullName="EPMLiveCore.SocialEngine.Core.Logger!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Logging.Logger!"/>
     <Add FullName="EPMLiveCore.ExtensionMethods!"/>
     <Add FullName="EPMLiveCore.XMLDataManager!"/>
     <Add Namespace="EPMLiveCore.SocialEngine!"/>
@@ -83,6 +84,7 @@
     <Add FullName="EPMLiveCore.ReportAuth!"/>
     <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
     <Add FullName="EPMLiveCore.Infrastructure.ResourcePoolManager!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.ReportXmlBuilder!"/>
     <Add FullName="EPMLiveCore.Infrastructure.SPListItemManager!"/>
     <Add FullName="EPMLiveCore.Infrastructure.GridViewManagerFactory!"/>
     <Add FullName="EPMLiveCore.Infrastructure.GridViewUtils!"/>
@@ -115,6 +117,7 @@
     <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.addusers!"/>
+    <Add FullName="EPMLiveCore.SocialEngine.Entities.Activity!"/>
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
     <Add FullName="EPMLiveCore.CascadingLookupField!"/>
     <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>

@@ -7,12 +7,13 @@ pipeline {
     }
     options {
         skipDefaultCheckout true
+		timeout(time: 4, unit: 'HOURS') 
     }
 	triggers {
 		cron(env.BRANCH_NAME == 'develop' ? '@midnight' : '')
 	}
     parameters {
-        string(name: 'Version', defaultValue: '7.0.3.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'Version', defaultValue: '7.1.0.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
         string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
         string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
@@ -88,7 +89,7 @@ pipeline {
 				}
 			}
 		}
-		stage('Parallel Jobs') {
+		stage('Tests') {
 			parallel {
 				stage('Deploy Staging') {
 					steps {
@@ -115,23 +116,45 @@ pipeline {
 						}
 					}
 				}
-				stage('Protractor UI Tests') {
-					steps {
-						timestamps {
-							script {
-								echo 'Triggering Protractor UI tests job...'
-								env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
-								if (params.ProtractorBranch?.trim()) {
-									env.PROTRACTOR_BRANCH = params.ProtractorBranch
+				stage('Automated Tests') {
+					stages {
+						stage('Protractor Tests') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering Protractor UI tests job...'
+										env.PROTRACTOR_BRANCH = currentBuild.getProjectName()
+										if (params.ProtractorBranch?.trim()) {
+											env.PROTRACTOR_BRANCH = params.ProtractorBranch
+										}
+										build(
+											job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
+											wait: true,
+											propagate: false,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
+											]
+										)
+									}
 								}
-								build(
-									job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
-									wait: true,
-									parameters: [
-										[$class: 'StringParameterValue', name: 'TargetHost', value: params.TargetHost],
-										[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
-									]
-								)
+							}
+						}
+						stage('Performance Tests') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering performance tests job...'
+										build(
+											job: "../EPML-Perf/EPML-Perf", 
+											wait: true,
+											propagate: false,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'APP_URL', value: params.TargetHost]
+											]
+										)
+									}
+								}
 							}
 						}
 					}

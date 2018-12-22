@@ -108,9 +108,9 @@
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-<%=DialogTitle %>
+<%=BasicDialogProperties.DialogTitle %>
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-<%=DialogTitle%>
+<%=BasicDialogProperties.DialogTitle%>
 </asp:Content>

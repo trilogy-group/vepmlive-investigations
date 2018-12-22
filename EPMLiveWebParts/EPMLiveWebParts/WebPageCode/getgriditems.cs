@@ -869,70 +869,16 @@ namespace EPMLiveWebParts
             {
                 try
                 {
-                    string HasComments = "";
+                    const string oneString = "1";
+                    const string twoString = "2";
 
-                    string scomments = dr["CommentCount"].ToString();
-                    double comments = 0;
-                    double.TryParse(scomments, out comments);
-                    if (comments > 0)
-                    {
-                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
-                        {
-                            ArrayList commenters = new ArrayList();
-                            int authorid = 0;
-                            try
-                            {
-                                commenters = new ArrayList(dr["Commenters"].ToString().Split(','));
-                            }
-                            catch { }
-                            try
-                            {
-                                SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, dr["Author"].ToString());
-                                authorid = uv.LookupId;
-                            }
-                            catch { }
-                            bool isAssigned = false;
-                            try
-                            {
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, dr["AssignedTo"].ToString());
-                                foreach (SPFieldUserValue uv in uvc)
-                                {
-                                    if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
-                                    {
-                                        isAssigned = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            catch { }
-                            if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
-                            {
-                                ArrayList commentersread = new ArrayList();
-                                try
-                                {
-                                    commentersread = new ArrayList(dr["CommentersRead"].ToString().Split(','));
-                                }
-                                catch { }
-                                if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
-                                {
-                                    HasComments += "1";
-                                }
-                                else
-                                {
-                                    HasComments += "2";
-                                }
-                            }
-                            else
-                                HasComments += "1";
-                        }
-                    }
-
+                    var hasComments = GetCommentsString(dr, oneString, twoString, oneString, string.Empty);
 
                     XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                     XmlAttribute attrName = docXml.CreateAttribute("name");
                     attrName.Value = "HasComments";
                     ndSiteUrl.Attributes.Append(attrName);
-                    ndSiteUrl.InnerText = HasComments;
+                    ndSiteUrl.InnerText = hasComments;
                     ndNewItem.AppendChild(ndSiteUrl);
                 }
                 catch { }
@@ -1328,63 +1274,14 @@ namespace EPMLiveWebParts
                                         }
                                         try
                                         {
-                                            string scomments = dr["CommentCount"].ToString();
-                                            double comments = 0;
-                                            double.TryParse(scomments, out comments);
-                                            if (comments > 0)
-                                            {
-                                                if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
-                                                {
-                                                    ArrayList commenters = new ArrayList();
-                                                    int authorid = 0;
-                                                    try
-                                                    {
-                                                        commenters = new ArrayList(dr["Commenters"].ToString().Split(','));
-                                                    }
-                                                    catch { }
-                                                    try
-                                                    {
-                                                        SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, dr["Author"].ToString());
-                                                        authorid = uv.LookupId;
-                                                    }
-                                                    catch { }
-                                                    bool isAssigned = false;
-                                                    try
-                                                    {
-                                                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, dr["AssignedTo"].ToString());
-                                                        foreach (SPFieldUserValue uv in uvc)
-                                                        {
-                                                            if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
-                                                            {
-                                                                isAssigned = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    catch { }
-                                                    if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
-                                                    {
-                                                        ArrayList commentersread = new ArrayList();
-                                                        try
-                                                        {
-                                                            commentersread = new ArrayList(dr["CommentersRead"].ToString().Split(','));
-                                                        }
-                                                        catch { }
-                                                        if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
-                                                        {
-                                                            val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                                        }
-                                                        else
-                                                        {
-                                                            val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
-                                                        }
-                                                    }
-                                                    else
-                                                        val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                                }
-                                                else
-                                                    val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                            }
+                                            val = string.Concat(
+                                                val,
+                                                GetCommentsString(
+                                                    dr,
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>",
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>",
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>",
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>"));
                                         }
                                         catch { }
 
@@ -1432,7 +1329,24 @@ namespace EPMLiveWebParts
                                         {
                                             SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
                                             displayValue = "";
-                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                            string loginName = uv.LookupValue;
+
+                                            try
+                                            {
+                                                //SKYVERA-2119: Check if we have a group with this ID
+                                                if (string.IsNullOrEmpty(loginName))
+                                                {
+                                                    var group = field.ParentList.ParentWeb.SiteGroups.GetByID(int.Parse(val));
+
+                                                    if (group != null)
+                                                    {
+                                                        loginName = group.LoginName;
+                                                    }
+                                                }
+                                            }
+                                            catch { }
+
+                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + loginName + "</a>";
                                         }
                                         else
                                         {
@@ -2002,6 +1916,86 @@ namespace EPMLiveWebParts
                 }
                 counter++;
             }
+        }
+
+        private string GetCommentsString(DataRow dataRow, string firstAppend, string secondAppend, string thirdAppend, string fourthAppend)
+        {
+            var returnValue = new StringBuilder();
+
+            var comments = dataRow["CommentCount"].ToString();
+            var commentsCount = 0.0;
+            double.TryParse(comments, out commentsCount);
+            if (commentsCount > 0)
+            {
+                if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                {
+                    var commenters = new ArrayList();
+                    var authorid = 0;
+                    try
+                    {
+                        commenters = new ArrayList(dataRow["Commenters"].ToString().Split(','));
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    try
+                    {
+                        var userValue = new SPFieldUserValue(list.ParentWeb, dataRow["Author"].ToString());
+                        authorid = userValue.LookupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    var isAssigned = false;
+                    try
+                    {
+                        var userValueCollection = new SPFieldUserValueCollection(list.ParentWeb, dataRow["AssignedTo"].ToString());
+                        foreach (var userValue in userValueCollection)
+                        {
+                            if (userValue.LookupId == list.ParentWeb.CurrentUser.ID)
+                            {
+                                isAssigned = true;
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
+                    {
+                        var commentersread = new ArrayList();
+                        try
+                        {
+                            commentersread = new ArrayList(dataRow["CommentersRead"].ToString().Split(','));
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
+                        {
+                            returnValue.Append(firstAppend);
+                        }
+                        else
+                        {
+                            returnValue.Append(secondAppend);
+                        }
+                    }
+                    else
+                    {
+                        returnValue.Append(thirdAppend);
+                    }
+                }
+                else
+                {
+                    returnValue.Append(fourthAppend);
+                }
+            }
+            return returnValue.ToString();
         }
 
         private void HandleFilteredLookupCase(SPField field, XmlDocument fieldXml, string val, XmlNode ndNewCell, ref string displayValue)
