@@ -103,8 +103,16 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
                         using (SPWeb tWeb = tSite.OpenWeb(web.ID))
                         {
+                            SPListItem tLi = null;
                             SPList tList = tWeb.Lists[listid];
-                            SPListItem tLi = tList.GetItemById(itemid);
+                            try
+                            {
+                                tLi = tList.GetItemById(itemid);
+                            }
+                            catch(ArgumentException)
+                            {
+                                throw new SPException("The associated project does not exist or has been deleted.");
+                            }
                             web.Site.CatchAccessDeniedException = false;
 
                             foreach (SPRoleAssignment assn in tLi.RoleAssignments)
