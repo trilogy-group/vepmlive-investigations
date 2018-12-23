@@ -346,6 +346,7 @@
     <Compile Include="Web References\SalesforcePartnerService\Reference.RemainingSmallClasses1.cs" />
     <Compile Include="Web References\SalesforcePartnerService\SingleEmailMessageTest.cs" />
     <Compile Include="Web References\SSRS2005\ReferenceTest.SmallClasses1.cs" />
+    <Compile Include="Web References\SSRS2006\ReferenceTest.cs" />
     <Compile Include="WebPageCode\AdminConnsTest.cs" />
     <Compile Include="WebPageCode\AdminQueueTests.cs" />
     <Compile Include="WebPageCode\CreateDatabaseTest.cs" />
