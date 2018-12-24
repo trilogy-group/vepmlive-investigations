@@ -8,7 +8,7 @@ using Shouldly;
 
 namespace EPMLiveCore.Tests.Web_References.SSRS2005
 {
-    /// <summary>
+    /// <summary> 
     /// Unit Tests for remaining small classes in namespace <see cref="EPMLiveCore.SSRS2005"/>
     /// </summary>
     [TestClass, ExcludeFromCodeCoverage]
