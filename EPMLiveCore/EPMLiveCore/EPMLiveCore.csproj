@@ -259,6 +259,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
     <Compile Include="JsonUtilHelper.cs" />
     <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
+    <Compile Include="Layouts\epmlive\XmlDataSimplifier.cs" />
     <Compile Include="Layouts\epmlive\WebSettingsAdditionalInfo.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />

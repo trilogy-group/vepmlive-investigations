@@ -858,14 +858,98 @@ namespace EPMLiveWebParts
 
         private static string getFormat(SPField oField, XmlDocument oDoc, SPWeb oWeb)
         {
-            return FormatHelper.GetFormat(
-                oField,
-                oDoc,
-                oWeb,
-                nInfo => 0.ToString("c0", nInfo)[0] == '0'
-                    ? ",0.00 " + nInfo.CurrencySymbol
-                    : nInfo.CurrencySymbol + ",0.00",
-                "0\\%;-##%");
+            string format = "";
+
+            switch (oField.Type)
+            {
+                case SPFieldType.DateTime:
+                    try
+                    {
+
+                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
+                        {
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                        }
+                        else
+                        {
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
+                        }
+                    }
+                    catch { }
+                    break;
+                case SPFieldType.Number:
+                    if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                    {
+                        format = "0\\%;0\\%;0\\%";
+                    }
+                    else
+                    {
+                        int decCount = 0;
+                        string decimals = "";
+                        try
+                        {
+                            decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                        }
+                        catch { }
+
+                        for (int i = 0; i < decCount; i++)
+                        {
+                            decimals += "0";
+                        }
+
+                        if (decCount > 0)
+                            decimals = "." + decimals;
+
+                        format = ",0" + decimals;
+                        break;
+                    }
+                    break;
+                case SPFieldType.Currency:
+                    SPFieldCurrency c = (SPFieldCurrency)oField;
+                    System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
+                    if ((0).ToString("c0", nInfo)[0] == '0')
+                        format = ",0.00 " + nInfo.CurrencySymbol;
+                    else
+                        format = nInfo.CurrencySymbol + ",0.00";
+                    break;
+                case SPFieldType.Calculated:
+                    switch (oDoc.FirstChild.Attributes["ResultType"].Value)
+                    {
+                        case "Currency":
+                            format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
+                            break;
+                        case "Number":
+                            if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                            {
+                                format = "0\\%;-##%";
+                            }
+                            else
+                            {
+                                int decCount = 0;
+                                string decimals = "";
+                                try
+                                {
+                                    decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                                }
+                                catch { }
+
+                                for (int i = 0; i < decCount; i++)
+                                {
+                                    decimals += "0";
+                                }
+
+                                if (decCount > 0)
+                                    decimals = "." + decimals;
+
+                                format = ",0" + decimals;
+                            }
+                            break;
+                    };
+                    break;
+
+            };
+
+            return format;
         }
 
         private SPField getRealField(SPField field)

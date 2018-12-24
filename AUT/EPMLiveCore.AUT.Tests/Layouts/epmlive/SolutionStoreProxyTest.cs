@@ -1,14 +1,15 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Xml;
-using Action = System.Action;
 using AUT.ConfigureTestProjects.Analyzer;
 using AUT.ConfigureTestProjects.BaseSetup;
 using AUT.ConfigureTestProjects.Extensions;
 using AUT.ConfigureTestProjects.StaticTypes;
 using NUnit.Framework;
-using Should = Shouldly.Should;
 using Shouldly;
+using Action = System.Action;
+using Should = Shouldly.Should;
 
 namespace EPMLiveCore
 {
@@ -31,10 +32,10 @@ namespace EPMLiveCore
         private const string MethodCallWorkEngineDotComSvc = "CallWorkEngineDotComSvc";
         private const string MethodCallWorkEngineListSvc = "CallWorkEngineListSvc";
         private const string MethodCallWorkEngineCopySvc = "CallWorkEngineCopySvc";
-        private const string MethodList_GetListItems_InXml = "List_GetListItems_InXml";
-        private const string MethodList_GetList_InXml = "List_GetList_InXml";
-        private const string MethodList_GetList_InJSON = "List_GetList_InJSON";
-        private const string MethodList_GetListItems_InJSON = "List_GetListItems_InJSON";
+        private const string MethodList_GetListItems_InXml = "ListGetListItemsInXml";
+        private const string MethodList_GetList_InXml = "ListGetListInXml";
+        private const string MethodList_GetList_InJSON = "ListGetListInJSON";
+        private const string MethodList_GetListItems_InJSON = "ListGetListItemsInJSON";
         private const string MethodSimplifySPGetListItemsXml = "SimplifySPGetListItemsXml";
         private const string MethodSimplifySPGetListXml = "SimplifySPGetListXml";
         private const string MethodGetDefaultXMLWriterSettings = "GetDefaultXMLWriterSettings";
@@ -43,10 +44,10 @@ namespace EPMLiveCore
         private const string Field_dataManager = "_dataManager";
         private const string Field_webSvcName = "_webSvcName";
         private const string Field_webSvcMethod = "_webSvcMethod";
-        private const string Field_compLevels = "_compLevels";
-        private const string Field_solutionType = "_solutionType";
-        private const string FieldWEB_SVC_NAME = "WEB_SVC_NAME";
-        private const string FieldWEB_SVC_METHOD = "WEB_SVC_METHOD";
+        private const string Field_compLevels = "CompLevels";
+        private const string Field_solutionType = "SolutionType";
+        private const string FieldWEB_SVC_NAME = "WebSvcName";
+        private const string FieldWEB_SVC_METHOD = "WebSvcMethod";
         private Type _solutionStoreProxyInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
         private SolutionStoreProxy _solutionStoreProxyInstance;
@@ -89,9 +90,6 @@ namespace EPMLiveCore
         [TestCase(MethodList_GetList_InXml, 0)]
         [TestCase(MethodList_GetList_InJSON, 0)]
         [TestCase(MethodList_GetListItems_InJSON, 0)]
-        [TestCase(MethodSimplifySPGetListItemsXml, 0)]
-        [TestCase(MethodSimplifySPGetListXml, 0)]
-        [TestCase(MethodGetDefaultXMLWriterSettings, 0)]
         [TestCase(MethodPage_Load, 0)]
         public void AUT_SolutionStoreProxy_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
@@ -105,6 +103,49 @@ namespace EPMLiveCore
 
             // Assert
             currentMethodInfo.ShouldNotBeNull();
+        }
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Initializer")]
+        [TestCase(MethodSimplifySPGetListItemsXml, 0)]
+        [TestCase(MethodSimplifySPGetListXml, 0)]
+        public void AUT_XmlDataSimplifier_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
+        {
+            // Arrange
+            var currentMethodInfo = typeof(XmlDataSimplifier).GetMethod(methodName);
+
+            // Act
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(typeof(XmlDataSimplifier),
+                                                                 Fixture,
+                                                                 currentMethodInfo);
+
+            // Assert
+            currentMethodInfo.ShouldNotBeNull();
+        }
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Initializer")]
+        public void AUT_XmlDataSimplifier_Method_GetDefaultXMLWriterSettings_Explore_Verify_Test()
+        {
+            // Arrange
+            var currentMethodInfo = GetDefaultXmlWriterSettingsMethodInfo();
+
+            // Act
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(typeof(XmlDataSimplifier),
+                                                                 Fixture,
+                                                                 currentMethodInfo);
+
+            // Assert
+            currentMethodInfo.ShouldNotBeNull();
+        }
+
+        private static MethodInfo GetDefaultXmlWriterSettingsMethodInfo()
+        {
+            return typeof(XmlDataSimplifier).GetMethod(
+                MethodGetDefaultXMLWriterSettings,
+                BindingFlags.NonPublic | BindingFlags.Static);
         }
 
         #endregion
@@ -121,8 +162,6 @@ namespace EPMLiveCore
         [TestCase(Field_dataManager)]
         [TestCase(Field_webSvcName)]
         [TestCase(Field_webSvcMethod)]
-        [TestCase(Field_compLevels)]
-        [TestCase(Field_solutionType)]
         [TestCase(FieldWEB_SVC_NAME)]
         [TestCase(FieldWEB_SVC_METHOD)]
         public void AUT_SolutionStoreProxy_All_Fields_Explore_Verify_By_Name_Test(string name)
@@ -134,6 +173,23 @@ namespace EPMLiveCore
             ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_solutionStoreProxyInstanceFixture, 
                                                                 Fixture, 
                                                                 fieldInfo);
+
+            // Assert
+            fieldInfo.ShouldNotBeNull();
+        }
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT Initializer")]
+        [TestCase(Field_compLevels)]
+        [TestCase(Field_solutionType)]
+        public void AUT_XmlDataSimplifier_All_Properties_Explore_Verify_By_Name_Test(string name)
+        {
+            // Arrange
+            var fieldInfo = typeof(XmlDataSimplifier).GetField(name);
+
+            // Act
+            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(typeof(XmlDataSimplifier), Fixture, fieldInfo);
 
             // Assert
             fieldInfo.ShouldNotBeNull();
@@ -212,14 +268,27 @@ namespace EPMLiveCore
         [TestCase(MethodList_GetList_InXml)]
         [TestCase(MethodList_GetList_InJSON)]
         [TestCase(MethodList_GetListItems_InJSON)]
-        [TestCase(MethodSimplifySPGetListItemsXml)]
-        [TestCase(MethodSimplifySPGetListXml)]
-        [TestCase(MethodGetDefaultXMLWriterSettings)]
         [TestCase(MethodPage_Load)]
         public void AUT_SolutionStoreProxy_NonStatic_Methods_Explore_Verify_Test(string methodName)
         {
             // AAA: Arrange, Act, Assert
             ShouldlyExtension.ExploreVerifyMethods<SolutionStoreProxy>(Fixture, methodName);
+        }
+
+        [Test]
+        [Timeout(TestsTimeOut)]
+        [Category("AUT MethodCallTest")]
+        [TestCase(MethodSimplifySPGetListItemsXml)]
+        [TestCase(MethodSimplifySPGetListXml)]
+        [TestCase(MethodGetDefaultXMLWriterSettings)]
+        public void AUT_XmlDataSimplifier_Static_Methods_Explore_Verify_Test(string methodName)
+        {
+            // AAA: Arrange, Act, Assert
+            ShouldlyExtension.ExploreVerifyStaticMethodsWithOrWithoutInstance(
+                null, 
+                typeof(XmlDataSimplifier),
+                Fixture, 
+                methodName);
         }
 
         #endregion
@@ -1192,24 +1261,31 @@ namespace EPMLiveCore
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_SolutionStoreProxy_SimplifySPGetListItemsXml_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        public void AUT_XmlDataSimplifier_SimplifySPGetListItemsXml_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
         {
             // Arrange
             var data = CreateType<XmlNode>();
             var methodSimplifySPGetListItemsXmlPrametersTypes = new Type[] { typeof(XmlNode) };
             object[] parametersOfSimplifySPGetListItemsXml = { data };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodSimplifySPGetListItemsXml, methodSimplifySPGetListItemsXmlPrametersTypes, out exception);
+            Exception exception;
+            var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListItemsXml);
 
             // Act
-            var result1 = methodInfo.GetResultMethodInfo<SolutionStoreProxy, string>(_solutionStoreProxyInstanceFixture, out exception1, parametersOfSimplifySPGetListItemsXml);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<SolutionStoreProxy, string>(_solutionStoreProxyInstance, MethodSimplifySPGetListItemsXml, parametersOfSimplifySPGetListItemsXml, methodSimplifySPGetListItemsXmlPrametersTypes);
+            var firstResult = methodInfo.GetObjectResultMethodInfo(
+                typeof(XmlDataSimplifier),
+                out exception, 
+                parametersOfSimplifySPGetListItemsXml);
+            var secondResult = ReflectionAnalyzer.GetResultOfStaticMethod<string>(
+                null,
+                typeof(XmlDataSimplifier),
+                MethodSimplifySPGetListItemsXml,
+                parametersOfSimplifySPGetListItemsXml,
+                methodSimplifySPGetListItemsXmlPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
+            firstResult.ShouldBeNull();
+            secondResult.ShouldBeNull();
             parametersOfSimplifySPGetListItemsXml.ShouldNotBeNull();
             parametersOfSimplifySPGetListItemsXml.Length.ShouldBe(1);
             methodSimplifySPGetListItemsXmlPrametersTypes.Length.ShouldBe(1);
@@ -1289,7 +1365,7 @@ namespace EPMLiveCore
         {
             // Arrange
             Exception exception;
-            var methodInfo = GetMethodInfo(MethodSimplifySPGetListItemsXml, 0);
+            var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListItemsXml);
 
             // Act
             var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_solutionStoreProxyInstanceFixture, Fixture, out exception);
@@ -1309,7 +1385,7 @@ namespace EPMLiveCore
         public void AUT_SolutionStoreProxy_SimplifySPGetListItemsXml_Method_Call_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var methodInfo = GetMethodInfo(MethodSimplifySPGetListItemsXml, 0);
+            var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListItemsXml);
             const int parametersCount = 1;
 
             // Act
@@ -1337,24 +1413,31 @@ namespace EPMLiveCore
         [Test]
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
-        public void AUT_SolutionStoreProxy_SimplifySPGetListXml_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
+        public void AUT_XmlDataSimplifier_SimplifySPGetListXml_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
         {
             // Arrange
             var data = CreateType<XmlNode>();
             var methodSimplifySPGetListXmlPrametersTypes = new Type[] { typeof(XmlNode) };
             object[] parametersOfSimplifySPGetListXml = { data };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodSimplifySPGetListXml, methodSimplifySPGetListXmlPrametersTypes, out exception);
+            Exception exception;
+            var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListXml);
 
             // Act
-            var result1 = methodInfo.GetResultMethodInfo<SolutionStoreProxy, string>(_solutionStoreProxyInstanceFixture, out exception1, parametersOfSimplifySPGetListXml);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<SolutionStoreProxy, string>(_solutionStoreProxyInstance, MethodSimplifySPGetListXml, parametersOfSimplifySPGetListXml, methodSimplifySPGetListXmlPrametersTypes);
+            var firstResult = methodInfo.GetObjectResultMethodInfo(
+                typeof(XmlDataSimplifier), 
+                out exception, 
+                parametersOfSimplifySPGetListXml);
+            var secondResult = ReflectionAnalyzer.GetResultOfStaticMethod<string>(
+                null, 
+                typeof(XmlDataSimplifier),
+                MethodSimplifySPGetListXml, 
+                parametersOfSimplifySPGetListXml, 
+                methodSimplifySPGetListXmlPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
+            firstResult.ShouldBeNull();
+            secondResult.ShouldBeNull();
             parametersOfSimplifySPGetListXml.ShouldNotBeNull();
             parametersOfSimplifySPGetListXml.Length.ShouldBe(1);
             methodSimplifySPGetListXmlPrametersTypes.Length.ShouldBe(1);
@@ -1434,7 +1517,7 @@ namespace EPMLiveCore
         {
             // Arrange
             Exception exception;
-            var methodInfo = GetMethodInfo(MethodSimplifySPGetListXml, 0);
+            var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListXml);
 
             // Act
             var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_solutionStoreProxyInstanceFixture, Fixture, out exception);
@@ -1454,7 +1537,7 @@ namespace EPMLiveCore
         public void AUT_SolutionStoreProxy_SimplifySPGetListXml_Method_Call_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var methodInfo = GetMethodInfo(MethodSimplifySPGetListXml, 0);
+            var methodInfo = typeof(XmlDataSimplifier).GetMethod(MethodSimplifySPGetListXml);
             const int parametersCount = 1;
 
             // Act
@@ -1488,14 +1571,14 @@ namespace EPMLiveCore
             Type [] methodGetDefaultXMLWriterSettingsPrametersTypes = null;
             object[] parametersOfGetDefaultXMLWriterSettings = null; // no parameter present
             Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetDefaultXMLWriterSettings, methodGetDefaultXMLWriterSettingsPrametersTypes, out exception);
+            var methodInfo = GetDefaultXmlWriterSettingsMethodInfo();
 
             // Assert
             methodInfo.ShouldNotBeNull();
             exception.ShouldBeNull();
             parametersOfGetDefaultXMLWriterSettings.ShouldBeNull();
             methodGetDefaultXMLWriterSettingsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(() => methodInfo.Invoke(_solutionStoreProxyInstanceFixture, parametersOfGetDefaultXMLWriterSettings));
+            Should.NotThrow(() => methodInfo.Invoke(null, parametersOfGetDefaultXMLWriterSettings));
         }
 
         #endregion
@@ -1528,9 +1611,14 @@ namespace EPMLiveCore
         {
             // Arrange
             Type [] methodGetDefaultXMLWriterSettingsPrametersTypes = null;
+            Exception exception;
 
             // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_solutionStoreProxyInstance, MethodGetDefaultXMLWriterSettings, Fixture, methodGetDefaultXMLWriterSettingsPrametersTypes);
+            var result = typeof(XmlDataSimplifier)
+                .GetMethod(
+                    MethodGetDefaultXMLWriterSettings,
+                    BindingFlags.NonPublic | BindingFlags.Static)
+                .InvokeStaticMethodInfo(out exception, methodGetDefaultXMLWriterSettingsPrametersTypes);
 
             // Assert
             result.ShouldNotBeNull();
@@ -1569,10 +1657,13 @@ namespace EPMLiveCore
         {
             // Arrange
             Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetDefaultXMLWriterSettings, 0);
+            var methodInfo = GetDefaultXmlWriterSettingsMethodInfo();
 
             // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_solutionStoreProxyInstanceFixture, Fixture, out exception);
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(
+                _solutionStoreProxyInstanceFixture,
+                Fixture,
+                out exception);
 
             // Assert
             methodInfo.ShouldNotBeNull();
