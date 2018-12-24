@@ -307,7 +307,7 @@ namespace EPMLiveCore.Tests.Web_References.SSRS2005
             var propertiesDictionary = new Dictionary<string, object>()
             {
                 ["ItemNamespace"] = new ItemNamespaceEnum(),
-                ["AnyAttr"] = new System.Xml.XmlAttribute[] { },
+                ["AnyAttr"] = new XmlAttribute[] { },
             };
 
             // Act
@@ -479,20 +479,20 @@ namespace EPMLiveCore.Tests.Web_References.SSRS2005
             AssertProperties(privateObject, propertiesDictionary);
         }
 
-        private void SetProperties(PrivateObject privateObject, Dictionary<string, object> propertiesDictionary)
+        static private void SetProperties(PrivateObject privateObject, Dictionary<string, object> propertiesDictionary)
         {
-            foreach (var kvp in propertiesDictionary)
+            foreach (var keyValuePair in propertiesDictionary)
             {
-                privateObject.SetProperty(kvp.Key, kvp.Value);
+                privateObject.SetProperty(keyValuePair.Key, keyValuePair.Value);
             }
         }
 
         private void AssertProperties(PrivateObject privateObject, Dictionary<string, object> propertiesDictionary)
         {
             var assertions = new List<Action>();
-            foreach (var kvp in propertiesDictionary)
+            foreach (var keyValuePair in propertiesDictionary)
             {
-                assertions.Add(() => privateObject.GetProperty(kvp.Key).ShouldBe(kvp.Value));
+                assertions.Add(() => privateObject.GetProperty(keyValuePair.Key).ShouldBe(keyValuePair.Value));
             }
             this.ShouldSatisfyAllConditions(assertions.ToArray());
         }
