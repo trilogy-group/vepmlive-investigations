@@ -47,7 +47,7 @@ namespace EPMLiveWebParts
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Exception Suppressed {0}", ex);
+                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace EPMLiveWebParts
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Exception Suppressed {0}", ex);
+                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
                 }
                 if (format == "DateOnly")
                 {
@@ -80,113 +80,6 @@ namespace EPMLiveWebParts
         {
             var parsedValue = double.Parse(val, numberFormatInfo);
             val = parsedValue.ToString("c");
-        }
-
-        public static string GetFormat(
-            SPField field,
-            XmlDocument xmlDoc,
-            SPWeb web,
-            Func<NumberFormatInfo, string> setCurrencyFormatFunc,
-            string numberFormat)
-        {
-            var format = string.Empty;
-
-            switch (field.Type)
-            {
-                case SPFieldType.DateTime:
-                    try
-                    {
-                        format = xmlDoc.FirstChild.Attributes["Format"].Value == "DateOnly"
-                            ? CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern
-                            : CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError("Exception Suppressed {0}", ex);
-                    }
-                    break;
-                case SPFieldType.Number:
-                    if (xmlDoc.FirstChild.Attributes["Percentage"] != null
-                        && string.Equals(
-                            xmlDoc.FirstChild.Attributes["Percentage"].Value,
-                            bool.TrueString,
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        format = "0\\%;0\\%;0\\%";
-                    }
-                    else
-                    {
-                        int decCount;
-                        var decimals = string.Empty;
-                        int.TryParse(xmlDoc.FirstChild.Attributes["Decimals"].Value, out decCount);
-
-                        var stringBuilder = new StringBuilder(decimals);
-                        for (var i = 0; i < decCount; i++)
-                        {
-                            stringBuilder.Append("0");
-                        }
-                        decimals = stringBuilder.ToString();
-
-                        if (decCount > 0)
-                        {
-                            decimals = $".{decimals}";
-                        }
-
-                        format = ",0" + decimals;
-                    }
-                    break;
-                case SPFieldType.Currency:
-                    var currency = (SPFieldCurrency)field;
-                    var info = CultureInfo.GetCultureInfo(currency.CurrencyLocaleId).NumberFormat;
-                    format = setCurrencyFormatFunc?.Invoke(info);
-                    break;
-                case SPFieldType.Calculated:
-                    switch (xmlDoc.FirstChild.Attributes["ResultType"].Value)
-                    {
-                        case "Currency":
-                            format = $"{web.Locale.NumberFormat.CurrencySymbol},0.00";
-                            break;
-                        case "Number":
-                            if (xmlDoc.FirstChild.Attributes["Percentage"] != null
-                                && string.Equals(
-                                    xmlDoc.FirstChild.Attributes["Percentage"].Value,
-                                    bool.TrueString,
-                                    StringComparison.OrdinalIgnoreCase))
-                            {
-                                format = numberFormat;
-                            }
-                            else
-                            {
-                                var decCount = 0;
-                                var decimals = string.Empty;
-                                try
-                                {
-                                    decCount = int.Parse(xmlDoc.FirstChild.Attributes["Decimals"].Value);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Trace.TraceError("Exception Suppressed {0}", ex);
-                                }
-
-                                var stringBuilder = new StringBuilder(decimals);
-                                for (var i = 0; i < decCount; i++)
-                                {
-                                    stringBuilder.Append("0");
-                                }
-                                decimals = stringBuilder.ToString();
-
-                                if (decCount > 0)
-                                {
-                                    decimals = $".{decimals}";
-                                }
-
-                                format = $",0{decimals}";
-                            }
-                            break;
-                    }
-                    break;
-            }
-            return format;
         }
     }
 }
