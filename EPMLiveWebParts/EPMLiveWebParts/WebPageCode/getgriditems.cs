@@ -4077,6 +4077,11 @@ namespace EPMLiveWebParts
                     nodeCall.Attributes.Append(attrName);
 
                     var nodeParam = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                    if (dataSet.Tables[1].Rows.Count == 0 || dataSet.Tables[1].Columns.Count == 0)
+                    {
+                        throw new InvalidOperationException(
+                            "dataSet.Tables[1] should have at least one row and one column.");
+                    }
                     nodeParam.InnerText = dataSet.Tables[1].Rows[0][0].ToString();
 
                     nodeCall.AppendChild(nodeParam);
