@@ -516,175 +516,171 @@ namespace EPMLiveWebParts
 
         private XmlNode addMenus(XmlNode ndNewItem, SPList list, string showcreateworkspace)
         {
+            Guard.ArgumentIsNotNull(list, nameof(list));
 
-            int[] viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            if (DoesUserHavePermissionsViewListItems)
-                viewMenus[0] = 1;
-
-            if (DoesUserHavePermissionsEditListItems)
-                viewMenus[1] = 1;
-
-            if (DoesUserHavePermissionsManagePermissions)
-                viewMenus[2] = 1;
-
-            if (DoesUserHavePermissionsDeleteListItems && !isTimesheet)
-                viewMenus[3] = 1;
-
-
-            if (list.EnableVersioning)
-                if (DoesUserHavePermissionsViewVersions)
-                    viewMenus[4] = 1;
-
-            //if (list.WorkflowAssociations.Count > 0)
-            //    if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
-            //        viewMenus[0] = 1;
-
-
+            var viewMenus = new int[14];
+            viewMenus[0] = GetMenuView(DoesUserHavePermissionsViewListItems);
+            viewMenus[1] = GetMenuView(DoesUserHavePermissionsEditListItems);
+            viewMenus[2] = GetMenuView(DoesUserHavePermissionsManagePermissions);
+            viewMenus[3] = GetMenuView(DoesUserHavePermissionsDeleteListItems && !isTimesheet);
+            viewMenus[4] = GetMenuView(list.EnableVersioning && DoesUserHavePermissionsViewVersions);
             viewMenus[5] = 1;
+            viewMenus[6] = GetMenuView(list.EnableModeration && DoesUserHavePermissionsApproveItems);
+            viewMenus[7] = GetMenuView(list.WorkflowAssociations.Count > 0);
 
-            if (list.EnableModeration)
-                if (DoesUserHavePermissionsApproveItems)
-                    viewMenus[6] = 1;
+            AddPlannerMenus(list);
 
-            if (list.WorkflowAssociations.Count > 0)
-                viewMenus[7] = 1;
+            // show project button
+            viewMenus[8] = TryGetMenuView(
+                () => hshMenus[list.ID].agile || hshMenus[list.ID].workplan || hshMenus[list.ID].project);
 
+            // show create workspace
+            viewMenus[9] = GetMenuView(requestsenabled
+                && list.ParentWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs)
+                && showcreateworkspace.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase));
 
+            // show work planner
+            viewMenus[10] = TryGetMenuView(() => hshMenus[list.ID].workplan);
 
+            // show agile planner
+            viewMenus[11] = TryGetMenuView(() => hshMenus[list.ID].agile);
+            viewMenus[12] = GetMenuView(list.EnableAttachments && DoesUserHavePermissionsEditListItems);
+
+            // show edit in project (NON PS)
+            viewMenus[13] = TryGetMenuView(() => hshMenus[list.ID].project);
+
+            var viewMenusBuider = new StringBuilder();
+            foreach (var viewMenu in viewMenus)
+            {
+                viewMenusBuider.AppendFormat(",{0}", viewMenu.ToString());
+            }
+            var nodeUserData = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+            nodeUserData.InnerText = viewMenusBuider.ToString().Substring(1);
+
+            var attrName = docXml.CreateAttribute("name");
+            attrName.Value = "viewMenus";
+            nodeUserData.Attributes.Append(attrName);
+
+            Guard.ArgumentIsNotNull(ndNewItem, nameof(ndNewItem));
+            ndNewItem.AppendChild(nodeUserData);
+            return ndNewItem;
+        }
+
+        private void AddPlannerMenus(SPList list)
+        {
             if (!hshMenus.ContainsKey(list.ID))
             {
-                string pubPC = "";
-
-                bool wp = false;
-                bool ap = false;
+                var pubPC = string.Empty;
+                var workPlanProject = false;
+                var agileProject = false;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    using (SPSite site = new SPSite(list.ParentWeb.Site.ID))
+                    using (var site = new SPSite(list.ParentWeb.Site.ID))
                     {
-                        using (SPWeb web = site.OpenWeb())
+                        using (var web = site.OpenWeb())
                         {
-
-                            Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
+                            var lockWeb = CoreFunctions.getLockedWeb(web);
                             if (lockWeb == Guid.Empty || lockWeb == list.ParentWeb.ID)
                             {
-                                if (EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveWPProjectCenter") == list.Title)
-                                {
-                                    try
-                                    {
-                                        wp = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveWPEnable"));
-                                    }
-                                    catch { }
-                                }
-                                if (EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveAgileProjectCenter") == list.Title)
-                                {
-                                    try
-                                    {
-                                        ap = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveAgileEnable"));
-                                    }
-                                    catch { }
-                                }
-                                pubPC = EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLivePublisherProjectCenter");
+                                GetPlannerMenusConfig(
+                                    list.ParentWeb,
+                                    list.Title,
+                                    out pubPC,
+                                    out workPlanProject,
+                                    out agileProject);
                             }
                             else
                             {
-                                using (SPWeb w = site.OpenWeb(lockWeb))
+                                using (var spWeb = site.OpenWeb(lockWeb))
                                 {
-                                    if (EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPProjectCenter") == list.Title)
-                                    {
-                                        try
-                                        {
-                                            wp = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPEnable"));
-                                        }
-                                        catch { }
-                                    }
-                                    if (EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveAgileProjectCenter") == list.Title)
-                                    {
-                                        try
-                                        {
-                                            ap = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveAgileEnable"));
-                                        }
-                                        catch { }
-                                    }
-                                    pubPC = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePublisherProjectCenter");
+                                    GetPlannerMenusConfig(
+                                        spWeb,
+                                        list.Title,
+                                        out pubPC,
+                                        out workPlanProject,
+                                        out agileProject);
                                 }
                             }
                         }
                     }
 
                 });
-                PlannerMenus pm = new PlannerMenus();
-                pm.agile = ap;
-                pm.workplan = wp;
+                var plannerMenus = new PlannerMenus
+                {
+                    agile = agileProject,
+                    workplan = workPlanProject
+                };
                 try
                 {
-                    SPDocumentLibrary pschedules = (SPDocumentLibrary)list.ParentWeb.Lists["Project Schedules"];
-                    if (pschedules != null && pubPC.ToLower() == list.Title.ToLower())
+                    var projectSchedules = (SPDocumentLibrary)list.ParentWeb.Lists["Project Schedules"];
+                    if (projectSchedules != null && pubPC.Equals(list.Title, StringComparison.OrdinalIgnoreCase))
                     {
-                        pm.project = true;
+                        plannerMenus.project = true;
                     }
                 }
-                catch { }
-                hshMenus.Add(list.ID, pm);
-            }
+                catch (Exception ex)
+                {
+                    SDTrace.WriteLine(ex);
+                }
 
-            //if (list.TemplateFeatureId == new Guid("8fdde10b-891e-4600-ad06-dd9e554faca0") || list.TemplateFeatureId == new Guid("8087cd06-a830-49b9-9697-f1457a276bcb") || list.Title == EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveProjectCenter"))
-            //show project button
+                hshMenus.Add(list.ID, plannerMenus);
+            }
+        }
+
+        private static void GetPlannerMenusConfig(
+            SPWeb spWeb,
+            string listTitle,
+            out string pubPC,
+            out bool wpProject,
+            out bool agileProject)
+        {
+            wpProject = GetProjectEnableSetting(spWeb, listTitle, "EPMLiveWPProjectCenter", "EPMLiveWPEnable");
+            agileProject = GetProjectEnableSetting(spWeb, listTitle, "EPMLiveAgileProjectCenter", "EPMLiveAgileEnable");
+            pubPC = CoreFunctions.getConfigSetting(spWeb, "EPMLivePublisherProjectCenter");
+        }
+
+        private int TryGetMenuView(Func<bool> getShouldViewCondition)
+        {
             try
             {
-                if (hshMenus[list.ID].agile || hshMenus[list.ID].workplan || hshMenus[list.ID].project)
-                    viewMenus[8] = 1;
+                var shouldViewCondition = getShouldViewCondition.Invoke();
+                return GetMenuView(shouldViewCondition);
             }
-            catch { }
-            //show create workspace
-            if (requestsenabled && list.ParentWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs) && showcreateworkspace.ToLower() == "true")
-                viewMenus[9] = 1;
-
-            //show work planner
-            try
+            catch (Exception ex)
             {
-                if (hshMenus[list.ID].workplan)
-                    viewMenus[10] = 1;
+                SDTrace.WriteLine(ex);
+                return 0;
             }
-            catch { }
-            //show agile planner
-            try
+        }
+
+        private static bool GetProjectEnableSetting(SPWeb spWeb, string title, string titleKey, string enableKey)
+        {
+            if (CoreFunctions.getConfigSetting(spWeb, titleKey) == title)
             {
-                if (hshMenus[list.ID].agile)
-                    viewMenus[11] = 1;
+                try
+                {
+                    var configSetting = CoreFunctions.getConfigSetting(spWeb, enableKey);
+                    bool isEnable;
+                    if (!bool.TryParse(configSetting, out isEnable))
+                    {
+                        throw new InvalidOperationException($"Valid bool value was expected in {configSetting}");
+                    }
+                    return isEnable;
+                }
+                catch (Exception ex)
+                {
+                    SDTrace.WriteLine(ex);
+                }
             }
-            catch { }
-            //if (list.ParentWeb.Features[new Guid("")] != null)
-            //    viewMenus[10] = 1;
 
-            if (list.EnableAttachments && DoesUserHavePermissionsEditListItems)
-                viewMenus[12] = 1;
+            return false;
+        }
 
-            //show edit in project (NON PS)
-            try
-            {
-                if (hshMenus[list.ID].project)
-                    viewMenus[13] = 1;
-            }
-            catch { }
-
-            string strViewMenus = "";
-
-            foreach (int v in viewMenus)
-            {
-                strViewMenus += "," + v.ToString();
-            }
-            strViewMenus = strViewMenus.Substring(1);
-            XmlNode ndUserData = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-            ndUserData.InnerText = strViewMenus;
-
-            XmlAttribute attrName = docXml.CreateAttribute("name");
-            attrName.Value = "viewMenus";
-            ndUserData.Attributes.Append(attrName);
-
-            ndNewItem.AppendChild(ndUserData);
-
-            return ndNewItem;
+        private int GetMenuView(bool shouldViewMenu)
+        {
+            return shouldViewMenu
+                ? 1
+                : 0;
         }
 
         private void addFilterItems(string field, string value)
