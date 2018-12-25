@@ -4044,7 +4044,7 @@ namespace EPMLiveWebParts
                 try
                 {
                     var dataTable = ReportingData.GetReportingData(web, rollupList, true, query, orderBy);
-                    if (dataTable != null && dataTable.Rows.Count > 0)
+                    if (dataTable?.Rows.Count > 0)
                     {
                         ProcessListDTWithSiteFields(web, groupsList, dataTable, rollupList);
                     }
