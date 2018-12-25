@@ -165,6 +165,7 @@ namespace EPMLiveWebParts.Tests
             PrepareForAddMenus(list);
             var node = SetXmlDocument();
             ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
+            _privateObj.SetField("requestsenabled", true);
 
             // Act
             var result = _privateObj.Invoke(MethodAddMenus, new object[] { node, list, bool.TrueString });
@@ -173,7 +174,7 @@ namespace EPMLiveWebParts.Tests
             node.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => node.InnerXml.ShouldNotBeNullOrEmpty(),
-                () => node.InnerXml.ShouldBe("<userdata name=\"viewMenus\">1,1,1,1,1,1,1,0,1,0,1,1,0,1</userdata>"));
+                () => node.InnerXml.ShouldBe("<userdata name=\"viewMenus\">1,1,1,1,1,1,1,0,1,1,1,1,0,1</userdata>"));
         }
 
         [TestMethod]
