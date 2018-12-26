@@ -5636,7 +5636,7 @@ namespace EPMLiveWebParts
                     using (var web = site.OpenWeb())
                     {
                         //to Fix EPML-5716
-                        tempList = web.GetList(currentWeb.Url + "/" + strlist);
+                        tempList = web.GetList($"{currentWeb.Url}/{strlist}");
                     }
                 }
             });
