@@ -19,5 +19,27 @@ namespace EPMLiveCore.Helpers
                 throw new InvalidOperationException($"{argument} cannot be null");
             }
         }
+
+        public static bool TryParseBool(string str)
+        {
+            bool booleanValue;
+            if (bool.TryParse(str, out booleanValue))
+            {
+                return booleanValue;
+            }
+
+            throw new InvalidOperationException($"{str} should contain a valid bool value.");
+        }
+
+        public static int TryParseInt(string str)
+        {
+            int intValue;
+            if (int.TryParse(str, out intValue))
+            {
+                return intValue;
+            }
+
+            throw new InvalidOperationException($"{str} should contain a valid int value.");
+        }
     }
 }

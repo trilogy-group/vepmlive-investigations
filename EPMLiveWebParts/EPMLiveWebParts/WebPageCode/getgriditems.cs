@@ -5456,359 +5456,413 @@ namespace EPMLiveWebParts
             return field;
         }
 
-        public virtual void getParams(SPWeb curWeb)
+        public virtual void getParams(SPWeb currentWeb)
         {
-            try
-            {
-                Hashtable hshParams = new Hashtable();
-                string sEncryptedString = Request["data"];
-                byte[] encodedDataAsBytes = System.Convert.FromBase64String(sEncryptedString.Replace(' ', '+'));
-                string[] props = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
-
-                foreach (string s in props)
-                {
-                    hshParams.Add(s.Split('\t')[0], s.Split('\t')[1]);
-                }
-
-                strlist = hshParams["List"].ToString();
-                strview = hshParams["View"].ToString();
-                try
-                {
-                    ReportID = hshParams["ReportID"].ToString();
-                }
-                catch { }
-                try
-                {
-                    usewbs = hshParams["WBS"].ToString();
-                }
-                catch { }
-                try
-                {
-                    executive = hshParams["Executive"].ToString();
-                }
-                catch { }
-                try
-                {
-                    linktype = hshParams["LType"].ToString();
-                }
-                catch { }
-                try
-                {
-                    lookupFilterField = hshParams["LookupField"].ToString();
-                }
-                catch { }
-                try
-                {
-                    lookupFilterFieldList = hshParams["LookupFieldList"].ToString();
-                }
-                catch { }
-
-                try
-                {
-                    sSearchField = Request["searchfield"].ToString();
-                }
-                catch { }
-                try
-                {
-                    sSearchValue = Request["searchvalue"].ToString();
-                }
-                catch { }
-                try
-                {
-                    sSearchType = Request["searchtype"].ToString();
-                }
-                catch { }
-
-                try
-                {
-                    if (hshParams["RLists"].ToString() != "")
-                    {
-                        string[] tRollupLists = hshParams["RLists"].ToString().Split(',');
-                        rolluplists = new string[tRollupLists.Length];
-                        for (int i = 0; i < tRollupLists.Length; i++)
-                        {
-                            string[] tRlist = tRollupLists[i].Split('|');
-                            rolluplists[i] = tRlist[0];
-                            string icon = "";
-                            try
-                            {
-                                icon = tRlist[1];
-                            }
-                            catch { }
-                            hshLists.Add(rolluplists[i], icon);
-                        }
-                    }
-                }
-                catch { }
-
-                filterfield = hshParams["FilterField"].ToString();
-                filtervalue = hshParams["FilterValue"].ToString();
-
-                try
-                {
-                    LookupFilterField = hshParams["LookupFilterField"].ToString();
-                }
-                catch { }
-                try
-                {
-                    LookupFilterValue = hshParams["LookupFilterValue"].ToString();
-                }
-                catch { }
-
-                try
-                {
-                    if (hshParams["RSites"].ToString() != "")
-                    {
-                        rollupsites = hshParams["RSites"].ToString().Split(',');
-                    }
-                }
-                catch { }
-                gridname = hshParams["GridName"].ToString();
-                try
-                {
-                    additionalgroups = hshParams["AGroups"].ToString();
-                }
-                catch { }
-                expandlevel = 0;
-                try
-                {
-                    expandlevel = int.Parse(hshParams["Expand"].ToString());
-                }
-                catch { }
-
-                try
-                {
-                    InfoField = hshParams["Info"].ToString();
-                }
-                catch { }
-                try
-                {
-                    StartDateField = hshParams["Start"].ToString();
-                }
-                catch { }
-                try
-                {
-                    DueDateField = hshParams["Finish"].ToString();
-                }
-                catch { }
-                try
-                {
-                    ProgressField = hshParams["Percent"].ToString();
-                }
-                catch { }
-
-                SPList tempList = null;
-
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                {
-                    using (SPSite s = new SPSite(curWeb.Url))
-                    {
-                        using (SPWeb w = s.OpenWeb())
-                        {
-                            //to Fix EPML-5716
-                            tempList = w.GetList(curWeb.Url + "/" + strlist);
-                        }
-                    }
-                });
-
-                list = curWeb.Lists[tempList.ID];
-                view = list.Views[strview];
-
-                try
-                {
-                    inEditMode = bool.Parse(Request["edit"]);
-                }
-                catch { }
-                try
-                {
-                    showinsertrow = bool.Parse(hshParams["ShowInsert"].ToString());
-                }
-                catch { }
-                try
-                {
-                    usePerformance = false;
-                    usePerformance = bool.Parse(hshParams["UsePerf"].ToString());
-                }
-                catch { }
-                try
-                {
-                    usePopup = false;
-                    usePopup = bool.Parse(hshParams["UsePopup"].ToString());
-                }
-                catch { }
-                try
-                {
-                    requestsenabled = false;
-                    requestsenabled = bool.Parse(hshParams["Requests"].ToString());
-                }
-                catch { }
-                try
-                {
-                    showCheckboxes = false;
-                    showCheckboxes = bool.Parse(hshParams["ShowCheckboxes"].ToString());
-                }
-                catch { }
-                try
-                {
-                    bUseReporting = bool.Parse(hshParams["UseReporting"].ToString());
-                }
-                catch { }
-                GridViewSession gvs = new GridViewSession(view.ID);
-                try
-                {
-                    iPageSize = int.Parse(hshParams["PageSize"].ToString());
-                }
-                catch { }
-                try
-                {
-                    iPage = int.Parse(Request["Page"].ToString());
-                    if (bUseReporting)
-                    {
-                        gvs.Page = iPage;
-                    }
-                }
-                catch { }
-                if (iPage == 0 && bUseReporting)
-                    iPage = gvs.Page;
-
-                try
-                {
-                    DifferentColumns = Request["Cols"].ToString();
-                }
-                catch { }
-                try
-                {
-                    if (string.IsNullOrEmpty(DifferentColumns))
-                        DifferentColumns = gvs.Columns;
-                    else
-                        gvs.Columns = DifferentColumns;
-                }
-                catch { }
-
-                try
-                {
-                    FromGroupBy = Request["FromGroupBy"].ToString();
-                }
-                catch { }
-
-                try
-                {
-                    DifferentGroups = Request["GB"].ToString();
-
-                    if (FromGroupBy == "1")
-                    {
-                        Session["FromGroupBy"] = "1";
-                    }
-
-                    if (Convert.ToString(Session["FromGroupBy"]).Equals("1") && DifferentGroups == "")
-                    {
-                        GroupByFromToolbar = true;
-                    }
-                }
-                catch
-                {
-                    Session["FromGroupBy"] = "0";
-                }
-                try
-                {
-                    if (string.IsNullOrEmpty(DifferentGroups))
-                        DifferentGroups = gvs.Groups;
-                    else
-                        gvs.Groups = DifferentGroups;
-                }
-                catch { }
-
-
-                try
-                {
-                    if (Request["NP"].ToString() == "true")
-                    {
-                        iPageSize = 0;
-                    }
-                }
-                catch { }
-                try
-                {
-                    WPID = hshParams["WPID"].ToString();
-                }
-                catch { }
-            }
-            catch { }
+            TryGetParamValues(currentWeb);
 
             Dictionary<string, Dictionary<string, string>> fieldProperties = null;
             try
             {
-                GridViewSession gvs = new GridViewSession(Guid.Empty);
+                new GridViewSession(Guid.Empty);
             }
-            catch { }
-            GridGanttSettings gSettings = new GridGanttSettings(list);
-            if (gSettings.DisplaySettings != "")
-                fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-            bool bIsDisplay = false;
-
-            foreach (string field in view.ViewFields)
+            catch (Exception ex)
             {
-                SPField oField = list.Fields.GetFieldByInternalName(field);
-                if (getRealField(oField).InternalName == "Title")
-                {
-                    aViewFields.Add(field);
-                }
-                else
-                {
-                    if (fieldProperties != null)
-                        bIsDisplay = EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display");
-                    else
-                        bIsDisplay = !oField.ShowInDisplayForm.HasValue || (bool)oField.ShowInViewForms;
-                    if (bIsDisplay == true)
-                    {
-                        aViewFields.Add(field);
-                    }
-                }
-
-                if (field == "WorkspaceUrl")
-                    bWorkspaceUrl = true;
+                SDTrace.WriteLine(ex);
+            }
+            var ganttSettings = new GridGanttSettings(list);
+            if (!string.IsNullOrWhiteSpace(ganttSettings.DisplaySettings))
+            {
+                fieldProperties = ListDisplayUtils.ConvertFromString(ganttSettings.DisplaySettings);
             }
 
-            if (!string.IsNullOrEmpty(DifferentColumns))
+            AddViewFields(fieldProperties);
+            AddDifferentColumnsViewFields(fieldProperties);
+        }
+
+        private void AddDifferentColumnsViewFields(Dictionary<string, Dictionary<string, string>> fieldProperties)
+        {
+            if (!string.IsNullOrWhiteSpace(DifferentColumns))
             {
-                ArrayList arrCurFields = new ArrayList(aViewFields);
+                var currentFields = new ArrayList(aViewFields);
 
-                foreach (string sField in DifferentColumns.Split(','))
+                var allDifferentColumns = DifferentColumns.Split(',');
+                foreach (var column in allDifferentColumns)
                 {
-
-                    //if (!aViewFields.Contains(sField))
-                    //    aViewFields.Add(sField);
-                    //EPML-4653: for fields with no permission, we should NOT add them back to the current view.
-                    //Adding them back into the view causes the view column ordering to break
-                    //Since Gantt is a special column and not a field we need to make special adjustment for Gantt column
-                    if (!aViewFields.Contains(sField))
+                    // EPML-4653: for fields with no permission, we should NOT add them back to the current view.
+                    // Adding them back into the view causes the view column ordering to break
+                    // Since Gantt is a special column and not a field we need to make special adjustment for Gantt column
+                    if (!aViewFields.Contains(column))
                     {
-                        if (sField.ToLower().Equals("gantt"))
+                        if (column.Equals("gantt", StringComparison.OrdinalIgnoreCase))
                         {
-                            aViewFields.Add(sField);
+                            aViewFields.Add(column);
                         }
                         else
                         {
-                            SPField oField = list.Fields.GetFieldByInternalName(sField);
-                            if (EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display"))
+                            var spField = list.Fields.GetFieldByInternalName(column);
+                            if (EPMLiveCore.EditableFieldDisplay.IsDisplayField(spField, fieldProperties, "Display"))
                             {
-                                aViewFields.Add(sField);
+                                aViewFields.Add(column);
                             }
                         }
                     }
-                    if (arrCurFields.Contains(sField))
-                        arrCurFields.Remove(sField);
+
+                    if (currentFields.Contains(column))
+                    {
+                        currentFields.Remove(column);
+                    }
                 }
 
-                foreach (string sField in arrCurFields)
+                foreach (string sField in currentFields)
                 {
                     if (aViewFields.Contains(sField))
+                    {
                         aViewFields.Remove(sField);
+                    }
                 }
             }
-
-
         }
+
+        private void AddViewFields(Dictionary<string, Dictionary<string, string>> fieldProperties)
+        {
+            var isDisplay = false;
+            foreach (string viewField in view.ViewFields)
+            {
+                var spField = list.Fields.GetFieldByInternalName(viewField);
+                if (getRealField(spField).InternalName == "Title")
+                {
+                    aViewFields.Add(viewField);
+                }
+                else
+                {
+                    isDisplay = fieldProperties != null
+                        ? EPMLiveCore.EditableFieldDisplay.IsDisplayField(spField, fieldProperties, "Display")
+                        : !spField.ShowInDisplayForm.HasValue || (bool)spField.ShowInViewForms;
+
+                    if (isDisplay)
+                    {
+                        aViewFields.Add(viewField);
+                    }
+                }
+
+                if (viewField == "WorkspaceUrl")
+                {
+                    bWorkspaceUrl = true;
+                }
+            }
+        }
+
+        private void TryGetParamValues(SPWeb currentWeb)
+        {
+            try
+            {
+                var paramsHashTable = new Hashtable();
+                var encryptedString = Request["data"];
+                Guard.ValueIsNotNull(encryptedString, nameof(encryptedString));
+                var encodedDataAsBytes = Convert.FromBase64String(
+                    encryptedString.Replace(' ', '+'));
+                var properties = ASCIIEncoding.ASCII.GetString(encodedDataAsBytes)
+                    .Split('\n');
+
+                foreach (var strProperty in properties)
+                {
+                    var splittedProperty = strProperty.Split('\t');
+                    paramsHashTable.Add(splittedProperty[0], splittedProperty[1]);
+                }
+
+                strlist = paramsHashTable["List"].ToString();
+                strview = paramsHashTable["View"].ToString();
+
+                TryGetParamValue(paramsHashTable, "ReportID", ref ReportID);
+                TryGetParamValue(paramsHashTable, "WBS", ref usewbs);
+                TryGetParamValue(paramsHashTable, "Executive", ref executive);
+                TryGetParamValue(paramsHashTable, "LType", ref linktype);
+                TryGetParamValue(paramsHashTable, "LookupField", ref lookupFilterField);
+                TryGetParamValue(paramsHashTable, "LookupFieldList", ref lookupFilterFieldList);
+                TryGetParamValue(paramsHashTable, "searchfield", ref sSearchField);
+                TryGetParamValue(paramsHashTable, "searchvalue", ref sSearchValue);
+                TryGetParamValue(paramsHashTable, "searchtype", ref sSearchType);
+
+                UpdateRollupLists(paramsHashTable);
+                UpdateFilter(paramsHashTable);
+                UpdateRollupSites(paramsHashTable);
+                gridname = paramsHashTable["GridName"].ToString();
+                TryGetParamValue(paramsHashTable, "AGroups", ref additionalgroups);
+                expandlevel = 0;
+                TryGetParamValue(paramsHashTable, "Expand", ref expandlevel);
+                TryGetParamValue(paramsHashTable, "Info", ref InfoField);
+                TryGetParamValue(paramsHashTable, "Start", ref StartDateField);
+                TryGetParamValue(paramsHashTable, "Finish", ref DueDateField);
+                TryGetParamValue(paramsHashTable, "Percent", ref ProgressField);
+
+                SetListAndView(currentWeb);
+                SetIsEditMode();
+
+                TryGetParamValue(paramsHashTable, "ShowInsert", ref showinsertrow);
+                TryGetParamValue(paramsHashTable, "UsePerf", ref usePerformance, false);
+                TryGetParamValue(paramsHashTable, "UsePopup", ref usePopup, false);
+                TryGetParamValue(paramsHashTable, "Requests", ref requestsenabled, false);
+                TryGetParamValue(paramsHashTable, "ShowCheckboxes", ref showCheckboxes, false);
+                TryGetParamValue(paramsHashTable, "UseReporting", ref bUseReporting);
+                GetGridViewParams(paramsHashTable);
+                TryGetParamValue(paramsHashTable, "WPID", ref WPID);
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void SetIsEditMode()
+        {
+            try
+            {
+                inEditMode = Guard.TryParseBool(Request["edit"]);
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void SetListAndView(SPWeb currentWeb)
+        {
+            Guard.ArgumentIsNotNull(currentWeb, nameof(currentWeb));
+            SPList tempList = null;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (var site = new SPSite(currentWeb.Url))
+                {
+                    using (var web = site.OpenWeb())
+                    {
+                        //to Fix EPML-5716
+                        tempList = web.GetList(currentWeb.Url + "/" + strlist);
+                    }
+                }
+            });
+
+            Guard.ValueIsNotNull(tempList, nameof(tempList));
+            list = currentWeb.Lists[tempList.ID];
+
+            Guard.ValueIsNotNull(list, nameof(list));
+            view = list.Views[strview];
+        }
+
+        private void GetGridViewParams(Hashtable paramsHashTable)
+        {
+            var gridViewSession = new GridViewSession(view.ID);
+            TryGetParamValue(paramsHashTable, "PageSize", ref iPageSize);
+
+            SetPage(gridViewSession);
+            SetDifferentColumns(gridViewSession);
+            SetGroupBy(paramsHashTable);
+
+            try
+            {
+                if (string.IsNullOrEmpty(DifferentGroups))
+                {
+                    DifferentGroups = gridViewSession.Groups;
+                }
+                else
+                {
+                    gridViewSession.Groups = DifferentGroups;
+                }
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+
+            try
+            {
+                if (Request["NP"].ToString() == "true")
+                {
+                    iPageSize = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void SetGroupBy(Hashtable paramsHashTable)
+        {
+            TryGetParamValue(paramsHashTable, "FromGroupBy", ref FromGroupBy);
+            try
+            {
+                DifferentGroups = Request["GB"].ToString();
+
+                if (FromGroupBy == "1")
+                {
+                    Session["FromGroupBy"] = "1";
+                }
+
+                if ("1".Equals(Convert.ToString(Session["FromGroupBy"]))
+                    && string.IsNullOrWhiteSpace(DifferentGroups))
+                {
+                    GroupByFromToolbar = true;
+                }
+            }
+            catch
+            {
+                Session["FromGroupBy"] = "0";
+            }
+        }
+
+        private void SetDifferentColumns(GridViewSession gridViewSession)
+        {
+            try
+            {
+                DifferentColumns = Request["Cols"].ToString();
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+            try
+            {
+                if (string.IsNullOrWhiteSpace(DifferentColumns))
+                {
+                    DifferentColumns = gridViewSession.Columns;
+                }
+                else
+                {
+                    gridViewSession.Columns = DifferentColumns;
+                }
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void SetPage(GridViewSession gridViewSession)
+        {
+            try
+            {
+                iPage = Guard.TryParseInt(Request["Page"].ToString());
+                if (bUseReporting)
+                {
+                    gridViewSession.Page = iPage;
+                }
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+
+            if (iPage == 0 && bUseReporting)
+            {
+                iPage = gridViewSession.Page;
+            }
+        }
+
+        private void UpdateRollupSites(Hashtable paramsHashTable)
+        {
+            try
+            {
+                var allRollupSites = paramsHashTable["RSites"].ToString();
+                if (!string.IsNullOrWhiteSpace(allRollupSites))
+                {
+                    rollupsites = allRollupSites.Split(',');
+                }
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void UpdateRollupLists(Hashtable paramsHashTable)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(paramsHashTable["RLists"].ToString()))
+                {
+                    var rollupLists = paramsHashTable["RLists"].ToString()
+                        .Split(',');
+                    rolluplists = new string[rollupLists.Length];
+                    for (var i = 0; i < rollupLists.Length; i++)
+                    {
+                        var rolluplist = rollupLists[i].Split('|');
+                        rolluplists[i] = rolluplist[0];
+                        var icon = string.Empty;
+                        try
+                        {
+                            icon = rolluplist[1];
+                        }
+                        catch (Exception ex)
+                        {
+                            SDTrace.WriteLine(ex);
+                        }
+                        hshLists.Add(rolluplists[i], icon);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void UpdateFilter(Hashtable paramsHashTable)
+        {
+            filterfield = paramsHashTable["FilterField"].ToString();
+            filtervalue = paramsHashTable["FilterValue"].ToString();
+
+            TryGetParamValue(paramsHashTable, "LookupFilterField", ref LookupFilterField);
+            TryGetParamValue(paramsHashTable, "LookupFilterValue", ref LookupFilterValue);
+        }
+
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref bool showinsertrow)
+        {
+            try
+            {
+                showinsertrow = Guard.TryParseBool(paramsHashTable[key].ToString());
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref bool showinsertrow, bool defaultValue)
+        {
+            try
+            {
+                showinsertrow = Guard.TryParseBool(paramsHashTable[key].ToString());
+            }
+            catch
+            {
+                showinsertrow = defaultValue;
+            }
+        }
+
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref int expandlevel)
+        {
+            try
+            {
+                expandlevel = Guard.TryParseInt(paramsHashTable[key].ToString());
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref string parameterToUpdate)
+        {
+            try
+            {
+                parameterToUpdate = paramsHashTable[key].ToString();
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
         public string getField(SPListItem li, string field, bool group)
         {
             string val = "";
