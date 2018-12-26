@@ -138,6 +138,7 @@
     <Compile Include="WebServices\CADataCacheTests.cs" />
     <Compile Include="WebServices\ClientPriorizationTests.cs" />
     <Compile Include="WebServices\CostAnalyzerDataCacheTests.cs" />
+    <Compile Include="WebServices\CostAnalyzerTests.cs" />
     <Compile Include="WebServices\EditCalendarTests.cs" />
     <Compile Include="WebServices\EditCostsTests.SaveEditCostsData.cs" />
     <Compile Include="WebServices\EditCostsTestsSplitOne.cs" />
