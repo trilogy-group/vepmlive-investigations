@@ -84,8 +84,6 @@ namespace ProjectPublisher2016
             Globals.ThisAddIn.c.Activate();
         }
 
-    
-
         private void btnAbout_Click(object sender, RibbonControlEventArgs e)
         {
             Globals.ThisAddIn.c.About();
