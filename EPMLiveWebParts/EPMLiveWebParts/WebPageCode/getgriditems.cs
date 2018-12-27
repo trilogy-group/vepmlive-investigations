@@ -519,35 +519,30 @@ namespace EPMLiveWebParts
             Guard.ArgumentIsNotNull(list, nameof(list));
 
             var viewMenus = new int[14];
-            viewMenus[0] = GetMenuView(DoesUserHavePermissionsViewListItems);
-            viewMenus[1] = GetMenuView(DoesUserHavePermissionsEditListItems);
-            viewMenus[2] = GetMenuView(DoesUserHavePermissionsManagePermissions);
-            viewMenus[3] = GetMenuView(DoesUserHavePermissionsDeleteListItems && !isTimesheet);
-            viewMenus[4] = GetMenuView(list.EnableVersioning && DoesUserHavePermissionsViewVersions);
+            viewMenus[0] = DoesUserHavePermissionsViewListItems ? 1 : 0;
+            viewMenus[1] = DoesUserHavePermissionsEditListItems ? 1 : 0;
+            viewMenus[2] = DoesUserHavePermissionsManagePermissions ? 1 : 0;
+            viewMenus[3] = DoesUserHavePermissionsDeleteListItems && !isTimesheet ? 1 : 0;
+            viewMenus[4] = list.EnableVersioning && DoesUserHavePermissionsViewVersions ? 1 : 0;
             viewMenus[5] = 1;
-            viewMenus[6] = GetMenuView(list.EnableModeration && DoesUserHavePermissionsApproveItems);
-            viewMenus[7] = GetMenuView(list.WorkflowAssociations.Count > 0);
+            viewMenus[6] = list.EnableModeration && DoesUserHavePermissionsApproveItems ? 1 : 0;
+            viewMenus[7] = list.WorkflowAssociations.Count > 0 ? 1 : 0;
 
             AddPlannerMenus(list);
-
-            // show project button
-            viewMenus[8] = TryGetMenuView(
-                () => hshMenus[list.ID].agile || hshMenus[list.ID].workplan || hshMenus[list.ID].project);
+            ShowProjectButton(list, viewMenus);
 
             // show create workspace
-            viewMenus[9] = GetMenuView(requestsenabled
-                && list.ParentWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs)
-                && showcreateworkspace.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase));
+            viewMenus[9] = requestsenabled
+                    && list.ParentWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs)
+                    && showcreateworkspace.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase)
+                ? 1
+                : 0;
 
-            // show work planner
-            viewMenus[10] = TryGetMenuView(() => hshMenus[list.ID].workplan);
+            ShowWorkPlanner(list, viewMenus);
+            ShowAgilePlanner(list, viewMenus);
 
-            // show agile planner
-            viewMenus[11] = TryGetMenuView(() => hshMenus[list.ID].agile);
-            viewMenus[12] = GetMenuView(list.EnableAttachments && DoesUserHavePermissionsEditListItems);
-
-            // show edit in project (NON PS)
-            viewMenus[13] = TryGetMenuView(() => hshMenus[list.ID].project);
+            viewMenus[12] = list.EnableAttachments && DoesUserHavePermissionsEditListItems ? 1 : 0;
+            ShowEditInProject(list, viewMenus);
 
             var viewMenusBuider = new StringBuilder();
             foreach (var viewMenu in viewMenus)
@@ -564,6 +559,56 @@ namespace EPMLiveWebParts
             Guard.ArgumentIsNotNull(ndNewItem, nameof(ndNewItem));
             ndNewItem.AppendChild(nodeUserData);
             return ndNewItem;
+        }
+
+        private void ShowEditInProject(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[13] = hshMenus[list.ID].project ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void ShowAgilePlanner(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[11] = hshMenus[list.ID].agile ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void ShowWorkPlanner(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[10] = hshMenus[list.ID].workplan ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void ShowProjectButton(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[8] = hshMenus[list.ID].agile || hshMenus[list.ID].workplan || hshMenus[list.ID].project
+                    ? 1
+                    : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
         }
 
         private void AddPlannerMenus(SPList list)
@@ -639,20 +684,6 @@ namespace EPMLiveWebParts
             pubPC = CoreFunctions.getConfigSetting(spWeb, "EPMLivePublisherProjectCenter");
         }
 
-        private int TryGetMenuView(Func<bool> getShouldViewCondition)
-        {
-            try
-            {
-                var shouldViewCondition = getShouldViewCondition.Invoke();
-                return GetMenuView(shouldViewCondition);
-            }
-            catch (Exception ex)
-            {
-                SDTrace.WriteLine(ex);
-                return 0;
-            }
-        }
-
         private static bool GetProjectEnableSetting(SPWeb spWeb, string title, string titleKey, string enableKey)
         {
             if (CoreFunctions.getConfigSetting(spWeb, titleKey) == title)
@@ -674,13 +705,6 @@ namespace EPMLiveWebParts
             }
 
             return false;
-        }
-
-        private int GetMenuView(bool shouldViewMenu)
-        {
-            return shouldViewMenu
-                ? 1
-                : 0;
         }
 
         private void addFilterItems(string field, string value)
