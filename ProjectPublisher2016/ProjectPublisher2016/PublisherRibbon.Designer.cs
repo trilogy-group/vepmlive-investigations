@@ -66,7 +66,7 @@
             this.mnuHelp = this.Factory.CreateRibbonMenu();
             this.btnProxy = this.Factory.CreateRibbonButton();
             this.btnActivate = this.Factory.CreateRibbonButton();
-            this.btnOnline = this.Factory.CreateRibbonButton();
+           
             this.btnUpdates = this.Factory.CreateRibbonButton();
             this.btnEnablePPM = this.Factory.CreateRibbonToggleButton();
             this.separator3 = this.Factory.CreateRibbonSeparator();
@@ -314,7 +314,7 @@
             this.mnuHelp.Image = global::ProjectPublisher2016.Properties.Resources.help;
             this.mnuHelp.Items.Add(this.btnProxy);
             this.mnuHelp.Items.Add(this.btnActivate);
-            this.mnuHelp.Items.Add(this.btnOnline);
+            
             this.mnuHelp.Items.Add(this.btnEnablePPM);
             this.mnuHelp.Items.Add(this.separator3);
             this.mnuHelp.Items.Add(this.btnAbout);
@@ -335,13 +335,7 @@
             this.btnActivate.Name = "btnActivate";
             this.btnActivate.ShowImage = true;
             this.btnActivate.Click += this.btnActivate_Click;
-            // 
-            // btnOnline
-            // 
-            this.btnOnline.Label = "Online Help Guide";
-            this.btnOnline.Name = "btnOnline";
-            this.btnOnline.ShowImage = true;
-            this.btnOnline.Click += this.btnOnline_Click;           
+                  
             // 
             // btnEnablePPM
             // 
@@ -409,7 +403,7 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonMenu mnuHelp;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnProxy;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnActivate;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnOnline;
+        
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnUpdates;
         internal Microsoft.Office.Tools.Ribbon.RibbonSeparator separator3;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnAbout;
