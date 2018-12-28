@@ -177,6 +177,26 @@ namespace EPMLiveWebParts.Tests
         }
 
         [TestMethod]
+        public void AddMenus_Invoke_SetsAllNodesButTwo()
+        {
+            // Arrange
+            var list = new ShimSPList().Instance;
+            PrepareForAddMenus(list);
+            var node = SetXmlDocument();
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
+            _privateObj.SetField("requestsenabled", true);
+
+            // Act
+            var result = _privateObj.Invoke(MethodAddMenus, new object[] { node, list, bool.TrueString });
+
+            // Assert
+            node.ShouldNotBeNull();
+            this.ShouldSatisfyAllConditions(
+                () => node.InnerXml.ShouldNotBeNullOrEmpty(),
+                () => node.InnerXml.ShouldBe("<userdata name=\"viewMenus\">1,1,1,1,1,1,1,0,1,1,1,1,0,1</userdata>"));
+        }
+
+        [TestMethod]
         public void AddMenus_EmptyLockWeb_FillsNode()
         {
             // Arrange
