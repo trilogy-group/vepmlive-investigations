@@ -52,7 +52,7 @@ namespace EPMLiveReporting.Tests.Layouts.EPMLive
         private const string SiteGuidField = "siteguid";
         private const string WebGuidField = "webguid";
         private const string ListGuidField = "listguid";
-        private const string lastQueueCheckField = "lastqueuecheck";
+        private const string LastQueueCheckField = "lastqueuecheck";
         private const string ParentJobUidField = "parentjobuid";
         private const string TimeJobUidField = "timejobuid";
         private const string SelectListNameFromRptList = "SELECT ListName FROM RPTList WHERE SiteId=@siteId";
@@ -456,7 +456,7 @@ namespace EPMLiveReporting.Tests.Layouts.EPMLive
                 () => actualParam.ShouldContainKeyAndValue($"@{ScheduleTypeField}", 2),
                 () => actualParam.ShouldContainKeyAndValue($"@{DaysField}", "3"),
                 () => actualParam.ShouldContainKeyAndValue($"@{JobDataField}", DummyListName),
-                () => actualParam.ShouldContainKeyAndValue($"@{lastQueueCheckField}", DBNull.Value),
+                () => actualParam.ShouldContainKeyAndValue($"@{LastQueueCheckField}", DBNull.Value),
                 () => actualParam.ShouldContainKeyAndValue($"@{ParentJobUidField}", DBNull.Value),
                 () => _labelErrorSite.Visible.ShouldBeFalse());
         }
@@ -591,37 +591,12 @@ namespace EPMLiveReporting.Tests.Layouts.EPMLive
             _privateObject.SetField(CheckBoxListDaysField, checkBoxListDays);
 
             var dropDownListDays = new DropDownList();
-            dropDownListDays.Items.Add(new ListItem("1", "1"));
-            dropDownListDays.Items.Add(new ListItem("2", "2"));
-            dropDownListDays.Items.Add(new ListItem("3", "3"));
-            dropDownListDays.Items.Add(new ListItem("4", "4"));
-            dropDownListDays.Items.Add(new ListItem("5", "5"));
-            dropDownListDays.Items.Add(new ListItem("6", "6"));
-            dropDownListDays.Items.Add(new ListItem("7", "7"));
-            dropDownListDays.Items.Add(new ListItem("8", "8"));
-            dropDownListDays.Items.Add(new ListItem("9", "9"));
-            dropDownListDays.Items.Add(new ListItem("10", "10"));
-            dropDownListDays.Items.Add(new ListItem("11", "11"));
-            dropDownListDays.Items.Add(new ListItem("12", "12"));
-            dropDownListDays.Items.Add(new ListItem("13", "13"));
-            dropDownListDays.Items.Add(new ListItem("14", "14"));
-            dropDownListDays.Items.Add(new ListItem("15", "15"));
-            dropDownListDays.Items.Add(new ListItem("16", "16"));
-            dropDownListDays.Items.Add(new ListItem("17", "17"));
-            dropDownListDays.Items.Add(new ListItem("18", "18"));
-            dropDownListDays.Items.Add(new ListItem("19", "19"));
-            dropDownListDays.Items.Add(new ListItem("20", "20"));
-            dropDownListDays.Items.Add(new ListItem("21", "21"));
-            dropDownListDays.Items.Add(new ListItem("22", "22"));
-            dropDownListDays.Items.Add(new ListItem("23", "23"));
-            dropDownListDays.Items.Add(new ListItem("24", "24"));
-            dropDownListDays.Items.Add(new ListItem("25", "25"));
-            dropDownListDays.Items.Add(new ListItem("26", "26"));
-            dropDownListDays.Items.Add(new ListItem("27", "27"));
-            dropDownListDays.Items.Add(new ListItem("28", "28"));
-            dropDownListDays.Items.Add(new ListItem("29", "29"));
-            dropDownListDays.Items.Add(new ListItem("30", "30"));
-            dropDownListDays.Items.Add(new ListItem("31", "31"));
+
+            for (var i = 1; i <= 31; i++)
+            {
+                dropDownListDays.Items.Add(new ListItem(i.ToString(), i.ToString()));
+            }
+
             _privateObject.SetField(DropDownListDaysField, dropDownListDays);
 
             _privateObject.SetField(ListBoxListsField, new ListBox());
