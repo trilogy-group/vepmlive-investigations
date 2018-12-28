@@ -91,6 +91,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Jobs\CollectJobTests.cs" />
+    <Compile Include="Layouts\EPMLive\ReportSchedule.apsx.Tests.cs" />
     <Compile Include="ListRefreshTestst2.cs" />
     <Compile Include="ParentItemUpdateTests.cs" />
     <Compile Include="ViewLogDetailTests.cs" />
@@ -124,6 +125,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
