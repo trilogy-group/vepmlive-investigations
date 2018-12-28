@@ -5839,11 +5839,11 @@ namespace EPMLiveWebParts
             TryGetParamValue(paramsHashTable, "LookupFilterValue", ref LookupFilterValue);
         }
 
-        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref bool showinsertrow)
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref bool showInsertRow)
         {
             try
             {
-                showinsertrow = Guard.TryParseBool(paramsHashTable[key].ToString());
+                showInsertRow = Guard.TryParseBool(paramsHashTable[key].ToString());
             }
             catch (Exception ex)
             {
@@ -5851,23 +5851,23 @@ namespace EPMLiveWebParts
             }
         }
 
-        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref bool showinsertrow, bool defaultValue)
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref bool showInsertRow, bool defaultValue)
         {
             try
             {
-                showinsertrow = Guard.TryParseBool(paramsHashTable[key].ToString());
+                showInsertRow = Guard.TryParseBool(paramsHashTable[key].ToString());
             }
             catch
             {
-                showinsertrow = defaultValue;
+                showInsertRow = defaultValue;
             }
         }
 
-        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref int expandlevel)
+        private void TryGetParamValue(Hashtable paramsHashTable, string key, ref int expandLevel)
         {
             try
             {
-                expandlevel = Guard.TryParseInt(paramsHashTable[key].ToString());
+                expandLevel = Guard.TryParseInt(paramsHashTable[key].ToString());
             }
             catch (Exception ex)
             {
