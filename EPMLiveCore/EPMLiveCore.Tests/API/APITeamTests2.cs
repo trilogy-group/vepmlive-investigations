@@ -359,7 +359,7 @@ namespace EPMLiveCore.Tests.API
             ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection().Instance;
             ShimSPListItemCollection.AllInstances.GetDataTable = _ =>
             {
-                DataTable dataTable = new DataTable();
+                var dataTable = new DataTable();
                 dataTable.Columns.Add("ResID");
                 dataTable.Columns.Add("ID");
                 dataTable.Columns.Add("Title");
