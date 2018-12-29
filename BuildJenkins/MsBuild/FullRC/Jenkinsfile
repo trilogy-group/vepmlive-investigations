@@ -157,6 +157,23 @@ pipeline {
 								}
 							}
 						}
+						stage('Security Tests') {
+							when {
+								expression { new Date()[Calendar.DAY_OF_WEEK] == Calendar.SATURDAY }
+							}
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering security tests job...'
+										build(
+											job: "../EPML-Sec/EPML-Sec", 
+											wait: true,
+											propagate: false
+										)
+									}
+								}
+							}
+						}		
 					}
 				}
 				stage('TS-Client Tests') {
