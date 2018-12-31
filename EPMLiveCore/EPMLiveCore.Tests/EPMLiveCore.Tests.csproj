@@ -287,6 +287,7 @@
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.IsFieldExcluded.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.RenderControl.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.SmallFunctions.cs" />
     <Compile Include="NewAppTest.cs" />
     <Compile Include="PlatformIntegrationEventTest.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
