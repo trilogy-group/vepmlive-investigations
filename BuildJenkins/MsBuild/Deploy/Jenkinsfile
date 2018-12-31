@@ -1,13 +1,14 @@
 pipeline {
 	agent {
 		node {
-			label 'skyvera-jenkins-win-build'
+			label 'skyvera-non-docker-jenkins-win-build'
 			customWorkspace "c:\\jenkins\\build"
 		}
 	}
 	options {
 		skipDefaultCheckout true
 		timestamps()
+		timeout(time: 2, unit: 'HOURS') 
 	}
 	parameters {
 		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
