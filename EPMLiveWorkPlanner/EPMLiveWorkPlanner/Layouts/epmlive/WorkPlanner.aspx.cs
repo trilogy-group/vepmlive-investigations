@@ -755,6 +755,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             if (props.Length > 1)
             {
+
                 sb.Append("\"");
                 sb.Append(GetCleanString(props[0].ToString()));
                 sb.Append("\"");
@@ -815,7 +816,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 catch { }
 
-
+               
                 if (bAgile)
                 {
                     try
