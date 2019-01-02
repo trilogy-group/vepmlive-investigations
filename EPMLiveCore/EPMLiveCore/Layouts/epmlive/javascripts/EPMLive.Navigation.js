@@ -3188,7 +3188,7 @@
         ExecuteOrDelayUntilScriptLoaded(initializeNavigation, 'EPMLiveNavigation');
     }
     window.showModalDialog = window.showModalDialog || function (url, arg, opt) {
-        if (typeof arg == "undefined") {
+        if (typeof arg == 'undefined') {
             window.open(url, '', opt);
         }
         else {
@@ -3197,23 +3197,23 @@
             var width = 430;
             var height = 230;
             var value = arg.value;
-            var domelement = opt.split(";");
-            for (var i = 0; i < domelement.length; i++) {
-                if (domelement[i].indexOf("Height") != -1) {
-                    height = domelement[i].split(":")[1];
+            var domElement = opt.split(';');
+            for (var i = 0; i < domElement.length; i++) {
+                if (domElement[i].indexOf('Height') !== -1) {
+                    height = domElement[i].split(":")[1];
                 }
-                else if (domelement[i].indexOf("Width") != -1) {
-                    width = domelement[i].split(":")[1];
+                else if (domElement[i].indexOf('Width') !== -1) {
+                    width = domElement[i].split(":")[1];
                 }
             }
             dialog.showModal();
-            $("textarea#myDialogtxtarea").val(arg.value);
+            $('textarea#myDialogtxtarea').val(arg.value);
             document.getElementById('myDialogClose').onclick = function () {
                 dialog.close();
                 dialog.remove();
             };
             document.getElementById('myDialogOk').onclick = function () {
-                $("#" + arg.id).val($("textarea#myDialogtxtarea").val())
+                $('#' + arg.id).val($('textarea#myDialogtxtarea').val())
                 dialog.close();
                 dialog.remove();
             }
