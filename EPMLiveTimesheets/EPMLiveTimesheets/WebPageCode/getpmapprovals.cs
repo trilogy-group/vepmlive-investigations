@@ -206,12 +206,12 @@ namespace TimeSheets
                         using (SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn))
                         {
                             cmd.Parameters.AddWithValue("@siteid", site.ID);
-                            using (SqlDataReader dr = cmd.ExecuteReader())
+                            using (SqlDataReader dataReader  = cmd.ExecuteReader())
                             {
-                                while (dr.Read())
+                                while (dataReader .Read())
                                 {
                                     timeeditor = true;
-                                    worktypes += "|" + dr.GetInt32(0).ToString();
+                                    worktypes += "|" + dataReader .GetInt32(0).ToString();
                                 }
                             }
                         }
