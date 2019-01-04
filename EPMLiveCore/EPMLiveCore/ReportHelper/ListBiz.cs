@@ -12,6 +12,7 @@ namespace EPMLiveCore.ReportHelper
 {
     public class ListBiz
     {
+        private const int NewEventSequenceNumber = 11000;
         public static Collection<string> AutomaticFields = new Collection<string>
         {
             "Title",
@@ -839,7 +840,6 @@ namespace EPMLiveCore.ReportHelper
 
         private void RegisterEvent()
         {
-
             SPList spList = null;
             var reportData = new ReportData(_siteId);
 
@@ -897,8 +897,8 @@ namespace EPMLiveCore.ReportHelper
                             reportData.LogStatus(
                                 _listId,
                                 _listName,
-                                spWeb.ServerRelativeUrl + " - Event registration issue.",
-                                "Warning: " + _listName.Replace("'", "") + " list not present. On site:" + spWeb.ServerRelativeUrl,
+                                string.Format("{0} - Event registration issue.", spWeb.ServerRelativeUrl),
+                                string.Format("Warning: {0} list not present. On site:{1}", _listName.Replace("'", string.Empty), spWeb.ServerRelativeUrl),
                                 0,
                                 1);
 
@@ -929,7 +929,7 @@ namespace EPMLiveCore.ReportHelper
         {
             foreach (var newEvent in moreNewEvents)
             {
-                newEvent.SequenceNumber = 11000;
+                newEvent.SequenceNumber = NewEventSequenceNumber;
                 newEvent.Update();
             }
         }
