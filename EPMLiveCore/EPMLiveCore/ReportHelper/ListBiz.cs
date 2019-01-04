@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Web.UI.WebControls;
 using EPMLiveCore.Properties;
@@ -838,158 +839,223 @@ namespace EPMLiveCore.ReportHelper
 
         private void RegisterEvent()
         {
+
             SPList spList = null;
-            var DAO = new ReportData(_siteId);
+            var reportData = new ReportData(_siteId);
 
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(
-                    delegate
-                    {
-                        using (var spSite = new SPSite(_siteId))
-                        {
-                            spList = null;
-                            foreach (SPWeb spWeb in spSite.AllWebs)
-                            {
-                                using (spWeb)
-                                {
-                                    spWeb.AllowUnsafeUpdates = true;
-                                    try
-                                    {
-                                        try
-                                        {
-                                            spList = spWeb.Lists[_listName];
-                                        }
-                                        catch { }
+                SPSecurity.RunWithElevatedPrivileges(delegate { spList = ProcessEvents(reportData); });
 
-                                        if (spList == null)
-                                        {
-                                            continue;
-                                        }
-
-                                        // remove existing event receivers first
-                                        List<SPEventReceiverDefinition> evts = GetListEvents(spList,
-                                            Resources.ReportingAssembly,
-                                            Resources.ReportingClassName,
-                                            new List<SPEventReceiverType>
-                                            {
-                                                SPEventReceiverType.ItemAdded,
-                                                SPEventReceiverType.ItemUpdated,
-                                                SPEventReceiverType.ItemDeleting
-                                            });
-
-                                        foreach (SPEventReceiverDefinition e in evts)
-                                        {
-                                            e.Delete();
-                                        }
-
-                                        // then add event receivers
-                                        spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.ReportingAssembly,
-                                            Resources.ReportingClassName);
-                                        spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.ReportingAssembly,
-                                            Resources.ReportingClassName);
-                                        spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.ReportingAssembly,
-                                            Resources.ReportingClassName);
-
-                                        List<SPEventReceiverDefinition> newEvts = GetListEvents(spList,
-                                            Resources.ReportingAssembly,
-                                            Resources.ReportingClassName,
-                                            new List<SPEventReceiverType>
-                                            {
-                                                SPEventReceiverType.ItemAdded,
-                                                SPEventReceiverType.ItemUpdated,
-                                                SPEventReceiverType.ItemDeleting
-                                            });
-
-                                        foreach (SPEventReceiverDefinition e in newEvts)
-                                        {
-                                            e.SequenceNumber = 11000;
-                                            e.Update();
-                                        }
-
-                                        spList.Update();
-
-                                        //Add list and field deleting event handlers IF it's the rootweb                                        
-                                        //if (spWeb.Url.ToLower() == spSite.RootWeb.Url.ToLower())
-                                        //{
-                                        // remove existing event receivers first
-                                        List<SPEventReceiverDefinition> delEvts = GetListEvents(spList,
-                                            Resources.ReportingAssembly,
-                                            "EPMLiveReportsAdmin.LstEvents",
-                                            new List<SPEventReceiverType>
-                                            {
-                                                SPEventReceiverType.FieldAdding,
-                                                SPEventReceiverType.ListDeleting,
-                                                SPEventReceiverType.FieldAdded,
-                                                SPEventReceiverType.FieldUpdated,
-                                                SPEventReceiverType.FieldDeleting
-
-                                            });
-
-                                        foreach (SPEventReceiverDefinition e in delEvts)
-                                        {
-                                            e.Delete();
-                                        }
-
-                                        // then add event receivers
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, Resources.ReportingAssembly,
-                                          "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.ReportingAssembly,
-                                            "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.ReportingAssembly,
-                                            "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldUpdated, Resources.ReportingAssembly,
-                                            "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.ReportingAssembly,
-                                            "EPMLiveReportsAdmin.LstEvents");
-
-                                        List<SPEventReceiverDefinition> newEvts2 = GetListEvents(spList,
-                                            Resources.ReportingAssembly,
-                                            "EPMLiveReportsAdmin.LstEvents",
-                                            new List<SPEventReceiverType>
-                                            {
-                                                SPEventReceiverType.FieldAdding,
-                                                SPEventReceiverType.ListDeleting,
-                                                SPEventReceiverType.FieldAdded,
-                                                SPEventReceiverType.FieldUpdated,
-                                                SPEventReceiverType.FieldDeleting,
-                                            });
-                                        foreach (SPEventReceiverDefinition e in newEvts2)
-                                        {
-                                            e.SequenceNumber = 11000;
-                                            e.Update();
-                                        }
-                                        //}
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        //Report "List Not Present" error
-                                        DAO.LogStatus(_listId, _listName,
-                                            spWeb.ServerRelativeUrl + " - Event registration issue.",
-                                            "Warning: " + _listName.Replace("'", "") + " list not present. On site:" +
-                                            spWeb.ServerRelativeUrl, 0, 1);
-                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
-                                    }
-                                    spWeb.AllowUnsafeUpdates = false;
-                                }
-                            }
-                        }
-                    });
-
+                // CC-78036 Unused Variable, but I'm keeping it to preserve behavior
                 var rd = new ReportData(_siteId);
             }
             catch (Exception ex)
             {
-                var rd = new ReportData(_siteId);
-                if (spList != null)
-                    rd.InsertLog(spList.ID, spList.Title.Replace("'", ""), "Created Mapping", "Created Mapping", 0);
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-                else
-                    rd.InsertLog(Guid.Empty, "Unknown", "An error occurred while registering event.",
-                        string.Format("Can't register event on site {0} - Exception: {1}", _siteId,
-                            ex.Message.Replace("'", "")), 2);
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                HandleException(ex, spList);
             }
+        }
+
+        private SPList ProcessEvents(ReportData reportData)
+        {
+            SPList spList;
+            using (var spSite = new SPSite(_siteId))
+            {
+                spList = null;
+                foreach (SPWeb spWeb in spSite.AllWebs)
+                {
+                    using (spWeb)
+                    {
+                        spWeb.AllowUnsafeUpdates = true;
+                        try
+                        {
+                            try
+                            {
+                                spList = spWeb.Lists[_listName];
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError("Exception Suppressed {0}", ex);
+                            }
+
+                            if (spList == null)
+                            {
+                                continue;
+                            }
+
+                            FirstPass(spList);
+                            spList.Update();
+                            SecondPass(spList);
+
+                            //}
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", ex);
+
+                            //Report "List Not Present" error
+                            reportData.LogStatus(
+                                _listId,
+                                _listName,
+                                spWeb.ServerRelativeUrl + " - Event registration issue.",
+                                "Warning: " + _listName.Replace("'", "") + " list not present. On site:" + spWeb.ServerRelativeUrl,
+                                0,
+                                1);
+
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        }
+                        spWeb.AllowUnsafeUpdates = false;
+                    }
+                }
+            }
+            return spList;
+        }
+
+        private void SecondPass(SPList spList)
+        {
+            RemoveExistingEventsSecondPass(spList);
+            var newEvents = AddEventReceiversSecondPass(spList);
+            UpdateEventsSecondPass(newEvents);
+        }
+
+        private void FirstPass(SPList spList)
+        {
+            RemoveExistingEvents(spList);
+            var newEvents = AddEventReceivers(spList);
+            UpdateEvents(newEvents);
+        }
+
+        private static void UpdateEventsSecondPass(List<SPEventReceiverDefinition> moreNewEvents)
+        {
+            foreach (var newEvent in moreNewEvents)
+            {
+                newEvent.SequenceNumber = 11000;
+                newEvent.Update();
+            }
+        }
+
+        private List<SPEventReceiverDefinition> AddEventReceiversSecondPass(SPList spList)
+        {
+            // then add event receivers
+            spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, Resources.ReportingAssembly, "EPMLiveReportsAdmin.LstEvents");
+            spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.ReportingAssembly, "EPMLiveReportsAdmin.LstEvents");
+            spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.ReportingAssembly, "EPMLiveReportsAdmin.LstEvents");
+            spList.EventReceivers.Add(SPEventReceiverType.FieldUpdated, Resources.ReportingAssembly, "EPMLiveReportsAdmin.LstEvents");
+            spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.ReportingAssembly, "EPMLiveReportsAdmin.LstEvents");
+
+            var moreNewEvents = GetListEvents(
+                spList,
+                Resources.ReportingAssembly,
+                "EPMLiveReportsAdmin.LstEvents",
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.FieldAdding,
+                    SPEventReceiverType.ListDeleting,
+                    SPEventReceiverType.FieldAdded,
+                    SPEventReceiverType.FieldUpdated,
+                    SPEventReceiverType.FieldDeleting
+                });
+            return moreNewEvents;
+        }
+
+        private void RemoveExistingEventsSecondPass(SPList spList)
+        {
+            //Add list and field deleting event handlers IF it's the rootweb                                        
+            //if (spWeb.Url.ToLower() == spSite.RootWeb.Url.ToLower())
+            //{
+            // remove existing event receivers first
+            var deletingEvents = GetListEvents(
+                spList,
+                Resources.ReportingAssembly,
+                "EPMLiveReportsAdmin.LstEvents",
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.FieldAdding,
+                    SPEventReceiverType.ListDeleting,
+                    SPEventReceiverType.FieldAdded,
+                    SPEventReceiverType.FieldUpdated,
+                    SPEventReceiverType.FieldDeleting
+                });
+
+            foreach (var deletingEvent in deletingEvents)
+            {
+                deletingEvent.Delete();
+            }
+        }
+
+        private static void UpdateEvents(List<SPEventReceiverDefinition> newEvents)
+        {
+            foreach (var newEvent in newEvents)
+            {
+                newEvent.SequenceNumber = 11000;
+                newEvent.Update();
+            }
+        }
+
+        private List<SPEventReceiverDefinition> AddEventReceivers(SPList spList)
+        {
+            // then add event receivers
+            spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.ReportingAssembly, Resources.ReportingClassName);
+            spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.ReportingAssembly, Resources.ReportingClassName);
+            spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.ReportingAssembly, Resources.ReportingClassName);
+
+            var newEvents = GetListEvents(
+                spList,
+                Resources.ReportingAssembly,
+                Resources.ReportingClassName,
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
+            return newEvents;
+        }
+
+        private void RemoveExistingEvents(SPList spList)
+        {
+            // remove existing event receivers first
+            var events = GetListEvents(
+                spList,
+                Resources.ReportingAssembly,
+                Resources.ReportingClassName,
+                new List<SPEventReceiverType>
+                {
+                    SPEventReceiverType.ItemAdded,
+                    SPEventReceiverType.ItemUpdated,
+                    SPEventReceiverType.ItemDeleting
+                });
+
+            foreach (var spEvent in events)
+            {
+                spEvent.Delete();
+            }
+        }
+
+        private void HandleException(Exception ex, SPList spList)
+        {
+            const int LogType0 = 0;
+            const int LogType2 = 2;
+
+            Trace.TraceError("Exception Suppressed {0}", ex);
+            var data = new ReportData(_siteId);
+            if (spList != null)
+            {
+                data.InsertLog(spList.ID, spList.Title.Replace("'", string.Empty), "Created Mapping", "Created Mapping", LogType0);
+            }
+
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
+            else
+            {
+                data.InsertLog(
+                    Guid.Empty,
+                    "Unknown",
+                    "An error occurred while registering event.",
+                    string.Format("Can't register event on site {0} - Exception: {1}", _siteId, ex.Message.Replace("'", string.Empty)),
+                    LogType2);
+            }
+
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 
         private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className,
