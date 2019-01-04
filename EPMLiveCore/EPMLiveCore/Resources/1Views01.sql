@@ -509,16 +509,22 @@ begin
     Print 'Updating View vwTSTimesheetTotals'
     SET @createoralter = 'ALTER'
 end
-exec(@createoralter + ' VIEW [dbo].[vwTSTimesheetTotals]
+exec(@createoralter + ' VIEW dbo.vwTSTimesheetTotals WITH SCHEMABINDING 
 AS
 SELECT     SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours, dbo.TSITEM.TS_UID, dbo.TSITEMHOURS.TS_ITEM_DATE, dbo.TSTIMESHEET.PERIOD_ID, 
-                      dbo.TSTIMESHEET.SITE_UID
+                      dbo.TSTIMESHEET.SITE_UID, COUNT_BIG(*) AS COUNT  
 FROM         dbo.TSITEM INNER JOIN
                       dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID INNER JOIN
                       dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
 GROUP BY dbo.TSITEM.TS_UID, dbo.TSITEMHOURS.TS_ITEM_DATE, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.SITE_UID
 ')
  
+IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='IDX_vwTSTimesheetTotals' AND object_id = OBJECT_ID('dbo.vwTSTimesheetTotals'))
+begin
+	CREATE UNIQUE CLUSTERED INDEX IDX_vwTSTimesheetTotals   
+	ON dbo.vwTSTimesheetTotals (SITE_UID, PERIOD_ID, TS_UID, TS_ITEM_DATE); 
+end
+
 ------------------------------View: vwTSTimesheetWQueue---------------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'vwTSTimesheetWQueue')
 begin
