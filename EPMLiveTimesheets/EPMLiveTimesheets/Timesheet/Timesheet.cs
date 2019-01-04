@@ -574,7 +574,7 @@ namespace TimeSheets
                             ? string.Empty
                             : web.ServerRelativeUrl);
                     output.Write("/_layouts/epmlive/timesheetadmin.aspx\">Go To Timesheet Admin</a>");
-                    output.WriteLine("");
+                    output.WriteLine(string.Empty);
                 }
 
                 output.WriteLine("<script language=\"javascript\">");
