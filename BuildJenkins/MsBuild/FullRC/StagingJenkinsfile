@@ -34,7 +34,7 @@ pipeline {
     stages {
 		stage ("Weekly Deploy") {
 			when {
-				expression { (new Date()[Calendar.DAY_OF_WEEK] == Calendar.MONDAY) ||  params.ForceStage == 'true'}
+				expression { (new Date()[Calendar.DAY_OF_WEEK] == Calendar.SUNDAY) ||  params.ForceStage == 'true'}
 			}
 			stages {
 				stage('Preparing Release') {
