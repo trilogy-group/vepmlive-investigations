@@ -84,7 +84,7 @@ namespace TimerService
                                             
                                             if (startProcess(rd))
                                             {
-                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id", cn))
+                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id and status = 1", cn))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
                                                     cmd1.ExecuteNonQuery();
