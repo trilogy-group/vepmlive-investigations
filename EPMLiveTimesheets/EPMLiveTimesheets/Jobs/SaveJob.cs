@@ -595,7 +595,7 @@ namespace TimeSheets
                                         catch (Exception ex)
                                         {
                                             bErrors = true;
-                                            sbErrors.Append("Item (" + id + ") Error: " + ex.Message);
+                                            sbErrors.Append("Item (" + id + ") Error: " + ex.ToString());
                                         }
                                         finally
                                         {
@@ -629,7 +629,7 @@ namespace TimeSheets
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sbErrors.Append("Item (" + id + ") Error x2: " + ex.Message);
+                    sbErrors.Append("Item (" + id + ") Error x2: " + ex.ToString());
                 }
                 if (drItem.Length > 0)
                 {
@@ -836,7 +836,7 @@ namespace TimeSheets
             catch (Exception ex)
             {
                 bErrors = true;
-                sbErrors.Append("Error: " + ex.Message);
+                sbErrors.Append("Error: " + ex.ToString());
             }
             finally
             {

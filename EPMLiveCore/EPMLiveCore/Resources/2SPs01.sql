@@ -1112,7 +1112,7 @@ set @sql = '';WITH CTE AS
 ( 
 SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
 FROM TSQUEUE 
-WHERE QUEUE is null and status=0 and JOBTYPE_ID = 32
+WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and JOBTYPE_ID = 32
 order by DTCREATED
 ) 
 UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0;
@@ -1121,7 +1121,7 @@ WITH CTE2 AS
 ( 
 SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
 FROM TSQUEUE 
-WHERE QUEUE is null and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
+WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
 ) 
 UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0
