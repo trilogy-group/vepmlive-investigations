@@ -29,11 +29,12 @@ pipeline {
 		string(name: 'ProtractorUsername', defaultValue: 'servicedesk', description: 'Protractor username')
 		string(name: 'ProtractorPassword', defaultValue: 'A123456*', description: 'Protractor password')
 		string(name: 'RunTSClient', defaultValue: 'true', description: 'Execute legacy TS-Client tests')
+		string(name: 'ForceStage', defaultValue: 'false', description: 'Force staging deployment')
     }
     stages {
 		stage ("Weekly Deploy") {
 			when {
-				expression { new Date()[Calendar.DAY_OF_WEEK] == Calendar.SUNDAY }
+				expression { (new Date()[Calendar.DAY_OF_WEEK] == Calendar.MONDAY) ||  params.ForceStage == 'true'}
 			}
 			stages {
 				stage('Preparing Release') {
