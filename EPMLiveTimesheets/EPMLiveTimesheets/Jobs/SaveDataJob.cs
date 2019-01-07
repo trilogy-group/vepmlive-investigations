@@ -144,7 +144,7 @@ namespace TimeSheets
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors = "Error: " + ex.Message;
+                    sErrors = "Error: " + ex.ToString();
                 }
                 finally
                 {
@@ -372,7 +372,7 @@ namespace TimeSheets
                                         catch (Exception ex)
                                         {
                                             bErrors = true;
-                                            sErrors += "Item (" + id + ") Error: " + ex.Message;
+                                            sErrors += "Item (" + id + ") Error: " + ex.ToString();
                                         }
 
 
@@ -405,7 +405,7 @@ namespace TimeSheets
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "Item (" + id + ") Error x2: " + ex.Message;
+                    sErrors += "Item (" + id + ") Error x2: " + ex.ToString();
                 }
                 if (drItem.Length > 0)
                 {
@@ -529,7 +529,7 @@ namespace TimeSheets
                             }
                             catch (Exception exception)
                             {
-                                error += "Error: " + exception.Message + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
+                                error += "Error: " + exception.ToString() + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
                             }
                         }
 
