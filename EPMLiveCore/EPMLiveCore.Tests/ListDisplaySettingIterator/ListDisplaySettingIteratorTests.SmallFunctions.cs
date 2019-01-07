@@ -318,43 +318,7 @@ namespace EPMLiveCore.Tests
                 () => result.ShouldNotBeNull(),
                 () => result.Count.ShouldBe(2));
         }
-
-        [TestMethod]
-        public void ProcessNewItemRecent_ParametersGiven_CheckBehaviour()
-        {
-            // Arrange
-            var parameters = new object[] { new ShimSPListItem().Instance };
-            ShimSPList.AllInstances.TitleGet = _ => DummyString;
-            ShimSPListItem.AllInstances.TitleGet = _ => DummyString;
-            ShimGridGanttSettings.ConstructorSPList = (_, _1) => { };
-            ShimQueryExecutor.AllInstances.ExecuteEpmLiveQueryStringIDictionaryOfStringObject = (_, _1, _2) =>
-            {
-                _query.Append($"\n{_1}");
-                return new DataTable();
-            };
-            var expectedQueries = new[]
-            {
-                "AND [F_Date] NOT IN (SELECT TOP 20 [F_Date] FROM FRF WHERE [Type] = 2 ORDER BY [F_Date] DESC)",
-                "IF ((SELECT COUNT(*) FROM FRF WHERE [Type] = 2) > 20)",
-                "IF EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=2)",
-                "INSERT INTO FRF ([SITE_ID], [WEB_ID], [LIST_ID], [ITEM_ID], [USER_ID], [Icon], [Title], [Type], [F_Date])",
-                "SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=2",
-                "SELECT * FROM FRF WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=2",
-                "UPDATE FRF SET [F_Date] = GETDATE() ",
-                "VALUES (@siteid, @webid, @listid, @itemid, @userid, @icon, @title, 2, GETDATE())",
-                "WHERE [SITE_ID]=@siteid AND [WEB_ID]=@webid AND [LIST_ID]=@listid AND [ITEM_ID]=@itemid AND [USER_ID]=@userid AND [Type]=2 ",
-                "WHERE [Type] = 2 "
-            };
-
-            // Act
-            const string MethodName = "ProcessNewItemRecent";
-            _privateObject.Invoke(MethodName, parameters);
-
-            // Assert
-            var assertions = AssertQueries(expectedQueries);
-            this.ShouldSatisfyAllConditions(assertions.ToArray());
-        }
-
+        
         [TestMethod]
         public void CustomHandler_NullParametersGiven_ChildControlAdded()
         {
@@ -406,7 +370,7 @@ namespace EPMLiveCore.Tests
         
         private void SetupForCreateChildControlsTestMethod()
         {
-            var internalName = "internalName";
+            const string internalName = "internalName";
             _privateObject.SetFieldOrProperty("isFeatureActivated", true);
             ShimSPFieldCollection.AllInstances.CountGet = _ => 4;
             ShimSPFieldCollection.AllInstances.ItemGetInt32 = (_, index) =>
@@ -503,8 +467,18 @@ namespace EPMLiveCore.Tests
             ShimSPListCollection.AllInstances.ItemGetString = (_, key) => new ShimSPList().Instance;
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection().Instance;
             ShimCoreFunctions.createSiteStringStringStringStringStringBooleanBooleanSPWebGuidOutStringOutStringOutStringOut =
-                (string title, string description, string url, string template, string user, bool unique, bool toplink,
-            SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle) =>
+                (string title, 
+                string description, 
+                string url, 
+                string template, 
+                string user, 
+                bool unique, 
+                bool toplink,
+                SPWeb parentWeb, 
+                out Guid createdWebId, 
+                out string createdWebUrl, 
+                out string createdWebServerRelativeUrl, 
+                out string createdWebTitle) =>
                 {
                     createdWebId = new Guid();
                     createdWebUrl = DummyString;
