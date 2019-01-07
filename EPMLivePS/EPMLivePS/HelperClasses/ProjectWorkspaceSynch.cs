@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
+using EPMLiveEnterprise.WebSvcCustomFields;
 using Microsoft.SharePoint;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
 
@@ -12,6 +13,20 @@ namespace EPMLiveEnterprise
 {
     public class ProjectWorkspaceSynch : IDisposable
     {
+        private const string TransUIdFieldName = "transuid";
+        private const string SummaryFieldName = "Summary";
+        private const string TaskHierarchyFieldName = "TaskHierarchy";
+        private const string IsAssignmentFieldName = "IsAssignment";
+        private const int ErrorReadingCustomFieldId = 320;
+        private const int ErrorUpdatingFieldId = 333;
+        private const int ErrorAddingFieldId = 331;
+        private const int ErrorProcessingTaskCenterId = 330;
+        private const string ProjectGuidFieldName = "projectguid";
+        private const string IsProjectServerFieldName = "IsProjectServer";
+        private const string PublishToPwaFieldName = "PublishToPWA";
+        private const string ProjectServerUrlFieldName = "ProjectServerURL";
+        private const string SharePointProjectFieldName = "SharePointProject";
+
         private bool _disposed = false;
         private SqlConnection cn;
 
@@ -175,12 +190,15 @@ namespace EPMLiveEnterprise
                 var newFields = new Hashtable();
                 var updFields = new Hashtable();
 
-                using (var command = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory in (3,4)", cn))
-                using (var dataReader = command.ExecuteReader())
+                using (var command =
+                    new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory in (3,4)", cn))
                 {
-                    while (dataReader.Read())
+                    using (var dataReader = command.ExecuteReader())
                     {
-                        newFields.Add(dataReader.GetString(0), dataReader.GetBoolean(1));
+                        while (dataReader.Read())
+                        {
+                            newFields.Add(dataReader.GetString(0), dataReader.GetBoolean(1));
+                        }
                     }
                 }
 
@@ -189,210 +207,260 @@ namespace EPMLiveEnterprise
                 {
                     list = myWebToPublish.Lists["Task Center"];
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
 
                 if (list != null)
-                {                    
-                    if (!list.Fields.ContainsField("transuid"))
-                    {
-                        SPFieldText fldTransUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), "transuid");
-                        fldTransUid.Hidden = true;
-                        fldTransUid.Required = false;
-                        list.Fields.Add(fldTransUid);
-                        list.Update();
-                    }
-                    if (!list.Fields.ContainsField("Summary"))
-                    {
-                        list.Fields.Add("Summary", SPFieldType.Boolean, false);
-                        SPField f = list.Fields["Summary"];
-                        f.DefaultValue = "0";
-                        f.Hidden = false;
-                        f.ShowInEditForm = false;
-                        f.ShowInNewForm = false;
-                        f.Update();
+                {
+                    AddCustomTaskCenterFields(list);
 
-                    }
-                    if (!list.Fields.ContainsField("IsAssignment"))
-                    {
-                        list.Fields.Add("IsAssignment", SPFieldType.Boolean, false);
-                        SPField f = list.Fields["IsAssignment"];
-                        f.DefaultValue = "0";
-                        f.ShowInEditForm = false;
-                        f.ShowInNewForm = false;
-                        f.Update();
-                    }
-                    if (!list.Fields.ContainsField("TaskHierarchy"))
-                    {
-                        list.Fields.Add("TaskHierarchy", SPFieldType.Note, false);
-                        SPField f = list.Fields["TaskHierarchy"];
-                        f.ShowInEditForm = false;
-                        f.ShowInNewForm = false;
-                        f.Update();
-                    }
+                    var customFieldDataSet = GetCustomTaskCenterFieldDataSet();
 
-                    WebSvcCustomFields.CustomFieldDataSet cfDs = new WebSvcCustomFields.CustomFieldDataSet();
-                    try
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            cfDs = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error in publishProject() Reading Custom Fields: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 320);
-                    }
-
-                    foreach (SPField field in list.Fields)
-                    {
-                        //if (!field.Hidden && !field.Sealed)
-                        {
-                            //if (field.Type == SPFieldType.Boolean || field.Type == SPFieldType.Text || field.Type == SPFieldType.Number || field.Type == SPFieldType.Currency || field.Type == SPFieldType.DateTime || field.Type == SPFieldType.Choice || field.InternalName == "AssignedTo" || field.Type == SPFieldType.Note)
-                            {
-                                if (!newFields.Contains(field.InternalName))
-                                {
-                                    //Enterprise Fields
-                                    if (field.InternalName.Length > 3)
-                                    {
-                                        string fieldName = field.InternalName.Substring(3);
-                                        int temp = 0;
-                                        if (int.TryParse(fieldName, out temp))
-                                        {
-                                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] drCf = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
-                                            
-                                            if (drCf.Length > 0)
-                                            {
-                                                updFields.Add(field.Id, field.ShowInEditForm);
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        updFields.Add(field.Id, newFields[field.InternalName].ToString());
-                                    }
-                                    catch { }
-                                    try
-                                    {
-                                        newFields.Remove(field.InternalName);
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                    }
-
-                    foreach (DictionaryEntry de in updFields)
-                    {
-                        try
-                        {
-                            SPField f = list.Fields[new Guid(de.Key.ToString())];
-                            if (f.Type == SPFieldType.Choice)
-                            {
-                                string fieldName = f.InternalName.Substring(3);
-                                int temp = 0;
-                                if (int.TryParse(fieldName, out temp))
-                                {
-                                    f.SchemaXml = getSchemaXml(f, fieldName);
-                                }
-                                //cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn);
-                                //cmd.Parameters.AddWithValue("@fieldname", f.InternalName);
-                                //dr = cmd.ExecuteReader();
-
-                                //if (dr.Read())
-                                //{
-
-                                //    f.SchemaXml = getSchemaXml(f, dr.GetString(0));
-                                //}
-                                //dr.Close();
-                                
-                            }
-
-                            if (isCalculated(cfDs, f.InternalName.Substring(3)))
-                            {
-                                f.ShowInEditForm = false;
-                                f.ShowInNewForm = false;
-                            }
-                            //if (de.Value.ToString() == "True")
-                            //{
-                            //    f.ShowInNewForm = true;
-                            //    f.ShowInEditForm = true;
-                            //}
-                            //else
-                            //{
-                            //    f.ShowInNewForm = false;
-                            //    f.ShowInEditForm = false;
-                            //}
-                            
-                            f.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            myLog.WriteEntry("Error Updating Field (" + de.Key.ToString() + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 333);
-                        }
-                    }
-                    foreach (DictionaryEntry de in newFields)
-                    {
-                        try
-                        {
-                            var field = default(SPField);
-                            using (var command = new SqlCommand("select * from customfields where wssfieldname=@fieldname", cn))
-                            {
-                                command.Parameters.AddWithValue("@fieldname", de.Key.ToString());
-
-                                using (var dataReader = command.ExecuteReader())
-                                {
-                                    if (dataReader.Read())
-                                    {
-                                        var fieldTypeName = dataReader.GetString(7);
-                                        var fieldType = _fieldTypes.ContainsKey(fieldTypeName)
-                                            ? _fieldTypes[fieldTypeName]
-                                            : SPFieldType.Text;
-
-                                        list.Fields.Add(de.Key.ToString().Trim(), fieldType, false);
-
-                                        field = list.Fields[de.Key.ToString()];
-                                        field.Title = dataReader.GetString(2);
-                                    }
-                                }
-                            }
-
-                            if (field != null)
-                            {
-                                if (field.Type == SPFieldType.Choice)
-                                {
-                                    using (var command = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn))
-                                    {
-                                        command.Parameters.AddWithValue("@fieldname", field.InternalName);
-                                        using (var dataReader = command.ExecuteReader())
-                                        {
-                                            if (dataReader.Read())
-                                            {
-                                                field.SchemaXml = getSchemaXml(field, dataReader.GetString(0));
-                                            }
-                                        }
-                                    }
-                                }
-                                if (isCalculated(cfDs, de.Key.ToString().Substring(3)))
-                                {
-                                    field.ShowInEditForm = false;
-                                    field.ShowInNewForm = false;
-                                }
-                                field.Update();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            myLog.WriteEntry("Error Adding Field: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 331);
-                        }
-                    }
+                    PopulateListsToAddAndUpdate(list, newFields, customFieldDataSet, updFields);
+                    UpdateFields(updFields, list, customFieldDataSet);
+                    AddNewFields(newFields, list, customFieldDataSet);
                 }
             }
             catch (Exception ex)
             {
-                myLog.WriteEntry("Error Processing Task Center: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
+                myLog.WriteEntry(string.Format("Error Processing Task Center: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorProcessingTaskCenterId);
+            }
+        }
+
+        private CustomFieldDataSet GetCustomTaskCenterFieldDataSet()
+        {
+            var customFieldDataSet = new CustomFieldDataSet();
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(
+                    delegate { customFieldDataSet = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId)); });
+            }
+            catch (Exception ex)
+            {
+                myLog.WriteEntry(
+                    string.Format("Error in publishProject() Reading Custom Fields: {0}{1}", ex.Message, ex.StackTrace),
+                    EventLogEntryType.Error,
+                    ErrorReadingCustomFieldId);
+            }
+            return customFieldDataSet;
+        }
+
+        private static void AddCustomTaskCenterFields(SPList list)
+        {
+            if (!list.Fields.ContainsField(TransUIdFieldName))
+            {
+                var fieldTransUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), TransUIdFieldName);
+                fieldTransUid.Hidden = true;
+                fieldTransUid.Required = false;
+                list.Fields.Add(fieldTransUid);
+                list.Update();
+            }
+            if (!list.Fields.ContainsField(SummaryFieldName))
+            {
+                list.Fields.Add(SummaryFieldName, SPFieldType.Boolean, false);
+                var summaryField = list.Fields[SummaryFieldName];
+                summaryField.DefaultValue = "0";
+                summaryField.Hidden = false;
+                summaryField.ShowInEditForm = false;
+                summaryField.ShowInNewForm = false;
+                summaryField.Update();
+            }
+            if (!list.Fields.ContainsField(IsAssignmentFieldName))
+            {
+                list.Fields.Add(IsAssignmentFieldName, SPFieldType.Boolean, false);
+                var isAssignmentField = list.Fields[IsAssignmentFieldName];
+                isAssignmentField.DefaultValue = "0";
+                isAssignmentField.ShowInEditForm = false;
+                isAssignmentField.ShowInNewForm = false;
+                isAssignmentField.Update();
+            }
+            if (!list.Fields.ContainsField(TaskHierarchyFieldName))
+            {
+                list.Fields.Add(TaskHierarchyFieldName, SPFieldType.Note, false);
+                var taskHierarchyField = list.Fields[TaskHierarchyFieldName];
+                taskHierarchyField.ShowInEditForm = false;
+                taskHierarchyField.ShowInNewForm = false;
+                taskHierarchyField.Update();
+            }
+        }
+
+        private static void PopulateListsToAddAndUpdate(SPList list, Hashtable newFields, CustomFieldDataSet customFieldDataSet, Hashtable updFields)
+        {
+            foreach (SPField field in list.Fields)
+            {
+                //if (!field.Hidden && !field.Sealed)
+                {
+                    //if (field.Type == SPFieldType.Boolean || field.Type == SPFieldType.Text || field.Type == SPFieldType.Number || field.Type == SPFieldType.Currency || field.Type == SPFieldType.DateTime || field.Type == SPFieldType.Choice || field.InternalName == "AssignedTo" || field.Type == SPFieldType.Note)
+                    {
+                        if (!newFields.Contains(field.InternalName))
+                        {
+                            //Enterprise Fields
+                            if (field.InternalName.Length > 3)
+                            {
+                                var fieldName = field.InternalName.Substring(3);
+                                var temp = 0;
+                                if (int.TryParse(fieldName, out temp))
+                                {
+                                    var customFieldsRows =
+                                        (CustomFieldDataSet.CustomFieldsRow[])customFieldDataSet.CustomFields.Select(
+                                            string.Format("MD_PROP_ID={0}", fieldName));
+
+                                    if (customFieldsRows.Length > 0)
+                                    {
+                                        updFields.Add(field.Id, field.ShowInEditForm);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                updFields.Add(field.Id, newFields[field.InternalName].ToString());
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError("Exception Suppressed {0}", ex);
+                            }
+                            try
+                            {
+                                newFields.Remove(field.InternalName);
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError("Exception Suppressed {0}", ex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void UpdateFields(Hashtable updFields, SPList list, CustomFieldDataSet customFieldDataSet)
+        {
+            foreach (DictionaryEntry dictionaryEntry in updFields)
+            {
+                try
+                {
+                    var field = list.Fields[new Guid(dictionaryEntry.Key.ToString())];
+                    if (field.Type == SPFieldType.Choice)
+                    {
+                        var fieldName = field.InternalName.Substring(3);
+                        var temp = 0;
+                        if (int.TryParse(fieldName, out temp))
+                        {
+                            field.SchemaXml = getSchemaXml(field, fieldName);
+                        }
+
+                        //cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn);
+                        //cmd.Parameters.AddWithValue("@fieldname", f.InternalName);
+                        //dr = cmd.ExecuteReader();
+
+                        //if (dr.Read())
+                        //{
+
+                        //    f.SchemaXml = getSchemaXml(f, dr.GetString(0));
+                        //}
+                        //dr.Close();
+                    }
+
+                    if (isCalculated(customFieldDataSet, field.InternalName.Substring(3)))
+                    {
+                        field.ShowInEditForm = false;
+                        field.ShowInNewForm = false;
+                    }
+
+                    //if (de.Value.ToString() == "True")
+                    //{
+                    //    f.ShowInNewForm = true;
+                    //    f.ShowInEditForm = true;
+                    //}
+                    //else
+                    //{
+                    //    f.ShowInNewForm = false;
+                    //    f.ShowInEditForm = false;
+                    //}
+
+                    field.Update();
+                }
+                catch (Exception ex)
+                {
+                    myLog.WriteEntry(
+                        string.Format("Error Updating Field ({0}): {1}{2}", dictionaryEntry.Key, ex.Message, ex.StackTrace),
+                        EventLogEntryType.Error,
+                        ErrorUpdatingFieldId);
+                }
+            }
+        }
+
+        private void AddNewFields(Hashtable newFields, SPList list, CustomFieldDataSet customFieldDataSet)
+        {
+            foreach (DictionaryEntry dictionaryEntry in newFields)
+            {
+                try
+                {
+                    var field = GetTaskCenterFieldToAdd(dictionaryEntry, list);
+                    AddTaskCenterField(field, customFieldDataSet, dictionaryEntry);
+                }
+                catch (Exception ex)
+                {
+                    myLog.WriteEntry(string.Format("Error Adding Field: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorAddingFieldId);
+                }
+            }
+        }
+
+        private SPField GetTaskCenterFieldToAdd(DictionaryEntry dictionaryEntry, SPList list)
+        {
+            var field = default(SPField);
+            using (var command = new SqlCommand("select * from customfields where wssfieldname=@fieldname", cn))
+            {
+                command.Parameters.AddWithValue("@fieldname", dictionaryEntry.Key.ToString());
+
+                using (var dataReader = command.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        var fieldTypeName = dataReader.GetString(7);
+                        var fieldType = _fieldTypes.ContainsKey(fieldTypeName)
+                            ? _fieldTypes[fieldTypeName]
+                            : SPFieldType.Text;
+
+                        list.Fields.Add(dictionaryEntry.Key.ToString().Trim(), fieldType, false);
+
+                        field = list.Fields[dictionaryEntry.Key.ToString()];
+                        field.Title = dataReader.GetString(2);
+                    }
+                }
+            }
+            return field;
+        }
+
+        private void AddTaskCenterField(SPField field, CustomFieldDataSet customFieldDataSet, DictionaryEntry dictionaryEntry)
+        {
+            if (field != null)
+            {
+                if (field.Type == SPFieldType.Choice)
+                {
+                    using (var command = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn))
+                    {
+                        command.Parameters.AddWithValue("@fieldname", field.InternalName);
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            if (dataReader.Read())
+                            {
+                                field.SchemaXml = getSchemaXml(field, dataReader.GetString(0));
+                            }
+                        }
+                    }
+                }
+                if (isCalculated(customFieldDataSet, dictionaryEntry.Key.ToString().Substring(3)))
+                {
+                    field.ShowInEditForm = false;
+                    field.ShowInNewForm = false;
+                }
+                field.Update();
             }
         }
 
@@ -557,19 +625,12 @@ namespace EPMLiveEnterprise
         {
             try
             {
-                ArrayList newFields = new ArrayList();
-                Hashtable allFields = new Hashtable();
-                Hashtable delFields = new Hashtable();
-                Hashtable updFields = new Hashtable();
+                var newFields = new ArrayList();
+                var allFields = new Hashtable();
+                var delFields = new Hashtable();
+                var updateFields = new Hashtable();
 
-                SqlCommand cmd = new SqlCommand("select wssfieldname,editable from customfields where pjvisible=1 order by displayname", cn);
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    allFields.Add(dr.GetString(0), dr.GetBoolean(1));
-                    newFields.Add(dr.GetString(0));
-                }
-                dr.Close();
+                PopulateProjectCenterFieldsLists(allFields, newFields);
 
                 //SPWeb web = mySite.OpenWeb(publishSiteUrl.Replace(mySite.Url, "").Substring(1));
 
@@ -578,228 +639,292 @@ namespace EPMLiveEnterprise
                 {
                     list = myWebToPublish.Lists["Project Center"];
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
 
                 if (list != null)
-                {                    
-                    if (!list.Fields.ContainsField("projectguid"))
-                    {
-                        SPFieldText fldProjUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), "projectguid");
-                        fldProjUid.Hidden = true;
-                        fldProjUid.Required = false;
-                        list.Fields.Add(fldProjUid);
-                        list.Update();
-                    }
+                {
+                    AddCustomProjectCenterFields(list);
 
-                    if (!list.Fields.ContainsField("IsProjectServer"))
-                    {
-                        list.Fields.Add("IsProjectServer", SPFieldType.Boolean, false);
-                        SPField f = list.Fields["IsProjectServer"];
-                        f.Hidden = true;
-                        f.Update();
-                    }
-
-                    if (!list.Fields.ContainsField("PublishToPWA"))
-                    {
-                        list.Fields.Add("PublishToPWA", SPFieldType.Boolean, false);
-                        SPField f = list.Fields["PublishToPWA"];
-                        f.Hidden = false;
-                        f.DefaultValue = "1";
-                        f.Title = "Publish To Project Server";
-                        f.Update();
-                    }
-
-                    if (!list.Fields.ContainsField("ProjectServerURL"))
-                    {
-                        list.Fields.Add("ProjectServerURL", SPFieldType.Text, false);
-                        SPField f = list.Fields["ProjectServerURL"];
-                        f.Hidden = false;
-                        f.ShowInEditForm = false;
-                        f.ShowInNewForm = false;
-                        f.Sealed = true;
-                        f.Title = "Project Server URL";
-                        f.Update();
-                    }
-
-                    if (!list.Fields.ContainsField("SharePointProject"))
-                    {
-                        list.Fields.Add("SharePointProject", SPFieldType.Boolean, false);
-                        SPField f = list.Fields["SharePointProject"];
-                        f.Hidden = false;
-                        f.DefaultValue = "1";
-                        f.Title = "SharePoint Project";
-                        f.Update();
-                    }
-
-                    WebSvcCustomFields.CustomFieldDataSet cfDs = new WebSvcCustomFields.CustomFieldDataSet();
+                    var customFieldDataSet = new CustomFieldDataSet();
                     try
                     {
-                        cfDs = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                        customFieldDataSet = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
                     }
                     catch (Exception ex)
                     {
-                        myLog.WriteEntry("Error in publishProject() Reading Custom Fields: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 320);
+                        myLog.WriteEntry(
+                            string.Format("Error in publishProject() Reading Custom Fields: {0}{1}", ex.Message, ex.StackTrace),
+                            EventLogEntryType.Error,
+                            ErrorReadingCustomFieldId);
                     }
 
-                    foreach (SPField field in list.Fields)
-                    {
-                        //if (field.Reorderable)
-                        {
-                            if (field.Type == SPFieldType.Boolean || field.Type == SPFieldType.Text || field.Type == SPFieldType.Number || field.Type == SPFieldType.Currency || field.Type == SPFieldType.DateTime || field.Type == SPFieldType.Choice || field.InternalName == "AssignedTo")
-                            {
-
-                                if (!newFields.Contains(field.InternalName))
-                                {
-                                    if (field.InternalName.Length > 3)
-                                    {
-                                        string fieldName = field.InternalName.Substring(3);
-                                        int temp = 0;
-                                        if (int.TryParse(fieldName, out temp))
-                                        {
-                                            WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] drCf = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])cfDs.CustomFields.Select("MD_PROP_ID=" + fieldName);
-
-                                            if (drCf.Length > 0)
-                                            {
-                                                updFields.Add(field.Id, false);
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        updFields.Add(field.Id, field.ShowInEditForm);
-                                    }
-                                    catch { }
-                                    try
-                                    {
-                                        newFields.Remove(field.InternalName);
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                    }
-
-                    try
-                    {
-                        newFields.Remove("StartDate");
-                    }
-                    catch { }
-                    try
-                    {
-                        newFields.Remove("DueDate");
-                    }
-                    catch { }
-
-                    foreach (DictionaryEntry de in updFields)
-                    {
-                        try
-                        {
-                            SPField f = list.Fields[new Guid(de.Key.ToString())];
-                            if (f.Type == SPFieldType.Choice)
-                            {
-                                string fieldName = f.InternalName.Substring(3);
-                                int temp = 0;
-                                if (int.TryParse(fieldName, out temp))
-                                {
-                                    f.SchemaXml = getSchemaXml(f, fieldName);
-                                }
-                            }
-                            //bool show = false;
-                            //try
-                            //{
-                            //    show = bool.Parse(de.Value.ToString());
-                            //}
-                            //catch { }
-                            f.ShowInNewForm = false;
-                            f.ShowInEditForm = false;
-                            f.Update();
-                        }
-                        catch (Exception ex)
-                        {
-                            myLog.WriteEntry("Error Updating Field (" + de.Key.ToString() + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 333);
-                        }
-                    }
-                    foreach (string str in newFields)
-                    {
-                        cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname", cn);
-                        cmd.Parameters.AddWithValue("@fieldname", str);
-                        dr = cmd.ExecuteReader();
-                        if (dr.Read())
-                        {
-                            try
-                            {
-                                SPFieldType fType = SPFieldType.Text;
-                                switch (dr.GetString(7))
-                                {
-                                    case "DATETIME":
-                                        fType = SPFieldType.DateTime;
-                                        break;
-                                    case "DURATION":
-                                        fType = SPFieldType.Number;
-                                        break;
-                                    case "NUMBER":
-                                        fType = SPFieldType.Number;
-                                        break;
-                                    case "CURRENCY":
-                                        fType = SPFieldType.Currency;
-                                        break;
-                                    case "BOOLEAN":
-                                        fType = SPFieldType.Boolean;
-                                        break;
-                                    case "CHOICE":
-                                        fType = SPFieldType.Choice;
-                                        break;
-                                }
-
-                                list.Fields.Add(str, fType, false);
-
-                                SPField f = list.Fields.GetFieldByInternalName(str);
-                                f.Title = dr.GetString(2);
-
-                                f.ShowInNewForm = false;
-                                f.ShowInEditForm = false;
-
-                                dr.Close();
-                                if (f.Type == SPFieldType.Choice)
-                                {
-                                    cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname and (fieldcategory=3 OR fieldcategory=4)", cn);
-                                    cmd.Parameters.AddWithValue("@fieldname", f.InternalName);
-                                    dr = cmd.ExecuteReader();
-
-                                    if (dr.Read())
-                                    {
-                                        f.SchemaXml = getSchemaXml(f, dr.GetString(0));
-                                    }
-                                    dr.Close();
-                                }
-
-                                f.Update();
-
-                            }
-                            catch (Exception ex)
-                            {
-                                myLog.WriteEntry("Error Adding Field To Project Center: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 331);
-                            }
-                            try
-                            {
-                                dr.Close();
-                            }
-                            catch { }
-                        }
-                        dr.Close();
-                    }
-                }
-                else
-                {
-                    //myLog.WriteEntry("Project Center was not found at site: " + myWebToPublish.Url, EventLogEntryType.Warning, 331);
+                    PopulateAddAndUpdateLists(list, newFields, customFieldDataSet, updateFields);
+                    ProcessProjectCenterFieldsToUpdate(updateFields, list);
+                    ProcessNewProjectCenterFields(newFields, list);
                 }
             }
             catch (Exception ex)
             {
-                myLog.WriteEntry("Error Processing Project Center: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
+                myLog.WriteEntry(string.Format("Error Processing Project Center: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorProcessingTaskCenterId);
+            }
+        }
+
+        private void PopulateProjectCenterFieldsLists(Hashtable allFields, ArrayList newFields)
+        {
+            using (var sqlCommand = new SqlCommand("select wssfieldname,editable from customfields where pjvisible=1 order by displayname", cn))
+            {
+                using (var dataReader = sqlCommand.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        allFields.Add(dataReader.GetString(0), dataReader.GetBoolean(1));
+                        newFields.Add(dataReader.GetString(0));
+                    }
+                }
+            }
+        }
+
+        private void AddCustomProjectCenterFields(SPList list)
+        {
+            if (!list.Fields.ContainsField(ProjectGuidFieldName))
+            {
+                var fieldProjectGuid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), ProjectGuidFieldName);
+                fieldProjectGuid.Hidden = true;
+                fieldProjectGuid.Required = false;
+                list.Fields.Add(fieldProjectGuid);
+                list.Update();
+            }
+
+            if (!list.Fields.ContainsField(IsProjectServerFieldName))
+            {
+                list.Fields.Add(IsProjectServerFieldName, SPFieldType.Boolean, false);
+                var isProjectServerField = list.Fields[IsProjectServerFieldName];
+                isProjectServerField.Hidden = true;
+                isProjectServerField.Update();
+            }
+
+            if (!list.Fields.ContainsField(PublishToPwaFieldName))
+            {
+                list.Fields.Add(PublishToPwaFieldName, SPFieldType.Boolean, false);
+                var publishToPwaField = list.Fields[PublishToPwaFieldName];
+                publishToPwaField.Hidden = false;
+                publishToPwaField.DefaultValue = "1";
+                publishToPwaField.Title = "Publish To Project Server";
+                publishToPwaField.Update();
+            }
+
+            if (!list.Fields.ContainsField(ProjectServerUrlFieldName))
+            {
+                list.Fields.Add(ProjectServerUrlFieldName, SPFieldType.Text, false);
+                var projectServerUrlField = list.Fields[ProjectServerUrlFieldName];
+                projectServerUrlField.Hidden = false;
+                projectServerUrlField.ShowInEditForm = false;
+                projectServerUrlField.ShowInNewForm = false;
+                projectServerUrlField.Sealed = true;
+                projectServerUrlField.Title = "Project Server URL";
+                projectServerUrlField.Update();
+            }
+
+            if (!list.Fields.ContainsField(SharePointProjectFieldName))
+            {
+                list.Fields.Add(SharePointProjectFieldName, SPFieldType.Boolean, false);
+                var sharePointProjectField = list.Fields[SharePointProjectFieldName];
+                sharePointProjectField.Hidden = false;
+                sharePointProjectField.DefaultValue = "1";
+                sharePointProjectField.Title = "SharePoint Project";
+                sharePointProjectField.Update();
+            }
+        }
+
+        private static void PopulateAddAndUpdateLists(SPList list, ArrayList newFields, CustomFieldDataSet customFieldDataSet, Hashtable updateFields)
+        {
+            foreach (SPField field in list.Fields)
+            {
+                //if (field.Reorderable)
+                {
+                    if (field.Type == SPFieldType.Boolean
+                        || field.Type == SPFieldType.Text
+                        || field.Type == SPFieldType.Number
+                        || field.Type == SPFieldType.Currency
+                        || field.Type == SPFieldType.DateTime
+                        || field.Type == SPFieldType.Choice
+                        || field.InternalName == "AssignedTo")
+                    {
+                        if (!newFields.Contains(field.InternalName))
+                        {
+                            if (field.InternalName.Length > 3)
+                            {
+                                var fieldName = field.InternalName.Substring(3);
+                                var temp = 0;
+                                if (int.TryParse(fieldName, out temp))
+                                {
+                                    var customFieldsRows = (CustomFieldDataSet.CustomFieldsRow[])customFieldDataSet.CustomFields.Select(
+                                        string.Format("MD_PROP_ID={0}", fieldName));
+
+                                    if (customFieldsRows.Length > 0)
+                                    {
+                                        updateFields.Add(field.Id, false);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                updateFields.Add(field.Id, field.ShowInEditForm);
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError("Exception Suppressed {0}", ex);
+                            }
+                            try
+                            {
+                                newFields.Remove(field.InternalName);
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.TraceError("Exception Suppressed {0}", ex);
+                            }
+                        }
+                    }
+                }
+            }
+
+            try
+            {
+                newFields.Remove("StartDate");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                newFields.Remove("DueDate");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private void ProcessProjectCenterFieldsToUpdate(Hashtable updateFields, SPList list)
+        {
+            foreach (DictionaryEntry dictionaryEntry in updateFields)
+            {
+                try
+                {
+                    var field = list.Fields[new Guid(dictionaryEntry.Key.ToString())];
+                    if (field.Type == SPFieldType.Choice)
+                    {
+                        var fieldName = field.InternalName.Substring(3);
+                        var temp = 0;
+                        if (int.TryParse(fieldName, out temp))
+                        {
+                            field.SchemaXml = getSchemaXml(field, fieldName);
+                        }
+                    }
+
+                    //bool show = false;
+                    //try
+                    //{
+                    //    show = bool.Parse(de.Value.ToString());
+                    //}
+                    //catch { }
+                    field.ShowInNewForm = false;
+                    field.ShowInEditForm = false;
+                    field.Update();
+                }
+                catch (Exception ex)
+                {
+                    myLog.WriteEntry(string.Format("Error Updating Field ({0}): {1}{2}", dictionaryEntry.Key, ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorUpdatingFieldId);
+                }
+            }
+        }
+
+        private void ProcessNewProjectCenterFields(ArrayList newFields, SPList list)
+        {
+            foreach (string str in newFields)
+            {
+                using (var sqlCommand = new SqlCommand("select * from customfields where wssfieldname=@fieldname", cn))
+                {
+                    sqlCommand.Parameters.AddWithValue("@fieldname", str);
+                    using (var dataReader = sqlCommand.ExecuteReader())
+                    {
+                        if (dataReader.Read())
+                        {
+                            try
+                            {
+                                var type = SPFieldType.Text;
+                                var fieldValue = dataReader.GetString(7);
+                                switch (fieldValue)
+                                {
+                                    case "DATETIME":
+                                        type = SPFieldType.DateTime;
+                                        break;
+                                    case "DURATION":
+                                        type = SPFieldType.Number;
+                                        break;
+                                    case "NUMBER":
+                                        type = SPFieldType.Number;
+                                        break;
+                                    case "CURRENCY":
+                                        type = SPFieldType.Currency;
+                                        break;
+                                    case "BOOLEAN":
+                                        type = SPFieldType.Boolean;
+                                        break;
+                                    case "CHOICE":
+                                        type = SPFieldType.Choice;
+                                        break;
+                                    default:
+                                        Trace.TraceWarning("Unexpected Value:{0}", fieldValue);
+                                        break;
+                                }
+
+                                list.Fields.Add(str, type, false);
+
+                                var field = list.Fields.GetFieldByInternalName(str);
+                                field.Title = dataReader.GetString(2);
+
+                                field.ShowInNewForm = false;
+                                field.ShowInEditForm = false;
+
+                                UpdateCustomProjectCenterField(field);
+
+                                field.Update();
+                            }
+                            catch (Exception ex)
+                            {
+                                myLog.WriteEntry(string.Format("Error Adding Field To Project Center: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorAddingFieldId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void UpdateCustomProjectCenterField(SPField field)
+        {
+            if (field.Type == SPFieldType.Choice)
+            {
+                using (var sqlCommand = new SqlCommand(
+                    "select * from customfields where wssfieldname=@fieldname and (fieldcategory=3 OR fieldcategory=4)",
+                    cn))
+                {
+                    sqlCommand.Parameters.AddWithValue("@fieldname", field.InternalName);
+                    using (var dataReader = sqlCommand.ExecuteReader())
+                    {
+                        if (dataReader.Read())
+                        {
+                            field.SchemaXml = getSchemaXml(field, dataReader.GetString(0));
+                        }
+                    }
+                }
             }
         }
 
