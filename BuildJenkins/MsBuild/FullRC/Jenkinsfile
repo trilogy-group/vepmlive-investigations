@@ -7,7 +7,7 @@ pipeline {
     }
     options {
         skipDefaultCheckout true
-		timeout(time: 4, unit: 'HOURS') 
+		timeout(time: 2, unit: 'HOURS') 
     }
 	triggers {
 		cron(env.BRANCH_NAME == 'develop' ? '@midnight' : '')
@@ -20,10 +20,8 @@ pipeline {
         string(name: 'ReleaseBranch', defaultValue: '', description: 'Release branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
         string(name: 'ReleaseBranchBuild', defaultValue: '', description: 'Release build number to get artifacts from instead of triggering new build (leave empty to trigger new build)')
         string(name: 'DeployBranch', defaultValue: '', description: 'Deploy branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-        string(name: 'ProtractorBranch', defaultValue: 'TestAutomation', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-        string(name: 'CoreBranch', defaultValue: '', description: 'Core branch to build (leave empty to use the Release branch name, replace "/" with "%2F")')
-        string(name: 'CoreBranchBuild', defaultValue: '', description: 'Core build number to copy artifacts from (leave empty to trigger new build and use its artifacts)')
-
+		string(name: 'AppUrl', defaultValue: 'http://qaepmlive6', description: 'SharePoint application url for deployment')
+		
     }
     stages {
         stage('Preparing Release') {
