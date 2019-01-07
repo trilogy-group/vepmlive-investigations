@@ -158,8 +158,13 @@ namespace TimerService
                         thisClass.GetField("bErrors").SetValue(classObject, true);
                         thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
                     }
+					if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
+					{
+						string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
+						logMessage("ERR", "PROC", error);
+					}
 
-                    m = thisClass.GetMethod("finishJob");
+					m = thisClass.GetMethod("finishJob");
                     m.Invoke(classObject, new object[] { });
 
                 }

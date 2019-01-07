@@ -17,7 +17,26 @@ namespace TimeSheets
         public string sErrors = "";
         public bool bErrors = false;
 
-        private const int MAXFAILEDCOUNT = 2;
+		private static int? maxFailedCount = null;
+        private static int MaxFailedCount
+		{
+			get
+			{
+				if (!maxFailedCount.HasValue)
+				{
+					try
+					{
+						maxFailedCount = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("Timesheet.MaxFailedCount"));
+						maxFailedCount = Math.Max(maxFailedCount.Value, 1);
+					}
+					catch
+					{
+						maxFailedCount = 2;
+					}
+				}
+				return maxFailedCount.Value;
+			}
+		}
         private const int FINISHJOBSTATUS = 3;
         private const int RESTARTJOBSTATUS = 0;
         private static Dictionary<Guid, int> failedjobs = new Dictionary<Guid, int>();
@@ -66,7 +85,7 @@ namespace TimeSheets
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors = ex.Message;
+                    sErrors = "Error: " + ex.ToString();
                 }
             }
             return true;
@@ -95,7 +114,7 @@ namespace TimeSheets
                     {
                         using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  @status, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
                         {
-                            var param = getStatusParam();
+                            var param = getStatusParam(QueueUid, bErrors);
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             if (bErrors)
                                 cmd.Parameters.AddWithValue("@result", "Errors");
@@ -118,15 +137,15 @@ namespace TimeSheets
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors = ex.Message;
+                    sErrors = "Error: " + ex.ToString();
                 }
 
             }
 
         }
 
-        private Object LockFailedIds = new Object();
-        private int getStatusParam()
+        private static Object LockFailedIds = new Object();
+        private static int getStatusParam(Guid QueueUid, bool bErrors)
         {
             lock (LockFailedIds)
             {
@@ -134,7 +153,7 @@ namespace TimeSheets
                 {
                     if (failedjobs.ContainsKey(QueueUid))
                     {
-                        if (failedjobs[QueueUid] <= MAXFAILEDCOUNT)
+                        if (failedjobs[QueueUid] <= MaxFailedCount)
                         {
                             failedjobs.Remove(QueueUid);
                             return FINISHJOBSTATUS;
