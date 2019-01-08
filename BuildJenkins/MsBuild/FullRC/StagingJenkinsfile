@@ -29,10 +29,13 @@ pipeline {
 		string(name: 'ProtractorUsername', defaultValue: 'servicedesk', description: 'Protractor username')
 		string(name: 'ProtractorPassword', defaultValue: 'A123456*', description: 'Protractor password')
 		string(name: 'RunTSClient', defaultValue: 'true', description: 'Execute legacy TS-Client tests')
+		string(name: 'ForceStage', defaultValue: 'false', description: 'Force staging deployment')
     }
     stages {
 		stage ("Weekly Deploy") {
-			
+			when {
+				expression { (new Date()[Calendar.DAY_OF_WEEK] == Calendar.SUNDAY) ||  params.ForceStage == 'true'}
+			}
 			stages {
 				stage('Preparing Release') {
 					steps { 
@@ -108,9 +111,9 @@ pipeline {
 											propagate: false,
 											parameters: [
 												[$class: 'StringParameterValue', name: 'TargetHost', value: params.ProtractorTargetHost],
-												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName],
 												[$class: 'StringParameterValue', name: 'BaseUrl', value: params.ProtractorBaseUrl],
-												[$class: 'StringParameterValue', name: 'SiteCollection', value: params.ProtractorSiteCollection]
+												[$class: 'StringParameterValue', name: 'SiteCollection', value: params.ProtractorSiteCollection],
 												[$class: 'StringParameterValue', name: 'Username', value: params.ProtractorUsername],
 												[$class: 'StringParameterValue', name: 'Password', value: params.ProtractorPassword]
 											]
