@@ -108,9 +108,9 @@ pipeline {
 											propagate: false,
 											parameters: [
 												[$class: 'StringParameterValue', name: 'TargetHost', value: params.ProtractorTargetHost],
-												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName]
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName],
 												[$class: 'StringParameterValue', name: 'BaseUrl', value: params.ProtractorBaseUrl],
-												[$class: 'StringParameterValue', name: 'SiteCollection', value: params.ProtractorSiteCollection]
+												[$class: 'StringParameterValue', name: 'SiteCollection', value: params.ProtractorSiteCollection],
 												[$class: 'StringParameterValue', name: 'Username', value: params.ProtractorUsername],
 												[$class: 'StringParameterValue', name: 'Password', value: params.ProtractorPassword]
 											]
