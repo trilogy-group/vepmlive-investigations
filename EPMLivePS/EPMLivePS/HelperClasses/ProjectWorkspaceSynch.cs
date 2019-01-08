@@ -225,7 +225,10 @@ namespace EPMLiveEnterprise
             }
             catch (Exception ex)
             {
-                myLog.WriteEntry(string.Format("Error Processing Task Center: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorProcessingTaskCenterId);
+                myLog.WriteEntry(
+                    string.Format("Error Processing Task Center: {0}{1}", ex.Message, ex.StackTrace),
+                    EventLogEntryType.Error,
+                    ErrorProcessingTaskCenterId);
             }
         }
 
@@ -235,7 +238,10 @@ namespace EPMLiveEnterprise
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(
-                    delegate { customFieldDataSet = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId)); });
+                    delegate
+                    {
+                        customFieldDataSet = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                    });
             }
             catch (Exception ex)
             {
@@ -406,7 +412,10 @@ namespace EPMLiveEnterprise
                 }
                 catch (Exception ex)
                 {
-                    myLog.WriteEntry(string.Format("Error Adding Field: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorAddingFieldId);
+                    myLog.WriteEntry(
+                        string.Format("Error Adding Field: {0}{1}", ex.Message, ex.StackTrace),
+                        EventLogEntryType.Error,
+                        ErrorAddingFieldId);
                 }
             }
         }
@@ -668,21 +677,22 @@ namespace EPMLiveEnterprise
             }
             catch (Exception ex)
             {
-                myLog.WriteEntry(string.Format("Error Processing Project Center: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorProcessingTaskCenterId);
+                myLog.WriteEntry(
+                    string.Format("Error Processing Project Center: {0}{1}", ex.Message, ex.StackTrace),
+                    EventLogEntryType.Error,
+                    ErrorProcessingTaskCenterId);
             }
         }
 
         private void PopulateProjectCenterFieldsLists(Hashtable allFields, ArrayList newFields)
         {
             using (var sqlCommand = new SqlCommand("select wssfieldname,editable from customfields where pjvisible=1 order by displayname", cn))
+            using (var dataReader = sqlCommand.ExecuteReader())
             {
-                using (var dataReader = sqlCommand.ExecuteReader())
+                while (dataReader.Read())
                 {
-                    while (dataReader.Read())
-                    {
-                        allFields.Add(dataReader.GetString(0), dataReader.GetBoolean(1));
-                        newFields.Add(dataReader.GetString(0));
-                    }
+                    allFields.Add(dataReader.GetString(0), dataReader.GetBoolean(1));
+                    newFields.Add(dataReader.GetString(0));
                 }
             }
         }
@@ -841,7 +851,10 @@ namespace EPMLiveEnterprise
                 }
                 catch (Exception ex)
                 {
-                    myLog.WriteEntry(string.Format("Error Updating Field ({0}): {1}{2}", dictionaryEntry.Key, ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorUpdatingFieldId);
+                    myLog.WriteEntry(
+                        string.Format("Error Updating Field ({0}): {1}{2}", dictionaryEntry.Key, ex.Message, ex.StackTrace),
+                        EventLogEntryType.Error,
+                        ErrorUpdatingFieldId);
                 }
             }
         }
@@ -900,7 +913,10 @@ namespace EPMLiveEnterprise
                             }
                             catch (Exception ex)
                             {
-                                myLog.WriteEntry(string.Format("Error Adding Field To Project Center: {0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, ErrorAddingFieldId);
+                                myLog.WriteEntry(
+                                    string.Format("Error Adding Field To Project Center: {0}{1}", ex.Message, ex.StackTrace),
+                                    EventLogEntryType.Error,
+                                    ErrorAddingFieldId);
                             }
                         }
                     }
