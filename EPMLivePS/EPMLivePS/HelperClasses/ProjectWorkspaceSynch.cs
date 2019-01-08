@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
+using EPMLiveEnterprise.WebSvcProject;
 using Microsoft.SharePoint;
 using PSLibrary = Microsoft.Office.Project.Server.Library;
 
@@ -807,69 +808,83 @@ namespace EPMLiveEnterprise
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("select pubtype from publishercheck where projectguid=@projectguid",cn);
-                cmd.Parameters.AddWithValue("@projectguid", projectUid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (var sqlCommand = new SqlCommand("select pubtype from publishercheck where projectguid=@projectguid", cn))
                 {
-                    int pubtype = dr.GetInt32(0);
-                    dr.Close();
-                    try
+                    sqlCommand.Parameters.AddWithValue("@projectguid", projectUid);
+                    using (var dataReader = sqlCommand.ExecuteReader())
                     {
-                        
-
-                        SPGroup members = myWebToPublish.AssociatedMemberGroup;
-                        SPGroup visitors = myWebToPublish.AssociatedVisitorGroup;
-
-                        WebSvcProject.ProjectDataSet pDs = new WebSvcProject.ProjectDataSet();
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        if (dataReader.Read())
                         {
-                            pDs = psiProject.ReadProject(projectUid, EPMLiveEnterprise.WebSvcProject.DataStoreEnum.PublishedStore);
-                        });
-
-                        if (pubtype == 3)
-                        {
-                            foreach(WebSvcProject.ProjectDataSet.TaskRow tr in pDs.Task)
+                            var pubType = dataReader.GetInt32(0);
+                            dataReader.Close();
+                            try
                             {
-                                int userId = getResourceIdForTask(tr.TASK_UID,pDs);
-                                if(userId != 0)
-                                    members.AddUser(myWebToPublish.AllUsers.GetByID(userId));
+                                var members = myWebToPublish.AssociatedMemberGroup;
+                                var visitors = myWebToPublish.AssociatedVisitorGroup;
+
+                                var projectDataSet = new ProjectDataSet();
+                                SPSecurity.RunWithElevatedPrivileges(
+                                    delegate { projectDataSet = psiProject.ReadProject(projectUid, DataStoreEnum.PublishedStore); });
+
+                                if (pubType == 3)
+                                {
+                                    foreach (ProjectDataSet.TaskRow tr in projectDataSet.Task)
+                                    {
+                                        var userId = getResourceIdForTask(tr.TASK_UID, projectDataSet);
+                                        if (userId != 0)
+                                        {
+                                            members.AddUser(myWebToPublish.AllUsers.GetByID(userId));
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (ProjectDataSet.ProjectResourceRow projectResourceRow in projectDataSet.ProjectResource)
+                                    {
+                                        try
+                                        {
+                                            if (!projectResourceRow.IsWRES_ACCOUNTNull())
+                                            {
+                                                var email = string.Empty;
+                                                try
+                                                {
+                                                    email = projectResourceRow.WRES_EMAIL;
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Trace.TraceError("Exception Suppressed {0}", ex);
+                                                }
+                                                if (projectResourceRow.RES_WORK == 0)
+                                                {
+                                                    visitors.AddUser(projectResourceRow.WRES_ACCOUNT, email, projectResourceRow.RES_NAME, string.Empty);
+                                                }
+                                                else
+                                                {
+                                                    members.AddUser(projectResourceRow.WRES_ACCOUNT, email, projectResourceRow.RES_NAME, string.Empty);
+                                                }
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Trace.TraceError("Exception Suppressed {0}", ex);
+                                        }
+                                        //   myLog.WriteEntry(pr.RES_NAME + ": " + pr.RES_WORK, EventLogEntryType.Information, 330);
+                                    }
+                                }
+                                members.Update();
+                                visitors.Update();
+                            }
+                            catch (Exception ex)
+                            {
+                                myLog.WriteEntry("Error Processing Resources2: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
                             }
                         }
                         else
-                        {   
-                            foreach (WebSvcProject.ProjectDataSet.ProjectResourceRow pr in pDs.ProjectResource)
-                            {
-                                try
-                                {
-                                    if (!pr.IsWRES_ACCOUNTNull())
-                                    {
-                                        string email = "";
-                                        try
-                                        {
-                                            email = pr.WRES_EMAIL;
-                                        }catch{}
-                                        if (pr.RES_WORK == 0)
-                                            visitors.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");
-                                        else
-                                            members.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");
-                                    }
-                                }
-                                catch { }
-
-                             //   myLog.WriteEntry(pr.RES_NAME + ": " + pr.RES_WORK, EventLogEntryType.Information, 330);
-                            }
+                        {
+                            dataReader.Close();
                         }
-                        members.Update();
-                        visitors.Update();
-                    }
-                    catch (Exception ex)
-                    {
-                        myLog.WriteEntry("Error Processing Resources2: " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 330);
                     }
                 }
-                else
-                    dr.Close();
             }
             catch (Exception ex)
             {
@@ -877,41 +892,43 @@ namespace EPMLiveEnterprise
             }
         }
 
-        public int getResourceIdForTask(Guid taskuid, WebSvcProject.ProjectDataSet pDs)
+        public int getResourceIdForTask(Guid taskuid, ProjectDataSet pDs)
         {
-            int id = 0;
+            var id = 0;
 
-            SqlCommand cmd = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='AssignedToField'", cn);
-            SqlDataReader dReader = cmd.ExecuteReader();
-
-            try
+            using (var sqlCommand = new SqlCommand("SELECT config_value FROM ECONFIG where config_name='AssignedToField'", cn))
+            using (var sqlDataReader = sqlCommand.ExecuteReader())
             {
-                if (dReader.Read())
+                try
                 {
-                    string field = dReader.GetString(0);
-                    if (field.Trim() != "")
+                    if (sqlDataReader.Read())
                     {
-
-                        WebSvcProject.ProjectDataSet.TaskCustomFieldsRow[] dr = (WebSvcProject.ProjectDataSet.TaskCustomFieldsRow[])pDs.TaskCustomFields.Select("TASK_UID='" + taskuid + "' AND MD_PROP_UID='" + field + "'");
-
-                        if (dr.Length > 0)
+                        var field = sqlDataReader.GetString(0);
+                        if (field.Trim() != string.Empty)
                         {
-                            if (dr[0].IsCODE_VALUENull())
-                            {
-                                id = getResourceIdByEmail(dr[0].TEXT_VALUE);
-                            }
-                            else
-                            {
-                                string email = getLookupDescription(field, dr[0].CODE_VALUE.ToString());
-                                id = getResourceIdByEmail(email);
-                            }
+                            var fieldsRows = (ProjectDataSet.TaskCustomFieldsRow[])pDs.TaskCustomFields.Select(
+                                string.Format("TASK_UID='{0}' AND MD_PROP_UID='{1}'", taskuid, field));
 
+                            if (fieldsRows.Length > 0)
+                            {
+                                if (fieldsRows[0].IsCODE_VALUENull())
+                                {
+                                    id = getResourceIdByEmail(fieldsRows[0].TEXT_VALUE);
+                                }
+                                else
+                                {
+                                    var email = getLookupDescription(field, fieldsRows[0].CODE_VALUE.ToString());
+                                    id = getResourceIdByEmail(email);
+                                }
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
             }
-            catch { }
-            dReader.Close();
             return id;
         }
 
