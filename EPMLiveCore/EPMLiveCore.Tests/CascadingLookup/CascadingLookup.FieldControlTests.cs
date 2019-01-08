@@ -514,7 +514,12 @@ namespace EPMLiveCore.Tests.CascadingLookup
             };
 
             // Act
-            Action action = () => _privateObject.Invoke(ExecuteQueryMethodName, DummyUrl, DummyList, DummyField, new ShimSPQuery().Instance);
+            Action action = () => _privateObject.Invoke(
+                ExecuteQueryMethodName, 
+                DummyUrl, 
+                DummyList, 
+                DummyField, 
+                new ShimSPQuery().Instance);
 
             // Assert
             action.ShouldThrow<Exception>().Message.ShouldBe("Configuration Error (Url). Please contact Administrator.");
@@ -533,7 +538,12 @@ namespace EPMLiveCore.Tests.CascadingLookup
             };
 
             // Act
-            Action action = () => _privateObject.Invoke(ExecuteQueryMethodName, DummyUrl, DummyList, DummyField, new ShimSPQuery().Instance);
+            Action action = () => _privateObject.Invoke(
+                ExecuteQueryMethodName, 
+                DummyUrl, 
+                DummyList, 
+                DummyField, 
+                new ShimSPQuery().Instance);
 
             // Assert
             action.ShouldThrow<Exception>().Message.ShouldBe("Configuration Error (List). Please contact Administrator.");
@@ -556,7 +566,12 @@ namespace EPMLiveCore.Tests.CascadingLookup
             };
 
             // Act
-            Action action = () => _privateObject.Invoke(ExecuteQueryMethodName, DummyUrl, DummyList, DummyField, new ShimSPQuery().Instance);
+            Action action = () => _privateObject.Invoke(
+                ExecuteQueryMethodName, 
+                DummyUrl, 
+                DummyList, 
+                DummyField, 
+                new ShimSPQuery().Instance);
 
             // Assert
             action.ShouldThrow<Exception>().Message.ShouldBe("Configuration Error (Field). Please contact Administrator.");
