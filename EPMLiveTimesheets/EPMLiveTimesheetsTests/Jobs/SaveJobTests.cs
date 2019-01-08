@@ -749,7 +749,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
         public void ProcessItemRow_OnException_LogsError()
         {
             // Arrange
-            var expectedMessage = $"Item ({DummyString}) Error: {DummyString}";
+            var expectedMessage = $"Item ({DummyString}) Error: System.Exception: {DummyString}";
             var row = new ShimXmlNode(new XmlDocument()).Instance;
             var dtItems = new DataTable();
             var connection = new SqlConnection();
@@ -804,7 +804,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
         public void ProcessItemRow_OnGetAttributeException_LogsError()
         {
             // Arrange
-            var expectedMessage = $"Item ({DummyString}) Error x2: {DummyString}";
+            var expectedMessage = $"Item ({DummyString}) Error x2: System.Exception: {DummyString}";
             var row = new ShimXmlNode(new XmlDocument()).Instance;
             var dtItems = new DataTable();
             var connection = new SqlConnection();
@@ -1059,7 +1059,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
         public void Execute_OnGeneralException_LogsError()
         {
             // Arrange
-            var expectedErrorMessage = $"Error: {DummyString}";
+            var expectedErrorMessage = $"Error: System.Exception: {DummyString}";
             var spSite = new ShimSPSite
             {
                 RootWebGet = () => new ShimSPWeb
