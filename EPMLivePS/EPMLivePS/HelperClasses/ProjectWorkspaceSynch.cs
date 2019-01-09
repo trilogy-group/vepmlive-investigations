@@ -296,49 +296,43 @@ namespace EPMLiveEnterprise
         {
             foreach (SPField field in list.Fields)
             {
-                //if (!field.Hidden && !field.Sealed)
+                if (!newFields.Contains(field.InternalName))
                 {
-                    //if (field.Type == SPFieldType.Boolean || field.Type == SPFieldType.Text || field.Type == SPFieldType.Number || field.Type == SPFieldType.Currency || field.Type == SPFieldType.DateTime || field.Type == SPFieldType.Choice || field.InternalName == "AssignedTo" || field.Type == SPFieldType.Note)
+                    //Enterprise Fields
+                    if (field.InternalName.Length > 3)
                     {
-                        if (!newFields.Contains(field.InternalName))
+                        var fieldName = field.InternalName.Substring(3);
+                        var temp = 0;
+                        if (int.TryParse(fieldName, out temp))
                         {
-                            //Enterprise Fields
-                            if (field.InternalName.Length > 3)
-                            {
-                                var fieldName = field.InternalName.Substring(3);
-                                var temp = 0;
-                                if (int.TryParse(fieldName, out temp))
-                                {
-                                    var customFieldsRows =
-                                        (CustomFieldDataSet.CustomFieldsRow[])customFieldDataSet.CustomFields.Select(
-                                            string.Format("MD_PROP_ID={0}", fieldName));
+                            var customFieldsRows =
+                                (CustomFieldDataSet.CustomFieldsRow[])customFieldDataSet.CustomFields.Select(
+                                    string.Format("MD_PROP_ID={0}", fieldName));
 
-                                    if (customFieldsRows.Length > 0)
-                                    {
-                                        updFields.Add(field.Id, field.ShowInEditForm);
-                                    }
-                                }
+                            if (customFieldsRows.Length > 0)
+                            {
+                                updFields.Add(field.Id, field.ShowInEditForm);
                             }
                         }
-                        else
-                        {
-                            try
-                            {
-                                updFields.Add(field.Id, newFields[field.InternalName].ToString());
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.TraceError("Exception Suppressed {0}", ex);
-                            }
-                            try
-                            {
-                                newFields.Remove(field.InternalName);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.TraceError("Exception Suppressed {0}", ex);
-                            }
-                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        updFields.Add(field.Id, newFields[field.InternalName].ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    try
+                    {
+                        newFields.Remove(field.InternalName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
                     }
                 }
             }
@@ -359,17 +353,6 @@ namespace EPMLiveEnterprise
                         {
                             field.SchemaXml = getSchemaXml(field, fieldName);
                         }
-
-                        //cmd = new SqlCommand("select * from customfields where wssfieldname=@fieldname and fieldcategory=3", cn);
-                        //cmd.Parameters.AddWithValue("@fieldname", f.InternalName);
-                        //dr = cmd.ExecuteReader();
-
-                        //if (dr.Read())
-                        //{
-
-                        //    f.SchemaXml = getSchemaXml(f, dr.GetString(0));
-                        //}
-                        //dr.Close();
                     }
 
                     if (isCalculated(customFieldDataSet, field.InternalName.Substring(3)))
@@ -377,17 +360,6 @@ namespace EPMLiveEnterprise
                         field.ShowInEditForm = false;
                         field.ShowInNewForm = false;
                     }
-
-                    //if (de.Value.ToString() == "True")
-                    //{
-                    //    f.ShowInNewForm = true;
-                    //    f.ShowInEditForm = true;
-                    //}
-                    //else
-                    //{
-                    //    f.ShowInNewForm = false;
-                    //    f.ShowInEditForm = false;
-                    //}
 
                     field.Update();
                 }
@@ -636,12 +608,10 @@ namespace EPMLiveEnterprise
             {
                 var newFields = new ArrayList();
                 var allFields = new Hashtable();
-                var delFields = new Hashtable();
                 var updateFields = new Hashtable();
 
                 PopulateProjectCenterFieldsLists(allFields, newFields);
 
-                //SPWeb web = mySite.OpenWeb(publishSiteUrl.Replace(mySite.Url, "").Substring(1));
 
                 SPList list = null;
                 try
@@ -753,52 +723,49 @@ namespace EPMLiveEnterprise
         {
             foreach (SPField field in list.Fields)
             {
-                //if (field.Reorderable)
+                if (field.Type == SPFieldType.Boolean
+                    || field.Type == SPFieldType.Text
+                    || field.Type == SPFieldType.Number
+                    || field.Type == SPFieldType.Currency
+                    || field.Type == SPFieldType.DateTime
+                    || field.Type == SPFieldType.Choice
+                    || field.InternalName == "AssignedTo")
                 {
-                    if (field.Type == SPFieldType.Boolean
-                        || field.Type == SPFieldType.Text
-                        || field.Type == SPFieldType.Number
-                        || field.Type == SPFieldType.Currency
-                        || field.Type == SPFieldType.DateTime
-                        || field.Type == SPFieldType.Choice
-                        || field.InternalName == "AssignedTo")
+                    if (!newFields.Contains(field.InternalName))
                     {
-                        if (!newFields.Contains(field.InternalName))
+                        if (field.InternalName.Length > 3)
                         {
-                            if (field.InternalName.Length > 3)
+                            var fieldName = field.InternalName.Substring(3);
+                            var temp = 0;
+                            if (int.TryParse(fieldName, out temp))
                             {
-                                var fieldName = field.InternalName.Substring(3);
-                                var temp = 0;
-                                if (int.TryParse(fieldName, out temp))
-                                {
-                                    var customFieldsRows = (CustomFieldDataSet.CustomFieldsRow[])customFieldDataSet.CustomFields.Select(
-                                        string.Format("MD_PROP_ID={0}", fieldName));
+                                var customFieldsRows = (CustomFieldDataSet.CustomFieldsRow[])customFieldDataSet.CustomFields.Select(
+                                    string.Format("MD_PROP_ID={0}", fieldName));
 
-                                    if (customFieldsRows.Length > 0)
-                                    {
-                                        updateFields.Add(field.Id, false);
-                                    }
+                                if (customFieldsRows.Length > 0)
+                                {
+                                    updateFields.Add(field.Id, false);
                                 }
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        try
                         {
-                            try
-                            {
-                                updateFields.Add(field.Id, field.ShowInEditForm);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.TraceError("Exception Suppressed {0}", ex);
-                            }
-                            try
-                            {
-                                newFields.Remove(field.InternalName);
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.TraceError("Exception Suppressed {0}", ex);
-                            }
+                            updateFields.Add(field.Id, field.ShowInEditForm);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        try
+                        {
+                            newFields.Remove(field.InternalName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", ex);
                         }
                     }
                 }
@@ -838,13 +805,6 @@ namespace EPMLiveEnterprise
                             field.SchemaXml = getSchemaXml(field, fieldName);
                         }
                     }
-
-                    //bool show = false;
-                    //try
-                    //{
-                    //    show = bool.Parse(de.Value.ToString());
-                    //}
-                    //catch { }
                     field.ShowInNewForm = false;
                     field.ShowInEditForm = false;
                     field.Update();
