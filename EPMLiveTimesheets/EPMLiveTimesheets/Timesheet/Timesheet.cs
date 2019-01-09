@@ -23,6 +23,8 @@ using System.Web;
 using System.Text;
 
 using System.Collections;
+using System.Diagnostics;
+using EPMLiveCore;
 using EPMLiveWebParts;
 
 namespace TimeSheets
@@ -803,70 +805,130 @@ namespace TimeSheets
 
         private void renderGrid(HtmlTextWriter output, SPWeb web, SqlConnection cn)
         {
+            RenderStyle(output);
+
+            RenderHeader(output);
+
+            RenderSingleChoice(output);
+
+            RenderMultiChoice(output);
+
+            var firstEditorbox = RenderTimeEditor(output, web, cn);
+
+            RenderScriptBundles(output);
+
+            var literalControl = RenderTable(output);
+            RenderToolBar(output, literalControl);
+            RenderLoadingGrid(output);
+            RenderScriptFunctions(output, web, firstEditorbox);
+            RenderDialogNote(output);
+            RenderExcels(output);
+        }
+
+        private void RenderHeader(HtmlTextWriter output)
+        {
+            output.Write(
+                "<div id=\"people{0}\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width=200px; Z-Index:99;\">",
+                sFullGridId);
+            output.Write(
+                "<div id=\"peoplecheck{0}\" style=\"overflow: auto; width: 200px; height: 100px;  background-color: #FFFFFF;"
+                + " border: 1px solid #808080; margin-top:2px; padding:3px;\" class=\"ms-descriptiontext\">",
+                sFullGridId);
+            output.Write("</div>");
+
+            output.Write("<table border=\"0\" width=\"100%\"><tr><td>");
+            output.Write(
+                "<a onclick=\"javascript:viewChecks{0}('{0}');\"><img id=\"peoplecheckimg{0}\" src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>",
+                sFullGridId);
+            output.Write("</td><td align=\"right\">");
+            output.Write(
+                "<font class=\"ms-descriptiontext\"><a style=\"cursor:pointer\" onclick=\"javascript:mygrid{0}.editStop();\">Close</a></font>",
+                sFullGridId);
+            output.Write("</td></tr></table>");
+            output.Write("<div id=\"divPe{0}\" style=\"display:none;\">", sFullGridId);
+            peMulti.RenderControl(output);
+            output.Write("</div>");
+            output.Write("</div>");
+        }
+
+        private static void RenderStyle(HtmlTextWriter output)
+        {
             output.Write("<style>");
             output.Write(".ms-usereditor { width:200px; }");
             output.Write(".grid_hover { border: 10px solid #91CDF2; background-color: #F2FAFF } ");
             output.Write("</style>");
+        }
 
-
-
-            output.Write("<div id=\"people" + sFullGridId + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width=200px; Z-Index:99;\">");
-            output.Write("<div id=\"peoplecheck" + sFullGridId + "\" style=\"overflow: auto; width: 200px; height: 100px;  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:3px;\" class=\"ms-descriptiontext\">");
-            output.Write("</div>");
-
-            output.Write("<table border=\"0\" width=\"100%\"><tr><td>");
-            output.Write("<a onclick=\"javascript:viewChecks" + sFullGridId + "('" + sFullGridId + "');\"><img id=\"peoplecheckimg" + sFullGridId + "\" src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>");
-            output.Write("</td><td align=\"right\">");
-            output.Write("<font class=\"ms-descriptiontext\"><a style=\"cursor:pointer\" onclick=\"javascript:mygrid" + sFullGridId + ".editStop();\">Close</a></font>");
-            output.Write("</td></tr></table>");
-            output.Write("<div id=\"divPe" + sFullGridId + "\" style=\"display:none;\">");
-            peMulti.RenderControl(output);
-            output.Write("</div>");
-            output.Write("</div>");
-
-            //===============================Single================================
-            output.Write("<div id=\"peoplesingle" + sFullGridId + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width=200px; Z-Index:99;\">");
-            output.Write("<div id=\"peoplechecksingle" + sFullGridId + "\" style=\"width: 200px; height: 100px;  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:0px;\" class=\"ms-descriptiontext\">");
-            output.Write("<select size=\"6\" onclick=\"changeUser" + sFullGridId + "(this);\" id=\"peoplecheckselect" + sFullGridId + "\"  style=\"width:100%;height:100%\"><option>test</option></select>");
+        private void RenderSingleChoice(HtmlTextWriter output)
+        {
+            output.Write(
+                "<div id=\"peoplesingle{0}\" style=\"display:none; border: 1px solid #808080;"
+                + " padding: 3px; background-color: #F9F9F9; width=200px; Z-Index:99;\">",
+                sFullGridId);
+            output.Write(
+                "<div id=\"peoplechecksingle{0}\" style=\"width: 200px; height: 100px;"
+                + "  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:0px;\" class=\"ms-descriptiontext\">",
+                sFullGridId);
+            output.Write(
+                "<select size=\"6\" onclick=\"changeUser{0}(this);\" id=\"peoplecheckselect{0}\""
+                + "  style=\"width:100%;height:100%\"><option>test</option></select>",
+                sFullGridId);
             output.Write("</div>");
 
             output.Write("<table border=\"0\" width=\"200\"><tr><td>");
-            output.Write("<a onclick=\"javascript:viewDropDown" + sFullGridId + "('" + sFullGridId + "');\"><img id=\"peoplechecksingleimg" + sFullGridId + "\" src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>");
+            output.Write(
+                "<a onclick=\"javascript:viewDropDown{0}('{0}');\"><img id=\"peoplechecksingleimg{0}\""
+                + " src=\"_layouts/images/TPMAX1.GIF\" border=\"0\"></a><br>",
+                sFullGridId);
             output.Write("</td><td align=\"right\">");
-            output.Write("<font class=\"ms-descriptiontext\"><a style=\"cursor:pointer\" onclick=\"javascript:mygrid" + sFullGridId + ".editStop();\">Close</a></font>");
+            output.Write(
+                "<font class=\"ms-descriptiontext\"><a style=\"cursor:pointer\" onclick=\"javascript:mygrid{0}.editStop();\">Close</a></font>",
+                sFullGridId);
             output.Write("</td></tr></table>");
 
-            output.Write("<div id=\"divPes" + sFullGridId + "\" style=\"display:none;\">");
+            output.Write("<div id=\"divPes{0}\" style=\"display:none;\">", sFullGridId);
             peSingle.RenderControl(output);
             output.Write("</div>");
             output.Write("</div>");
-            //==============================MultiChoice==============================
-            output.Write("<div id=\"multichoicegrid" + this.ID + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width:200px;height:160px Z-Index:99;\">");
-            output.Write("<div id=\"multichoiceinner" + sFullGridId + "\" style=\"width: 100%; height: 100%;  background-color: #FFFFFF; border: 1px solid #808080; margin-top:2px; padding:0px;\" class=\"ms-descriptiontext\">");
+        }
+
+        private void RenderMultiChoice(HtmlTextWriter output)
+        {
+            output.Write(
+                "<div id=\"multichoicegrid{0}\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color:"
+                + " #F9F9F9; width:200px;height:160px Z-Index:99;\">",
+                ID);
+            output.Write(
+                "<div id=\"multichoiceinner{0}\" style=\"width: 100%; height: 100%;  background-color: #FFFFFF; "
+                + "border: 1px solid #808080; margin-top:2px; padding:0px;\" class=\"ms-descriptiontext\">",
+                sFullGridId);
             output.Write("test");
             output.Write("</div>");
             output.Write("<table border=\"0\" width=\"200\"><tr><td align=\"right\">");
-            output.Write("<font class=\"ms-descriptiontext\"><a style=\"cursor:pointer\" onclick=\"javascript:mygrid" + sFullGridId + ".editStop();\">Close</a></font>");
+            output.Write(
+                "<font class=\"ms-descriptiontext\"><a style=\"cursor:pointer\" onclick=\"javascript:mygrid{0}.editStop();\">Close</a></font>",
+                sFullGridId);
             output.Write("</td></tr></table>");
             output.Write("</div>");
+        }
 
-            //============================Time Editor===============================
+        private string RenderTimeEditor(HtmlTextWriter output, SPWeb web, SqlConnection sqlConnection)
+        {
+            string firstEditorbox;
+            output.Write(SharedFunctions.getTimeEditorDiv(editEvents, sFullGridId, sqlConnection, web, out firstEditorbox));
+            return firstEditorbox;
+        }
 
-            string firsteditorbox = "";
-            output.Write(SharedFunctions.getTimeEditorDiv(editEvents, sFullGridId, cn, web, out firsteditorbox));
-
-            //=============end time editor======================
-
+        private void RenderScriptBundles(HtmlTextWriter output)
+        {
             output.Write("<link rel=\"stylesheet\" href=\"/_layouts/epmlive/modal/modalmain.css\" type=\"text/css\" /> ");
 
-
             output.Write("<script type=\"text/javascript\" src=\"/_layouts/epmlive/modal/modal.js\"></script>");
-            //===================================
+
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css\"/>");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/skins/dhtmlxmenu_dhx_blue.css\">");
-            //output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xmenu/context.css\">");
             output.Write("<link rel=\"STYLESHEET\" type=\"text/css\" href=\"/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css\">");
 
             output.Write("<script>_css_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; _js_prefix=\"/_layouts/epmlive/DHTML/xgrid/\"; </script>");
@@ -885,24 +947,15 @@ namespace TimeSheets
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_srnd.js\"></script>");
             output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/ext/dhtmlxgrid_drag.js\"></script>");
 
-            //output.Write("<script src=\"/_layouts/epmlive/DHTML/dhtmlxajax.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/excells/dhtmlxgrid_excell_calendar.js\"></script>");
+            output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/excells/dhtmlxgrid_excell_combo.js\"></script>");
+            output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js\"></script>");
+            output.Write("<script src=\"_layouts/epmlive/DHTML/xcombo/dhtmlxcombo.js\"></script>");
+            output.Write("<script src=\"_layouts/epmlive/DHTML/calendar/dhtmlxcalendar.js\"></script>");
+            output.Write("<script src=\"_layouts/epmlive/DHTML/xdataproc/dhtmlxdataprocessor.js\"></script>");
 
-            //if (inEditMode)
-            {
-
-                output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/excells/dhtmlxgrid_excell_calendar.js\"></script>");
-                output.Write("<script src=\"/_layouts/epmlive/DHTML/xgrid/excells/dhtmlxgrid_excell_combo.js\"></script>");
-                output.Write("<script src=\"_layouts/epmlive/DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js\"></script>");
-                output.Write("<script src=\"_layouts/epmlive/DHTML/xcombo/dhtmlxcombo.js\"></script>");
-                output.Write("<script src=\"_layouts/epmlive/DHTML/calendar/dhtmlxcalendar.js\"></script>");
-                output.Write("<script src=\"_layouts/epmlive/DHTML/xdataproc/dhtmlxdataprocessor.js\"></script>");
-            }
-            
-
-
-            //-=====================================================================
-
-            output.Write("<style>.menuTable{background-color:#ffffff;}.contextMenuover, .contextMenudown{background-color:#9ac2e5;}.contextMenuover td{color:#000000;} </style>");
+            output.Write(
+                "<style>.menuTable{background-color:#ffffff;}.contextMenuover, .contextMenudown{background-color:#9ac2e5;}.contextMenuover td{color:#000000;} </style>");
 
             output.Write("<script src=\"/_layouts/epmlive/timesheets.js\"></script>");
 
@@ -927,37 +980,21 @@ namespace TimeSheets
             output.Write("}");
             output.Write("</style>");
 
-            output.Write("<div id=\"grid" + this.ID + "\"  style=\"width:100%;display:none;\" class=\"ms-listviewtable\" ></div>\r\n\r\n");
+            output.Write("<div id=\"grid{0}\"  style=\"width:100%;display:none;\" class=\"ms-listviewtable\" ></div>\r\n\r\n", ID);
+        }
 
-            /*
-            LiteralControl lt = new LiteralControl(@"<table border=0 cellpadding=0 cellspacing=0 style='margin-right: 4px' width='200' id='workviewselector" + sFullGridId + @"'>
-            <tr>
-            <td nowrap class=""ms-listheaderlabel"">Work View:&nbsp;</td>
-            <td id=""EPMLiveTaskRollupViewSelectorMenuTd"" nowrap=""nowrap"" class=""ms-viewselector"" onmouseover=""this.className='ms-viewselector'"" onmouseout=""this.className='ms-viewselector'"">
-            <span style=""display:none"">
-                <menu type='ServerMenu' id=""EPMLiveTaskRollupViewSelectorMenu"" CompactMode=""true"">
-                    <ie:menuitem id=""zz290_DefaultView"" type=""option"" onMenuClick=""changeworkview" + sFullGridId + @"(myworkpost" + sFullGridId + @",'My Work');"" text=""My Work"" menuGroupId=""100""></ie:menuitem>
-                    <ie:menuitem id=""zz310_View2"" type=""option"" onMenuClick=""changeworkview" + sFullGridId + @"(otherworkpost" + sFullGridId + @",'All Work');"" text=""All Work"" menuGroupId=""300""></ie:menuitem>
-                </menu>
-            </span>
-            <span title=""Open Menu"">
-            <div  id=""zz35_WorkSelectorMenu_t"" class=""ms-viewselector"" onmouseover=""MMU_PopMenuIfShowing(this);MMU_EcbTableMouseOverOut(this, true)"" hoverActive=""ms-viewselectorhover"" hoverInactive=""ms-viewselector"" onclick=""MMU_Open(byid('EPMLivetaskRollupViewSelectorMenu'), MMU_GetMenuFromClientId('zz35_WorkSelectorMenu'),event,true, 'EPMLiveTaskRollupViewSelectorMenuTd', 0);"" foa=""MMU_GetMenuFromClientId('zz35_WorkSelectorMenu')"" oncontextmenu=""this.click(); return false;"" nowrap=""nowrap"">
-            <a id=""zz35_WorkSelectorMenu"" accesskey=""W"" href=""#"" onclick=""javascript:return false;"" style=""cursor:hand;white-space:nowrap;"" onfocus=""MMU_EcbLinkOnFocusBlur(byid('EPMLivetaskRollupViewSelectorMenu'), this, true);"" onkeydown=""MMU_EcbLinkOnKeyDown(byid('EPMLivetaskRollupViewSelectorMenu'), MMU_GetMenuFromClientId('zz35_WorkSelectorMenu'), event);"" onclick=""MMU_Open(byid('EPMLivetaskRollupViewSelectorMenu'), MMU_GetMenuFromClientId('zz35_WorkSelectorMenu'),event,true, 'EPMLiveTaskRollupViewSelectorMenuTd', 0);"" oncontextmenu=""this.click(); return false;"" menuTokenValues=""MENUCLIENTID=zz35_WorkSelectorMenu,TEMPLATECLIENTID=EPMLivetaskRollupViewSelectorMenu"" serverclientid=""zz35_WorkSelectorMenu"">
-            My Work
-            <img src=""/_layouts/images/blank.gif"" border=""0"" alt=""Use SHIFT+ENTER to open the menu (new window).""/></a>
-            <img align=""absbottom"" src=""/_layouts/images/blank.gif"" alt="""" /></div></span>
-            </td>
-            </tr>
-            </table>");*/
-
-            LiteralControl lt = new LiteralControl(@"<table border=0 cellpadding=0 cellspacing=0 style='margin-right: 4px' width='200' id='workviewselector" + sFullGridId + @"'>
+        private LiteralControl RenderTable(HtmlTextWriter output)
+        {
+            var literalControl = new LiteralControl(
+                string.Format(
+                    @"<table border=0 cellpadding=0 cellspacing=0 style='margin-right: 4px' width='200' id='workviewselector{0}'>
 		    <tr>
 		    <td nowrap class=""ms-listheaderlabel"">Work View:&nbsp;</td>
             <td id=""WorkSelectorTd"" nowrap=""nowrap"" class=""ms-viewselector"" onmouseover=""this.className='ms-viewselector'"" onmouseout=""this.className='ms-viewselector'"">
             <span style=""display:none"">
             <menu type='ServerMenu' id=""zz30_WorkSelectorMenu"" CompactMode=""true"">
-                <ie:menuitem id=""zz290_DefaultView"" type=""option"" onMenuClick=""changeworkview" + sFullGridId + @"(myworkpost" + sFullGridId + @",'My Work');"" text=""My Work"" menuGroupId=""100""></ie:menuitem>
-                <ie:menuitem id=""zz310_View2"" type=""option"" onMenuClick=""changeworkview" + sFullGridId + @"(otherworkpost" + sFullGridId + @",'All Work');"" text=""All Work"" menuGroupId=""300""></ie:menuitem>
+                <ie:menuitem id=""zz290_DefaultView"" type=""option"" onMenuClick=""changeworkview{0}(myworkpost{0},'My Work');"" text=""My Work"" menuGroupId=""100""></ie:menuitem>
+                <ie:menuitem id=""zz310_View2"" type=""option"" onMenuClick=""changeworkview{0}(otherworkpost{0},'All Work');"" text=""All Work"" menuGroupId=""300""></ie:menuitem>
             </menu>
             </span>
             <span title=""Open Menu"">
@@ -970,150 +1007,231 @@ namespace TimeSheets
             </span>
             </td>
             </tr>
-		    </table>");
+		    </table>",
+                    sFullGridId));
 
-            output.Write("<div id=\"searchdiv" + this.ID + "\" style=\"width:100%;display:none;\" align=\"center\">");
-            output.Write("<table width=\"100%\" height=\"20\" cellpadding=\"3\" cellspacing=\"0\"><tr><td valign=\"top\" align=\"left\" height=\"20\" class=\"ms-titlearealeft\"><h3 class=\"ms-pagetitle\">Search For Work</h2></td><td align=\"right\" height=\"20\" class=\"ms-titlearealeft\">");
+            output.Write("<div id=\"searchdiv{0}\" style=\"width:100%;display:none;\" align=\"center\">", ID);
+            output.Write(
+                "<table width=\"100%\" height=\"20\" cellpadding=\"3\" cellspacing=\"0\"><tr><td valign=\"top\""
+                + " align=\"left\" height=\"20\" class=\"ms-titlearealeft\"><h3 class=\"ms-pagetitle\">Search For Work</h2>"
+                + "</td><td align=\"right\" height=\"20\" class=\"ms-titlearealeft\">");
             output.Write("</td></tr></table>");
             output.Write("<table width=\"100%\">");
-            output.Write("<tr><td class=\"ms-descriptiontext ms-inputformdescription\">Select Column: <select id=\"searchCol" + sFullGridId + "\" class=\"ms-input\"><option value=\"Title\">Title</option>");
+            output.Write(
+                "<tr><td class=\"ms-descriptiontext ms-inputformdescription\">Select Column:"
+                + " <select id=\"searchCol{0}\" class=\"ms-input\"><option value=\"Title\">Title</option>",
+                sFullGridId);
 
-            SortedList<string, string> sl = new SortedList<string, string>();
+            var sortedList = new SortedList<string, string>();
 
-            foreach (SPField f in list.Fields)
+            foreach (SPField spField in list.Fields)
             {
-                if (f.Reorderable && f.InternalName != "Title")
+                if (spField.Reorderable && spField.InternalName != "Title")
                 {
-                    sl.Add(f.Title, f.InternalName);
+                    sortedList.Add(spField.Title, spField.InternalName);
                 }
             }
-            foreach (string f in sl.Keys)
+            foreach (var title in sortedList.Keys)
             {
-                output.Write("<option value=\"" + sl[f].ToString() + "\">" + f.ToString() + "</option>");
+                output.Write("<option value=\"{0}\">{1}</option>", sortedList[title], title);
             }
 
-
             output.Write("</select></td></tr>");
-            output.Write("<tr><td class=\"ms-descriptiontext ms-inputformdescription\">Enter Search Term: <input type=\"text\" size=\"30\" class=\"ms-input\" id=\"searchTerm" + sFullGridId + "\" onKeyDown=\"KeyDownHandler" + sFullGridId + "(event)\"> <input type=\"button\" class=\"ms-input\" value=\"Go\" onClick=\"javascript:doSearch" + sFullGridId + "();\"> <input type=\"button\" class=\"ms-input\" value=\"Cancel\" onClick=\"javascript:cancelSearch" + sFullGridId + "();\"></td></tr></table>");
+            output.Write(
+                "<tr><td class=\"ms-descriptiontext ms-inputformdescription\">Enter Search Term: <input type=\"text\" size=\"30\""
+                + " class=\"ms-input\" id=\"searchTerm{0}\" onKeyDown=\"KeyDownHandler{0}(event)\"> <input type=\"button\" class=\"ms-input\""
+                + " value=\"Go\" onClick=\"javascript:doSearch{0}();\"> <input type=\"button\" class=\"ms-input\" value=\"Cancel\""
+                + " onClick=\"javascript:cancelSearch{0}();\"></td></tr></table>",
+                sFullGridId);
             output.Write("</div>");
 
-            output.Write("<div id=\"workdiv" + this.ID + "\" style=\"width:100%;display:none;\" align=\"center\">");
+            output.Write("<div id=\"workdiv{0}\" style=\"width:100%;display:none;\" align=\"center\">", ID);
 
-            output.Write("<table width=\"100%\" height=\"20\" cellpadding=\"3\" cellspacing=\"0\"><tr><td valign=\"top\" align=\"left\" height=\"20\" class=\"ms-titlearealeft\"><h3 class=\"ms-pagetitle\" id=\"myworktitle\">Available Time Sheet Items: My Work</h3></td><td align=\"right\" height=\"20\" class=\"ms-titlearealeft\">");
+            output.Write(
+                "<table width=\"100%\" height=\"20\" cellpadding=\"3\" cellspacing=\"0\"><tr><td valign=\"top\" align=\"left\" height=\"20\""
+                + " class=\"ms-titlearealeft\"><h3 class=\"ms-pagetitle\" id=\"myworktitle\">Available Time Sheet Items: My Work</h3></td><td align=\"right\""
+                + " height=\"20\" class=\"ms-titlearealeft\">");
 
-            lt.RenderControl(output);
+            literalControl.RenderControl(output);
 
             output.Write("</td></tr></table>");
+            return literalControl;
+        }
 
-            ToolBarButton tbLink = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbLink.Text = "Add To Timesheet";
-            tbLink.ImageUrl = "/_layouts/images/EXPTITEM.GIF";
-            tbLink.NavigateUrl = "";
-            tbLink.OnClientClick = "Javascript:addMyWork" + sFullGridId + "();";
-            tbLink.ToolTip = "Add";
+        private void RenderToolBar(HtmlTextWriter output, LiteralControl literalControl)
+        {
+            var toolBarAddToTimeSheetButton = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
+            toolBarAddToTimeSheetButton.Text = "Add To Timesheet";
+            toolBarAddToTimeSheetButton.ImageUrl = "/_layouts/images/EXPTITEM.GIF";
+            toolBarAddToTimeSheetButton.NavigateUrl = "";
+            toolBarAddToTimeSheetButton.OnClientClick = string.Format("Javascript:addMyWork{0}();", sFullGridId);
+            toolBarAddToTimeSheetButton.ToolTip = "Add";
 
-            ToolBarButton tbLink2 = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbLink2.NavigateUrl = "Javascript:switchfilterwork" + sFullGridId + "('" + worktoolbar.Buttons.ClientID + "_myworkfilter_LinkText');";
-            tbLink2.Text = "Show Filters";
-            tbLink2.ImageUrl = "/_layouts/epmlive/images/gridfilter.gif";
-            tbLink2.ToolTip = "Filters";
-            tbLink2.ID = "myworkfilter";
+            var toolBarShowFiltersButton = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
+            toolBarShowFiltersButton.NavigateUrl = string.Format(
+                "Javascript:switchfilterwork{0}('{1}_myworkfilter_LinkText');",
+                sFullGridId,
+                worktoolbar.Buttons.ClientID);
+            toolBarShowFiltersButton.Text = "Show Filters";
+            toolBarShowFiltersButton.ImageUrl = "/_layouts/epmlive/images/gridfilter.gif";
+            toolBarShowFiltersButton.ToolTip = "Filters";
+            toolBarShowFiltersButton.ID = "myworkfilter";
 
+            var toolBarCloseButton = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
+            toolBarCloseButton.Text = string.Empty;
+            toolBarCloseButton.ImageUrl = "/_layouts/images/close.gif";
+            toolBarCloseButton.OnClientClick = string.Format("Javascript:cancelGetMyWork{0}();", sFullGridId);
+            toolBarCloseButton.NavigateUrl = string.Empty;
+            toolBarCloseButton.ToolTip = "Hide";
 
+            var panel = new Panel();
+            panel.Controls.Add(
+                new LiteralControl(
+                    string.Format(
+                        "<div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'"
+                        + "\" onClick=\"Javascript:addMyWork{0}();\"><img align='absmiddle' alt=\"\" src=\"/_layouts/images/EXPTITEM.gif\""
+                        + " style='border-width:0px;'> Add To Timesheet</div>",
+                        sFullGridId)));
+            worktoolbar.Buttons.Controls.Add(panel);
 
-            ToolBarButton tbClose = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbClose.Text = "";
-            tbClose.ImageUrl = "/_layouts/images/close.gif";
-            tbClose.OnClientClick = "Javascript:cancelGetMyWork" + sFullGridId + "();";
-            tbClose.NavigateUrl = "";
-            tbClose.ToolTip = "Hide";
-
-            Panel pnl1 = new Panel();
-            pnl1.Controls.Add(new LiteralControl("<div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onClick=\"Javascript:addMyWork" + sFullGridId + "();\"><img align='absmiddle' alt=\"\" src=\"/_layouts/images/EXPTITEM.gif\" style='border-width:0px;'> Add To Timesheet</div>"));
-            worktoolbar.Buttons.Controls.Add(pnl1);
-            //worktoolbar.Buttons.Controls.Add(tbLink2);
-
-
-
-            worktoolbar.RightButtons.Controls.Add(lt);
-            worktoolbar.RightButtons.Controls.Add(tbClose);
+            worktoolbar.RightButtons.Controls.Add(literalControl);
+            worktoolbar.RightButtons.Controls.Add(toolBarCloseButton);
 
             worktoolbar.RenderControl(output);
+        }
 
-            output.Write("<div  width=\"100%\" id=\"loadingmyworkgrid" + this.ID + "\" align=\"center\">");
+        private void RenderLoadingGrid(HtmlTextWriter output)
+        {
+            output.Write("<div  width=\"100%\" id=\"loadingmyworkgrid{0}\" align=\"center\">", ID);
             output.Write("<img src=\"/_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle;\"/> Loading Items...");
             output.Write("</div>");
 
-            output.Write("<div id=\"myworkgrid" + this.ID + "\" style=\"width:100%;display:none;\"></div>");
-            output.Write("<div id=\"errordiv" + sFullGridId + "\" style=\"font-color:red;font-size:11px;\"></div>");
+            output.Write("<div id=\"myworkgrid{0}\" style=\"width:100%;display:none;\"></div>", ID);
+            output.Write("<div id=\"errordiv{0}\" style=\"font-color:red;font-size:11px;\"></div>", sFullGridId);
 
             output.Write("</div>\r\n\r\n");
 
-            output.Write("<div  width=\"100%\" id=\"loadinggrid" + this.ID + "\" align=\"center\">");
+            output.Write("<div  width=\"100%\" id=\"loadinggrid{0}\" align=\"center\">", ID);
             output.Write("<img src=\"_layouts/images/GEARS_ANv4.GIF\" style=\"vertical-align: middle;\"/> Loading Items...");
             output.Write("</div>");
+        }
 
+        private void RenderScriptFunctions(HtmlTextWriter output, SPWeb web, string firstEditorbox)
+        {
             output.Write("<script language=\"javascript\">");
 
+            RenderGridFilterFunction(output);
 
+            RenderMyWorkGridFilterFunction(output);
 
-            output.Write("function gridfilter" + sFullGridId + "(value){");
+            RenderSetSizeFunction(output);
+
+            RenderPrintGridFunction(output);
+            RenderSwitchFilterFunction(output);
+            RenderCellChangedFunction(output);
+
+            RenderViewChecksFunction(output);
+            RenderViewDropDownFunction(output);
+            RenderTouchRowsFunction(output);
+
+            RenderImpersonate(output, web);
+
+            RenderGrid(output, web, firstEditorbox);
+            RenderDataProcessorUpdateModel(output, web);
+            RenderUpdateItemFunction(output);
+            RenderSelectRowFunction(output);
+            RenderViewErrorFunction(output);
+            RenderSetTsuIdFunction(output, web);
+            RenderMyErrorHandlerFunction(output);
+            RenderUpdateNewsFunction(output);
+
+            output.Write("myDataProcessor.init(mygrid{0});", sFullGridId);
+
+            RenderLoadXFunction(output, web);
+            RenderClickTabFunction(output);
+            RenderValidateValuesFunction(output, web);
+            RenderGridCheckedIdsFunction(output);
+            RenderGridCheckedItemsFunction(output);
+
+            output.Write("</script>");
+        }
+
+        private void RenderGridFilterFunction(HtmlTextWriter output)
+        {
+            output.Write("function gridfilter{0}(value){{", sFullGridId);
             output.Write("var vals = value.split('|');");
-            output.Write("mygrid" + sFullGridId + ".filterBy(vals[0],vals[1]);");
+            output.Write("mygrid{0}.filterBy(vals[0],vals[1]);", sFullGridId);
             output.Write("}");
+        }
 
-            output.Write("function myworkgridfilter" + sFullGridId + "(value){");
+        private void RenderMyWorkGridFilterFunction(HtmlTextWriter output)
+        {
+            output.Write("function myworkgridfilter{0}(value){{", sFullGridId);
             output.Write("var vals = value.split('|');");
-            output.Write("mywork" + sFullGridId + ".filterBy(vals[0],vals[1]);");
+            output.Write("mywork{0}.filterBy(vals[0],vals[1]);", sFullGridId);
             output.Write("}");
+        }
 
-            output.Write("function setSize" + sFullGridId + "(){mygrid" + sFullGridId + "._askRealRows();}");
+        private void RenderSetSizeFunction(HtmlTextWriter output)
+        {
+            output.Write("function setSize{0}(){{mygrid{0}._askRealRows();}}", sFullGridId);
+        }
 
-            output.Write("function printgrid" + sFullGridId + "() {var temp = mygrid" + sFullGridId + ".hdr.rows[2];var parent = temp.parentNode;parent.removeChild(temp,true);mygrid" + sFullGridId + ".printView();parent.appendChild(temp);}");
-            output.Write("function switchFilter" + sFullGridId + "(hlink){");
-            output.Write("var input1 = mygrid" + sFullGridId + ".hdr.rows[2];");
-            output.Write("if(mygrid" + sFullGridId + "Hidden == false){");
+        private void RenderPrintGridFunction(HtmlTextWriter output)
+        {
+            output.Write(
+                "function printgrid{0}() {{var temp = mygrid{0}.hdr.rows[2];var parent = temp.parentNode;parent.removeChild(temp,true)"
+                + ";mygrid{0}.printView();parent.appendChild(temp);}}",
+                sFullGridId);
+        }
+
+        private void RenderSwitchFilterFunction(HtmlTextWriter output)
+        {
+            output.Write("function switchFilter{0}(hlink){{", sFullGridId);
+            output.Write("var input1 = mygrid{0}.hdr.rows[2];", sFullGridId);
+            output.Write("if(mygrid{0}Hidden == false){{", sFullGridId);
             output.Write("input1.style.display = \"none\";");
-            output.Write("mygrid" + sFullGridId + "Hidden = true;");
+            output.Write("mygrid{0}Hidden = true;", sFullGridId);
             output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Show Filters\";}");
             output.Write("}else{");
             output.Write("input1.style.display = \"\";");
-            output.Write("mygrid" + sFullGridId + "Hidden = false;");
+            output.Write("mygrid{0}Hidden = false;", sFullGridId);
             output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Hide Filters\";}");
             output.Write("}");
-            output.Write("mygrid" + sFullGridId + ".setSizes();");
+            output.Write("mygrid{0}.setSizes();", sFullGridId);
             output.Write("}");
-            output.Write("function switchFilterLoad" + sFullGridId + "(){switchFilter" + sFullGridId + "(null);}");
+            output.Write("function switchFilterLoad{0}(){{switchFilter{0}(null);}}", sFullGridId);
 
-            output.Write("function switchfilterwork" + sFullGridId + "(hlink){");
-            output.Write("var input1 = mywork" + sFullGridId + ".hdr.rows[2];");
-            output.Write("if(mywork" + sFullGridId + "Hidden == false){");
+            output.Write("function switchfilterwork{0}(hlink){{", sFullGridId);
+            output.Write("var input1 = mywork{0}.hdr.rows[2];", sFullGridId);
+            output.Write("if(mywork{0}Hidden == false){{", sFullGridId);
             output.Write("input1.style.display = \"none\";");
-            output.Write("mywork" + sFullGridId + "Hidden = true;");
-
-            
+            output.Write("mywork{0}Hidden = true;", sFullGridId);
 
             output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Show Filters\";}");
             output.Write("}else{");
             output.Write("input1.style.display = \"\";");
-            output.Write("mywork" + sFullGridId + "Hidden = false;");
+            output.Write("mywork{0}Hidden = false;", sFullGridId);
             output.Write("if(hlink != null){document.getElementById(hlink).innerHTML=\"&nbsp;Hide Filters\";}");
             output.Write("}");
-            output.Write("mywork" + sFullGridId + ".setSizes();");
+            output.Write("mywork{0}.setSizes();", sFullGridId);
             output.Write("}");
-            output.Write("function switchFilterLoadmywork" + sFullGridId + "(){switchfilterwork" + sFullGridId + "(null);}");
+            output.Write("function switchFilterLoadmywork{0}(){{switchfilterwork{0}(null);}}", sFullGridId);
+        }
 
-            output.Write("function cellChanged" + sFullGridId + "(mode, id, ind, newval, oldval){");
+        private void RenderCellChangedFunction(HtmlTextWriter output)
+        {
+            output.Write("function cellChanged{0}(mode, id, ind, newval, oldval){{", sFullGridId);
             output.Write("  if(mode != 2) return true;");
             output.Write("     var summ = 0;");
             output.Write("      try{");
-            output.Write("     if(mygrid" + sFullGridId + ".getUserData(id,\"itemid\") != \"\"){");
-            output.Write("     for(var i = 0;i<mygrid" + sFullGridId + ".getColumnsNum();i++){");
-            output.Write("          if(mygrid" + sFullGridId + ".getColumnId(i).indexOf(\"_TsDate_\") == 0){");
-            output.Write("                if(mygrid" + sFullGridId + ".getUserData(id,\"itemid\") != \"\"){");
-            output.Write("                     var vals = mygrid" + sFullGridId + ".cells(id,i).getValue();");
+            output.Write("     if(mygrid{0}.getUserData(id,\"itemid\") != \"\"){{", sFullGridId);
+            output.Write("     for(var i = 0;i<mygrid{0}.getColumnsNum();i++){{", sFullGridId);
+            output.Write("          if(mygrid{0}.getColumnId(i).indexOf(\"_TsDate_\") == 0){{", sFullGridId);
+            output.Write("                if(mygrid{0}.getUserData(id,\"itemid\") != \"\"){{", sFullGridId);
+            output.Write("                     var vals = mygrid{0}.cells(id,i).getValue();", sFullGridId);
             output.Write("                      if(i == ind) vals = newval;");
-            output.Write("                     if(mygrid" + sFullGridId + ".getColType(i) == \"timeeditor\"){");
+            output.Write("                     if(mygrid{0}.getColType(i) == \"timeeditor\"){{", sFullGridId);
             output.Write("                          if(vals.split('|')[0] != \"\"){");
             output.Write("                               var strVals = vals.split('|');");
             output.Write("                               for(var j = 0;j<strVals.length && strVals[j] != \"N\";j+=2){");
@@ -1126,15 +1244,18 @@ namespace TimeSheets
             output.Write("                               summ += parseFloat(vals);");
             output.Write("                     }");
             output.Write("               }");
-            output.Write("          }else if(mygrid" + sFullGridId + ".getColumnId(i) == \"_TsTotal_\" || mygrid" + sFullGridId + ".getColumnId(i) == \"_PercentWork_\"){");
-            output.Write("              mygrid" + sFullGridId + ".cells(id,i).setValue(summ);");
+            output.Write("          }}else if(mygrid{0}.getColumnId(i) == \"_TsTotal_\" || mygrid{0}.getColumnId(i) == \"_PercentWork_\"){{", sFullGridId);
+            output.Write("              mygrid{0}.cells(id,i).setValue(summ);", sFullGridId);
             output.Write("          }");
             output.Write("     }");
             output.Write("     }");
             output.Write("     }catch(e){}return true;");
             output.Write("}");
+        }
 
-            output.Write("function viewChecks" + sFullGridId + "(btn)");
+        private void RenderViewChecksFunction(HtmlTextWriter output)
+        {
+            output.Write("function viewChecks{0}(btn)", sFullGridId);
             output.Write("{");
             output.Write("var pp = document.getElementById('divPe' + btn);");
             output.Write("var ppi = document.getElementById('peoplecheckimg' + btn);");
@@ -1147,8 +1268,11 @@ namespace TimeSheets
             output.Write("ppi.src = \"_layouts/images/TPMAX1.GIF\";\r\n");
             output.Write("}");
             output.Write("}");
+        }
 
-            output.Write("function viewDropDown" + sFullGridId + "(btn)");
+        private void RenderViewDropDownFunction(HtmlTextWriter output)
+        {
+            output.Write("function viewDropDown{0}(btn)", sFullGridId);
             output.Write("{");
             output.Write("var pp = document.getElementById('divPes' + btn);");
             output.Write("var ppi = document.getElementById('peoplechecksingleimg' + btn);");
@@ -1161,313 +1285,451 @@ namespace TimeSheets
             output.Write("ppi.src = \"_layouts/images/TPMAX1.GIF\";\r\n");
             output.Write("}");
             output.Write("}");
+        }
 
-            output.Write("function touchRows" + sFullGridId + "(){");
-            output.Write("mygrid" + sFullGridId + ".forEachRow(function(id){");
-            output.Write("     cellChanged" + sFullGridId + "(2,id,0,'','');");
+        private void RenderTouchRowsFunction(HtmlTextWriter output)
+        {
+            output.Write("function touchRows{0}(){{", sFullGridId);
+            output.Write("mygrid{0}.forEachRow(function(id){{", sFullGridId);
+            output.Write("     cellChanged{0}(2,id,0,'','');", sFullGridId);
             output.Write("})");
             output.Write("}");
 
-            output.Write("function disableCells" + sFullGridId + "()");
+            output.Write("function disableCells{0}()", sFullGridId);
             output.Write("{");
-            output.Write("    mygrid" + sFullGridId + ".forEachRow(function(id){");
-            output.Write("        mygrid" + sFullGridId + ".forEachCell(id,function(cell,i){");
-            output.Write("            if(mygrid" + sFullGridId + ".getColType(i) != \"timeeditor\")");
+            output.Write("    mygrid{0}.forEachRow(function(id){{", sFullGridId);
+            output.Write("        mygrid{0}.forEachCell(id,function(cell,i){{", sFullGridId);
+            output.Write("            if(mygrid{0}.getColType(i) != \"timeeditor\")", sFullGridId);
             output.Write("              try{cell.setDisabled(true);}catch(e){}");
             output.Write("        });");
             output.Write("    });");
             output.Write("}");
 
-            output.Write("function setAllUpdated" + sFullGridId + "(){");
-            output.Write("mygrid" + sFullGridId + ".forEachRow(function(id){");
-            output.Write("if(mygrid" + sFullGridId + ".getUserData(id,\"itemid\") != \"\"){");
+            output.Write("function setAllUpdated{0}(){{", sFullGridId);
+            output.Write("mygrid{0}.forEachRow(function(id){{", sFullGridId);
+            output.Write("if(mygrid{0}.getUserData(id,\"itemid\") != \"\"){{", sFullGridId);
             output.Write("      myDataProcessor.setUpdated(id,true);");
-            output.Write("      gridChanged" + sFullGridId + " = true;");
+            output.Write("      gridChanged{0} = true;", sFullGridId);
             output.Write("}");
             output.Write("})");
             output.Write("}");
             output.Write("</script>");
+        }
 
+        private void RenderImpersonate(HtmlTextWriter output, SPWeb web)
+        {
             output.Write("<script>");
-            output.Write("var gridChanged" + sFullGridId + " = false;");
-            //output.Write("var myworkpost" + sFullGridId + " = \"data=" + getGridParams(false) + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "\";");
-            //output.Write("var otherworkpost" + sFullGridId + " = \"data=" + getGridParams(false) + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=1\";");
-            //output.Write("var nonworkpost" + sFullGridId + " = \"data=" + getGridParams(true) + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=2\";");
-            //output.Write("var searchworkpost" + sFullGridId + " = \"data=" + getGridParams(false) + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=4&allowOther=" + EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb,"EPMLiveTSAllowUnassigned").ToLower() + "\";");
-            output.Write("var submitaftersave" + sFullGridId + " = false;");
-            output.Write("var addaftersave" + sFullGridId + " = false;");
-            output.Write("var haderrors" + sFullGridId + " = false;");
-            output.Write("var myworkurl" + sFullGridId + " = \"" + web.Url + "/_layouts/epmlive/gettsmywork.aspx\";");
+            output.Write("var gridChanged{0} = false;", sFullGridId);
+            output.Write("var submitaftersave{0} = false;", sFullGridId);
+            output.Write("var addaftersave{0} = false;", sFullGridId);
+            output.Write("var haderrors{0} = false;", sFullGridId);
+            output.Write("var myworkurl{0} = \"{1}/_layouts/epmlive/gettsmywork.aspx\";", sFullGridId, web.Url);
             if (impersonate)
             {
-                output.Write("var actionurl" + sFullGridId + " = \"" + web.Url + "/_layouts/epmlive/dotsaction.aspx?duser=" + System.Web.HttpUtility.UrlEncode(username) + "\";");
-                output.Write("var myworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\";");
-                output.Write("var otherworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=1&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\";");
-                output.Write("var nonworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=2&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\";");
-                output.Write("var searchworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=4&allowOther=" + EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSAllowUnassigned").ToLower() + "&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\";");
-
+                output.Write("var actionurl{0} = \"{1}/_layouts/epmlive/dotsaction.aspx?duser={2}\";", sFullGridId, web.Url, HttpUtility.UrlEncode(username));
+                output.Write(
+                    "var myworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&duser={5}\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod,
+                    HttpUtility.UrlEncode(username));
+                output.Write(
+                    "var otherworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&workType=1&duser={5}\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod,
+                    HttpUtility.UrlEncode(username));
+                output.Write(
+                    "var nonworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&workType=2&duser={5}\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod,
+                    HttpUtility.UrlEncode(username));
+                output.Write(
+                    "var searchworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&workType=4&allowOther={5}&duser={6}\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod,
+                    CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSAllowUnassigned").ToLower(),
+                    HttpUtility.UrlEncode(username));
             }
             else
             {
-                output.Write("var actionurl" + sFullGridId + " = \"" + web.Url + "/_layouts/epmlive/dotsaction.aspx\";");
-                output.Write("var myworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "\";");
-                output.Write("var otherworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=1\";");
-                output.Write("var nonworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=2\";");
-                output.Write("var searchworkpost" + sFullGridId + " = \"data=" + sFullParamList + "&edit=" + inEditMode + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&period=" + intPeriod + "&workType=4&allowOther=" + EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSAllowUnassigned").ToLower() + "\";");
-
+                output.Write("var actionurl{0} = \"{1}/_layouts/epmlive/dotsaction.aspx\";", sFullGridId, web.Url);
+                output.Write(
+                    "var myworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod);
+                output.Write(
+                    "var otherworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&workType=1\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod);
+                output.Write(
+                    "var nonworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&workType=2\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod);
+                output.Write(
+                    "var searchworkpost{0} = \"data={1}&edit={2}&source={3}&period={4}&workType=4&allowOther={5}\";",
+                    sFullGridId,
+                    sFullParamList,
+                    inEditMode,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    intPeriod,
+                    CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSAllowUnassigned").ToLower());
             }
-            output.Write("var mygrid" + sFullGridId + "Hidden = false;");
-            output.Write("var mygrid" + sFullGridId + "Edit = " + inEditMode.ToString().ToLower() + ";");
-            output.Write("var mywork" + sFullGridId + "Hidden = false;");
-            output.Write("var tsuid" + sFullGridId + " = '" + tsuid + "';");
-            output.Write("var period" + sFullGridId + " = '" + intPeriod + "';");
-            output.Write("var mygridwidth" + sFullGridId + " = 0;");
-            output.Write("var firsteditorbox" + sFullGridId + " = '" + firsteditorbox + "';");
-            output.Write("var allowotherwork" + sFullGridId + " = " + EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSAllowUnassigned").ToLower() + ";");
-            output.Write("mygrid" + sFullGridId + " = new dhtmlXGridObject('grid" + this.ID + "');");
+        }
 
-            output.Write("mygrid" + sFullGridId + ".setImagePath(\"_layouts/epmlive/dhtml/xgrid/imgs/\");");
-            output.Write("mygrid" + sFullGridId + ".setSkin(\"editgrid\");");
+        private void RenderGrid(HtmlTextWriter output, SPWeb web, string firstEditorbox)
+        {
+            output.Write("var mygrid{0}Hidden = false;", sFullGridId);
+            output.Write("var mygrid{0}Edit = {1};", sFullGridId, inEditMode.ToString().ToLower());
+            output.Write("var mywork{0}Hidden = false;", sFullGridId);
+            output.Write("var tsuid{0} = '{1}';", sFullGridId, tsuid);
+            output.Write("var period{0} = '{1}';", sFullGridId, intPeriod);
+            output.Write("var mygridwidth{0} = 0;", sFullGridId);
+            output.Write("var firsteditorbox{0} = '{1}';", sFullGridId, firstEditorbox);
+            output.Write(
+                "var allowotherwork{0} = {1};",
+                sFullGridId,
+                EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveTSAllowUnassigned").ToLower());
+            output.Write("mygrid{0} = new dhtmlXGridObject('grid{1}');", sFullGridId, ID);
+            output.Write("mygrid{0}.setImagePath(\"_layouts/epmlive/dhtml/xgrid/imgs/\");", sFullGridId);
+            output.Write("mygrid{0}.setSkin(\"editgrid\");", sFullGridId);
 
-            if (this.Height == "")
+            if (Height == "")
             {
-                output.Write("mygrid" + sFullGridId + ".enableAutoHeight(true);");
+                output.Write("mygrid{0}.enableAutoHeight(true);", sFullGridId);
             }
             else
             {
-                MatchCollection mc = Regex.Matches(this.Height, "\\d*");
-                string h = "100";
-                if (mc.Count > 0)
+                var matches = Regex.Matches(Height, "\\d*");
+                var height = "100";
+                if (matches.Count > 0)
                 {
-                    h = mc[0].Value;
+                    height = matches[0].Value;
                     try
                     {
-                        h = (int.Parse(h) - 30).ToString();
+                        // CC-77863 I'm not replacing this call to int.TryParse because the code will look a lot worse
+                        height = (int.Parse(height) - 30).ToString();
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
                 }
-                output.Write("mygrid" + sFullGridId + ".enableAutoHeight(true," + h + ",true);");
+                output.Write("mygrid{0}.enableAutoHeight(true,{1},true);", sFullGridId, height);
             }
 
-            output.Write("mygrid" + sFullGridId + ".attachEvent(\"onEditCell\",cellChanged" + sFullGridId + ");");
-
-            output.Write("mygrid" + sFullGridId + ".attachEvent(\"onEditCell\",function(stage,rowId,cellInd,newValue,oldValue){");
+            output.Write("mygrid{0}.attachEvent(\"onEditCell\",cellChanged{0});", sFullGridId);
+            output.Write("mygrid{0}.attachEvent(\"onEditCell\",function(stage,rowId,cellInd,newValue,oldValue){{", sFullGridId);
             output.Write("if ((stage==2)&&(newValue!=oldValue)){");
-            output.Write("gridChanged" + sFullGridId + " = true;");
-            output.Write("mygrid" + sFullGridId + ".callEvent(\"onGridReconstructed\",[]);");
+            output.Write("gridChanged{0} = true;", sFullGridId);
+            output.Write("mygrid{0}.callEvent(\"onGridReconstructed\",[]);", sFullGridId);
             output.Write("return true;");
             output.Write("}");
             output.Write("return true;");
             output.Write("});");
 
-            output.Write("mygrid" + sFullGridId + ".setImageSize(1,1);");
-
-            output.Write("mygrid" + sFullGridId + ".setDateFormat(\"%m/%d/%Y\");");
-            output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",clearLoader);");
-            output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",touchRows" + sFullGridId + ");");
+            output.Write("mygrid{0}.setImageSize(1,1);", sFullGridId);
+            output.Write("mygrid{0}.setDateFormat(\"%m/%d/%Y\");", sFullGridId);
+            output.Write("mygrid{0}.attachEvent(\"onXLE\",clearLoader);", sFullGridId);
+            output.Write("mygrid{0}.attachEvent(\"onXLE\",touchRows{0});", sFullGridId);
             if (editEvents == "false")
-                output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",disableCells" + sFullGridId + ");");
+            {
+                output.Write("mygrid{0}.attachEvent(\"onXLE\",disableCells{0});", sFullGridId);
+            }
 
-            output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",switchFilterLoad" + sFullGridId + ");");
+            output.Write("mygrid{0}.attachEvent(\"onXLE\",switchFilterLoad{0});", sFullGridId);
             if (status == "New")
             {
-                output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",setAllUpdated" + sFullGridId + ");");
+                output.Write("mygrid{0}.attachEvent(\"onXLE\",setAllUpdated{0});", sFullGridId);
             }
 
-
-            //output.Write("mygrid" + sFullGridId + ".enableEditEvents('" + editEvents + "',false,false);");
-            output.Write("mygrid" + sFullGridId + ".enableEditEvents(true,false,false);");
-
-            output.Write("mygrid" + sFullGridId + ".attachEvent(\"onRowSelect\",selectRow" + sFullGridId + ");");
-
-            //if(status != "New" && status != "Saved")
-            output.Write("mygrid" + sFullGridId + ".enableTreeCellEdit(false);");
-
-            output.Write("mygrid" + sFullGridId + ".enableMathEditing(false);");
-            output.Write("mygrid" + sFullGridId + ".enableMathSerialization(true);");
-            //output.Write("mygrid" + sFullGridId + ".enableSmartXMLParsing(false);");
-
-            //output.Write("mygrid" + sFullGridId + ".setColumnHidden(0,!" + editEvents + ");");
-            //output.Write("mygrid" + sFullGridId + ".attachEvent(\"onXLE\",function(){mygrid" + sFullGridId + ".setColumnHidden(0,!" + editEvents + ")});");
+            output.Write("mygrid{0}.enableEditEvents(true,false,false);", sFullGridId);
+            output.Write("mygrid{0}.attachEvent(\"onRowSelect\",selectRow{0});", sFullGridId);
+            output.Write("mygrid{0}.enableTreeCellEdit(false);", sFullGridId);
+            output.Write("mygrid{0}.enableMathEditing(false);", sFullGridId);
+            output.Write("mygrid{0}.enableMathSerialization(true);", sFullGridId);
 
             ///CUSTOM PROPERTIES
-            output.WriteLine("mygrid" + sFullGridId + "._webpartid = '" + this.ID + "';");
-            output.WriteLine("mygrid" + sFullGridId + ".setImagePath(\"_layouts/epmlive/dhtml/xgrid/imgs/\");");
-            output.WriteLine("mygrid" + sFullGridId + "._gridMode = 'standard';");
+            output.WriteLine("mygrid{0}._webpartid = '{1}';", sFullGridId, ID);
+            output.WriteLine("mygrid{0}.setImagePath(\"_layouts/epmlive/dhtml/xgrid/imgs/\");", sFullGridId);
+            output.WriteLine("mygrid{0}._gridMode = 'standard';", sFullGridId);
 
-            string image = "/_layouts/" + web.Language + "/images/formatmap32x32.png";
+            var image = string.Format("/_layouts/{0}/images/formatmap32x32.png", web.Language);
 
             try
             {
-                output.WriteLine("mygrid" + sFullGridId + "._modifylist = " + list.DoesUserHavePermissions(SPBasePermissions.ManageLists).ToString().ToLower() + ";");
+                output.WriteLine(
+                    "mygrid{0}._modifylist = {1};",
+                    sFullGridId,
+                    list.DoesUserHavePermissions(SPBasePermissions.ManageLists).ToString().ToLower());
             }
             catch
             {
-                output.WriteLine("mygrid" + sFullGridId + "._modifylist = false;");
+                output.WriteLine("mygrid{0}._modifylist = false;", sFullGridId);
             }
             try
             {
-                output.WriteLine("mygrid" + sFullGridId + "._listperms = " + list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions).ToString().ToLower() + ";");
+                output.WriteLine(
+                    "mygrid{0}._listperms = {1};",
+                    sFullGridId,
+                    list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions).ToString().ToLower());
             }
             catch
             {
-                output.WriteLine("mygrid" + sFullGridId + "._listperms = false;");
+                output.WriteLine("mygrid{0}._listperms = false;", sFullGridId);
             }
 
-
-            output.WriteLine("mygrid" + sFullGridId + "._delegates = \"" + strDelegates + "\";");
-            output.WriteLine("mygrid" + sFullGridId + "._cururl = '" + HttpContext.Current.Request.Url.AbsolutePath + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._lockedts = " + lockedts + ";");
-            output.WriteLine("mygrid" + sFullGridId + "._lockunsubmit = " + lockunsubmit + ";");
-            output.WriteLine("mygrid" + sFullGridId + "._timesheetstatus = '" + status + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._timesheetperiod = '" + strCurPeriodName + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._nextperiod = '" + strNextPeriod + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._previousperiod = '" + strPreviousPeriod + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._allperiods = '" + strAllPeriods + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._shownewmenu = false;");
-            output.WriteLine("mygrid" + sFullGridId + "._allowedit = " + allowEditToggle.ToString().ToLower() + ";");
-            output.WriteLine("mygrid" + sFullGridId + "._listid = '" + HttpUtility.UrlEncode(list.ID.ToString()).ToUpper() + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._viewid = '" + HttpUtility.UrlEncode(view.ID.ToString()).ToUpper() + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._viewurl = '" + web.Url + view.ServerRelativeUrl + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._viewname = '" + view.Title + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._basetype = '" + list.BaseType + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._templatetype = '" + (int)list.BaseTemplate + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._newrow = false;");
-            output.WriteLine("mygrid" + sFullGridId + "._gridid = '" + sFullGridId + "';");
-            StringBuilder sbForms = new StringBuilder();
+            output.WriteLine("mygrid{0}._delegates = \"{1}\";", sFullGridId, strDelegates);
+            output.WriteLine("mygrid{0}._cururl = '{1}';", sFullGridId, HttpContext.Current.Request.Url.AbsolutePath);
+            output.WriteLine("mygrid{0}._lockedts = {1};", sFullGridId, lockedts);
+            output.WriteLine("mygrid{0}._lockunsubmit = {1};", sFullGridId, lockunsubmit);
+            output.WriteLine("mygrid{0}._timesheetstatus = '{1}';", sFullGridId, status);
+            output.WriteLine("mygrid{0}._timesheetperiod = '{1}';", sFullGridId, strCurPeriodName);
+            output.WriteLine("mygrid{0}._nextperiod = '{1}';", sFullGridId, strNextPeriod);
+            output.WriteLine("mygrid{0}._previousperiod = '{1}';", sFullGridId, strPreviousPeriod);
+            output.WriteLine("mygrid{0}._allperiods = '{1}';", sFullGridId, strAllPeriods);
+            output.WriteLine("mygrid{0}._shownewmenu = false;", sFullGridId);
+            output.WriteLine("mygrid{0}._allowedit = {1};", sFullGridId, allowEditToggle.ToString().ToLower());
+            output.WriteLine("mygrid{0}._listid = '{1}';", sFullGridId, HttpUtility.UrlEncode(list.ID.ToString()).ToUpper());
+            output.WriteLine("mygrid{0}._viewid = '{1}';", sFullGridId, HttpUtility.UrlEncode(view.ID.ToString()).ToUpper());
+            output.WriteLine("mygrid{0}._viewurl = '{1}{2}';", sFullGridId, web.Url, view.ServerRelativeUrl);
+            output.WriteLine("mygrid{0}._viewname = '{1}';", sFullGridId, view.Title);
+            output.WriteLine("mygrid{0}._basetype = '{1}';", sFullGridId, list.BaseType);
+            output.WriteLine("mygrid{0}._templatetype = '{1}';", sFullGridId, (int)list.BaseTemplate);
+            output.WriteLine("mygrid{0}._newrow = false;", sFullGridId);
+            output.WriteLine("mygrid{0}._gridid = '{0}';", sFullGridId);
+            var stringBuilderForms = new StringBuilder();
             foreach (SPForm form in list.Forms)
             {
                 switch (form.Type)
                 {
                     case PAGETYPE.PAGE_DISPLAYFORM:
-                        sbForms.Append("<Button Id='Ribbon.List.Settings.EditDefaultForms.Menu.MS.EditDefaultFormDisplay' CommandValueId='" + HttpUtility.UrlEncode(form.ServerRelativeUrl) + "' Command='EditDefaultForm' Image16by16='/_layouts/" + web.Language + "/images/formatmap16x16.png' Image16by16Top='-176' Image16by16Left='-16' Image32by32='/_layouts/" + web.Language + "/images/formatmap32x32.png' Image32by32Top='-256' Image32by32Left='-320' LabelText='Default Display Form'/>");
+                        stringBuilderForms.AppendFormat(
+                            "<Button Id='Ribbon.List.Settings.EditDefaultForms.Menu.MS.EditDefaultFormDisplay' CommandValueId='{0}'"
+                            + " Command='EditDefaultForm' Image16by16='/_layouts/{1}/images/formatmap16x16.png' Image16by16Top='-176'"
+                            + " Image16by16Left='-16' Image32by32='/_layouts/{1}/images/formatmap32x32.png' Image32by32Top='-256'"
+                            + " Image32by32Left='-320' LabelText='Default Display Form'/>",
+                            HttpUtility.UrlEncode(form.ServerRelativeUrl),
+                            web.Language);
                         break;
                     case PAGETYPE.PAGE_EDITFORM:
-                        sbForms.Append("<Button Id='Ribbon.List.Settings.EditDefaultForms.Menu.MS.EditDefaultFormDisplay' CommandValueId='" + HttpUtility.UrlEncode(form.ServerRelativeUrl) + "' Command='EditDefaultForm' Image16by16='/_layouts/" + web.Language + "/images/formatmap16x16.png' Image16by16Top='-32' Image16by16Left='-80' Image32by32='/_layouts/" + web.Language + "/images/formatmap32x32.png' Image32by32Top='-96' Image32by32Left='-448' LabelText='Default Edit Form'/>");
+                        stringBuilderForms.AppendFormat(
+                            "<Button Id='Ribbon.List.Settings.EditDefaultForms.Menu.MS.EditDefaultFormDisplay' CommandValueId='{0}'"
+                            + " Command='EditDefaultForm' Image16by16='/_layouts/{1}/images/formatmap16x16.png' Image16by16Top='-32' Image16by16Left='-80'"
+                            + " Image32by32='/_layouts/{1}/images/formatmap32x32.png' Image32by32Top='-96' Image32by32Left='-448' LabelText='Default Edit Form'/>",
+                            HttpUtility.UrlEncode(form.ServerRelativeUrl),
+                            web.Language);
                         break;
                     case PAGETYPE.PAGE_NEWFORM:
-                        sbForms.Append("<Button Id='Ribbon.List.Settings.EditDefaultForms.Menu.MS.EditDefaultFormDisplay' CommandValueId='" + HttpUtility.UrlEncode(form.ServerRelativeUrl) + "' Command='EditDefaultForm' Image16by16='/_layouts/" + web.Language + "/images/formatmap16x16.png' Image16by16Top='-128' Image16by16Left='-224' Image32by32='/_layouts/" + web.Language + "/images/formatmap32x32.png' Image32by32Top='-128' Image32by32Left='-96' LabelText='Default New Form'/>");
+                        stringBuilderForms.AppendFormat(
+                            "<Button Id='Ribbon.List.Settings.EditDefaultForms.Menu.MS.EditDefaultFormDisplay'"
+                            + " CommandValueId='{0}' Command='EditDefaultForm' Image16by16='/_layouts/{1}/images/formatmap16x16.png'"
+                            + " Image16by16Top='-128' Image16by16Left='-224' Image32by32='/_layouts/{1}/images/formatmap32x32.png' Image32by32Top='-128'"
+                            + " Image32by32Left='-96' LabelText='Default New Form'/>",
+                            HttpUtility.UrlEncode(form.ServerRelativeUrl),
+                            web.Language);
                         break;
-                };
-
+                    default:
+                        Trace.TraceError("Unexpected Value {0}", form.Type);
+                        break;
+                }
             }
-            output.WriteLine("mygrid" + sFullGridId + "._formmenus = \"" + sbForms + "\";");
-
+            output.WriteLine("mygrid{0}._formmenus = \"{1}\";", sFullGridId, stringBuilderForms);
             output.WriteLine(Properties.Resources.txtTimesheetRibbonFunctions.Replace("#gridid#", sFullGridId));
 
-            ////////////////////////////////////////////////////////////////////////
-
             output.Write("mygrid" + sFullGridId + ".init();");
+        }
 
+        private void RenderDataProcessorUpdateModel(HtmlTextWriter output, SPWeb web)
+        {
             if (impersonate)
-                output.Write("myDataProcessor = new dataProcessor(\"" + web.Url + "/_layouts/epmlive/savetimesheet.aspx?tsuid=" + tsuid + "&period=" + intPeriod.ToString() + "&edit=" + inEditMode + "&columns=" + getViewFields() + "&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\");");
+            {
+                output.Write(
+                    "myDataProcessor = new dataProcessor(\"{0}/_layouts/epmlive/savetimesheet.aspx?"
+                    + "tsuid={1}&period={2}&edit={3}&columns={4}&duser={5}\");",
+                    web.Url,
+                    tsuid,
+                    intPeriod,
+                    inEditMode,
+                    getViewFields(),
+                    HttpUtility.UrlEncode(username));
+            }
             else
-                output.Write("myDataProcessor = new dataProcessor(\"" + web.Url + "/_layouts/epmlive/savetimesheet.aspx?tsuid=" + tsuid + "&period=" + intPeriod.ToString() + "&edit=" + inEditMode + "&columns=" + getViewFields() + "\");");
+            {
+                output.Write(
+                    "myDataProcessor = new dataProcessor(\"{0}/_layouts/epmlive/savetimesheet.aspx?" + "tsuid={1}&period={2}&edit={3}&columns={4}\");",
+                    web.Url,
+                    tsuid,
+                    intPeriod,
+                    inEditMode,
+                    getViewFields());
+            }
             output.Write("myDataProcessor.setUpdateMode(\"off\");");
+        }
 
-            output.Write("function updateitem" + sFullGridId + "(node){");
+        private void RenderUpdateItemFunction(HtmlTextWriter output)
+        {
+            output.Write("function updateitem{0}(node){{", sFullGridId);
             output.Write("var id=node.getAttribute(\"sid\");");
-            output.Write("mygrid" + sFullGridId + ".setUserData(id, \"!nativeeditor_status\", \"\");");
-            output.Write("mygrid" + sFullGridId + ".setUserData(id, \"tsitemuid\", node.getAttribute(\"tsitemuid\"));");
+            output.Write("mygrid{0}.setUserData(id, \"!nativeeditor_status\", \"\");", sFullGridId);
+            output.Write("mygrid{0}.setUserData(id, \"tsitemuid\", node.getAttribute(\"tsitemuid\"));", sFullGridId);
             output.Write("return true;");
             output.Write("}");
+        }
 
-            output.Write("function selectRow" + sFullGridId + "(id, ind){");
+        private void RenderSelectRowFunction(HtmlTextWriter output)
+        {
+            output.Write("function selectRow{0}(id, ind){{", sFullGridId);
             output.Write("curRowId = id;");
-	        output.Write("curGrid = mygrid" + sFullGridId + ";");
-	        output.Write("RefreshCommandUI();");
+            output.Write("curGrid = mygrid{0};", sFullGridId);
+            output.Write("RefreshCommandUI();");
             output.Write("}");
+        }
 
-            output.Write("function viewError" + sFullGridId + "(id){");
-            output.Write("document.getElementById('dlgErrorText" + sFullGridId + "').innerHTML=mygrid" + sFullGridId + ".getUserData(id,\"lastError\");");
-            output.Write("sm('dlgError" + sFullGridId + "',250,130);");
+        private void RenderViewErrorFunction(HtmlTextWriter output)
+        {
+            output.Write("function viewError{0}(id){{", sFullGridId);
+            output.Write("document.getElementById('dlgErrorText{0}').innerHTML=mygrid{0}.getUserData(id,\"lastError\");", sFullGridId);
+            output.Write("sm('dlgError{0}',250,130);", sFullGridId);
             output.Write("}");
+        }
 
-            output.Write("function settsuid" + sFullGridId + "(node){");
+        private void RenderSetTsuIdFunction(HtmlTextWriter output, SPWeb web)
+        {
+            output.Write("function settsuid{0}(node){{", sFullGridId);
             output.Write("var id=node.getAttribute(\"tsuid\");");
-            if (impersonate)
-                output.Write("myDataProcessor.serverProcessor = \"" + web.Url + "/_layouts/epmlive/savetimesheet.aspx?tsuid=\" + id + \"&period=" + intPeriod.ToString() + "&edit=" + inEditMode + "&columns=" + getViewFields() + "&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\";");
-            else
-                output.Write("myDataProcessor.serverProcessor = \"" + web.Url + "/_layouts/epmlive/savetimesheet.aspx?tsuid=\" + id + \"&period=" + intPeriod.ToString() + "&edit=" + inEditMode + "&columns=" + getViewFields() + "\";");
-
-            output.Write("tsuid" + sFullGridId + " = id;");
-            output.Write("    if(submitaftersave" + sFullGridId + ")");
+            output.Write(
+                impersonate
+                    ? string.Format(
+                        "myDataProcessor.serverProcessor = \"{0}/_layouts/epmlive/savetimesheet.aspx?tsuid=\" + id + \"&period={1}&edit={2}&columns={3}&duser={4}\";",
+                        web.Url,
+                        intPeriod,
+                        inEditMode,
+                        getViewFields(),
+                        HttpUtility.UrlEncode(username))
+                    : string.Format(
+                        "myDataProcessor.serverProcessor = \"{0}/_layouts/epmlive/savetimesheet.aspx?tsuid=\" + id + \"&period={1}&edit={2}&columns={3}\";",
+                        web.Url,
+                        intPeriod,
+                        inEditMode,
+                        getViewFields()));
+            output.Write("tsuid{0} = id;", sFullGridId);
+            output.Write("    if(submitaftersave{0})", sFullGridId);
             output.Write("    {");
-            output.Write("      if(haderrors" + sFullGridId + ")");
+            output.Write("      if(haderrors{0})", sFullGridId);
             output.Write("      {");
             output.Write("          alert('Cannot submit timesheet, there were 1 or more errors during save.');");
             output.Write("      }else{");
-            output.Write("         submitaftersave" + sFullGridId + " = false;");
-            output.Write("         submit" + sFullGridId + "();");
+            output.Write("         submitaftersave{0} = false;", sFullGridId);
+            output.Write("         submit{0}();", sFullGridId);
             output.Write("      }");
             output.Write("    }");
-            output.Write("    else if(addaftersave" + sFullGridId + "){");
-            output.Write("         addaftersave" + sFullGridId + " = false;");
-            output.Write("         autoAdd" + sFullGridId + "();");
+            output.Write("    else if(addaftersave{0}){{", sFullGridId);
+            output.Write("         addaftersave{0} = false;", sFullGridId);
+            output.Write("         autoAdd{0}();", sFullGridId);
             output.Write("     }");
             output.Write("}");
+        }
 
-            output.Write("function myErrorHandler" + sFullGridId + "(obj){");
+        private void RenderMyErrorHandlerFunction(HtmlTextWriter output)
+        {
+            output.Write("function myErrorHandler{0}(obj){{", sFullGridId);
             output.Write("      var id = obj.getAttribute(\"sid\");");
-            output.Write("      mygrid" + sFullGridId + ".cells(id,1).setValue(\"<a href=\\\"javascript:viewError" + sFullGridId + "('\" + id + \"');\\\"><img src='/_layouts/images/EXCLAIM.GIF' border='0'></a>\");");
-            output.Write("      mygrid" + sFullGridId + ".setUserData(id,\"lastError\",obj.firstChild.data);");
-            output.Write("      haderrors" + sFullGridId + " = true;");
-            //output.Write("      return true;");
+            output.Write(
+                "      mygrid{0}.cells(id,1).setValue(\"<a href=\\\"javascript:viewError{0}('\" + id + \"');"
+                + "\\\"><img src='/_layouts/images/EXCLAIM.GIF' border='0'></a>\");",
+                sFullGridId);
+            output.Write("      mygrid{0}.setUserData(id,\"lastError\",obj.firstChild.data);", sFullGridId);
+            output.Write("      haderrors{0} = true;", sFullGridId);
+            output.Write("}");
+        }
+
+        private void RenderUpdateNewsFunction(HtmlTextWriter output)
+        {
+            output.Write("function updatewss{0}(obj){{", sFullGridId);
+            output.Write("      var id = obj.getAttribute(\"sid\");");
+            output.Write("      mygrid{0}.cells(id,1).setValue(\"\");", sFullGridId);
+            output.Write("      mygrid{0}.setUserData(id,\"lastError\",\"\");", sFullGridId);
             output.Write("}");
 
-            output.Write("function updatewss" + sFullGridId + "(obj){");
-            output.Write("      var id = obj.getAttribute(\"sid\");");
-            output.Write("      mygrid" + sFullGridId + ".cells(id,1).setValue(\"\");");
-            output.Write("      mygrid" + sFullGridId + ".setUserData(id,\"lastError\",\"\");");
-            //output.Write("      return true;");
-            output.Write("}");
-
-            output.Write("myDataProcessor.defineAction(\"error100\", myErrorHandler" + sFullGridId + ");");
-            output.Write("myDataProcessor.defineAction(\"updateitem\", updateitem" + sFullGridId + ");");
-            output.Write("myDataProcessor.defineAction(\"settsuid\", settsuid" + sFullGridId + ");");
-            output.Write("myDataProcessor.defineAction(\"updatewss\", updatewss" + sFullGridId + ");");
+            output.Write("myDataProcessor.defineAction(\"error100\", myErrorHandler{0});", sFullGridId);
+            output.Write("myDataProcessor.defineAction(\"updateitem\", updateitem{0});", sFullGridId);
+            output.Write("myDataProcessor.defineAction(\"settsuid\", settsuid{0});", sFullGridId);
+            output.Write("myDataProcessor.defineAction(\"updatewss\", updatewss{0});", sFullGridId);
             output.Write("myDataProcessor.setTransactionMode(\"POST\", true);");
 
             output.Write("myDataProcessor.setOnAfterUpdate(function(id,action,newid){");
-            //output.Write("if(action != \"error100\" && action != \"delete\"){mygrid" + sFullGridId + ".cells(id,1).setValue(\"\");}");
             output.Write("if(myDataProcessor.getSyncState())");
             output.Write("{");
-            output.Write("    gridChanged" + sFullGridId + " = false;");
-            output.Write("    mygrid" + sFullGridId + ".setSizes();");
+            output.Write("    gridChanged{0} = false;", sFullGridId);
+            output.Write("    mygrid{0}.setSizes();", sFullGridId);
             output.Write("    myDataProcessor.updatedRows = [];");
-            output.Write("    AfterSave(mygrid" + sFullGridId + ");");
+            output.Write("    AfterSave(mygrid{0});", sFullGridId);
             output.Write("    hm('dlgSaving');");
-            //output.Write("    if(submitaftersave" + sFullGridId + ")");
-            //output.Write("    {");
-            //output.Write("         //submitaftersave" + sFullGridId + " = false;");
-            //output.Write("         //submit" + sFullGridId + "();");
-            //output.Write("    }else{");
-            //output.Write("         alert('Timesheet Saved');");
-            //output.Write("    }");
             output.Write("}");
             output.Write("});");
+        }
 
-            output.Write("myDataProcessor.init(mygrid" + sFullGridId + ");");
-
-
-            //output.Write("mygrid" + sFullGridId + ".attachFooter(\"Totals:,#cspan,#cspan,{#stat_total},{#stat_total},{#stat_total},{#stat_total},{#stat_total}\");");
-
-            //output.Write("mygrid" + sFullGridId + ".attachEvent(\"onBeforeContextMenu\",onShowMenu);");
-
-
-            
-
-            output.Write("function loadX" + sFullGridId + "(){");
-            output.Write("mygridwidth" + sFullGridId + " = document.getElementById('WebPart" + this.Qualifier + "').offsetWidth - 20;");
+        private void RenderLoadXFunction(HtmlTextWriter output, SPWeb web)
+        {
+            output.Write("function loadX{0}(){{", sFullGridId);
+            output.Write("mygridwidth{0} = document.getElementById('WebPart{1}').offsetWidth - 20;", sFullGridId, Qualifier);
             if (impersonate)
-                output.Write("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/gettimesheet.aspx\",\"data=" + sFullParamList + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&rnd=" + Guid.NewGuid() + "&period=" + intPeriod + "&edit=" + inEditMode + "&status=" + status + "&width=\" + mygridwidth" + sFullGridId + " + \"&duser=" + System.Web.HttpUtility.UrlEncode(username) + "\");");
+            {
+                output.Write(
+                    "mygrid{0}.post(\"{1}/_layouts/epmlive/gettimesheet.aspx\",\""
+                    + "data={2}&source={3}&rnd={4}&period={5}&edit={6}&status={7}&width=\" + mygridwidth{0} + \"&duser={8}\");",
+                    sFullGridId,
+                    web.Url,
+                    sFullParamList,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    Guid.NewGuid(),
+                    intPeriod,
+                    inEditMode,
+                    status,
+                    HttpUtility.UrlEncode(username));
+            }
             else
-                output.Write("mygrid" + sFullGridId + ".post(\"" + web.Url + "/_layouts/epmlive/gettimesheet.aspx\",\"data=" + sFullParamList + "&source=" + System.Web.HttpUtility.UrlEncode(System.Web.HttpContext.Current.Request.Url.ToString()) + "&rnd=" + Guid.NewGuid() + "&period=" + intPeriod + "&edit=" + inEditMode + "&status=" + status + "&width=\" + mygridwidth" + sFullGridId + ");");
+            {
+                output.Write(
+                    "mygrid{0}.post(\"{1}/_layouts/epmlive/gettimesheet.aspx\",\""
+                    + "data={2}&source={3}&rnd={4}&period={5}&edit={6}&status={7}&width=\" + mygridwidth{0});",
+                    sFullGridId,
+                    web.Url,
+                    sFullParamList,
+                    HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()),
+                    Guid.NewGuid(),
+                    intPeriod,
+                    inEditMode,
+                    status);
+            }
 
             output.Write("}");
+        }
 
+        private void RenderClickTabFunction(HtmlTextWriter output)
+        {
             output.WriteLine("function clickTab(){");
-            output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
+            output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart{0}');", Qualifier);
             output.WriteLine("fireEvent(wp, 'mouseup');");
             output.WriteLine("setTimeout(\"clickbrowse()\",1000);");
             output.WriteLine("}");
@@ -1479,50 +1741,55 @@ namespace TimeSheets
 
             output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"GridViewContextualTabPageComponent.js\");");
 
-
-
             output.Write("try{");
-            //output.Write("_spBodyOnLoadFunctionNames.push(\"loadX" + sFullGridId + "\");");
-            output.WriteLine("setTimeout(\"loadX" + sFullGridId + "()\", 100);");
+            output.WriteLine("setTimeout(\"loadX{0}()\", 100);", sFullGridId);
 
             output.Write("}catch(e){alert(e);}");
+        }
 
-            string[] dayDefs = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveDaySettings").Split('|');
+        private void RenderValidateValuesFunction(HtmlTextWriter output, SPWeb web)
+        {
+            var daysDefinitions = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPMLiveDaySettings").Split('|');
 
-            string min = "";
-            string max = "";
+            var minStringBuilder = new StringBuilder(string.Empty);
+            var maxStringBuilder = new StringBuilder(string.Empty);
 
-            for (int i = 0; i < 20; i += 3)
+            for (var i = 0; i < 20; i += 3)
             {
-                if (dayDefs[i].ToLower() == "true")
+                if (string.Equals(daysDefinitions[i], "true", StringComparison.OrdinalIgnoreCase))
                 {
-                    min += "," + dayDefs[i + 1];
-                    max += "," + dayDefs[i + 2];
+                    minStringBuilder.Append(string.Format(",{0}", daysDefinitions[i + 1]));
+                    maxStringBuilder.Append(string.Format(",{0}", daysDefinitions[i + 2]));
                 }
             }
+            var min = minStringBuilder.ToString();
+            var max = maxStringBuilder.ToString();
+
             if (min.Length > 1)
+            {
                 min = min.Substring(1);
+            }
             if (max.Length > 1)
+            {
                 max = max.Substring(1);
+            }
 
-            output.Write("var dayMins = [" + min + "];");
-            output.Write("var dayMaxs = [" + max + "];");
+            output.Write("var dayMins = [{0}];", min);
+            output.Write("var dayMaxs = [{0}];", max);
 
-
-            output.Write("function validateValues" + sFullGridId + "(){");
-            if (inEditMode)
-                output.Write("     var cols = " + (view.ViewFields.Count + 2).ToString() + ";");
-            else
-                output.Write("     var cols = " + (view.ViewFields.Count + 1).ToString() + ";");
+            output.Write("function validateValues{0}(){{", sFullGridId);
+            output.Write(
+                inEditMode
+                    ? string.Format("     var cols = {0};", view.ViewFields.Count + 2)
+                    : string.Format("     var cols = {0};", view.ViewFields.Count + 1));
 
             output.Write("      var colCount = 0;");
-            output.Write("     for(var i = cols;i<mygrid" + sFullGridId + ".getColumnsNum() - 2;i++){");
+            output.Write("     for(var i = cols;i<mygrid{0}.getColumnsNum() - 2;i++){{", sFullGridId);
             output.Write("          var summ = 0;");
-            //output.Write("          alert(mygrid" + sFullGridId + ".getColId(i))");
             output.Write("          mygrid" + sFullGridId + ".forEachRow(function(id){");
-            output.Write("                if(mygrid" + sFullGridId + ".getUserData(id,\"itemid\") != \"\"){");
-            output.Write("                     var vals = mygrid" + sFullGridId + ".cells(id,i).getValue();");
-            output.Write("                     if(mygrid" + sFullGridId + ".getColType(i) == \"timeeditor\"){");
+            output.Write("                if(mygrid{0}.getUserData(id,\"itemid\") != \"\"){{", sFullGridId);
+            output.Write("                     var vals = mygrid{0}.cells(id,i).getValue();", sFullGridId);
+            output.Write("                     if(mygrid{0}.getColType(i) == \"timeeditor\"){{", sFullGridId);
             output.Write("                          if(vals.split('|')[0] != \"\"){");
             output.Write("                               var strVals = vals.split('|');");
             output.Write("                               for(var j = 0;j<strVals.length;j+=2){");
@@ -1537,21 +1804,28 @@ namespace TimeSheets
             output.Write("               }");
             output.Write("          });");
             output.Write("          if(summ < dayMins[colCount]){");
-            output.Write("               alert('The minimum for:\\r\\n ' + mygrid" + sFullGridId + ".getColumnLabel(i) + '\\r\\n is ' + dayMins[colCount] + ' hours, you currently have ' + summ + ' hours.');");
+            output.Write(
+                "               alert('The minimum for:\\r\\n ' + mygrid{0}.getColumnLabel(i) + '\\r\\n is ' + dayMins[colCount] + ' hours, you currently have ' + summ + ' hours.');",
+                sFullGridId);
             output.Write("               return false;");
             output.Write("          }");
             output.Write("          if(summ > dayMaxs[colCount]){");
-            output.Write("               alert('The maximum for:\\r\\n ' + mygrid" + sFullGridId + ".getColumnLabel(i) + '\\r\\n is ' + dayMaxs[colCount] + ' hours, you currently have ' + summ + ' hours.');");
+            output.Write(
+                "               alert('The maximum for:\\r\\n ' + mygrid{0}.getColumnLabel(i) + '\\r\\n is ' + dayMaxs[colCount] + ' hours, you currently have ' + summ + ' hours.');",
+                sFullGridId);
             output.Write("               return false;");
             output.Write("          }");
             output.Write("          colCount++;");
             output.Write("     }");
             output.Write("     return true;");
             output.Write("}");
+        }
 
-
-            output.WriteLine("mygrid" + sFullGridId + ".getCheckedIds = function(){");
-            output.WriteLine(@"
+        private void RenderGridCheckedIdsFunction(HtmlTextWriter output)
+        {
+            output.WriteLine("mygrid{0}.getCheckedIds = function(){{", sFullGridId);
+            output.WriteLine(
+                @"
                 var ids = """";
                 this.forEachRow(function (id) {
 			        var c = this.cells(id, 0);
@@ -1584,9 +1858,13 @@ namespace TimeSheets
 
                 return ids;
             };");
+        }
 
-            output.WriteLine("mygrid" + sFullGridId + ".getCheckedItems = function(){");
-            output.WriteLine(@"
+        private void RenderGridCheckedItemsFunction(HtmlTextWriter output)
+        {
+            output.WriteLine("mygrid{0}.getCheckedItems = function(){{", sFullGridId);
+            output.WriteLine(
+                @"
                 var ids = """";
                 this.forEachRow(function (id) {
 			        var c = this.cells(id, 0);
@@ -1619,26 +1897,32 @@ namespace TimeSheets
 
                 return ids;
             };");
+        }
 
-            output.Write("</script>");
+        private void RenderDialogNote(HtmlTextWriter output)
+        {
+            output.Write(
+                "<div id=\"dlgNote\" class=\"dialog\"><table width=\"100%\"><tr><td align=\"left\""
+                + " class=\"ms-sectionheader\"><H3 class=\"ms-standardheader\">Approval Note:</h3><br />"
+                + "{0}<br><br></td></tr><tr><td align=\"right\"><a href=\"javascript:hm('dlgNote');\""
+                + " class=\"ms-descriptiontext\">close</a></td></tr></table></div>",
+                appNote);
+        }
 
-            output.Write("<div id=\"dlgNote\" class=\"dialog\"><table width=\"100%\"><tr><td align=\"left\" class=\"ms-sectionheader\"><H3 class=\"ms-standardheader\">Approval Note:</h3><br />" + appNote + "<br><br></td></tr><tr><td align=\"right\"><a href=\"javascript:hm('dlgNote');\" class=\"ms-descriptiontext\">close</a></td></tr></table></div>");
-
-            string cExcells = Properties.Resources.txtTimesheetBase.Replace("#gridid#", sFullGridId).Replace("#griduid#", this.ID);
-            cExcells = cExcells.Replace("#peid#", peMulti.ClientID);
-            cExcells = cExcells.Replace("#peuid#", peMulti.UniqueID);
-            cExcells = cExcells.Replace("#pesid#", peSingle.ClientID);
-            cExcells = cExcells.Replace("#pesuid#", peSingle.UniqueID);
+        private void RenderExcels(HtmlTextWriter output)
+        {
+            var excels = Properties.Resources.txtTimesheetBase.Replace("#gridid#", sFullGridId).Replace("#griduid#", ID);
+            excels = excels.Replace("#peid#", peMulti.ClientID);
+            excels = excels.Replace("#peuid#", peMulti.UniqueID);
+            excels = excels.Replace("#pesid#", peSingle.ClientID);
+            excels = excels.Replace("#pesuid#", peSingle.UniqueID);
 
             output.Write("<script language=\"javascript\">");
             output.Write(Properties.Resources.txtExcels.Replace("#gridid#", sFullGridId));
 
             output.Write("</script>");
 
-            output.Write(cExcells);
-
-
-
+            output.Write(excels);
         }
 
         private string getViewFields()
