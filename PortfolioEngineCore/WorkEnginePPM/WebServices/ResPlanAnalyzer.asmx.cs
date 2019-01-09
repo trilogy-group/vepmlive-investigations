@@ -1,30 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Web;
-using System.Web.Script.Services;
 using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.Xml;
-using System.Security.Principal;
 using EPMLiveCore.Infrastructure.Logging;
 using ResourceValues;
 using RPADataCache;
 using System.Reflection;
-using System.Globalization;
-using System.Xml.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using EPMLiveCore;
 using Microsoft.SharePoint;
 using PortfolioEngineCore;
-using PortfolioEngineCore.Analyzers;
 using PortfolioEngineCore.PortfolioItems;
+using System.Dynamic;
+using System.Text;
 
 namespace WorkEnginePPM
 {
-
-
     /// <summary>
     /// Summary description for EditCosts
     /// </summary>
@@ -37,6 +26,7 @@ namespace WorkEnginePPM
     public class ResPlanAnalyzer : System.Web.Services.WebService
     {
         private const string COMPONENT_NAME = "Resource Plan Analyzer";
+        private const int CapacityValuesRequestNumber = (int)ResCenterRequest.CapacityValues;
 
         private static string basePath;
         private static string ppmId;
@@ -252,356 +242,514 @@ namespace WorkEnginePPM
             return "";
         }
 
-        public static string RALoadData(HttpContext Context, string sXML, RPAData RAData)
+        public static string RALoadData(HttpContext context, string xml, RPAData rpaData)
         {
+            var root = new CStruct();
+            dynamic data = null;
+            
+            root.LoadXML(xml);
+            
+            WebAdmin.CapturePFEBaseInfo(out basePath, 
+                out username, 
+                out ppmId, 
+                out ppmCompany, 
+                out ppmDbConn, 
+                out securityLevel);
+            var resourceAnalyzer = new ResourceAnalyzer(basePath, 
+                username, 
+                ppmId, 
+                ppmCompany, 
+                ppmDbConn, 
+                securityLevel);
+            var capacityScenario = new CapacityScenarios(basePath, 
+                username, 
+                ppmId, 
+                ppmCompany, 
+                ppmDbConn,
+                securityLevel);
 
-            CStruct xRoot = new CStruct();
-            string sReply = "";
-            string sViews = "";
-            string sTotal = "";
-            string sDetails = "";
-            string sDispMode = "";
-            string sHeatmaptext = "";
-            string sFromResGrid = "0";
+            var roleBasedCsAllowed = capacityScenario.RoleBasedCSAllowed();
 
-            int ipopstart = 0;
-            int ipopfin = 0;
-            bool bNegMode = false;
-
-            string sgpPMOAdmin = "";
-            string sTicketResourcesXML = "";
-            int iRawDataCount = 0;
-
-            string sErrStage = "O010";
-
-            xRoot.LoadXML(sXML);
-
-            sErrStage = "O011";
-
-            string sTicket = xRoot.GetStringAttr("Ticket");
-            int CalID = xRoot.GetIntAttr("CalID");
-            int StartID = xRoot.GetIntAttr("StartID");
-            int FinishID = xRoot.GetIntAttr("FinishID");
-
-            string sEchoReplyMessage = "";
-            string sReplyMessage = "";
-
-
-            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
-            PortfolioEngineCore.ResourceAnalyzer rpa = new ResourceAnalyzer(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
-
-
-            PortfolioEngineCore.CapacityScenarios rpcs = new CapacityScenarios(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
-
-            bool RoleBasedCSAllowed = rpcs.RoleBasedCSAllowed();
-
-            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-            //PortfolioEngineCore.ResourceAnalyzer rpa = new PortfolioEngineCore.ResourceAnalyzer(sBaseInfo);
+            var buildBaseInfo = WebAdmin.BuildBaseInfo(context);
             try
             {
-                if (rpa.SetResourceAnalyzerUserCalendarSettingsXML(CalID, StartID, FinishID) == false)
+                data = PerformDataLoad(resourceAnalyzer, 
+                    root, 
+                    context, 
+                    buildBaseInfo, 
+                    rpaData, 
+                    capacityScenario, 
+                    roleBasedCsAllowed);
+                if (data.Exception != null)
                 {
-                    sErrStage = "O012";
-                    sReply = HandleError("RALoadData", rpa.Status, rpa.FormatErrorText());
-                }
-                else
-                {
-
-                    string sStage;
-                    if (WebAdmin.AuthenticateUserAndProduct(Context, out sStage) == true)
-                    {
-
-                        string sDBConnect = WebAdmin.GetConnectionString(Context);
-                        sErrStage = "O013";
-
-                        PortfolioEngineCore.Capacity capacity = new PortfolioEngineCore.Capacity(sBaseInfo);
-                        //                        string sDeptXML;
-                        //                        capacity.SelectMyDepts(out sDeptXML);
-
-                        // check if I can see ALL resources
-                        sErrStage = "O014";
-                        bool bSuperRM = capacity.GetSuperRM();
-                        bool bSuperPM = capacity.GetSuperPM();
-                        List<CStruct> listResources = null;
-                        List<CStruct> listPIs = null;
-
-                        if (sTicket.Contains("?") || sTicket == "") sTicket = "A6CD298B-BAB7-4459-99DD-05C0F7A3C3D3";  // a value I was putting into the dbs during testing...
-
-                        sErrStage = "O020";
-                        if ((StatusEnum)capacity.SelectResourcesFromTicket(sTicket, out sTicketResourcesXML, out sEchoReplyMessage) == StatusEnum.rsSuccess)
-                        {
-                            string sParmXML, sReplyXML;
-                            CStruct xParms = new CStruct();
-                            xParms.Initialize("Parms");
-                            xParms.CreateInt("CalID", CalID);
-                            xParms.CreateInt("StartPeriodID", StartID);
-                            xParms.CreateInt("FinishPeriodID", FinishID);
-
-                            // this code was used to set the Departments into the parameters when using SelectMyDepartments above - will it come back? not impossible
-                            //CStruct xDepts = xParms.CreateSubStruct("Depts");
-                            //CStruct xSelDepts = new CStruct();
-                            //xSelDepts.LoadXML(sDeptXML);
-                            //List<CStruct> listDepts = xSelDepts.GetList("Dept");
-                            //foreach (CStruct xSelDept in listDepts)
-                            //{
-                            //    int lDeptID = xSelDept.GetIntAttr("ID");
-                            //    string sDeptName = xSelDept.GetStringAttr("Name");
-
-                            //    CStruct xDept = xDepts.CreateSubStruct("Dept");
-                            //    xDept.CreateIntAttr("ID", lDeptID);
-                            //    xDept.CreateStringAttr("Name", sDeptName);
-                            //}
-
-                            CStruct xSelItems = new CStruct();
-                            sErrStage = "O021";
-                            xSelItems.LoadXML(sTicketResourcesXML);
-                            sErrStage = "O022";
-                            listResources = xSelItems.GetList("Resource");
-                            if (listResources.Count == 0) listPIs = xSelItems.GetList("PI");
-
-                            if (listResources.Count > 0)
-                            {
-                                sErrStage = "O020a";
-                                //  stuff all the resources I am allowed to manage into a Dictionary
-                                Dictionary<int, int> dicMyResources = new Dictionary<int, int>();
-
-                                sFromResGrid = "1";
-
-                                if (bSuperRM == false)
-                                {
-                                    string sResourceXML;
-                                    sErrStage = "O020b";
-                                    capacity.SelectMyResources(out sResourceXML);
-                                    CStruct xMyResources = new CStruct();
-                                    sErrStage = "O020c";
-                                    xMyResources.LoadXML(sResourceXML);
-                                    sErrStage = "O020d";
-                                    List<CStruct>  listMyResources = xMyResources.GetList("Resource");
-                                    sErrStage = "O020e";
-                                    foreach (CStruct xSelResource in listMyResources)
-                                    {
-                                        int lWResID = xSelResource.GetIntAttr("ID");
-                                        dicMyResources.Add(lWResID, lWResID);
-                                    }
-                                }
-
-                                sErrStage = "O023";
-                                xParms.CreateInt("RequestNo", (int)ResCenterRequest.ResourceValuesForResources);
-                                CStruct xResources = xParms.CreateSubStruct("Resources");
-
-                                int lNumBlockedResources = 0;
-                                foreach (CStruct xSelResource in listResources)
-                                {
-                                    int lWResID = xSelResource.GetIntAttr("ID");
-                                    if (bSuperRM || dicMyResources.ContainsKey(lWResID))
-                                    {
-                                        CStruct xResource = xResources.CreateSubStruct("Resource");
-                                        xResource.CreateIntAttr("ID", lWResID);
-                                    }
-                                    else
-                                    {
-                                        string sName = xSelResource.GetStringAttr("Name");
-                                        if (lNumBlockedResources == 0) { sEchoReplyMessage += "\n" + "You do not have access to these resources: " + "\n" + sName; lNumBlockedResources = 1; }
-                                        else if (lNumBlockedResources == 5) { sEchoReplyMessage += ",..."; lNumBlockedResources += 1; }
-                                        else if (lNumBlockedResources < 5) { sEchoReplyMessage += "," + sName; lNumBlockedResources += 1; }
-                                        else lNumBlockedResources += 1;
-                                    }
-                                }
-                            }
-                            else if (listPIs.Count > 0)
-                            {
-                                sErrStage = "O024";
-                                Dictionary<int, int> dicMyProjects = new Dictionary<int, int>();
-                                if (bSuperPM == false)
-                                {
-                                    string sProjectXML;
-                                    sErrStage = "O024b";
-                                    capacity.SelectMyProjects(out sProjectXML);
-                                    CStruct xMyProjects = new CStruct();
-                                    sErrStage = "O024c";
-                                    xMyProjects.LoadXML(sProjectXML);
-                                    sErrStage = "O024d";
-                                    List<CStruct> listMyProjects = xMyProjects.GetList("Project");
-                                    sErrStage = "O024e";
-                                    foreach (CStruct xSelProject in listMyProjects)
-                                    {
-                                        int lProjID = xSelProject.GetIntAttr("ID");
-                                        dicMyProjects.Add(lProjID, lProjID);
-                                    }
-                                }
-
-                                sErrStage = "O024x";
-                                xParms.CreateInt("RequestNo", (int)ResCenterRequest.ResourceValuesForPIs);
-                                CStruct xPIs = xParms.CreateSubStruct("PIs");
-
-                                int lNumBlockedProjects = 0;
-                                foreach (CStruct xSelPI in listPIs)
-                                {
-                                    int lProjID = xSelPI.GetIntAttr("ID");
-                                    if (bSuperPM || dicMyProjects.ContainsKey(lProjID))
-                                    {
-                                        CStruct xPI = xPIs.CreateSubStruct("PI");
-                                        xPI.CreateIntAttr("ID", lProjID);
-                                    }
-                                    else
-                                    {
-                                        string sName = xSelPI.GetStringAttr("Name");
-                                        if (lNumBlockedProjects == 0) { sEchoReplyMessage += "\n" + "You do not have access to these projects: " + "\n" + sName; lNumBlockedProjects = 1; }
-                                        else if (lNumBlockedProjects == 5) { sEchoReplyMessage += ",..."; lNumBlockedProjects += 1; }
-                                        else if (lNumBlockedProjects < 5) { sEchoReplyMessage += "," + sName; lNumBlockedProjects += 1; }
-                                        else lNumBlockedProjects += 1;
-                                    }
-                                }
-                            }
-
-
-                            // *****    save parms (in case need when editing Capacity Scenarios within RPA)
-                            CStruct xSaveParms = new CStruct();
-                            xSaveParms.Initialize("Parms");
-                            xSaveParms.CreateInt("CalID", CalID);
-                            xSaveParms.CreateInt("StartPeriodID", StartID);
-                            xSaveParms.CreateInt("FinishPeriodID", FinishID);
-
-                            int lRequestNo = (int)ResCenterRequest.CapacityValues;
-                            xSaveParms.CreateInt("RequestNo", lRequestNo);
-                            // *****   save parms 
-
-                            sParmXML = xParms.XML();
-
-                            sErrStage = "O025";
-                            if ((StatusEnum)capacity.GetRVInfo(sParmXML, out sReplyXML, out sReplyMessage) == StatusEnum.rsSuccess)
-                            {
-
-
-                                sErrStage = "O026";
-                                if (sReplyMessage != "")
-                                    sEchoReplyMessage += "\n" + sReplyMessage;
-
-                                clsResourceValues resValues = new clsResourceValues();
-                                bool bDoIt = false;
-                                if (sReplyXML != "")
-                                    bDoIt = resValues.LoadFromXML(sReplyXML);
-
-
-                                if (bDoIt)
-                                {
-
-                                    sErrStage = "O027";
-                                    RAData.GrabRAData(resValues, "", resValues.ResExamView, StartID, CalID, sParmXML, out sErrStage);
-
-                                    string sModeXML = "";
-
-                                    string sDepts = RAData.GetCSDeptUIDs();
-
-                                    rpcs.GetCapacityScenariosXML(out sModeXML, RoleBasedCSAllowed, sDepts);
-                                    CStruct xCSMode = new CStruct();
-                                    xCSMode.LoadXML(sModeXML);
-
-
-                                    RAData.StashCSRoleMode(RoleBasedCSAllowed);
-                                    RAData.UpdateCSDataMode(xCSMode);
-
-                                    sErrStage = "O028";
-                                    sReply = RAData.GetTargetRGBData();
-
-                                    sErrStage = "O029";
-                                    if (rpa.GetResourceAnalyzerViewsXML(out sViews) == false)
-                                    {
-                                        sReply = HandleError("GetResourceValues", rpa.Status, rpa.FormatErrorText());
-                                        sViews = "";
-                                    }
-
-                                    sErrStage = "O030";
-                                    RAData.StashViews(sViews);
-                                    sErrStage = "O031";
-                                    RAData.StashCapacityReloadXML(xSaveParms.XML());
-
-                                    sErrStage = "O032";
-                                    sTotal = RAData.GetTotalsData(true);
-
-                                    sErrStage = "O033";
-
-                                    sDetails = RAData.GetDetailsData();
-
-                                    sErrStage = "O034";
-                                    sDispMode = RAData.GetDisplayMode();
-
-                                    sErrStage = "O035";
-                                    sgpPMOAdmin = RAData.GetPMOAdmin();
-                                    sErrStage = "O036";
-                                    iRawDataCount = RAData.GetRawDataCount();
-
-                                    RAData.GetStartFinishDataPeriods(out ipopstart, out ipopfin);
-                                    sHeatmaptext = RAData.GetHeatmapText();
-                                    bNegMode = RAData.GetNegotiationMode();
-
-
-                                }
-                                else
-                                    sReply = "<Error Value='Loading Data failed'/>";
-                            }
-                            else
-                            {
-                                sReply = "<Error Value = '" + sEchoReplyMessage + "\n" + sReplyMessage + "'/>";
-                            }
-                        }
-                        else
-                        {
-                            sReply = "<Error Value='Failed to decode ticket - " + sEchoReplyMessage + "'/>";
-                        }
-                    }
+                    throw (Exception)data.Exception;
                 }
             }
             catch (Exception ex)
             {
-                return HandleException("ResPlanAnalyzer.RALoadData at", 99999, ex, sErrStage);
+                return HandleException("ResPlanAnalyzer.RALoadData at", 99999, ex, data.ErrorStage);
             }
 
-            //sReply = "<Error Value='GetResourceValues failed - " + sEchoReplyMessage + "'/>";  //  stuck here as a test
-            
-            CStruct xResult = BuildResultXML("GetTotalsColumnsConfiguration", 0);
-            xResult.AppendXML(sReply);
-            if (sViews != "")
-                xResult.AppendXML(sViews);
+            var result = SetExtraData(rpaData, roleBasedCsAllowed, data);
 
+            return result.XML();
+        }
+        
+        private static dynamic PerformDataLoad(ResourceAnalyzer resourceAnalyzer, 
+            CStruct root, 
+            HttpContext context, 
+            string buildBaseInfo, 
+            RPAData rpaData,
+            CapacityScenarios capacityScenario,
+            bool roleBasedCsAllowed)
+        {
+            dynamic data = new ExpandoObject();
+            try
+            {
+                data.Exception = null;
+                data.Reply = string.Empty;
+                data.Views = string.Empty;
+                data.Total = string.Empty;
+                data.Details = string.Empty;
+                data.DisplayMode = string.Empty;
+                data.HeatMapText = string.Empty;
+                data.PmoAdmin = string.Empty;
+                data.TicketResourcesXml = string.Empty;
+                data.EchoReplyMessage = string.Empty;
+                data.FromResGrid = "0";
+                data.NegotiationMode = false;
+                data.RawDataCount = 0;
+                data.Ticket = root.GetStringAttr("Ticket");
+                data.CalId = root.GetIntAttr("CalID");
+                data.StartId = root.GetIntAttr("StartID");
+                data.FinishId = root.GetIntAttr("FinishID");
+                data.ErrorStage = "O011";
+                data.IpOperationStart = 0;
+                data.IpOperationFin = 0;
 
-            CStruct Extradata;
-            Extradata = xResult.CreateSubStruct("TotalsConfiguration");
-            Extradata.CreateStringAttr("Value", sTotal);
-            Extradata.AppendXML(sTotal);
-            Extradata = xResult.CreateSubStruct("DetailsConfiguration");
-            Extradata.CreateStringAttr("Value", sDetails);
-            Extradata.AppendXML(sDetails);
+                if (resourceAnalyzer.SetResourceAnalyzerUserCalendarSettingsXML(data.CalId, 
+                        data.StartId, 
+                        data.FinishId) == false)
+                {
+                    data.ErrorStage = "O012";
+                    data.Reply = HandleError("RALoadData",
+                        resourceAnalyzer.Status,
+                        resourceAnalyzer.FormatErrorText());
+                }
+                else
+                {
+                    ProcessAnalyzerUserCalendarSettings(context, 
+                        data, 
+                        buildBaseInfo, 
+                        capacityScenario, 
+                        rpaData, 
+                        roleBasedCsAllowed, 
+                        resourceAnalyzer);
+                }
+            }
+            catch (Exception ex)
+            {
+                data.Exception = ex;
+            }
 
-            Extradata = xResult.CreateSubStruct("FromResGrid");
+            return data;
+        }
+        
+        private static void ProcessAnalyzerUserCalendarSettings(HttpContext context, 
+            dynamic data, 
+            string buildBaseInfo, 
+            CapacityScenarios capacityScenario, 
+            RPAData rpaData, 
+            bool roleBasedCsAllowed, 
+            ResourceAnalyzer resourceAnalyzer)
+        {
+            string stage;
+            if (!WebAdmin.AuthenticateUserAndProduct(context, out stage))
+            {
+                return;
+            }
 
-            RAData.SetCalledFromResources(sFromResGrid == "1");
-            Extradata.CreateStringAttr("Value", sFromResGrid);
+            data.ErrorStage = "O013";
 
-            Extradata = xResult.CreateSubStruct("AllowCSResMode");
-            Extradata.CreateIntAttr("Value", (RoleBasedCSAllowed ? 1 : 0));
+            var capacity = new Capacity(buildBaseInfo);
 
-            Extradata = xResult.CreateSubStruct("DisplayMode");
-            Extradata.CreateStringAttr("Value", sDispMode);
-            Extradata = xResult.CreateSubStruct("gpPMOAdmin");
-            Extradata.CreateStringAttr("Value", sgpPMOAdmin);
-            Extradata = xResult.CreateSubStruct("LoadingDataReply");
-            Extradata.CreateStringAttr("Value", sEchoReplyMessage);
-            Extradata = xResult.CreateSubStruct("TicketValue");
-            Extradata.CreateStringAttr("Value", sTicket);
-            Extradata = xResult.CreateSubStruct("TicketReturns");
-            Extradata.CreateStringAttr("Value", sTicketResourcesXML);
-            Extradata = xResult.CreateSubStruct("DetailsLoaded");
-            Extradata.CreateIntAttr("Value", iRawDataCount);
-            Extradata = xResult.CreateSubStruct("PeriodRange");
-            Extradata.CreateIntAttr("Start", ipopstart);
-            Extradata.CreateIntAttr("Finish", ipopfin);
-            Extradata = xResult.CreateSubStruct("HeatMapText");
-            Extradata.CreateStringAttr("Value", sHeatmaptext);
-            Extradata = xResult.CreateSubStruct("NegMode");
-            Extradata.CreateBooleanAttr("Value", bNegMode);
-    
-            return xResult.XML();
+            // check if I can see ALL resources
+            data.ErrorStage = "O014";
+            var superRm = capacity.GetSuperRM();
+            var superPm = capacity.GetSuperPM();
+            List<CStruct> listPis = null;
+
+            if (data.Ticket.Contains("?") || data.Ticket == string.Empty)
+            {
+                // a value I was putting into the dbs during testing...
+                data.Ticket = "A6CD298B-BAB7-4459-99DD-05C0F7A3C3D3";
+            }
+
+            data.ErrorStage = "O020";
+            string ticketResourcesXml, echoReplyMessage;
+            var resourceStatus = (StatusEnum)capacity.SelectResourcesFromTicket(data.Ticket,
+                out ticketResourcesXml,
+                out echoReplyMessage);
+            data.TicketResourcesXml = ticketResourcesXml;
+            data.EchoReplyMessage = echoReplyMessage;
+            if (resourceStatus == StatusEnum.rsSuccess)
+            {
+                var paramsStruct = new CStruct();
+                paramsStruct.Initialize("Parms");
+                paramsStruct.CreateInt("CalID", data.CalId);
+                paramsStruct.CreateInt("StartPeriodID", data.StartId);
+                paramsStruct.CreateInt("FinishPeriodID", data.FinishId);
+
+                var selectedItem = new CStruct();
+                data.ErrorStage = "O021";
+                selectedItem.LoadXML(data.TicketResourcesXml);
+                data.ErrorStage = "O022";
+                var listResources = selectedItem.GetList("Resource");
+                if (listResources.Count == 0) listPis = selectedItem.GetList("PI");
+
+                if (listResources.Count > 0)
+                {
+                    ProcessResources(data, capacity, superRm, paramsStruct, listResources);
+                }
+                else if (listPis.Count > 0)
+                {
+                    ProcessListPis(data, listPis, capacity, paramsStruct, superPm);
+                }
+                
+                // save params (in case need when editing Capacity Scenarios within RPA)
+                SaveParams(data, 
+                    paramsStruct, 
+                    capacity, 
+                    capacityScenario, 
+                    roleBasedCsAllowed, 
+                    resourceAnalyzer,
+                    rpaData);
+            }
+            else
+            {
+                data.Reply = $"<Error Value='Failed to decode ticket - {data.EchoReplyMessage}'/>";
+            }
+        }
+        
+        private static void ProcessResources(dynamic data, Capacity capacity, bool superRm, CStruct paramsStruct, List<CStruct> listResources)
+        {
+            data.ErrorStage = "O020a";
+
+            // stuff all the resources I am allowed to manage into a Dictionary
+            var resourcesDictionary = new Dictionary<int, int>();
+            var echoReplyMessage = new StringBuilder();
+
+            data.FromResGrid = "1";
+
+            if (superRm == false)
+            {
+                data.ErrorStage = "O020b";
+                string resourceXml;
+                capacity.SelectMyResources(out resourceXml);
+                var xMyResources = new CStruct();
+                data.ErrorStage = "O020c";
+                xMyResources.LoadXML(resourceXml);
+                data.ErrorStage = "O020d";
+                var listMyResources = xMyResources.GetList("Resource");
+                data.ErrorStage = "O020e";
+                foreach (var selectedResource in listMyResources)
+                {
+                    var resourceId = selectedResource.GetIntAttr("ID");
+                    resourcesDictionary.Add(resourceId, resourceId);
+                }
+            }
+
+            data.ErrorStage = "O023";
+            paramsStruct.CreateInt("RequestNo", (int)ResCenterRequest.ResourceValuesForResources);
+            var resources = paramsStruct.CreateSubStruct("Resources");
+
+            var blockedResourcesNumber = 0;
+            foreach (var selectedResource in listResources)
+            {
+                var resourceId = selectedResource.GetIntAttr("ID");
+                if (superRm || resourcesDictionary.ContainsKey(resourceId))
+                {
+                    var resource = resources.CreateSubStruct("Resource");
+                    resource.CreateIntAttr("ID", resourceId);
+                }
+                else
+                {
+                    var name = selectedResource.GetStringAttr("Name");
+                    if (blockedResourcesNumber != 0)
+                    {
+                        if (blockedResourcesNumber == 5)
+                        {
+                            echoReplyMessage.Append(",...");
+                            blockedResourcesNumber += 1;
+                        }
+                        else if (blockedResourcesNumber < 5)
+                        {
+                            echoReplyMessage.Append($",{name}");
+                            blockedResourcesNumber += 1;
+                        }
+                        else blockedResourcesNumber += 1;
+                    }
+                    else
+                    {
+                        echoReplyMessage.Append($"\nYou do not have access to these resources: \n{name}");
+                        blockedResourcesNumber = 1;
+                    }
+                }
+            }
+
+            data.EchoReplyMessage += echoReplyMessage.ToString();
+        }
+
+        private static void SaveParams(dynamic data, 
+            CStruct paramsStruct, 
+            Capacity capacity, 
+            CapacityScenarios capacityScenario, 
+            bool roleBasedCsAllowed, 
+            ResourceAnalyzer resourceAnalyzer,
+            RPAData rpaData)
+        {
+            var saveParams = new CStruct();
+            saveParams.Initialize("Parms");
+            saveParams.CreateInt("CalID", data.CalId);
+            saveParams.CreateInt("StartPeriodID", data.StartId);
+            saveParams.CreateInt("FinishPeriodID", data.FinishId);
+
+            saveParams.CreateInt("RequestNo", CapacityValuesRequestNumber);
+
+            // save params
+            var paramXml = paramsStruct.XML();
+
+            data.ErrorStage = "O025";
+            string replyMessage;
+            string replyXml;
+            if ((StatusEnum)capacity.GetRVInfo(paramXml,
+                    out replyXml,
+                    out replyMessage) == StatusEnum.rsSuccess)
+            {
+                data.ErrorStage = "O026";
+                if (replyMessage != "")
+                {
+                    data.EchoReplyMessage += $"\n{replyMessage}";
+                }
+
+                var resourceValues = new clsResourceValues();
+                var replyXmlLoaded = false;
+                if (replyXml != "")
+                {
+                    replyXmlLoaded = resourceValues.LoadFromXML(replyXml);
+                }
+
+                if (replyXmlLoaded)
+                {
+                    SetReplyXmlLoadedData(data, 
+                        rpaData, 
+                        resourceValues, 
+                        paramXml,
+                        capacityScenario, 
+                        roleBasedCsAllowed, 
+                        resourceAnalyzer, 
+                        saveParams);
+                }
+                else
+                {
+                    data.Reply = "<Error Value='Loading Data failed'/>";
+                }
+            }
+            else
+            {
+                data.Reply = $"<Error Value = '{data.EchoReplyMessage}\n{replyMessage}'/>";
+            }
+        }
+
+        private static void ProcessListPis(dynamic data, 
+            IEnumerable<CStruct> listPis, 
+            Capacity capacity, CStruct paramsStruct, bool superPm)
+        {
+            data.ErrorStage = "O024";
+            var dicMyProjects = new Dictionary<int, int>();
+            if (superPm == false)
+            {
+                string projectXml;
+                data.ErrorStage = "O024b";
+                capacity.SelectMyProjects(out projectXml);
+                var myProjects = new CStruct();
+                data.ErrorStage = "O024c";
+                myProjects.LoadXML(projectXml);
+                data.ErrorStage = "O024d";
+                var listMyProjects = myProjects.GetList("Project");
+                data.ErrorStage = "O024e";
+                foreach (var selectedProject in listMyProjects)
+                {
+                    var projectId = selectedProject.GetIntAttr("ID");
+                    dicMyProjects.Add(projectId, projectId);
+                }
+            }
+
+            data.ErrorStage = "O024x";
+            paramsStruct.CreateInt("RequestNo", (int)ResCenterRequest.ResourceValuesForPIs);
+            var pis = paramsStruct.CreateSubStruct("PIs");
+
+            var lNumBlockedProjects = 0;
+            var echoReplyMessage = new StringBuilder();
+            foreach (var selectedPi in listPis)
+            {
+                var projectId = selectedPi.GetIntAttr("ID");
+                if (superPm || dicMyProjects.ContainsKey(projectId))
+                {
+                    var pi = pis.CreateSubStruct("PI");
+                    pi.CreateIntAttr("ID", projectId);
+                }
+                else
+                {
+                    var sName = selectedPi.GetStringAttr("Name");
+                    if (lNumBlockedProjects != 0)
+                    {
+                        if (lNumBlockedProjects == 5)
+                        {
+                            echoReplyMessage.Append(",...");
+                            lNumBlockedProjects += 1;
+                        }
+                        else if (lNumBlockedProjects < 5)
+                        {
+                            echoReplyMessage.Append($",{sName}");
+                            lNumBlockedProjects += 1;
+                        }
+                        else lNumBlockedProjects += 1;
+                    }
+                    else
+                    {
+                        echoReplyMessage.Append($"\nYou do not have access to these projects: \n{sName}");
+                        lNumBlockedProjects = 1;
+                    }
+                }
+            }
+
+            data.EchoReplyMessage += echoReplyMessage.ToString();
+        }
+
+        private static void SetReplyXmlLoadedData(dynamic data, 
+            RPAData rpaData, 
+            clsResourceValues resourceValues, 
+            string paramXml, 
+            CapacityScenarios capacityScenario,
+            bool roleBasedCsAllowed,
+            ResourceAnalyzer resourceAnalyzer,
+            CStruct saveParams)
+        {
+            data.ErrorStage = "O027";
+            string errorStage;
+            rpaData.GrabRAData(resourceValues,
+                string.Empty,
+                resourceValues.ResExamView,
+                data.StartId,
+                data.CalId,
+                paramXml,
+                out errorStage);
+            data.ErrorStage = errorStage;
+            string modeXml;
+
+            var departmentIds = rpaData.GetCSDeptUIDs();
+
+            capacityScenario.GetCapacityScenariosXML(out modeXml,
+                roleBasedCsAllowed,
+                departmentIds);
+
+            var csMode = new CStruct();
+            csMode.LoadXML(modeXml);
+
+            rpaData.StashCSRoleMode(roleBasedCsAllowed);
+            rpaData.UpdateCSDataMode(csMode);
+
+            data.ErrorStage = "O028";
+            data.Reply = rpaData.GetTargetRGBData();
+
+            data.ErrorStage = "O029";
+            string views;
+            if (resourceAnalyzer.GetResourceAnalyzerViewsXML(out views) == false)
+            {
+                data.Reply = HandleError("GetResourceValues",
+                    resourceAnalyzer.Status,
+                    resourceAnalyzer.FormatErrorText());
+                views = string.Empty;
+            }
+
+            data.Views = views;
+            data.ErrorStage = "O030";
+            rpaData.StashViews(data.Views);
+            data.ErrorStage = "O031";
+            rpaData.StashCapacityReloadXML(saveParams.XML());
+
+            data.ErrorStage = "O032";
+            data.Total = rpaData.GetTotalsData(true);
+
+            data.ErrorStage = "O033";
+
+            data.Details = rpaData.GetDetailsData();
+
+            data.ErrorStage = "O034";
+            data.DisplayMode = rpaData.GetDisplayMode();
+
+            data.ErrorStage = "O035";
+            data.PmoAdmin = rpaData.GetPMOAdmin();
+            data.ErrorStage = "O036";
+            data.RawDataCount = rpaData.GetRawDataCount();
+
+            int ipOperationStart;
+            int ipOperationFin;
+            rpaData.GetStartFinishDataPeriods(out ipOperationStart, out ipOperationFin);
+            data.IpOperationStart = ipOperationStart;
+            data.IpOperationFin = ipOperationFin;
+            data.HeatMapText = rpaData.GetHeatmapText();
+            data.NegotiationMode = rpaData.GetNegotiationMode();
+        }
+
+        private static CStruct SetExtraData(RPAData rpaData,
+            bool roleBasedCsAllowed, 
+            dynamic data)
+        {
+            var result = BuildResultXML("GetTotalsColumnsConfiguration", 0);
+            result.AppendXML(data.Reply);
+            if (data.Views != string.Empty)
+            {
+                result.AppendXML(data.Views);
+            }
+
+            var extraData = result.CreateSubStruct("TotalsConfiguration");
+            extraData.CreateStringAttr("Value", data.Total);
+            extraData.AppendXML(data.Total);
+            extraData = result.CreateSubStruct("DetailsConfiguration");
+            extraData.CreateStringAttr("Value", data.Details);
+            extraData.AppendXML(data.Details);
+
+            extraData = result.CreateSubStruct("FromResGrid");
+
+            rpaData.SetCalledFromResources(data.FromResGrid == "1");
+            extraData.CreateStringAttr("Value", data.FromResGrid);
+
+            extraData = result.CreateSubStruct("AllowCSResMode");
+            extraData.CreateIntAttr("Value", (roleBasedCsAllowed ? 1 : 0));
+
+            extraData = result.CreateSubStruct("DisplayMode");
+            extraData.CreateStringAttr("Value", data.DisplayMode);
+            extraData = result.CreateSubStruct("gpPMOAdmin");
+            extraData.CreateStringAttr("Value", data.PmoAdmin);
+            extraData = result.CreateSubStruct("LoadingDataReply");
+            extraData.CreateStringAttr("Value", data.EchoReplyMessage);
+            extraData = result.CreateSubStruct("TicketValue");
+            extraData.CreateStringAttr("Value", data.Ticket);
+            extraData = result.CreateSubStruct("TicketReturns");
+            extraData.CreateStringAttr("Value", data.TicketResourcesXml);
+            extraData = result.CreateSubStruct("DetailsLoaded");
+            extraData.CreateIntAttr("Value", data.RawDataCount);
+            extraData = result.CreateSubStruct("PeriodRange");
+            extraData.CreateIntAttr("Start", data.IpOperationStart);
+            extraData.CreateIntAttr("Finish", data.IpOperationFin);
+            extraData = result.CreateSubStruct("HeatMapText");
+            extraData.CreateStringAttr("Value", data.HeatMapText);
+            extraData = result.CreateSubStruct("NegMode");
+            extraData.CreateBooleanAttr("Value", data.NegotiationMode);
+
+            return result;
         }
 
         public static string GetRAWorkDetails(HttpContext Context, string sXML, RPAData RAData)
