@@ -116,13 +116,10 @@ namespace WorkEnginePPM
                         {
                             var calendarId = SqlDb.ReadIntValue(row["CB_ID"]);
 
-                            //if (editmode != 1 || calendarId != ctCalendarId)
-                            {
-                                var item = calendars.CreateSubStruct("item");
-                                item.CreateIntAttr("id", calendarId);
-                                item.CreateStringAttr("name", SqlDb.ReadStringValue(row["CB_NAME"], string.Empty));
-                                item.CreateIntAttr("used", SqlDb.ReadIntValue(row["used"]));
-                            }
+                            var item = calendars.CreateSubStruct("item");
+                            item.CreateIntAttr("id", calendarId);
+                            item.CreateStringAttr("name", SqlDb.ReadStringValue(row["CB_NAME"], string.Empty));
+                            item.CreateIntAttr("used", SqlDb.ReadIntValue(row["used"]));
                         }
 
                         postOptions.CreateBooleanAttr(
