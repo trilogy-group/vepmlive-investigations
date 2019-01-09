@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.UI.WebControls;
 using EPMLibrary;
 using Microsoft.SharePoint;
+using System.Linq;
 
 namespace TimeSheets
 {
@@ -303,6 +304,14 @@ namespace TimeSheets
                 {
                     if (userValue.User.LoginName == _userLoginName)
                         _authorized = true;
+                    else
+                    {
+                        SPUser user = SPContext.Current.Web.EnsureUser(_userLoginName);
+                        if (user.Groups.Cast<SPGroup>().Any(g => String.Equals(g.Name, _userLoginName, StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            _authorized = true;
+                        }
+                    }
                 }
             else if (fieldValues is SPFieldUserValue)
             {
