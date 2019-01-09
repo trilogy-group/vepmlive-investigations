@@ -826,7 +826,8 @@ namespace EPMLiveEnterprise
                                 SPSecurity.RunWithElevatedPrivileges(
                                     delegate { projectDataSet = psiProject.ReadProject(projectUid, DataStoreEnum.PublishedStore); });
 
-                                if (pubType == 3)
+                                const int PubType3 = 3;
+                                if (pubType == PubType3)
                                 {
                                     foreach (ProjectDataSet.TaskRow tr in projectDataSet.Task)
                                     {
@@ -868,7 +869,6 @@ namespace EPMLiveEnterprise
                                         {
                                             Trace.TraceError("Exception Suppressed {0}", ex);
                                         }
-                                        //   myLog.WriteEntry(pr.RES_NAME + ": " + pr.RES_WORK, EventLogEntryType.Information, 330);
                                     }
                                 }
                                 members.Update();
