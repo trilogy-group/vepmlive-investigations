@@ -81,7 +81,10 @@ namespace WorkEnginePPM
             processItem(properties);
             try
             {
-                properties.AfterProperties["Title"] = CoreFunctions.GetSafeGroupTitle(properties.AfterProperties["Title"]?.ToString());
+                if (properties.AfterProperties["Title"] != null && properties.AfterProperties["Title"].ToString().Trim() != string.Empty)
+                {
+                    properties.AfterProperties["Title"] = CoreFunctions.GetSafeGroupTitle(properties.AfterProperties["Title"]?.ToString());
+                }
             }
             catch (Exception ex)
             {
