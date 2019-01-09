@@ -302,8 +302,13 @@ namespace TimeSheets
                 // Multiple Users
                 foreach (SPFieldUserValue userValue in fieldValues as SPFieldUserValueCollection)
                 {
-                    if (userValue.User.LoginName == _userLoginName)
-                        _authorized = true;
+                    if (userValue.User != null)
+                    {
+                        if (userValue.User.LoginName == _userLoginName)
+                        {
+                            _authorized = true;
+                        }
+                    }
                     else
                     {
                         SPUser user = SPContext.Current.Web.EnsureUser(_userLoginName);
