@@ -1956,558 +1956,603 @@ namespace TimeSheets
         {
             try
             {
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(data);
+                var doc = GetXmlDocument(data);
+                var gridType = int.Parse(doc.FirstChild.Attributes["GridType"].Value);
+                var period = doc.FirstChild.Attributes["Period"].Value;
+                var gridId = doc.FirstChild.Attributes["GridId"].Value;
+                var editable = GetEditable(doc);
 
-                int iGridType = int.Parse(doc.FirstChild.Attributes["GridType"].Value);
-                string sPeriod = doc.FirstChild.Attributes["Period"].Value;
-                string sGridId = doc.FirstChild.Attributes["GridId"].Value;
-                string Editable = "0";
+                var docLayout = GetDocLayout();
+                var attribute = docLayout.CreateAttribute("id");
+                attribute.Value = "TS" + gridId;
 
-                try
-                {
-                    Editable = doc.FirstChild.Attributes["Editable"].Value;
-                }
-                catch { }
+                var cfgNode = AddCfgNode(docLayout, attribute, editable, period);
 
-                XmlDocument docLayout = new XmlDocument();
-                docLayout.LoadXml(Properties.Resources.txtMyTimesheet_GridLayout);
-                XmlAttribute attr = docLayout.CreateAttribute("id");
-                attr.Value = "TS" + sGridId;
+                var nodeRightCols = docLayout.FirstChild.SelectSingleNode("//RightCols");
+                var nodeLeftCols = docLayout.FirstChild.SelectSingleNode("//LeftCols");
+                var nodeFooter = docLayout.FirstChild.SelectSingleNode("//Foot/I[@id='-1']");
+                var nodeHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
+                var nodeGroupDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='Group']");
+                var nodeRDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='R']");
 
-                XmlNode ndCfg = docLayout.FirstChild.SelectSingleNode("//Cfg");
-                ndCfg.Attributes.Append(attr);
+                var settings = new TimesheetSettings(web);
 
-                attr = docLayout.CreateAttribute("GridEditable");
-                attr.Value = Editable;
-                ndCfg.Attributes.Append(attr);
+                var rightWidth = 200;
+                var midWidth = 0;
+                var cellWidth = 60;
 
-                attr = docLayout.CreateAttribute("PeriodId");
-                attr.Value = sPeriod;
-                ndCfg.Attributes.Append(attr);
-
-                attr = docLayout.CreateAttribute("SaveAndSubmit");
-                attr.Value = "false";
-                ndCfg.Attributes.Append(attr);
-
-
-                XmlNode nodeRightCols = docLayout.FirstChild.SelectSingleNode("//RightCols");
-                XmlNode ndLeftCols = docLayout.FirstChild.SelectSingleNode("//LeftCols");
-                XmlNode ndFooter = docLayout.FirstChild.SelectSingleNode("//Foot/I[@id='-1']");
-                XmlNode nodeHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
-                XmlNode nodeGroupDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='Group']");
-                XmlNode nodeRDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='R']");
-
-                TimesheetSettings settings = new TimesheetSettings(web);
-
-                int RightWidth = 200;
-                int MidWidth = 0;
-                int TSCellWidth = 60;
-
-                XmlNode ndSW = docLayout.FirstChild.SelectSingleNode("//RightCols/C[@Name='StopWatch']");
-
-                if (settings.AllowStopWatch && iGridType == 0)
-                {
-                    RightWidth += int.Parse(ndSW.Attributes["Width"].Value);
-                }
-                else
-                {
-                    ndSW.Attributes["Visible"].Value = "0";
-                }
+                AddStopWatchNode(docLayout, settings, gridType, ref rightWidth);
 
                 var totalColumnCalc = new StringBuilder();
+                var viewInfo = new Dictionary<string, string>();
+                var views = GetViews(web);
+                viewInfo = PopulateDefaultValues(views, docLayout, cfgNode, viewInfo);
 
-                Dictionary<string, string> viewInfo = new Dictionary<string, string>();
-
-                EPMLiveCore.API.ViewManager views = GetViews(web);
-
-                foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
-                {
-                    try
+                SPSecurity.RunWithElevatedPrivileges(
+                    delegate
                     {
-                        if (key.Value["Default"].ToLower() == "true")
-                        {
-                            attr = docLayout.CreateAttribute("Group");
-                            attr.Value = key.Value["Group"];
-                            ndCfg.Attributes.Append(attr);
+                        docLayout = PopulateGrid(
+                            web,
+                            settings,
+                            period,
+                            docLayout,
+                            cellWidth,
+                            nodeRightCols,
+                            nodeHeader,
+                            nodeGroupDef,
+                            totalColumnCalc,
+                            nodeRDef,
+                            gridType,
+                            viewInfo,
+                            ref rightWidth,
+                            ref midWidth);
+                    });
 
-                            attr = docLayout.CreateAttribute("Sort");
-                            attr.Value = key.Value["Sort"];
-                            ndCfg.Attributes.Append(attr);
-
-                            viewInfo = key.Value;
-                        }
-                    }
-                    catch { }
-                }
-
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                {
-                    using (var connection =
-                        GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
-                    {
-                        DataSet dataSet;
-                        using (var command =
-                            new SqlCommand("SELECT TSTYPE_ID, TSTYPE_NAME FROM TSTYPE where SITE_UID=@siteid", connection))
-                        {
-                            command.Parameters.AddWithValue("@siteid", web.Site.ID);
-
-                            dataSet = new DataSet();
-                            using (var adapter = new SqlDataAdapter(command))
-                            {
-                                adapter.Fill(dataSet);
-                            }
-                        }
-
-                        var calcOrder = new StringBuilder();
-                        var starts = GetPeriodDaysArray(connection, settings, web, sPeriod);
-                        foreach (DateTime start in starts)
-                        {
-                            var nodeColumn = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                            var createdAttribute = docLayout.CreateAttribute("Name");
-                            createdAttribute.Value = string.Format("P{0}", start.Ticks);
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("Visible");
-                            createdAttribute.Value = "1";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("CanHide");
-                            createdAttribute.Value = "0";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("CanSort");
-                            createdAttribute.Value = "0";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("CanResize");
-                            createdAttribute.Value = "0";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("CanEdit");
-                            createdAttribute.Value = "1";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("Width");
-                            createdAttribute.Value = TSCellWidth.ToString();
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("Align");
-                            createdAttribute.Value = "Right";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("Type");
-                            createdAttribute.Value = "Text";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("Format");
-                            createdAttribute.Value = ",0.00";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute("EditFormat");
-                            createdAttribute.Value = ",0.00";
-                            nodeColumn.Attributes.Append(createdAttribute);
-
-                            if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0 || settings.AllowNotes)
-                            {
-                                var clonedNode = nodeColumn.CloneNode(true);
-                                clonedNode.Attributes["Name"].Value =
-                                    string.Format("TS{0}", clonedNode.Attributes["Name"].Value);
-                                clonedNode.Attributes["Type"].Value = "Text";
-                                clonedNode.Attributes["Visible"].Value = "0";
-
-                                nodeRightCols.AppendChild(clonedNode);
-                            }
-
-                            nodeRightCols.AppendChild(nodeColumn);
-
-                            //Header
-                            createdAttribute = docLayout.CreateAttribute(string.Format("P{0}", start.Ticks));
-                            createdAttribute.Value = start.ToString("ddd<br>MMM dd");
-                            nodeHeader.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute(string.Format("P{0}Formula", start.Ticks));
-                            createdAttribute.Value = "sum()";
-                            nodeGroupDef.Attributes.Append(createdAttribute);
-
-                            createdAttribute = docLayout.CreateAttribute(string.Format("P{0}Type", start.Ticks));
-                            createdAttribute.Value = "Float";
-                            nodeGroupDef.Attributes.Append(createdAttribute);
-
-                            totalColumnCalc.AppendFormat("+P{0}", start.Ticks);
-
-                            calcOrder.AppendFormat(",P{0}", start.Ticks);
-
-                            RightWidth += TSCellWidth;
-                        }
-
-                        if (starts.Count > 0)
-                        {
-                            nodeRDef.Attributes["CalcOrder"].Value =
-                                string.Concat(nodeRDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
-                            nodeGroupDef.Attributes["CalcOrder"].Value =
-                                string.Concat(nodeGroupDef.Attributes["CalcOrder"].Value, calcOrder.ToString());
-                        }
-                    }
-
-                    if (iGridType == 0)
-                    {
-                        using (var rsite = new SPSite(web.Site.ID))
-                        {
-                            using (var rweb = rsite.OpenWeb(web.ID))
-                            {
-                                var lockedWebGuid = EpmCoreFunctions.getLockedWeb(rweb);
-                                if (lockedWebGuid != rweb.ID)
-                                {
-                                    using (var lockWeb = rsite.OpenWeb(lockedWebGuid))
-                                    {
-                                        PopulateTimesheetGridLayout(
-                                            lockWeb,
-                                            ref docLayout,
-                                            settings,
-                                            ref MidWidth,
-                                            viewInfo,
-                                            false,
-                                            "My Work");
-                                    }
-                                }
-                                else
-                                {
-                                    PopulateTimesheetGridLayout(
-                                        rweb,
-                                        ref docLayout,
-                                        settings,
-                                        ref MidWidth,
-                                        viewInfo,
-                                        false,
-                                        "My Work");
-                                }
-                            }
-                        }
-                    }
-                });
-
-
-
-                XmlNode ndProgressCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                XmlAttribute attr2 = docLayout.CreateAttribute("Name");
-                attr2.Value = "Progress";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Visible");
-                attr2.Value = "1";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("CanHide");
-                attr2.Value = "0";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("CanSort");
-                attr2.Value = "0";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Width");
-                attr2.Value = "100";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Type");
-                attr2.Value = "Float";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Format");
-                attr2.Value = "0%";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("HtmlPrefixFormula");
-                attr2.Value = "'<div style=\\\"width:50px;border:1px solid gray;float:left;height:12px\\\"><div style=\\\"width:'+(Value>1?50:Math.abs(Value*50))+'px;overflow:hidden;float:left;background:'+(Value>1?'#DD0000':'#4B75FC')+';height:12px\\\">&nbsp;</div></div>'";
-                ndProgressCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Formula");
-                attr2.Value = "Work>0?((TSOtherHours + TSTotals)/Work):0";
-                ndProgressCol.Attributes.Append(attr2);
-
-                nodeRightCols.AppendChild(ndProgressCol);
-
-
-                XmlNode ndTotalsCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                attr2 = docLayout.CreateAttribute("Name");
-                attr2.Value = "TSTotals";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Visible");
-                attr2.Value = "1";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("CanHide");
-                attr2.Value = "0";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("CanSort");
-                attr2.Value = "0";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Width");
-                attr2.Value = "50";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Class");
-                attr2.Value = "Totals";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Type");
-                attr2.Value = "Float";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("CanEdit");
-                attr2.Value = "0";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Formula");
-                attr2.Value = totalColumnCalc.ToString().Trim('+');
-                ndTotalsCol.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("Format");
-                attr2.Value = ",0.00";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                nodeRightCols.AppendChild(ndTotalsCol);
-
-                attr2 = docLayout.CreateAttribute("TSTotals");
-                attr2.Value = "Totals";
-                ndTotalsCol.Attributes.Append(attr2);
-
-                nodeHeader.Attributes.Append(attr2);
-
-                attr2 = docLayout.CreateAttribute("TSTotalsFormula");
-                attr2.Value = totalColumnCalc.ToString().Trim('+');
-                nodeGroupDef.Attributes.Append(attr2);
-
-
-
-
-                if (RightWidth > (TSCellWidth * 5) + 300)
-                    RightWidth = (TSCellWidth * 5) + 300;
-
-                attr2 = docLayout.CreateAttribute("MinRightWidth");
-                attr2.Value = RightWidth.ToString();
-                ndCfg.Attributes.Append(attr2);
-
-                if (MidWidth > 300)
-                    MidWidth = 300;
-
-                attr2 = docLayout.CreateAttribute("MinMidWidth");
-                attr2.Value = MidWidth.ToString();
-                ndCfg.Attributes.Append(attr2);
-
-
+                CreateProgressNode(docLayout, nodeRightCols);
+                AppendTsTotalsToNodes(docLayout, totalColumnCalc, nodeRightCols, nodeHeader);
+                CreateAndAppendAttribute(docLayout, nodeGroupDef, "TSTotalsFormula", totalColumnCalc.ToString().Trim('+'));
+                AddRightWidthAttribute(ref rightWidth, cellWidth, docLayout, cfgNode);
+                AddMidWidthAttribute(ref midWidth, docLayout, cfgNode);
                 nodeGroupDef.Attributes["CalcOrder"].Value += ",TSTotals";
 
-
-                XmlNode ndCols = docLayout.FirstChild.SelectSingleNode("//Cols");
-                if (ndCols.ChildNodes.Count > 0)
-                {
-                    ndFooter.Attributes["MidHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
-                }
-                else
-                {
-                    ndFooter.Attributes["LeftHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
-                }
-
-                if (iGridType == 1)
-                {
-                    ndFooter.ParentNode.RemoveChild(ndFooter);
-
-
-                    XmlNode ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "Project";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("GroupEmpty");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Width");
-                    attr2.Value = "150";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanSort");
-                    attr2.Value = "1";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanHide");
-                    attr2.Value = "1";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanEdit");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.InsertAfter(ndNewCol, ndLeftCols.SelectSingleNode("//C[@Name='Title']"));
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "PMApproval";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Type");
-                    attr2.Value = "Html";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Width");
-                    attr2.Value = "40";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanSort");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.PrependChild(ndNewCol);
-
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "TMApproval";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Type");
-                    attr2.Value = "Html";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Width");
-                    attr2.Value = "40";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanSort");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.PrependChild(ndNewCol);
-
-
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "ApprovalNotes";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanSort");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("CanEdit");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Width");
-                    attr2.Value = "30";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Align");
-                    attr2.Value = "Center";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Type");
-                    attr2.Value = "Html";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.PrependChild(ndNewCol);
-
-
-                    attr2 = docLayout.CreateAttribute("ChildPaging");
-                    attr2.Value = "3";
-                    ndCfg.Attributes.Append(attr2);
-
-                    try
-                    {
-                        ndCfg.Attributes.Remove(ndCfg.Attributes["Group"]);
-                    }
-                    catch { }
-
-
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "Work";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Type");
-                    attr2.Value = "Float";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Visible");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.AppendChild(ndNewCol);
-
-                    try
-                    {
-                        docLayout.FirstChild.SelectSingleNode("//Panel").Attributes["Visible"].Value = "1";
-                    }
-                    catch { }
-                    try
-                    {
-                        docLayout.FirstChild.SelectSingleNode("//D[@Name='R']").Attributes["CanSelect"].Value = "0";
-                    }
-                    catch { }
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "ResId";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Visible");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.AppendChild(ndNewCol);
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "Submitted";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Visible");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Type");
-                    attr2.Value = "Int";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.AppendChild(ndNewCol);
-
-                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-                    attr2 = docLayout.CreateAttribute("Name");
-                    attr2.Value = "Approved";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Type");
-                    attr2.Value = "Int";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    attr2 = docLayout.CreateAttribute("Visible");
-                    attr2.Value = "0";
-                    ndNewCol.Attributes.Append(attr2);
-
-                    ndLeftCols.AppendChild(ndNewCol);
-                }
+                SetNodeFooterAttributes(docLayout, nodeFooter);
+                PopulateLeftColumn(gridType, nodeFooter, docLayout, nodeLeftCols, cfgNode);
 
                 return docLayout.OuterXml;
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                var docLayout = new XmlDocument();
+                docLayout.LoadXml(Resources.txtMyTimesheet_GridErrorLayout);
 
-
-                XmlDocument docLayout = new XmlDocument();
-                docLayout.LoadXml(Properties.Resources.txtMyTimesheet_GridErrorLayout);
-
-                docLayout.FirstChild.SelectSingleNode("//Foot/I").Attributes["Error"].Value = "Layout Load Error: " + System.Web.HttpUtility.HtmlEncode(ex.Message);
+                docLayout.FirstChild.SelectSingleNode("//Foot/I").Attributes["Error"].Value =
+                    "Layout Load Error: " + HttpUtility.HtmlEncode(ex.Message);
 
                 return docLayout.OuterXml;
             }
 
+        }
+
+        private static void AddStopWatchNode(
+            XmlDocument docLayout,
+            TimesheetSettings settings,
+            int gridType,
+            ref int rightWidth)
+        {
+            var nodeStopWatch = docLayout.FirstChild.SelectSingleNode("//RightCols/C[@Name='StopWatch']");
+
+            if (settings.AllowStopWatch && gridType == 0)
+            {
+                rightWidth += int.Parse(nodeStopWatch.Attributes["Width"].Value);
+            }
+            else
+            {
+                nodeStopWatch.Attributes["Visible"].Value = "0";
+            }
+        }
+
+        private static void AddMidWidthAttribute(ref int midWidth, XmlDocument docLayout, XmlNode cfgNode)
+        {
+            if (midWidth > 300)
+            {
+                midWidth = 300;
+            }
+            CreateAndAppendAttribute(docLayout, cfgNode, "MinMidWidth", midWidth.ToString());
+        }
+
+        private static void AddRightWidthAttribute(ref int rightWidth, int cellWidth, XmlDocument docLayout, XmlNode cfgNode)
+        {
+            if (rightWidth > cellWidth * 5 + 300)
+            {
+                rightWidth = cellWidth * 5 + 300;
+            }
+            CreateAndAppendAttribute(docLayout, cfgNode, "MinRightWidth", rightWidth.ToString());
+        }
+
+        private static XmlDocument GetXmlDocument(string data)
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(data);
+            return doc;
+        }
+
+        private static XmlDocument PopulateGrid(
+            SPWeb web,
+            TimesheetSettings settings,
+            string period,
+            XmlDocument docLayout,
+            int cellWidth,
+            XmlNode nodeRightCols,
+            XmlNode nodeHeader,
+            XmlNode nodeGroupDef,
+            StringBuilder totalColumnCalc,
+            XmlNode nodeRDef,
+            int gridType,
+            Dictionary<string, string> viewInfo,
+            ref int rightWidth,
+            ref int midWidth)
+        {
+            using (var connection = GetOpenedConnection(EpmCoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+            {
+                DataSet dataSet;
+                using (var command = new SqlCommand(
+                    "SELECT TSTYPE_ID, TSTYPE_NAME FROM TSTYPE where SITE_UID=@siteid",
+                    connection))
+                {
+                    command.Parameters.AddWithValue("@siteid", web.Site.ID);
+
+                    dataSet = new DataSet();
+                    using (var adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(dataSet);
+                    }
+                }
+
+                CreatTicksNodes(
+                    web,
+                    connection,
+                    settings,
+                    period,
+                    docLayout,
+                    cellWidth,
+                    dataSet,
+                    nodeRightCols,
+                    nodeHeader,
+                    nodeGroupDef,
+                    totalColumnCalc,
+                    ref rightWidth,
+                    nodeRDef);
+            }
+
+            if (gridType == 0)
+            {
+                PopulateGridLayout(web, ref docLayout, settings, viewInfo, ref midWidth);
+            }
+            return docLayout;
+        }
+
+        private static XmlNode AddCfgNode(XmlDocument docLayout, XmlAttribute attribute, string editable, string period)
+        {
+            var cfgNode = docLayout.FirstChild.SelectSingleNode("//Cfg");
+            cfgNode.Attributes.Append(attribute);
+
+            attribute = docLayout.CreateAttribute("GridEditable");
+            attribute.Value = editable;
+            cfgNode.Attributes.Append(attribute);
+
+            attribute = docLayout.CreateAttribute("PeriodId");
+            attribute.Value = period;
+            cfgNode.Attributes.Append(attribute);
+
+            attribute = docLayout.CreateAttribute("SaveAndSubmit");
+            attribute.Value = "false";
+            cfgNode.Attributes.Append(attribute);
+            return cfgNode;
+        }
+
+        private static XmlDocument GetDocLayout()
+        {
+            var docLayout = new XmlDocument();
+            docLayout.LoadXml(Resources.txtMyTimesheet_GridLayout);
+            return docLayout;
+        }
+
+        private static string GetEditable(XmlDocument doc)
+        {
+            var editable = "0";
+            try
+            {
+                editable = doc.FirstChild.Attributes["Editable"].Value;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+            return editable;
+        }
+
+        private static Dictionary<string, string> PopulateDefaultValues(
+            ViewManager views,
+            XmlDocument docLayout,
+            XmlNode cfgNode,
+            Dictionary<string, string> viewInfo)
+        {
+            XmlAttribute attribute;
+            foreach (var key in views.Views)
+            {
+                try
+                {
+                    if (string.Equals(key.Value["Default"], "true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        attribute = docLayout.CreateAttribute("Group");
+                        attribute.Value = key.Value["Group"];
+                        cfgNode.Attributes.Append(attribute);
+
+                        attribute = docLayout.CreateAttribute("Sort");
+                        attribute.Value = key.Value["Sort"];
+                        cfgNode.Attributes.Append(attribute);
+
+                        viewInfo = key.Value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+            return viewInfo;
+        }
+
+        private static void SetNodeFooterAttributes(XmlDocument docLayout, XmlNode nodeFooter)
+        {
+            var nodeCols = docLayout.FirstChild.SelectSingleNode("//Cols");
+            if (nodeCols.ChildNodes.Count > 0)
+            {
+                nodeFooter.Attributes["MidHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
+            }
+            else
+            {
+                nodeFooter.Attributes["LeftHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
+            }
+        }
+
+        private static void PopulateLeftColumn(
+            int gridType,
+            XmlNode nodeFooter,
+            XmlDocument docLayout,
+            XmlNode nodeLeftCols,
+            XmlNode cfgNode)
+        {
+            if (gridType == 1)
+            {
+                nodeFooter.ParentNode.RemoveChild(nodeFooter);
+
+                CreateProjectNode(docLayout, nodeLeftCols);
+
+                CreatePMApprovalNode(docLayout, nodeLeftCols);
+                CreateTmApprovalNode(docLayout, nodeLeftCols);
+                CreateApprovalNotesNode(docLayout, nodeLeftCols);
+
+                CreateAndAppendAttribute(docLayout, cfgNode, "ChildPaging", "3");
+                RemoveGroupNode(cfgNode);
+
+                CreateWorkNode(docLayout, nodeLeftCols);
+
+                SetVisibleAttribute(docLayout);
+                SetCanSelectAttribute(docLayout);
+
+                CreateResIdNode(docLayout, nodeLeftCols);
+                CreateSubmmitedNode(docLayout, nodeLeftCols);
+                CreateApprovedNode(docLayout, nodeLeftCols);
+            }
+        }
+
+        private static void PopulateGridLayout(
+            SPWeb web,
+            ref XmlDocument docLayout,
+            TimesheetSettings settings,
+            Dictionary<string, string> viewInfo,
+            ref int midWidth)
+        {
+            using (var site = new SPSite(web.Site.ID))
+            {
+                using (var spWeb = site.OpenWeb(web.ID))
+                {
+                    var lockedWebGuid = EpmCoreFunctions.getLockedWeb(spWeb);
+                    if (lockedWebGuid != spWeb.ID)
+                    {
+                        using (var lockWeb = site.OpenWeb(lockedWebGuid))
+                        {
+                            PopulateTimesheetGridLayout(
+                                lockWeb,
+                                ref docLayout,
+                                settings,
+                                ref midWidth,
+                                viewInfo,
+                                false,
+                                "My Work");
+                        }
+                    }
+                    else
+                    {
+                        PopulateTimesheetGridLayout(spWeb, ref docLayout, settings, ref midWidth, viewInfo, false, "My Work");
+                    }
+                }
+            }
+        }
+
+        private static void CreatTicksNodes(
+            SPWeb web,
+            SqlConnection connection,
+            TimesheetSettings settings,
+            string period,
+            XmlDocument docLayout,
+            int cellWidth,
+            DataSet dataSet,
+            XmlNode nodeRightCols,
+            XmlNode nodeHeader,
+            XmlNode nodeGroupDef,
+            StringBuilder totalColumnCalc,
+            ref int rightWidth,
+            XmlNode nodeRDef)
+        {
+            var calcOrder = new StringBuilder();
+            var starts = GetPeriodDaysArray(connection, settings, web, period);
+            foreach (DateTime start in starts)
+            {
+                var nodeColumn = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+                var attributeName = string.Format("P{0}", start.Ticks);
+                CreateAndAppendAttribute(docLayout, nodeColumn, "Name", attributeName);
+                CreateAndAppendAttribute(docLayout, nodeColumn, "Visible", "1");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "CanHide", "0");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "CanSort", "0");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "CanResize", "0");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "CanEdit", "1");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "Width", cellWidth.ToString());
+                CreateAndAppendAttribute(docLayout, nodeColumn, "Align", "Right");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "Type", "Text");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "Format", ",0.00");
+                CreateAndAppendAttribute(docLayout, nodeColumn, "EditFormat", ",0.00");
+
+                AppendClonedNode(settings, dataSet, nodeRightCols, nodeColumn);
+
+                nodeRightCols.AppendChild(nodeColumn);
+
+
+                CreateAndAppendAttribute(docLayout, nodeHeader, attributeName, start.ToString("ddd<br>MMM dd"));
+                CreateAndAppendAttribute(docLayout, nodeGroupDef, string.Format("P{0}Formula", start.Ticks), "sum()");
+                CreateAndAppendAttribute(docLayout, nodeGroupDef, string.Format("P{0}Type", start.Ticks), "Float");
+
+                totalColumnCalc.AppendFormat("+P{0}", start.Ticks);
+
+                calcOrder.AppendFormat(",P{0}", start.Ticks);
+
+                rightWidth += cellWidth;
+            }
+
+            if (starts.Count > 0)
+            {
+                nodeRDef.Attributes["CalcOrder"].Value = string.Concat(
+                    nodeRDef.Attributes["CalcOrder"].Value,
+                    calcOrder.ToString());
+                nodeGroupDef.Attributes["CalcOrder"].Value = string.Concat(
+                    nodeGroupDef.Attributes["CalcOrder"].Value,
+                    calcOrder.ToString());
+            }
+        }
+
+        private static void AppendClonedNode(
+            TimesheetSettings settings,
+            DataSet dataSet,
+            XmlNode nodeRightCols,
+            XmlNode nodeColumn)
+        {
+            if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0 || settings.AllowNotes)
+            {
+                var clonedNode = nodeColumn.CloneNode(true);
+                clonedNode.Attributes["Name"].Value = string.Format("TS{0}", clonedNode.Attributes["Name"].Value);
+                clonedNode.Attributes["Type"].Value = "Text";
+                clonedNode.Attributes["Visible"].Value = "0";
+
+                nodeRightCols.AppendChild(clonedNode);
+            }
+        }
+
+        private static void CreateProgressNode(XmlDocument docLayout, XmlNode nodeRightCols)
+        {
+            var nodeProgressCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+            var attributeName = docLayout.CreateAttribute("Name");
+            attributeName.Value = "Progress";
+            nodeProgressCol.Attributes.Append(attributeName);
+
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "Name", "Progress");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "Visible", "1");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "CanHide", "0");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "CanSort", "0");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "Width", "100");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "Type", "Float");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "Format", "0%");
+            CreateAndAppendAttribute(
+                docLayout,
+                nodeProgressCol,
+                "HtmlPrefixFormula",
+                "'<div style=\\\"width:50px;border:1px solid gray;float:left;height:12px\\\"><div style=\\\"width:'+(Value>1?50:Math.abs(Value*50))+'px;overflow:hidden;float:left;background:'+(Value>1?'#DD0000':'#4B75FC')+';height:12px\\\">&nbsp;</div></div>'");
+            CreateAndAppendAttribute(docLayout, nodeProgressCol, "Formula", "Work>0?((TSOtherHours + TSTotals)/Work):0");
+
+            nodeRightCols.AppendChild(nodeProgressCol);
+        }
+
+        private static void AppendTsTotalsToNodes(
+            XmlDocument docLayout,
+            StringBuilder totalColumnCalc,
+            XmlNode nodeRightCols,
+            XmlNode nodeHeader)
+        {
+            var nodeTotalsCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+        
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Name", "TSTotals");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Visible", "1");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "CanHide", "0");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "CanSort", "0");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Width", "50");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Class", "Totals");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Type", "Float");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "CanEdit", "0");
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Formula", totalColumnCalc.ToString().Trim('+'));
+            CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Format", ",0.00");
+
+            nodeRightCols.AppendChild(nodeTotalsCol);
+
+            var attribute = docLayout.CreateAttribute("TSTotals");
+            attribute.Value = "Totals";
+            nodeTotalsCol.Attributes.Append(attribute);
+            nodeHeader.Attributes.Append(attribute);
+        }
+
+        private static void CreateProjectNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            var newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "Project");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "GroupEmpty", "0");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Width", "150");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanSort", "1");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanHide", "1");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanEdit", "0");
+
+            nodeLeftCols.InsertAfter(newColumnNode, nodeLeftCols.SelectSingleNode("//C[@Name='Title']"));
+        }
+
+        private static void CreatePMApprovalNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            var newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "PMApproval");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Type", "Html");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Width", "40");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanSort", "0");
+
+            nodeLeftCols.PrependChild(newColumnNode);
+        }
+
+        private static void CreateTmApprovalNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            var newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "TMApproval");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Type", "Html");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Width", "40");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanSort", "0");
+
+            nodeLeftCols.PrependChild(newColumnNode);
+        }
+
+        private static void CreateApprovalNotesNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            var newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "ApprovalNotes");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanSort", "0");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "CanEdit", "0");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Width", "30");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Align", "Center");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Type", "Html");
+
+            nodeLeftCols.PrependChild(newColumnNode);
+        }
+
+        private static void RemoveGroupNode(XmlNode cfgNode)
+        {
+            try
+            {
+                cfgNode.Attributes.Remove(cfgNode.Attributes["Group"]);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void CreateWorkNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            XmlNode newColumnNode;
+            newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "Work");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Type", "Float");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Visible", "0");
+
+            nodeLeftCols.AppendChild(newColumnNode);
+        }
+
+        private static void SetVisibleAttribute(XmlDocument docLayout)
+        {
+            try
+            {
+                docLayout.FirstChild.SelectSingleNode("//Panel").Attributes["Visible"].Value = "1";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void SetCanSelectAttribute(XmlDocument docLayout)
+        {
+            try
+            {
+                docLayout.FirstChild.SelectSingleNode("//D[@Name='R']").Attributes["CanSelect"].Value = "0";
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private static void CreateResIdNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            XmlNode newColumnNode;
+            newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "ResId");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Visible", "0");
+
+            nodeLeftCols.AppendChild(newColumnNode);
+        }
+
+        private static void CreateSubmmitedNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            var newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "Submitted");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Visible", "0");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Type", "Int");
+
+            nodeLeftCols.AppendChild(newColumnNode);
+        }
+
+        private static void CreateApprovedNode(XmlDocument docLayout, XmlNode nodeLeftCols)
+        {
+            var newColumnNode = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Name", "Approved");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Type", "Int");
+            CreateAndAppendAttribute(docLayout, newColumnNode, "Visible", "0");
+
+            nodeLeftCols.AppendChild(newColumnNode);
+        }
+
+        private static void CreateAndAppendAttribute(
+            XmlDocument docLayout,
+            XmlNode nodeToAppend,
+            string attributeName,
+            string attributeValue)
+        {
+            var attribute = docLayout.CreateAttribute(attributeName);
+            attribute.Value = attributeValue;
+            nodeToAppend.Attributes.Append(attribute);
         }
 
         private static string getFormat(SPField oField, XmlDocument oDoc, SPWeb oWeb)
