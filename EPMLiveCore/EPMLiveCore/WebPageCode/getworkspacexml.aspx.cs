@@ -192,15 +192,13 @@ namespace EPMLiveCore
             newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
             newCell.InnerText = web.ServerRelativeUrl;
             newNode.AppendChild(newCell);
+            newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
+            newCell.InnerText = web.ID.ToString();
 
-            {
-                newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
-                newCell.InnerText = web.ID.ToString();
-                var attrName = doc.CreateAttribute("name");
-                attrName.Value = "webid";
-                newCell.Attributes.Append(attrName);
-                newNode.AppendChild(newCell);
-            }
+            var attributeName = doc.CreateAttribute("name");
+            attributeName.Value = "webid";
+            newCell.Attributes.Append(attributeName);
+            newNode.AppendChild(newCell);
 
             return canPublish;
         }
