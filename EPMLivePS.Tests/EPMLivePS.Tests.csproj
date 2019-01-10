@@ -142,6 +142,7 @@
     <Compile Include="EPMLivePublisherTests.cs" />
     <Compile Include="HelperClasses\ProjectWorkspaceSynchTest.cs" />
     <Compile Include="HelperClasses\ProjectWorkspaceSynchTests.cs" />
+    <Compile Include="Layouts\epmlive\EActionTests.cs" />
     <Compile Include="Layouts\epmlive\EconfigTest.cs" />
     <Compile Include="Layouts\epmlive\PsSubSettingsTest.Button1Click.cs" />
     <Compile Include="Layouts\epmlive\PsSubSettingsTest.PageLoad.cs" />
