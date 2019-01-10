@@ -2,4 +2,4 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
-[assembly: AssemblyFileVersion("6.1.0.0")]
+[assembly: AssemblyFileVersion("7.0.5.0")]
