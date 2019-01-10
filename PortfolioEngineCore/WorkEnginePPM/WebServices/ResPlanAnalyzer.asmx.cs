@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Reflection;
+using System.Text;
 using System.Web;
 using System.Web.Services;
 using EPMLiveCore.Infrastructure.Logging;
-using ResourceValues;
-using RPADataCache;
-using System.Reflection;
 using Microsoft.SharePoint;
 using PortfolioEngineCore;
 using PortfolioEngineCore.PortfolioItems;
-using System.Dynamic;
-using System.Text;
+using ResourceValues;
+using RPADataCache;
 
 namespace WorkEnginePPM
 {
@@ -527,14 +527,14 @@ namespace WorkEnginePPM
                     out replyMessage) == StatusEnum.rsSuccess)
             {
                 data.ErrorStage = "O026";
-                if (replyMessage != "")
+                if (replyMessage != string.Empty)
                 {
                     data.EchoReplyMessage += $"\n{replyMessage}";
                 }
 
                 var resourceValues = new clsResourceValues();
                 var replyXmlLoaded = false;
-                if (replyXml != "")
+                if (replyXml != string.Empty)
                 {
                     replyXmlLoaded = resourceValues.LoadFromXML(replyXml);
                 }
