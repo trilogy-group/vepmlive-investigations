@@ -3,6 +3,7 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using PortfolioEngineCore;
@@ -63,212 +64,248 @@ namespace WorkEnginePPM
 
         public static string DBAdminRequest(HttpContext Context, string sRequestContext, CStruct xData)
         {
-            string sReply = "";
+            var reply = string.Empty;
             try
             {
-                int nPROJECT_ID;
-                string sBaseInfo;                    
-                DataAccess da;
-                DBAccess dba;
-
-               switch (sRequestContext)
+                switch (sRequestContext)
                 {
                     case "ClosePI":
                     {
-                        nPROJECT_ID = xData.GetIntAttr("PROJECT_ID");
-                        sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        da = new DataAccess(sBaseInfo);
-                        dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            try
-                            {
-                                if (dbaDBAdmin.ClosePI(dba, nPROJECT_ID, out sReply) != StatusEnum.rsSuccess)
-                                {
-                                    if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.ClosePI", dba.StatusText);
-                                }
-                                else
-                                {
-                                    sReply = GetPIXML(dba, nPROJECT_ID);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "DBAdmin.ClosePI", ex.Message);
-                            }
-                            dba.Close();
-                        }
+                        HandlePlosePiCase(Context, xData, ref reply);
                         break;
                     }
                     case "OpenPI":
                     {
-                        nPROJECT_ID = xData.GetIntAttr("PROJECT_ID");
-                        sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        da = new DataAccess(sBaseInfo);
-                        dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            try
-                            {
-                                if (dbaDBAdmin.OpenPI(dba, nPROJECT_ID, out sReply) != StatusEnum.rsSuccess)
-                                {
-                                    if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.OpenPI", dba.StatusText);
-                                }
-                                else
-                                {
-                                    sReply = GetPIXML(dba, nPROJECT_ID);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "DBAdmin.OpenPI", ex.Message);
-                            }
-                            dba.Close();
-                        }
+                        HandleOpenPiCase(Context, xData, ref reply);
                         break;
                     }
                     case "CheckInPI":
                     {
-                        nPROJECT_ID = xData.GetIntAttr("PROJECT_ID");
-                        sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        da = new DataAccess(sBaseInfo);
-                        dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            try
-                            {
-                                if (dbaDBAdmin.CheckInPI(dba, nPROJECT_ID, out sReply) != StatusEnum.rsSuccess)
-                                {
-                                    if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.CheckInPI", dba.StatusText);
-                                }
-                                else
-                                {
-                                    sReply = GetPIXML(dba, nPROJECT_ID);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "DBAdmin.CheckInPI", ex.Message);
-                            }
-                            dba.Close();
-                        }
+                        HandleCheckInPiCase(Context, xData, ref reply);
                         break;
                     }
                     case "DeletePI":
                     {
-                        nPROJECT_ID = xData.GetIntAttr("PROJECT_ID");
-                        sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        da = new DataAccess(sBaseInfo);
-                        dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            try
-                            {
-                                if (dbaDBAdmin.DeletePI(dba, nPROJECT_ID, out sReply) != StatusEnum.rsSuccess)
-                                {
-                                    if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.DeletePI", dba.StatusText);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "DBAdmin.DeletePI", ex.Message);
-                            }
-                            dba.Close();
-                        }
+                        HandleDeletePiCase(Context, xData, ref reply);
                         break;
                     }
                     case "CanDeleteRes":
                     {
-                        int nWRES_ID = xData.GetIntAttr("WRES_ID");
-                        sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        da = new DataAccess(sBaseInfo);
-                        dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            try
-                            {
-                                if (dbaDBAdmin.CanDeleteResource(dba, nWRES_ID, out sReply) != StatusEnum.rsSuccess)
-                                {
-                                    // if  status != success then sreply already fully formatted with error   
-                                    //sReply = WebAdmin.FormatError("exception", "DBAdmin.CanDeleteRes1", dba.StatusText);
-                                }
-                                else if (sReply.Length > 0)
-                                {
-                                    // error reply just needs formatting
-                                    sReply = "This resource cannot be deleted, it is used as follows:" + "\n" + sReply;
-                                    sReply = WebAdmin.FormatError("error", "CanDeleteResource", sReply);
-                                }
-                                else
-                                {
-                                    if (dbaDBAdmin.CanDeleteResourceWarning(dba, nWRES_ID, out sReply) != StatusEnum.rsSuccess)
-                                    {
-                                        // if  status != success then sreply already fully formatted with error   
-                                        //if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.CanDeleteRes2", dba.StatusText);
-                                    }
-                                    else if (sReply.Length > 0)
-                                    {
-                                        sReply = "This resource can be deleted, references will be changed to point to you:" + "\n" + sReply;
-                                        sReply = WebAdmin.FormatWarning(sReply);
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "DBAdmin.CanDeleteRes", ex.Message);
-                            }
-                            dba.Close();
-                        }
+                        HandleCanDeleteResCase(Context, xData, ref reply);
                         break;
                     }
                     case "DeleteRes":
                     {
-                        int nWRES_ID = xData.GetIntAttr("WRES_ID");
-                        sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-                        da = new DataAccess(sBaseInfo);
-                        dba = da.dba;
-                        if (dba.Open() == StatusEnum.rsSuccess)
-                        {
-                            try
-                            {
-                                if (nWRES_ID == da.UserId)
-                                {
-                                    sReply = "You are logged in as this resource, cannot delete";
-                                }
-                                else
-                                {
-                                    if (dbaDBAdmin.DeleteResource(dba, nWRES_ID, out sReply) != StatusEnum.rsSuccess)
-                                    {
-                                        if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "DBAdmin.DeleteResource", dba.StatusText);
-                                    }
-                                    else
-                                    {
-                                        ////  needed to update list after SAVE
-                                        //CStruct xCostviews = new CStruct();
-                                        //xCostviews.Initialize("Costview");
-                                        //xCostviews.CreateIntAttr("VIEW_UID", nVIEW_UID);
-                                        //xCostviews.CreateStringAttr("VIEW_NAME", sVIEW_NAME);
-                                        //xCostviews.CreateStringAttr("VIEW_DESC", sVIEW_DESC);
-                                        //sReply = xCostviews.XML();
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                sReply = WebAdmin.FormatError("exception", "DBAdmin.DeleteRes", ex.Message);
-                            }
-                            dba.Close();
-                        }
+                        HandleDeleteResCase(Context, xData, ref reply);
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                sReply = WebAdmin.FormatError("exception", "DBAdmin.DBAdminRequest", ex.Message);
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                reply = WebAdmin.FormatError("exception", "DBAdmin.DBAdminRequest", ex.Message);
             }
 
-            return sReply;
+            return reply;
         }
+
+        private static void HandleDeleteResCase(HttpContext Context, CStruct data, ref string reply)
+        {
+            var wResId = data.GetIntAttr("WRES_ID");
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
+            {
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
+                {
+                    try
+                    {
+                        if (wResId == dataAccess.UserId)
+                        {
+                            reply = "You are logged in as this resource, cannot delete";
+                        }
+                        else
+                        {
+                            if (dbaDBAdmin.DeleteResource(dataAccessDba, wResId, out reply) != StatusEnum.rsSuccess && reply.Length == 0)
+                            {
+                                reply = WebAdmin.FormatError("exception", "DBAdmin.DeleteResource", dataAccessDba.StatusText);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                        reply = WebAdmin.FormatError("exception", "DBAdmin.DeleteRes", ex.Message);
+                    }
+                    dataAccessDba.Close();
+                }
+            }
+        }
+
+        private static void HandleCanDeleteResCase(HttpContext Context, CStruct data, ref string reply)
+        {
+            var wResId = data.GetIntAttr("WRES_ID");
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
+            {
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
+                {
+                    try
+                    {
+                        if (dbaDBAdmin.CanDeleteResource(dataAccessDba, wResId, out reply) == StatusEnum.rsSuccess)
+                        {
+                            if (reply.Length > 0)
+                            {
+                                reply = string.Format("This resource cannot be deleted, it is used as follows:\n{0}", reply);
+                                reply = WebAdmin.FormatError("error", "CanDeleteResource", reply);
+                            }
+                            else
+                            {
+                                if (dbaDBAdmin.CanDeleteResourceWarning(dataAccessDba, wResId, out reply) == StatusEnum.rsSuccess && reply.Length > 0)
+                                {
+                                    reply = string.Format(
+                                        "This resource can be deleted, references will be changed to point to you:\n{0}",
+                                        reply);
+                                    reply = WebAdmin.FormatWarning(reply);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                        reply = WebAdmin.FormatError("exception", "DBAdmin.CanDeleteRes", ex.Message);
+                    }
+                    dataAccessDba.Close();
+                }
+            }
+        }
+
+        private static void HandleDeletePiCase(HttpContext Context, CStruct data, ref string reply)
+        {
+            var projectId = data.GetIntAttr("PROJECT_ID");
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
+            {
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
+                {
+                    try
+                    {
+                        if (dbaDBAdmin.DeletePI(dataAccessDba, projectId, out reply) != StatusEnum.rsSuccess && reply.Length == 0)
+                        {
+                            reply = WebAdmin.FormatError("exception", "DBAdmin.DeletePI", dataAccessDba.StatusText);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                        reply = WebAdmin.FormatError("exception", "DBAdmin.DeletePI", ex.Message);
+                    }
+                    dataAccessDba.Close();
+                }
+            }
+        }
+
+        private static void HandleCheckInPiCase(HttpContext Context, CStruct data, ref string reply)
+        {
+            var projectId = data.GetIntAttr("PROJECT_ID");
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
+            {
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
+                {
+                    try
+                    {
+                        if (dbaDBAdmin.CheckInPI(dataAccessDba, projectId, out reply) != StatusEnum.rsSuccess)
+                        {
+                            if (reply.Length == 0)
+                            {
+                                reply = WebAdmin.FormatError("exception", "DBAdmin.CheckInPI", dataAccessDba.StatusText);
+                            }
+                        }
+                        else
+                        {
+                            reply = GetPIXML(dataAccessDba, projectId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                        reply = WebAdmin.FormatError("exception", "DBAdmin.CheckInPI", ex.Message);
+                    }
+                }
+            }
+        }
+
+        private static void HandleOpenPiCase(HttpContext Context, CStruct data, ref string reply)
+        {
+            var projectId = data.GetIntAttr("PROJECT_ID");
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
+            {
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
+                {
+                    try
+                    {
+                        if (dbaDBAdmin.OpenPI(dataAccessDba, projectId, out reply) != StatusEnum.rsSuccess)
+                        {
+                            if (reply.Length == 0)
+                            {
+                                reply = WebAdmin.FormatError("exception", "DBAdmin.OpenPI", dataAccessDba.StatusText);
+                            }
+                        }
+                        else
+                        {
+                            reply = GetPIXML(dataAccessDba, projectId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                        reply = WebAdmin.FormatError("exception", "DBAdmin.OpenPI", ex.Message);
+                    }
+                }
+            }
+        }
+
+        private static void HandlePlosePiCase(HttpContext Context, CStruct data, ref string reply)
+        {
+            var projectId = data.GetIntAttr("PROJECT_ID");
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
+            {
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
+                {
+                    try
+                    {
+                        if (dbaDBAdmin.ClosePI(dataAccessDba, projectId, out reply) != StatusEnum.rsSuccess)
+                        {
+                            if (reply.Length == 0)
+                            {
+                                reply = WebAdmin.FormatError("exception", "DBAdmin.ClosePI", dataAccessDba.StatusText);
+                            }
+                        }
+                        else
+                        {
+                            reply = GetPIXML(dataAccessDba, projectId);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                        reply = WebAdmin.FormatError("exception", "DBAdmin.ClosePI", ex.Message);
+                    }
+                }
+            }
+        }
+
         protected static string GetPIXML(DBAccess dba, int nPROJECT_ID)
         {
             string sXML = "";
