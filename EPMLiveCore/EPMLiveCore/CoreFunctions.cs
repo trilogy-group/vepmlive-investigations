@@ -2339,8 +2339,19 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title, string description, string url, string template, string user, bool unique, bool toplink,
-            SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
+        public static string createSite(
+            string title, 
+            string description, 
+            string inputUrl, 
+            string template, 
+            string user, 
+            bool unique, 
+            bool toplink,
+            SPWeb parentWeb, 
+            out Guid createdWebId, 
+            out string createdWebUrl, 
+            out string createdWebServerRelativeUrl, 
+            out string createdWebTitle)
         {
             createdWebId = Guid.Empty;
             createdWebUrl = string.Empty;
@@ -2348,10 +2359,10 @@ namespace EPMLiveCore
             createdWebServerRelativeUrl = string.Empty;
             try
             {
-                var sUrl = "";
+                var url = string.Empty;
 
-                Regex rgx = new Regex("[^a-zA-Z 0-9]");
-                title = rgx.Replace(title, "");
+                var rgx = new Regex("[^a-zA-Z 0-9]");
+                title = rgx.Replace(title, string.Empty);
 
                 var finalTitle = title;
                 var exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
@@ -2365,114 +2376,152 @@ namespace EPMLiveCore
                     exists = WebExistsUnderParentWeb(parentWeb, finalTitle);
                 }
 
-                // In EPM 5.5, we decided to make all workspaces 
-                // unique. "OPEN" workspaces are different
+                // In EPM 5.5, we decided to make all work-spaces 
+                // unique. "OPEN" work-spaces are different
                 // in that they have a owner (the workspace creator)
                 // and a "Everyone" group with contribute permission
 
-                //Change entire workspace permission logic for Jira item # EPML-4553: Open workspace not inhering permissions
+                // Change entire workspace permission logic for Jira item # EPML-4553: Open workspace not inhering permissions
                 var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, unique, false);
                 try
                 {
-                    createdWebId = web.ID;
-                    createdWebUrl = web.Url;
-                    createdWebServerRelativeUrl = web.ServerRelativeUrl;
-                    createdWebTitle = web.Title;
+                    url = ProceedWebCreation(
+                        web,
+                        toplink,
+                        unique,
+                        user,
+                        out createdWebId,
+                        out createdWebUrl, 
+                        out createdWebServerRelativeUrl, 
+                        out createdWebTitle);
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception thrown: {0}", ex);
+                }
+                finally
+                {
+                    web?.Dispose();
+                }
 
-                    if (web.Navigation.TopNavigationBar != null)
+                return $"0:{url}";
+            }
+            catch (Exception ex)
+            {
+                return $"1:{ex.Message}";
+            }
+        }
+        
+        private static string ProceedWebCreation(
+            SPWeb web,
+            bool toplink,
+            bool unique,
+            string user, 
+            out Guid createdWebId, 
+            out string createdWebUrl, 
+            out string createdWebServerRelativeUrl, 
+            out string createdWebTitle)
+        {
+            createdWebId = web.ID;
+            createdWebUrl = web.Url;
+            createdWebServerRelativeUrl = web.ServerRelativeUrl;
+            createdWebTitle = web.Title;
+
+            if (web.Navigation.TopNavigationBar != null)
+            {
+                web.Navigation.TopNavigationBar.Navigation.UseShared = toplink;
+            }
+
+            web.AllowUnsafeUpdates = true;
+
+            web.Update();
+
+            API.Applications.GenerateQuickLaunchFromApp(web);
+
+            if (unique)
+            {
+                ProcessUniqueSiteCreation(web, user);
+            }
+            else
+            {
+                ProcessNonUniqueSiteCreation(web);
+            }
+
+            return web.Url;
+        }
+
+        private static void ProcessNonUniqueSiteCreation(SPWeb web)
+        {
+            SPSecurity.RunWithElevatedPrivileges(
+                () =>
                     {
-                        web.Navigation.TopNavigationBar.Navigation.UseShared = toplink;
-                    }
-
-                    web.AllowUnsafeUpdates = true;
-
-                    web.Update();
-
-                    API.Applications.GenerateQuickLaunchFromApp(web);
-
-                    string strEPMLiveGroupsPermAssignments = "";
-                    if (unique)
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(() =>
+                        using (var spSite = new SPSite(web.Url))
                         {
-                            using (var spSite = new SPSite(web.Url))
+                            using (var spWeb = spSite.OpenWeb())
                             {
-                                using (var spWeb = spSite.OpenWeb())
-                                {
-                                    var groups = Security.AddBasicSecurityToWorkspace(
-                                        spWeb, 
-                                        spWeb.Title,
-                                        spWeb.AllUsers[user]);
-
-                                    strEPMLiveGroupsPermAssignments = getConfigSetting(
-                                        spWeb,
-                                        "EPMLiveGroupsPermAssignments");
-
-                                    SPUtilities.SPListUtility.MapListsReporting(spWeb);
-                                }
-                            }
-                        });
-
-
-                        if (strEPMLiveGroupsPermAssignments.Length > 1)
-                        {
-
-                            string[] strOuter = strEPMLiveGroupsPermAssignments.Split(new string[] { "|~|" },
-                                StringSplitOptions.None);
-                            foreach (string strInner in strOuter)
-                            {
-                                string[] strInnerMost = strInner.Split('~');
-                                SPGroup spGroup = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
-
-                                //Persist groups & permissions to the database
-                                if (spGroup != null)
-                                {
-                                    SPRoleAssignment spRA = new SPRoleAssignment(spGroup);
-                                    spRA.RoleDefinitionBindings.Add(
-                                        web.RoleDefinitions.GetById(Convert.ToInt32(strInnerMost[1])));
-                                    web.RoleAssignments.Add(spRA);
-                                }
+                                SPUtilities.SPListUtility.MapListsReporting(spWeb);
                             }
                         }
-                        web.Update();
-                    }
-                    else
+                    });
+
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                     {
-                        SPSecurity.RunWithElevatedPrivileges(() =>
+                        using (var es = new SPSite(web.Url))
                         {
-                            using (SPSite spSite = new SPSite(web.Url))
+                            using (var ew = es.OpenWeb())
                             {
-                                using (SPWeb spWeb = spSite.OpenWeb())
-                                {
-                                    SPUtilities.SPListUtility.MapListsReporting(spWeb);
-                                }
+                                ew.AllowUnsafeUpdates = true;
+
+                                // EPML-4553: Open workspace not inhering permissions
+                                ew.ResetRoleInheritance();
+                                ew.Update();
                             }
-                        });
+                        }
+                    });
+        }
 
-                        var ownerByCreation = web.AllUsers[user];
-
-                        SPSecurity.RunWithElevatedPrivileges(delegate
-                        {
-                            using (var es = new SPSite(web.Url))
+        private static void ProcessUniqueSiteCreation(SPWeb web, string user)
+        {
+            var empLiveGroupsPermAssignments = string.Empty;
+            SPSecurity.RunWithElevatedPrivileges(
+                            () =>
                             {
-                                using (var ew = es.OpenWeb())
+                                using (var spSite = new SPSite(web.Url))
                                 {
-                                    ew.AllowUnsafeUpdates = true;
-                                    //EPML-4553: Open workspace not inhering permissions
-                                    ew.ResetRoleInheritance();
-                                    ew.Update();
+                                    using (var spWeb = spSite.OpenWeb())
+                                    {
+                                        var groups = Security.AddBasicSecurityToWorkspace(spWeb, spWeb.Title, spWeb.AllUsers[user]);
+
+                                        empLiveGroupsPermAssignments = getConfigSetting(spWeb, "EPMLiveGroupsPermAssignments");
+
+                                        SPUtilities.SPListUtility.MapListsReporting(spWeb);
+                                    }
                                 }
-                            }
-                        });
+                            });
+
+
+            if (empLiveGroupsPermAssignments.Length > 1)
+            {
+                var outerString = empLiveGroupsPermAssignments.Split(new string[] { "|~|" }, StringSplitOptions.None);
+                foreach (var strInner in outerString)
+                {
+                    var innerMostString = strInner.Split('~');
+                    var spGroup = web.SiteGroups.GetByID(Convert.ToInt32(innerMostString[0]));
+
+                    // Persist groups & permissions to the database
+                    if (spGroup == null)
+                    {
+                        continue;
                     }
-                    sUrl = web.Url;
-                }
-                catch { }
-                finally { if (web != null) web.Dispose(); }
 
-                return "0:" + sUrl;
+                    var roleAssignment = new SPRoleAssignment(spGroup);
+                    roleAssignment.RoleDefinitionBindings.Add(web.RoleDefinitions.GetById(Convert.ToInt32(innerMostString[1])));
+                    web.RoleAssignments.Add(roleAssignment);
+                }
             }
-            catch (Exception ex) { return "1:" + ex.Message.ToString(); }
+
+            web.Update();
         }
 
         public static bool WebExistsUnderParentWeb(SPWeb parentWeb, string webName)
