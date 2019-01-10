@@ -1413,7 +1413,7 @@ namespace TimeSheets
             output.Write("mygrid{0}.setImagePath(\"_layouts/epmlive/dhtml/xgrid/imgs/\");", sFullGridId);
             output.Write("mygrid{0}.setSkin(\"editgrid\");", sFullGridId);
 
-            if (Height == "")
+            if (Height == string.Empty)
             {
                 output.Write("mygrid{0}.enableAutoHeight(true);", sFullGridId);
             }
