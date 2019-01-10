@@ -71,7 +71,7 @@ namespace WorkEnginePPM
                 {
                     case "ClosePI":
                     {
-                        HandlePlosePiCase(Context, xData, ref reply);
+                        HandleClosePiCase(Context, xData, ref reply);
                         break;
                     }
                     case "OpenPI":
@@ -110,10 +110,10 @@ namespace WorkEnginePPM
             return reply;
         }
 
-        private static void HandleDeleteResCase(HttpContext Context, CStruct data, ref string reply)
+        private static void HandleDeleteResCase(HttpContext context, CStruct data, ref string reply)
         {
             var wResId = data.GetIntAttr("WRES_ID");
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             using (var dataAccessDba = dataAccess.dba)
             {
@@ -143,10 +143,10 @@ namespace WorkEnginePPM
             }
         }
 
-        private static void HandleCanDeleteResCase(HttpContext Context, CStruct data, ref string reply)
+        private static void HandleCanDeleteResCase(HttpContext context, CStruct data, ref string reply)
         {
             var wResId = data.GetIntAttr("WRES_ID");
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             using (var dataAccessDba = dataAccess.dba)
             {
@@ -183,10 +183,10 @@ namespace WorkEnginePPM
             }
         }
 
-        private static void HandleDeletePiCase(HttpContext Context, CStruct data, ref string reply)
+        private static void HandleDeletePiCase(HttpContext context, CStruct data, ref string reply)
         {
             var projectId = data.GetIntAttr("PROJECT_ID");
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             using (var dataAccessDba = dataAccess.dba)
             {
@@ -209,10 +209,10 @@ namespace WorkEnginePPM
             }
         }
 
-        private static void HandleCheckInPiCase(HttpContext Context, CStruct data, ref string reply)
+        private static void HandleCheckInPiCase(HttpContext context, CStruct data, ref string reply)
         {
             var projectId = data.GetIntAttr("PROJECT_ID");
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             using (var dataAccessDba = dataAccess.dba)
             {
@@ -241,10 +241,10 @@ namespace WorkEnginePPM
             }
         }
 
-        private static void HandleOpenPiCase(HttpContext Context, CStruct data, ref string reply)
+        private static void HandleOpenPiCase(HttpContext context, CStruct data, ref string reply)
         {
             var projectId = data.GetIntAttr("PROJECT_ID");
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             using (var dataAccessDba = dataAccess.dba)
             {
@@ -266,7 +266,6 @@ namespace WorkEnginePPM
                     }
                     catch (Exception ex)
                     {
-
                         Trace.TraceError("Exception Suppressed {0}", ex);
                         reply = WebAdmin.FormatError("exception", "DBAdmin.OpenPI", ex.Message);
                     }
@@ -274,10 +273,10 @@ namespace WorkEnginePPM
             }
         }
 
-        private static void HandlePlosePiCase(HttpContext Context, CStruct data, ref string reply)
+        private static void HandleClosePiCase(HttpContext context, CStruct data, ref string reply)
         {
             var projectId = data.GetIntAttr("PROJECT_ID");
-            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            var baseInfo = WebAdmin.BuildBaseInfo(context);
             using (var dataAccess = new DataAccess(baseInfo))
             using (var dataAccessDba = dataAccess.dba)
             {
