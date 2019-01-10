@@ -99,6 +99,10 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected EPMLiveCore.TimeDebug tb;
         protected string timerString;
 
+        private const int AssignmentsIndex = 9;
+        private const int SummaryIndex = 10;
+        private const int AllocationIndex = 11;
+
         public string EPMLiveVersion
         {
             get { return EPMLiveScriptManager.FileVersion; }
@@ -784,9 +788,22 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             viewString.Append("details: \"");
             viewString.Append(properties[7]);
             viewString.Append("\",");
-
-            AddErrorProneViewString(properties, viewString);
             
+            if (properties.Length > AssignmentsIndex)
+            {
+                viewString.Append($"assignments: \"{properties[AssignmentsIndex]}\",");
+            }
+
+            if (properties.Length > SummaryIndex)
+            {
+                viewString.Append($"summary: \"{properties[SummaryIndex]}\",");
+            }
+
+            if (properties.Length >= AllocationIndex)
+            {
+                viewString.Append($"allocation: \"{properties[AllocationIndex]}\",");
+            }
+
             if (bAgile)
             {
                 AddAgileViewString(agileProperties, viewString);
@@ -799,53 +816,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             return viewString;
         }
         
-        private void AddErrorProneViewString(string[] properties, StringBuilder viewString)
-        {
-            try
-            {
-                if (properties.Length > 9)
-                {
-                    viewString.Append("assignments: \"");
-                    viewString.Append(properties[9]);
-                    viewString.Append("\",");
-                }
-            }
-            catch (Exception ex)
-            {
-                DiagnosticTrace.TraceError("Swallowed exception: {0}", ex);
-            }
-
-            try
-            {
-                if (properties.Length > 10)
-                {
-                    viewString.Append("summary: \"");
-                    viewString.Append(properties[10]);
-                    viewString.Append("\",");
-                }
-            }
-            catch (Exception ex)
-            {
-                DiagnosticTrace.TraceError("Swallowed exception: {0}", ex);
-            }
-
-            try
-            {
-                if (properties.Length <= 11)
-                {
-                    return;
-                }
-
-                viewString.Append("allocation: \"");
-                viewString.Append(properties[11]);
-                viewString.Append("\",");
-            }
-            catch (Exception ex)
-            {
-                DiagnosticTrace.TraceError("Swallowed exception: {0}", ex);
-            }
-        }
-
         private void AddAgileViewString(string[] agileProperties, StringBuilder viewString)
         {
             var viewStringArray = new string[]
@@ -863,9 +833,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 try
                 {
-                    viewString.Append($"{viewStringArray[index]}: \"");
-                    viewString.Append(agileProperties[index]);
-                    viewString.Append("\",");
+                    viewString.Append($"{viewStringArray[index]}: \"{agileProperties[index]}\",");
                 }
                 catch (Exception ex)
                 {
