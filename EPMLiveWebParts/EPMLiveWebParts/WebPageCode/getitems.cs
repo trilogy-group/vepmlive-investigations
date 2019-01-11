@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveWebParts
 {
@@ -633,9 +634,9 @@ namespace EPMLiveWebParts
 
         private string formatField(string val, string fieldname, bool calculated, bool group, SPListItem li)
         {
-            SPField spfield = li.ParentList.Fields.GetFieldByInternalName(fieldname);
-            string format = "";
-            XmlDocument fieldXml = new XmlDocument();
+            var spfield = li.ParentList.Fields.GetFieldByInternalName(fieldname);
+            var format = string.Empty;
+            var fieldXml = new XmlDocument();
             fieldXml.LoadXml(spfield.SchemaXml);
             if (calculated && !group)
             {
@@ -644,100 +645,135 @@ namespace EPMLiveWebParts
             switch (spfield.Type)
             {
                 case SPFieldType.User:
-                    if (group)
-                    {
-
-                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
-                        val = "";
-                        foreach (SPFieldLookupValue lv in lvc)
-                        {
-                            val += ", " + lv.LookupValue;
-                        }
-                        if (val.Length > 1)
-                            val = val.Substring(2);
-                    }
-                    else
-                        val = li.ParentList.Fields[spfield.Id].GetFieldValueAsHtml(val);
+                    GetFieldValueForUser(ref val, group, li, spfield);
                     break;
                 case SPFieldType.Calculated:
-                    string[] sdata = val.Replace(";#", "\n").Split('\n');
-                    string resulttype = "";
-                    try
-                    {
-                        resulttype = fieldXml.ChildNodes[0].Attributes["ResultType"].Value;
-                    }
-                    catch { }
-
-
-                    switch (resulttype)
-                    {
-                        case "Text":
-                            if (spfield.Description == "Indicator")
-                            {
-                                val = val.ToLower();
-                            }
-                            else
-                            {
-                                //val = sdata[1];
-                            }
-                            break;
-                        case "Currency":
-                            {
-                                double fval = double.Parse(val);
-                                val = fval.ToString("c");
-                            }
-                            break;
-                        case "Number":
-                            int decimals = 0;
-                            try
-                            {
-                                decimals = int.Parse(fieldXml.ChildNodes[0].Attributes["Decimals"].Value);
-                                for (int j = 0; j < decimals; j++)
-                                {
-                                    format += "0";
-                                }
-                                if (format.Length > 0)
-                                    format = "#,##0." + format;
-                                else
-                                    format = "#,##0";
-                            }
-                            catch { }
-                            if (spfield.SchemaXml.Contains("Percentage=\"TRUE\""))
-                            {
-                                try
-                                {
-                                    double fval = double.Parse(val) * 100;
-                                    val = fval.ToString(format) + "%";
-                                }
-                                catch { }
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    double fval = double.Parse(val);
-                                    val = fval.ToString(format);
-
-                                }
-                                catch { }
-                            }
-                            break;
-                    };
+                    GetFieldValueForCalculated(ref val, fieldXml, spfield, format);
                     break;
                 case SPFieldType.DateTime:
-                    try
-                    {
-                        format = fieldXml.ChildNodes[0].Attributes["Format"].Value;
-                    }
-                    catch { }
-                    if (format == "DateOnly")
-                        val = DateTime.Parse(val).ToShortDateString();
+                    GetFieldValueForDateTime(ref val, format, fieldXml);
                     break;
                 default:
                     val = li.ParentList.Fields[spfield.Id].GetFieldValueAsHtml(val);
                     break;
-            };
+            }
             return val;
+        }
+
+        private static void GetFieldValueForDateTime(ref string fieldValue, string format, XmlDocument fieldXml)
+        {
+            try
+            {
+                format = fieldXml.ChildNodes[0].Attributes["Format"].Value;
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+            if (format == "DateOnly")
+            {
+                fieldValue = DateTime.Parse(fieldValue).ToShortDateString();
+            }
+        }
+
+        private static void GetFieldValueForCalculated(ref string valueField, XmlDocument fieldXml, SPField spfield, string format)
+        {
+            // CC-78052 The following variable is never used but I'm keeping it as a receiver of the statement
+            var sdata = valueField.Replace(";#", "\n").Split('\n');
+            var resultType = string.Empty;
+            try
+            {
+                resultType = fieldXml.ChildNodes[0].Attributes["ResultType"].Value;
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            switch (resultType)
+            {
+                case "Text":
+                    if (spfield.Description == "Indicator")
+                    {
+                        valueField = valueField.ToLower();
+                    }
+                    break;
+                case "Currency":
+                {
+                    var fieldValue = double.Parse(valueField);
+                    valueField = fieldValue.ToString("c");
+                }
+                    break;
+                case "Number":
+                    try
+                    {
+                        var decimals = int.Parse(fieldXml.ChildNodes[0].Attributes["Decimals"].Value);
+                        var stringBuilder = new StringBuilder(format);
+                        for (var j = 0; j < decimals; j++)
+                        {
+                            stringBuilder.Append("0");
+                        }
+                        format = stringBuilder.ToString();
+                        format = format.Length > 0
+                            ? string.Format("#,##0.{0}", format)
+                            : "#,##0";
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceError("Exception Suppressed {0}", ex);
+                    }
+                    if (spfield.SchemaXml.Contains("Percentage=\"TRUE\""))
+                    {
+                        try
+                        {
+                            var fieldValue = double.Parse(valueField) * 100;
+                            valueField = string.Format("{0}%", fieldValue.ToString(format));
+                        }
+                        catch (Exception ex)
+                        {
+                            TraceError("Exception Suppressed {0}", ex);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var fieldValue = double.Parse(valueField);
+                            valueField = fieldValue.ToString(format);
+                        }
+                        catch (Exception ex)
+                        {
+                            TraceError("Exception Suppressed {0}", ex);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private static void GetFieldValueForUser(ref string valueField, bool isGroup, SPListItem listItem, SPField spfield)
+        {
+            if (isGroup)
+            {
+                var lookupValueCollection = new SPFieldLookupValueCollection(valueField);
+
+                var stringBuilder = new StringBuilder(string.Empty);
+
+                foreach (var lookupValue in lookupValueCollection)
+                {
+                    stringBuilder.Append(string.Format(", {0}", lookupValue.LookupValue));
+                }
+
+                valueField = stringBuilder.ToString();
+
+                if (valueField.Length > 1)
+                {
+                    valueField = valueField.Substring(2);
+                }
+            }
+            else
+            {
+                valueField = listItem.ParentList.Fields[spfield.Id].GetFieldValueAsHtml(valueField);
+            }
         }
 
         private void addHeader()
