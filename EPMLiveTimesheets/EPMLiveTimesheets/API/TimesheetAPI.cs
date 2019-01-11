@@ -1879,7 +1879,7 @@ namespace TimeSheets
                                             }
                                         });
 
-                                        //Getting List pf rejected entries
+                                        // Getting List of rejected entries
                                         using (var command =
                                             new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", connection))
                                         {
@@ -1892,7 +1892,8 @@ namespace TimeSheets
                                                 }
                                             }
                                         }
-                                        //Getting List pf rejected entries
+
+                                        // Getting notes of rejected entries
                                         using (var command =
                                             new SqlCommand("select approval_notes from vwTSApprovalNotes where ts_uid=@ts_uid", connection))
                                         {

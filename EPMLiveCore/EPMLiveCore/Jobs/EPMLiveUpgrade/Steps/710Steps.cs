@@ -16,8 +16,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         public override bool Perform()
         {
             Guid webAppId = Web.Site.WebApplication.Id;
-            bool result = true;
-
+            var result = true;
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 try
@@ -28,8 +27,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     using (var epmLiveCn = new SqlConnection(epmLiveCnStr))
                     {
                         epmLiveCn.Open();
-
-                        #region ViewCode
                         epmLiveCn.ExecuteNonQuery(@"IF EXISTS (SELECT * FROM EMAILTEMPLATES WHERE EMAILID=18)
 	DELETE EMAILTEMPLATES WHERE EMAILID=18;
 
@@ -42,8 +39,6 @@ BEGIN
 	'Email time Allocation - Not a team member');
 END"
 );
-                        #endregion
-
                         LogMessage("New templates sucessfully added to EMAILTEMPLATES (case they don't exist already).", MessageKind.SUCCESS, 4);
                     }
                 }
@@ -58,7 +53,6 @@ END"
                     result = false;
                 }
             });
-
             return result;
         }
     }
