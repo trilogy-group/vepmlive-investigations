@@ -71,7 +71,10 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Dashboard\Dashboard.BuildProjectGrid.cs" />
     <Compile Include="Dashboard\Dashboard.cs" />
+    <Compile Include="Dashboard\Dashboard.RenderWebPart.cs" />
+    <Compile Include="Dashboard\Dashboard.StateProperties.cs" />
     <Compile Include="IssueSummary\IssueSummary.cs" />
     <Compile Include="Milestone_Summary\Milestone_Summary.cs" />
     <Compile Include="ProjectData.BuildData.cs" />
