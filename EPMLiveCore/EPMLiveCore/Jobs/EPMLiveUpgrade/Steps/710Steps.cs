@@ -49,7 +49,6 @@ END"
                         : exception.Message;
 
                     LogMessage(message, MessageKind.FAILURE, 4);
-
                     result = false;
                 }
             });
