@@ -134,7 +134,7 @@ namespace TimeSheets.Layouts.epmlive
 
         private void RegisterBaseScript()
         {
-            var message = "You have not saved your changes. Are you sure you want to change the user?";
+            const string message = "You have not saved your changes. Are you sure you want to change the user?";
             ddlUsers.Attributes["onchange"] =
                 $"if (dirty && !confirm('{message.Replace("'", "\'")}')) {{ resetDDLIndex(); return false; }}; dirty = false;";
             var dtcTextBox = dtcDate.Controls[0] as TextBox;
