@@ -134,7 +134,7 @@
     <Compile Include="Layouts\epmlive\WorkLog.aspx.designer.cs">
       <DependentUpon>WorkLog.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\epmlive\WorkLog.Scipts.cs">
+    <Compile Include="Layouts\epmlive\WorkLog.Scripts.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Models\TimeSheetItem.cs" />
