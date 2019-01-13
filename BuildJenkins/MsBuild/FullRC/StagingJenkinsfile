@@ -17,7 +17,10 @@ pipeline {
 		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'StagingPassword', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 		string(name: 'StagingAppUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Staging SharePoint application url for deployment')
-        string(name: 'ReleaseBranch', defaultValue: '', description: 'Release branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
+        string(name: 'Staging2TargetHost', defaultValue: '10.25.2.85,10.25.2.57,10.25.2.54', description: 'Staging Target hosts to deploy to')
+		string(name: 'Staging2UserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
+        string(name: 'Staging2Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
+		string(name: 'ReleaseBranch', defaultValue: '', description: 'Release branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
         string(name: 'ReleaseBranchBuild', defaultValue: '', description: 'Release build number to get artifacts from instead of triggering new build (leave empty to trigger new build)')
         string(name: 'DeployBranch', defaultValue: '', description: 'Deploy branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
         string(name: 'ProtractorBranch', defaultValue: 'TestAutomation', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
@@ -64,27 +67,56 @@ pipeline {
 						}
 					}
 				}
-				stage('Deploy Staging') {
-					steps {
-						timestamps {
-							script {
-								echo 'Triggering Deploy job...'
-								env.DEPLOY_BRANCH = currentBuild.getProjectName()
-								if (params.DeployBranch?.trim()) {
-									env.DEPLOY_BRANCH = params.DeployBranch
+				stage ('Deploy') {
+					parallel {
+						stage('Deploy Staging') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering Deploy job...'
+										env.DEPLOY_BRANCH = currentBuild.getProjectName()
+										if (params.DeployBranch?.trim()) {
+											env.DEPLOY_BRANCH = params.DeployBranch
+										}
+										build(
+											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+											wait: true,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
+												[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
+												[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
+												[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+												[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
+											]
+										)
+									}
 								}
-								build(
-									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
-									wait: true,
-									parameters: [
-										[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
-										[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
-										[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
-										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-										[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
-										[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
-									]
-								)
+							}
+						}
+						stage('Deploy Staging2') {
+							steps {
+								timestamps {
+									script {
+										echo 'Triggering Deploy job...'
+										env.DEPLOY_BRANCH = currentBuild.getProjectName()
+										if (params.DeployBranch?.trim()) {
+											env.DEPLOY_BRANCH = params.DeployBranch
+										}
+										build(
+											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+											wait: true,
+											parameters: [
+												[$class: 'StringParameterValue', name: 'TargetHost', value: params.Staging2TargetHost],
+												[$class: 'StringParameterValue', name: 'UserName', value: params.Staging2UserName],
+												[$class: 'StringParameterValue', name: 'Password', value: params.Staging2Password],
+												[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
+												[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
+												[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
+											]
+										)
+									}
+								}
 							}
 						}
 					}
