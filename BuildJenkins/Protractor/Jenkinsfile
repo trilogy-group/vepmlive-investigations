@@ -3,7 +3,6 @@ pipeline {
 		label 'skyvera-jenkins-protractor'
 	}
 	options {
-		skipDefaultCheckout true
 		timestamps()
 		timeout(time: 2, unit: 'HOURS')
     }
