@@ -7,7 +7,6 @@ pipeline {
     }
     options {
         skipDefaultCheckout true
-		timeout(time: 4, unit: 'HOURS') 
     }
 	triggers {
 		cron(env.BRANCH_NAME == 'Releases/7.1.0' ? '@midnight' : '')

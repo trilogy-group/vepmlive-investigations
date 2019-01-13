@@ -8,6 +8,7 @@ pipeline {
 	options {
 		skipDefaultCheckout true
 		timestamps()
+		timeout(time: 4, unit: 'HOURS') 
 	}
 	parameters {
 		string(name: 'FullRcBranch', defaultValue: '', description: 'Full RC branch to get artifacts from (leave empty to use the same branch name as this build, replace "/" with "%2F")')
