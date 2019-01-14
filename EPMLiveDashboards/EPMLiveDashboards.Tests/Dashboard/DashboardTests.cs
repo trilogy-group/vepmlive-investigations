@@ -400,7 +400,8 @@ namespace EPMLiveDashboards.Tests
             var stringBuilder = new StringBuilder();
             var writer = new ShimHtmlTextWriter
             {
-                WriteString = content => stringBuilder.Append(content)
+                WriteString = content => stringBuilder.Append(content),
+                WriteStringObjectArray = (content, objects) => stringBuilder.AppendFormat(content, objects)
             }.Instance;
             ShimControl.AllInstances.EnsureChildControls = _ => { };
             ShimDashboard.AllInstances.buildProjectGrid = _ => Error;
@@ -441,7 +442,8 @@ namespace EPMLiveDashboards.Tests
             var stringBuilder = new StringBuilder();
             var writer = new ShimHtmlTextWriter
             {
-                WriteString = content => stringBuilder.Append(content)
+                WriteString = content => stringBuilder.Append(content),
+                WriteStringObjectArray = (content, objects) => stringBuilder.AppendFormat(content, objects)
             }.Instance;
             ShimControl.AllInstances.EnsureChildControls = _ => { };
             ShimDashboard.AllInstances.buildProjectGrid = _ => string.Empty;
@@ -470,7 +472,8 @@ namespace EPMLiveDashboards.Tests
             var stringBuilder = new StringBuilder();
             var writer = new ShimHtmlTextWriter
             {
-                WriteString = content => stringBuilder.Append(content)
+                WriteString = content => stringBuilder.Append(content),
+                WriteStringObjectArray = (content, objects) => stringBuilder.AppendFormat(content, objects)
             }.Instance;
             ShimControl.AllInstances.EnsureChildControls = _ => 
             {
@@ -495,7 +498,8 @@ namespace EPMLiveDashboards.Tests
             var stringBuilder = new StringBuilder();
             var writer = new ShimHtmlTextWriter
             {
-                WriteString = content => stringBuilder.Append(content)
+                WriteString = content => stringBuilder.Append(content),
+                WriteStringObjectArray = (content, objects) => stringBuilder.AppendFormat(content, objects)
             }.Instance;
             privateObject.SetFieldOrProperty("activation", 1);
 
@@ -517,7 +521,8 @@ namespace EPMLiveDashboards.Tests
             var stringBuilder = new StringBuilder();
             var writer = new ShimHtmlTextWriter
             {
-                WriteString = content => stringBuilder.Append(content)
+                WriteString = content => stringBuilder.Append(content),
+                WriteStringObjectArray = (content, objects) => stringBuilder.AppendFormat(content, objects)
             }.Instance;
             privateObject.SetFieldOrProperty("activation", 2);
 
@@ -539,7 +544,8 @@ namespace EPMLiveDashboards.Tests
             var stringBuilder = new StringBuilder();
             var writer = new ShimHtmlTextWriter
             {
-                WriteString = content => stringBuilder.Append(content)
+                WriteString = content => stringBuilder.Append(content),
+                WriteStringObjectArray = (content, objects) => stringBuilder.AppendFormat(content, objects)
             }.Instance;
             privateObject.SetFieldOrProperty("activation", -1);
 

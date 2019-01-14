@@ -1,28 +1,20 @@
 ﻿using System;
+using System.Collections;
+using System.Data;
 using System.Runtime.InteropServices;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
+using System.Xml;
 using System.Xml.Serialization;
-
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using Microsoft.SharePoint.WebPartPages;
-
-using System.Text;
-using System.Data;
-
-using System.Xml;
-
-using System.ComponentModel;
-using System.Collections;
-using System.Diagnostics;
+using SharepointWebPart = Microsoft.SharePoint.WebPartPages;
 
 namespace Dashboard
 {
     [Guid("0bc20b84-5782-4bcb-a86e-399e2be233bf")]
     [XmlRoot(Namespace = "MyWebParts")]
-    public partial class Dashboard : Microsoft.SharePoint.WebPartPages.WebPart
+    public partial class Dashboard : SharepointWebPart.WebPart
     {
         private string outputData;
         private SPGridView gvPJSummary;

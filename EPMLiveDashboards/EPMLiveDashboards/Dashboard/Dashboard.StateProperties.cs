@@ -15,7 +15,6 @@ namespace Dashboard
         [FriendlyName("Project Center State Field")]
         [Description("")]
         [Browsable(true)]
-
         // The accessor for this property.
         public string MyState
         {
@@ -35,7 +34,6 @@ namespace Dashboard
         [FriendlyName("Issue State Field")]
         [Description("")]
         [Browsable(true)]
-
         // The accessor for this property.
         public string MyIssueState
         {
@@ -55,7 +53,6 @@ namespace Dashboard
         [FriendlyName("Risk Status Field")]
         [Description("")]
         [Browsable(true)]
-
         // The accessor for this property.
         public string MyRiskState
         {
