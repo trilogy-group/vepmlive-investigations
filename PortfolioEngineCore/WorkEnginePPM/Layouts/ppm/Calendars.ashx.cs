@@ -3,6 +3,7 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Reflection;
 using PortfolioEngineCore;
 
@@ -140,123 +141,161 @@ namespace WorkEnginePPM
         }
         private static string UpdateCalendarInfo(HttpContext Context, CStruct xData)
         {
-            string sReply = "";
-            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-            DataAccess da = new DataAccess(sBaseInfo);
-            DBAccess dba = da.dba;
-            if (dba.Open() == StatusEnum.rsSuccess)
+            var reply = string.Empty;
+            var baseInfo = WebAdmin.BuildBaseInfo(Context);
+            using (var dataAccess = new DataAccess(baseInfo))
+            using (var dataAccessDba = dataAccess.dba)
             {
-                int nCalendarId = Int32.Parse(xData.GetStringAttr("calendarid"));
-                string sCalendarName = xData.GetStringAttr("name");
-                dba.BeginTransaction();
-                try
+                if (dataAccessDba.Open() == StatusEnum.rsSuccess)
                 {
-                    int lRowsAffected;
+                    var calendarId = int.Parse(xData.GetStringAttr("calendarid"));
+                    var calendarName = xData.GetStringAttr("name");
+                    dataAccessDba.BeginTransaction();
 
-                    if (dbaCalendars.UpdateCalendar(dba, ref nCalendarId, sCalendarName, "", out sReply) != StatusEnum.rsSuccess)
-                    { if (sReply.Length == 0) sReply = WebAdmin.FormatError("exception", "Calendars.UpdateCustomFieldInfo", dba.StatusText); }
+                    reply = UpdateOnDataBase(xData, dataAccessDba, calendarName, ref calendarId);
+
+                    if (dataAccessDba.Status == StatusEnum.rsSuccess)
+                    {
+                        dataAccessDba.CommitTransaction();
+
+                        // submit Jobs to recalculate anything which may have been affected by changing the calendar
+                        try
+                        {
+                            RecalculateResourceAvailability(dataAccessDba, calendarId, dataAccess);
+                            RecalculateFteValues(dataAccessDba, dataAccess);
+                            reply = RecalculateCostCategoryRates(dataAccessDba, calendarId, calendarName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", ex);
+                            reply = WebAdmin.FormatError(
+                                "exception",
+                                "Calendars.UpdateCalendarInfo",
+                                string.Format("Saving Calendar '{0}' failed to execute follow up calculations.\n{1}", calendarName, ex.Message));
+                        }
+                    }
                     else
                     {
-                        string sXML = xData.InnerText;
-                        _TGrid tg = new _TGrid();
-                        InitializeColumns(tg);
-                        DataTable dt = tg.SetXmlData(sXML);
-                        if (dbaCalendars.CheckPeriods(dt, out sReply) != StatusEnum.rsSuccess)
-                        {
-                            if (sReply.Length == 0) { sReply = WebAdmin.FormatError("exception", "Calendars.CheckPeriods", "Saving Calendar '" + sCalendarName + "' failed"); }
-                        }
-                        if (sReply.Length > 0)
-                        {
-                            sReply = DBAccess.FormatAdminError("error", "Calendars.CheckPeriods", sReply);
-                            dba.Status = StatusEnum.rsRequestCannotBeCompleted;
-                        }
-                        else
-                        {
-                            dbaCalendars.DeletePeriods(dba, nCalendarId, out lRowsAffected);
-                            if (dbaCalendars.InsertPeriods(dba, nCalendarId, dt, out lRowsAffected) != StatusEnum.rsSuccess)
-                            {
-                                sReply = WebAdmin.FormatError("error", "Calendars.InsertPeriods", dba.StatusText);
-                                dba.Status = StatusEnum.rsRequestCannotBeCompleted;
-                            }
-                        }
+                        dataAccessDba.RollbackTransaction();
                     }
                 }
-                catch (Exception ex)
+            }
+            return reply;
+        }
+
+        private static string RecalculateCostCategoryRates(DBAccess dataAccessDba, int calendarId, string calendarName)
+        {
+            string reply;
+
+            // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
+            if (!AdminFunctions.CalcCategoryRates(dataAccessDba, out reply))
+            {
+                reply = SqlDb.FormatAdminError("error", "Calendars.UpdateCalendarInfo", reply);
+                dataAccessDba.Status = StatusEnum.rsRequestCannotBeCompleted;
+            }
+            else
+            {
+                var calendar = new CStruct();
+                calendar.Initialize("calendar");
+                calendar.CreateIntAttr("calendarid", calendarId);
+                calendar.CreateStringAttr("name", calendarName);
+                reply = calendar.XML();
+            }
+            return reply;
+        }
+
+        private static void RecalculateFteValues(DBAccess dataAccessDba, DataAccess dataAccess)
+        {
+            // recalculate FTE values if using default values
+            var queue = new CStruct();
+            queue.Initialize("Queue");
+            queue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcDefaultFTEs);
+            queue.CreateString("Context", "Edit Periods");
+            queue.CreateString("Comment", "Calculate Default FTE values");
+            queue.CreateString("Data", "No Context Data");
+            AdminFunctions.SubmitJobRequest(dataAccessDba, dataAccessDba.UserWResID, queue.XML(), dataAccess.BasePath);
+        }
+
+        private static void RecalculateResourceAvailability(DBAccess dataAccessDba, int calendarId, DataAccess dataAccess)
+        {
+            // if calendar we've just changed is the RP calendar then recalculate resource availability
+            DataTable dataTable;
+            var rpCalendar = -1;
+            dbaGeneral.SelectAdmin(dataAccessDba, out dataTable);
+            if (dataTable.Rows.Count == 1)
+            {
+                var row = dataTable.Rows[0];
+                rpCalendar = SqlDb.ReadIntValue(row["ADM_PORT_COMMITMENTS_CB_ID"]);
+            }
+
+            if (rpCalendar == calendarId)
+            {
+                var queue = new CStruct();
+                queue.Initialize("Queue");
+                queue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcAvailability);
+                queue.CreateString("Context", "Edit Calendar");
+                queue.CreateString("Comment", "Calculate Availability");
+                queue.CreateString("Data", "No Context Data");
+                AdminFunctions.SubmitJobRequest(dataAccessDba, dataAccessDba.UserWResID, queue.XML(), dataAccess.BasePath);
+
+                // CC-77735 Since the commented out is not broken I'm keeping it because as the comment below is useful for testing
+                // this is useful for test
+                //AdminFunctions.CalcRPAllAvailabilities(dataAccessDba);
+            }
+        }
+
+        private static string UpdateOnDataBase(CStruct data, DBAccess dataAccessDba, string calendarName, ref int calendarId)
+        {
+            string reply;
+            try
+            {
+                int rowsAffected;
+
+                if (dbaCalendars.UpdateCalendar(dataAccessDba, ref calendarId, calendarName, string.Empty, out reply) != StatusEnum.rsSuccess)
                 {
-                    sReply = WebAdmin.FormatError("exception", "Calendars.UpdateCalendarInfo", "Saving Calendar '" + sCalendarName + "' failed.\n" + ex.Message);
-                    dba.Status = (StatusEnum)99999;
-                }
-
-                if (dba.Status == StatusEnum.rsSuccess)
-                {
-                    dba.CommitTransaction();
-
-                    //sReply = ReadCalendarInfo(dba, nCalendarId);
-
-                    // submit Jobs to recalculate anything which may have been affected by changing the calendar
-                    try
+                    if (reply.Length == 0)
                     {
-                        // if calendar we've just changed is the RP calendar then recalculate resource availability
-                        DataTable dt;
-                        int nRPCalendar=-1;
-                        dbaGeneral.SelectAdmin(dba, out dt);
-                        if (dt.Rows.Count == 1)
-                        {
-                            DataRow row = dt.Rows[0];
-                            nRPCalendar = DBAccess.ReadIntValue(row["ADM_PORT_COMMITMENTS_CB_ID"]);
-                        }
-
-                        CStruct xQueue;
-                        if (nRPCalendar==nCalendarId)
-                        {
-                            xQueue = new CStruct();
-                            xQueue.Initialize("Queue");
-                            xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcAvailability);
-                            xQueue.CreateString("Context", "Edit Calendar");
-                            xQueue.CreateString("Comment", "Calculate Availability");
-                            xQueue.CreateString("Data", "No Context Data");
-                            AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), da.BasePath);
-
-                            // this is useful for test
-                            //AdminFunctions.CalcRPAllAvailabilities(dba);
-                        }
-
-                        // recalculate FTE values if using default values
-                        xQueue = new CStruct();
-                        xQueue.Initialize("Queue");
-                        xQueue.CreateInt("JobContext", (int)QueuedJobContext.qjcCalcDefaultFTEs);
-                        xQueue.CreateString("Context", "Edit Periods");
-                        xQueue.CreateString("Comment", "Calculate Default FTE values");
-                        xQueue.CreateString("Data", "No Context Data");
-                        AdminFunctions.SubmitJobRequest(dba, dba.UserWResID, xQueue.XML(), da.BasePath);
-
-                        // recalculate Cost Category Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
-                        if (!AdminFunctions.CalcCategoryRates(dba, out sReply))
-                        {
-                            sReply = DBAccess.FormatAdminError("error", "Calendars.UpdateCalendarInfo", sReply);
-                            dba.Status = StatusEnum.rsRequestCannotBeCompleted;
-                        }
-                        else
-                        {
-                            CStruct xCalendar = new CStruct();
-                            xCalendar.Initialize("calendar");
-                            xCalendar.CreateIntAttr("calendarid", nCalendarId);
-                            xCalendar.CreateStringAttr("name", sCalendarName);
-                            sReply = xCalendar.XML();
-                        }
+                        reply = WebAdmin.FormatError("exception", "Calendars.UpdateCustomFieldInfo", dataAccessDba.StatusText);
                     }
-                    catch (Exception ex)
-                    {
-                        sReply = WebAdmin.FormatError("exception", "Calendars.UpdateCalendarInfo", "Saving Calendar '" + sCalendarName + "' failed to execute follow up calculations.\n" + ex.Message);
-                    }
-
                 }
                 else
-                    dba.RollbackTransaction();
+                {
+                    var xml = data.InnerText;
+                    var tGrid = new _TGrid();
+                    InitializeColumns(tGrid);
 
-                dba.Close();
+                    // CC-77735 Not calling dispose as instance isn't owned by this code
+                    var dataTable = tGrid.SetXmlData(xml);
+                    if (dbaCalendars.CheckPeriods(dataTable, out reply) != StatusEnum.rsSuccess && reply.Length == 0)
+                    {
+                        reply = WebAdmin.FormatError("exception", "Calendars.CheckPeriods", "Saving Calendar '" + calendarName + "' failed");
+                    }
+                    if (reply.Length > 0)
+                    {
+                        reply = SqlDb.FormatAdminError("error", "Calendars.CheckPeriods", reply);
+                        dataAccessDba.Status = StatusEnum.rsRequestCannotBeCompleted;
+                    }
+                    else
+                    {
+                        dbaCalendars.DeletePeriods(dataAccessDba, calendarId, out rowsAffected);
+                        if (dbaCalendars.InsertPeriods(dataAccessDba, calendarId, dataTable, out rowsAffected) != StatusEnum.rsSuccess)
+                        {
+                            reply = WebAdmin.FormatError("error", "Calendars.InsertPeriods", dataAccessDba.StatusText);
+                            dataAccessDba.Status = StatusEnum.rsRequestCannotBeCompleted;
+                        }
+                    }
+                }
             }
-            return sReply;
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                reply = WebAdmin.FormatError(
+                    "exception",
+                    "Calendars.UpdateCalendarInfo",
+                    string.Format("Saving Calendar '{0}' failed.\n{1}", calendarName, ex.Message));
+                dataAccessDba.Status = (StatusEnum)99999;
+            }
+            return reply;
         }
 
         private static string DeleteCalendarInfo(HttpContext Context, CStruct xData)
