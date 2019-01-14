@@ -1,23 +1,15 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-
+using Microsoft.SharePoint;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveWebParts
 {
     public partial class getitems : System.Web.UI.Page
     {
+        private const string CenterAlignment = "center";
         private string strXml = "";
         private XmlDocument docXml;
         private XmlDocument docConfig;
@@ -761,7 +753,7 @@ namespace EPMLiveWebParts
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    TraceError("Exception Suppressed {0}", ex);
                 }
                 try
                 {
@@ -769,7 +761,7 @@ namespace EPMLiveWebParts
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    TraceError("Exception Suppressed {0}", ex);
                 }
                 try
                 {
@@ -777,7 +769,7 @@ namespace EPMLiveWebParts
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    TraceError("Exception Suppressed {0}", ex);
                 }
                 try
                 {
@@ -785,7 +777,7 @@ namespace EPMLiveWebParts
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    TraceError("Exception Suppressed {0}", ex);
                 }
                 var newColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
                 newColumn.InnerText = displayName;
@@ -851,14 +843,14 @@ namespace EPMLiveWebParts
             {
                 newColumn.InnerText = "Type";
                 attributeWidth.Value = "50";
-                attributeAlign.Value = "center";
+                attributeAlign.Value = CenterAlignment;
                 attributeType.Value = "img";
             }
             else if (name == "~Complete")
             {
                 newColumn.InnerText = "Complete";
                 attributeWidth.Value = "80";
-                attributeAlign.Value = "center";
+                attributeAlign.Value = CenterAlignment;
                 attributeType.Value = "ch";
             }
             else if (name == "~List")
@@ -923,7 +915,7 @@ namespace EPMLiveWebParts
             {
                 attributeType.Value = "ro";
                 attributeWidth.Value = "80";
-                attributeAlign.Value = "center";
+                attributeAlign.Value = CenterAlignment;
             }
 
             else if (format == "Number")
