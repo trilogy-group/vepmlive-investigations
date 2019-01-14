@@ -59,7 +59,9 @@ namespace EPMLiveCore
             {
                 if (user.IsSiteAdmin)
                 {
-                    userTable.Add(user.ID, user.Name + "\n" + user.Email + "\n" + user.LoginName + "\nSite Collection Administrator");
+                    var siteCollectionInfo = $"{user.Name}\n{user.Email}\n{user.LoginName}\nSite Collection Administrator";
+
+                    userTable.Add(user.ID, siteCollectionInfo);
                 }
             }
 
