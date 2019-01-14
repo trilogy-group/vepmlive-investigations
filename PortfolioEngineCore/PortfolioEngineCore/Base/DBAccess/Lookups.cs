@@ -340,8 +340,8 @@ namespace PortfolioEngineCore
                     var lvuid = int.Parse(lVUIdString);
                     if (lvuid > 0)
                     {
-                        
-                        ReadUSedListValues(dbAccess, lvuid, out var firstMessage, ref numberOfMessageLines, ref message);
+                        bool firstMessage;
+                        ReadUSedListValues(dbAccess, lvuid, out firstMessage, ref numberOfMessageLines, ref message);
                         var cleanFields = ReadListFieldsUSedInOtherPlaces(dbAccess);
 
                         foreach (var field in cleanFields)
