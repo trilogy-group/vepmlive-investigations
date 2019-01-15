@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Web.UI;
-using EPMLiveCore;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveCore
 {
@@ -148,31 +147,131 @@ namespace EPMLiveCore
             _cSite = SPContext.Current.Site;
             _cWeb = SPContext.Current.Web;
 
-            _solutionType = (!string.IsNullOrEmpty(Request.Params["type"])) ? Request.Params["type"] : string.Empty;
-            _lstGuid = (!string.IsNullOrEmpty(Request.Params["list"])) ? Request.Params["list"] : string.Empty;
-            _copyFrom = (!string.IsNullOrEmpty(Request.Params["copyfrom"])) ? Request.Params["copyfrom"] : string.Empty;
+            SetSolutionType();
+            SetGuidList();
+            SetProjectName();
+            var lockedWeb = GetWebProperties();
 
-            if (!string.IsNullOrEmpty(_copyFrom))
-            {
-                SPList rqList = _cWeb.Lists[new Guid(_lstGuid)];
-                if (rqList != null)
+            // CC-77409 Keeping the commented code below as it seems to be used for testing
+            // get available features from corefunctions, which is currently hardcoded for testing purposes
+            //ArrayList features = CoreFunctions.getActivatedFeatures();
+
+            SetFeaturesList();
+
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-                    SPListItem item = null;
-                    try
+                    // go to locked web to find settings that specifies the template resource site
+                    using (var web = Site.OpenWeb(lockedWeb))
                     {
-                        item = rqList.GetItemById(int.Parse(_copyFrom));
-                    }
-                    catch { }
+                        SetTemplateResourceUrl(web);
+                        SetWorkEngineUrl();
+                        SetCompLevels(web);
+                        SetProjectSettings(web);
+                        SetCreateNewSettings(web);
 
-                    if (item != null)
-                    {
-                        _requestProjectName = item["Title"].ToString();
-                        txtURL.Text = _requestProjectName;
+                        _createFromLiveTemp = CoreFunctions.getConfigSetting(web, "EPMLiveUseLiveTemplates");
                     }
+                });
+        }
+
+        private void SetCreateNewSettings(SPWeb web)
+        {
+            var epmLiveCreateNewSettings = CoreFunctions.getConfigSetting(web, "EPMLiveCreateNewSettings");
+
+            if (!string.IsNullOrWhiteSpace(epmLiveCreateNewSettings))
+            {
+                var properties = new PropertyHash(CoreFunctions.getConfigSetting(web, "EPMLiveCreateNewSettings"), ";#", '|', '^');
+                if (properties?[0].Keys.Count > 0)
+                {
+                    // CC-77409 Won't replace block below to bool.TryParse as the current behavior is to throw if the conversion fails.
+                    _defaultCreateNewOpt = properties[0]["Default"].ToString();
+                    _isCreateFromOnlineAvail = bool.Parse(properties[1]["Online"].ToString());
+                    _isCreateFromLocalAvail = bool.Parse(properties[1]["Local"].ToString());
+                    _isCreateFromExistingAvail = bool.Parse(properties[1]["Existing"].ToString());
+                }
+                else
+                {
+                    _defaultCreateNewOpt = "online";
                 }
             }
+            else
+            {
+                _defaultCreateNewOpt = "existing";
+            }
+        }
 
-            Guid lockedWeb = CoreFunctions.getLockedWeb(Web);
+        private void SetProjectSettings(SPWeb web)
+        {
+            _projectWorkspaceSetting = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
+
+            var gridGanttSettings = new GridGanttSettings(_cWeb.Lists[new Guid(_lstGuid)]);
+
+            _newItemName = !string.IsNullOrWhiteSpace(_lstGuid)
+                ? gridGanttSettings.NewMenuName
+                : "workspace";
+            _newItemName = !string.IsNullOrWhiteSpace(_newItemName)
+                ? _newItemName
+                : "workspace";
+            _newItemNameLwrCs = _newItemName.ToLower();
+            _listName = _cWeb.Lists[new Guid(_lstGuid)].Title.ToLower();
+            _templateType = _newItemNameLwrCs;
+
+            if (_templateType.Equals("department site", StringComparison.CurrentCultureIgnoreCase))
+            {
+                _templateType = "department";
+            }
+
+            // CC-77409 Unused variable, but I'm keeping it as a receiver from the assignment.
+            var curList = _cWeb.Lists[new Guid(_lstGuid)];
+
+            if (!string.IsNullOrWhiteSpace(gridGanttSettings.RollupLists))
+            {
+                var rollupLists = gridGanttSettings.RollupLists.Split(',');
+                _rListName = rollupLists[0].Split('|')[0];
+            }
+
+            _reqListName = gridGanttSettings.RequestList;
+            _doNotDelRequest = gridGanttSettings.DeleteRequest.ToString();
+        }
+
+        private void SetCompLevels(SPWeb web)
+        {
+            // get comp levels to filter templates by comp levels
+            try
+            {
+                _compLevels = web.AllProperties["CompLevel"].ToString();
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+            try
+            {
+                _compLevels = web.AllProperties["complevel"].ToString();
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception was Suppressed {0}", ex);
+            }
+        }
+
+        private void SetFeaturesList()
+        {
+            var act = new Act(Web);
+            var features = act.GetActivatedLevels();
+
+            var stringBuilder = new StringBuilder(_featuresList);
+            foreach (var feature in features)
+            {
+                stringBuilder.AppendFormat("{0};#", feature);
+            }
+            _featuresList = stringBuilder.ToString();
+        }
+
+        private Guid GetWebProperties()
+        {
+            var lockedWeb = CoreFunctions.getLockedWeb(Web);
             _parentWebGuid_B = Web.ID.ToString("B");
             _parentWebUrl = Web.ServerRelativeUrl;
             _siteUrl = Site.Url;
@@ -181,140 +280,116 @@ namespace EPMLiveCore
             _sourceWebId = Web.ID.ToString();
             _curWebUrl = Web.Url;
             _solutionStoreServiceProxyUrl = Web.Url + SOLUTION_STORE_PROXY_URL;
-            _baseURL = Web.ServerRelativeUrl == "/" ? Web.ServerRelativeUrl : Web.ServerRelativeUrl + "/";
-
+            _baseURL = Web.ServerRelativeUrl == "/"
+                ? Web.ServerRelativeUrl
+                : string.Format("{0}/", Web.ServerRelativeUrl);
             _includeContentClientId = InputformsectionIncludeContent.ClientID;
             _moreInfoUrlClientId = txtURL.ClientID;
             _hasCreateSubSitePerm = Web.DoesUserHavePermissions(Web.CurrentUser.LoginName, SPBasePermissions.ManageSubwebs);
-            _moreInfoUrl = Web.Url + MORE_INFO_URL;
-            _smallParentUrl = Web.Url + SMALL_PARENT_URL;
-            _tempGalRedirect = (Web.ServerRelativeUrl == "/" ? "" : Web.ServerRelativeUrl) + TEMP_GAL_REDIRECT;
+            _moreInfoUrl = string.Format("{0}{1}", Web.Url, MORE_INFO_URL);
+            _smallParentUrl = string.Format("{0}{1}", Web.Url, SMALL_PARENT_URL);
+            _tempGalRedirect = string.Format(
+                "{0}{1}",
+                (Web.ServerRelativeUrl == "/"
+                    ? string.Empty
+                    : Web.ServerRelativeUrl),
+                TEMP_GAL_REDIRECT);
+            return lockedWeb;
+        }
 
-            // get available features from corefunctions, which is currently hardcoded for testing purposes
-            //ArrayList features = CoreFunctions.getActivatedFeatures();
+        private void SetProjectName()
+        {
+            _copyFrom = !string.IsNullOrWhiteSpace(Request.Params["copyfrom"])
+                ? Request.Params["copyfrom"]
+                : string.Empty;
 
-            Act act = new Act(Web);
-            ArrayList features = act.GetActivatedLevels();
-
-            foreach (object array in features)
+            if (!string.IsNullOrWhiteSpace(_copyFrom))
             {
-                _featuresList += array.ToString() + ";#";
+                var requests = _cWeb.Lists[new Guid(_lstGuid)];
+                if (requests != null)
+                {
+                    SPListItem item = null;
+                    try
+                    {
+                        item = requests.GetItemById(int.Parse(_copyFrom));
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceError("Exception Suppressed {0}", ex);
+                    }
+
+                    if (item != null)
+                    {
+                        _requestProjectName = item["Title"].ToString();
+                        txtURL.Text = _requestProjectName;
+                    }
+                }
+            }
+        }
+
+        private void SetGuidList()
+        {
+            _lstGuid = !string.IsNullOrWhiteSpace(Request.Params["list"])
+                ? Request.Params["list"]
+                : string.Empty;
+        }
+
+        private void SetSolutionType()
+        {
+            _solutionType = !string.IsNullOrWhiteSpace(Request.Params["type"])
+                ? Request.Params["type"]
+                : string.Empty;
+        }
+
+        private void SetWorkEngineUrl()
+        {
+            if (!string.IsNullOrWhiteSpace(_templateResourceUrl))
+            {
+                using (var templateResourceWeb = Site.AllWebs[_templateResourceUrl])
+                {
+                    _workengineSvcUrl = string.Format("{0}{1}", templateResourceWeb.Url, WORKENGINE_WS_URL);
+                }
+            }
+            else
+            {
+                _workengineSvcUrl = string.Format("{0}{1}", Web.Url, WORKENGINE_WS_URL);
+            }
+        }
+
+        private void SetTemplateResourceUrl(SPWeb web)
+        {
+            try
+            {
+                var templateGalleryUrl = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", false, true);
+                switch (templateGalleryUrl)
+                {
+                    case "{Site}":
+                        _templateResourceUrl = _cWeb.ServerRelativeUrl;
+                        break;
+                    case "{site}":
+                        _templateResourceUrl = _cWeb.ServerRelativeUrl;
+                        break;
+                    case "{Root}":
+                        _templateResourceUrl = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", true, true);
+                        break;
+                    case "{root}":
+                        _templateResourceUrl = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", true, true);
+                        break;
+                    default:
+                        TraceWarning("Unexpecte Value {0}", templateGalleryUrl);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+                _templateResourceUrl = _cWeb.ServerRelativeUrl;
             }
 
-            string _untranslatedGalleryToken = string.Empty;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            if (string.IsNullOrWhiteSpace(_templateResourceUrl))
             {
-                // go to locked web to find settings that specifies the template resource site
-                using (SPWeb web = Site.OpenWeb(lockedWeb))
-                {
-                    try 
-                    {
-                        _untranslatedGalleryToken = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", false, true);
-                        switch (_untranslatedGalleryToken)
-                        {
-                            case "{Site}":
-                                _templateResourceUrl = _cWeb.ServerRelativeUrl;
-                                break;
-                            case "{site}":
-                                _templateResourceUrl = _cWeb.ServerRelativeUrl;
-                                break;
-                            case "{Root}":
-                                _templateResourceUrl = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", true, true);
-                                break;
-                            case "{root}":
-                                _templateResourceUrl = CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", true, true);
-                                break;
-                        }
-                    }
-                    catch
-                    {
-                        _templateResourceUrl = _cWeb.ServerRelativeUrl;
-                    }
-
-                    if (string.IsNullOrEmpty(_templateResourceUrl) || _templateResourceUrl == " ")
-                    {
-                        _templateResourceUrl = _cWeb.ServerRelativeUrl;
-                    }
-
-                    if (!string.IsNullOrEmpty(_templateResourceUrl))
-                    {
-                        using (SPWeb templateResourceWeb = Site.AllWebs[_templateResourceUrl])
-                        {
-                            _workengineSvcUrl = templateResourceWeb.Url + WORKENGINE_WS_URL;
-                        }
-                    }
-                    else
-                    {
-                        _workengineSvcUrl = Web.Url + WORKENGINE_WS_URL;
-                    }
-
-                    // get comp levels to filter templates by comp levels
-                    try
-                    {
-                        _compLevels = web.AllProperties["CompLevel"].ToString();
-                    }
-                    catch { }
-                    try
-                    {
-                        _compLevels = web.AllProperties["complevel"].ToString();
-                    }
-                    catch { }
-                    //_workengineSvcUrl = "http://" + web.Site.HostName + (web.ServerRelativeUrl == "/" ? "" : web.ServerRelativeUrl) + WORKENGINE_WS_URL;
-                    _projectWorkspaceSetting = CoreFunctions.getConfigSetting(web, "EPMLiveNewProjectWorkspaceType");
-
-                    GridGanttSettings gSettings = new GridGanttSettings(_cWeb.Lists[new Guid(_lstGuid)]);
-
-                    _newItemName = !string.IsNullOrEmpty(_lstGuid) ? gSettings.NewMenuName : "workspace";
-                    _newItemName = !string.IsNullOrEmpty(_newItemName) ? _newItemName : "workspace";
-                    _newItemNameLwrCs = _newItemName.ToLower();
-                    _listName = _cWeb.Lists[new Guid(_lstGuid)].Title.ToLower();
-                    _templateType = _newItemNameLwrCs;
-
-                    if (_templateType.Equals("department site", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        _templateType = "department";
-                    }
-
-                    SPList curList = _cWeb.Lists[new Guid(_lstGuid)];
-
-
-                    if (!string.IsNullOrEmpty(gSettings.RollupLists))
-                    {
-                        string[] tRollupLists = gSettings.RollupLists.Split(',');
-                        _rListName = tRollupLists[0].Split('|')[0];
-                    }
-
-                    _reqListName = gSettings.RequestList;
-                    _doNotDelRequest = gSettings.DeleteRequest.ToString();
-
-                    string epmLiveCreateNewSettings = CoreFunctions.getConfigSetting(web, "EPMLiveCreateNewSettings");
-
-                    if (!string.IsNullOrEmpty(epmLiveCreateNewSettings))
-                    {
-                        EPMLiveCore.API.PropertyHash props = new EPMLiveCore.API.PropertyHash(CoreFunctions.getConfigSetting(web, "EPMLiveCreateNewSettings"), ";#", '|', '^');
-                        if (props != null && props[0].Keys.Count > 0)
-                        {
-                            _defaultCreateNewOpt = props[0]["Default"].ToString();
-                            _isCreateFromOnlineAvail = bool.Parse(props[1]["Online"].ToString());
-                            _isCreateFromLocalAvail = bool.Parse(props[1]["Local"].ToString());
-                            _isCreateFromExistingAvail = bool.Parse(props[1]["Existing"].ToString());
-                        }
-                        else
-                        {
-                            _defaultCreateNewOpt = "online";
-                        }
-                    }
-                    else
-                    {
-                        _defaultCreateNewOpt = "existing";
-                    }
-
-                    _createFromLiveTemp = CoreFunctions.getConfigSetting(web, "EPMLiveUseLiveTemplates");
-
-                }
-            });
-
+                _templateResourceUrl = _cWeb.ServerRelativeUrl;
+            }
         }
 
         private void LoadLeftDivOptions()
