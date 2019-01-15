@@ -1,16 +1,8 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using System.Text;
 using System.Xml;
+using Microsoft.SharePoint;
 using System.Xml.XPath;
 using static System.Diagnostics.Trace;
 
@@ -18,6 +10,7 @@ namespace EPMLiveWebParts
 {
     public partial class getitems : System.Web.UI.Page
     {
+        private const string CenterAlignment = "center";
         private string strXml = "";
         private XmlDocument docXml;
         private XmlDocument docConfig;
@@ -778,175 +771,197 @@ namespace EPMLiveWebParts
 
         private void addHeader()
         {
-            XmlNode ndHead = docXml.CreateNode(XmlNodeType.Element, "head", docXml.NamespaceURI);
-            docXml.ChildNodes[0].AppendChild(ndHead);
-            XmlNode beforeInitNode = docXml.CreateNode(XmlNodeType.Element, "beforeInit", docXml.NamespaceURI);
-            ndHead.AppendChild(beforeInitNode);
-            //try
-            //{
-            //    XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            //    ndNewColumn.InnerText = "Type";
+            var head = docXml.CreateNode(XmlNodeType.Element, "head", docXml.NamespaceURI);
+            docXml.ChildNodes[0].AppendChild(head);
+            var beforeInitNode = docXml.CreateNode(XmlNodeType.Element, "beforeInit", docXml.NamespaceURI);
+            head.AppendChild(beforeInitNode);
+            var counter = 0;
 
-            //    XmlAttribute attrType = docXml.CreateAttribute("type");
-            //    attrType.Value = "img";
-            //    XmlAttribute attrWidth = docXml.CreateAttribute("width");
-            //    attrWidth.Value = "50";
-            //    XmlAttribute attrId = docXml.CreateAttribute("id");
-            //    attrId.Value = "~Icon";
-
-            //    ndNewColumn.Attributes.Append(attrType);
-            //    ndNewColumn.Attributes.Append(attrWidth);
-            //    ndNewColumn.Attributes.Append(attrId);
-            //    ndHead.AppendChild(ndNewColumn);
-
-            //    arrColumns.Add("~Icon");
-            //}
-            //catch { }
-            int counter = 0;
-            foreach (XmlNode ndColumn in ndCurrentView.SelectNodes("Column"))
+            foreach (XmlNode column in ndCurrentView.SelectNodes("Column"))
             {
-                string name = "";
-                string displayname = "";
-                string width = "*";
-                string format = "";
+                var name = string.Empty;
+                var displayName = string.Empty;
+                var width = "*";
+                var format = string.Empty;
                 try
                 {
-                    name =  ndColumn.Attributes["Name"].Value;
-                }catch{}
+                    name = column.Attributes["Name"].Value;
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
                 try
                 {
-                    format = ndColumn.Attributes["Format"].Value;
+                    format = column.Attributes["Format"].Value;
                 }
-                catch { }
-                 try
+                catch (Exception ex)
                 {
-                    displayname = ndColumn.Attributes["Display"].Value;
-                }catch{}
+                    TraceError("Exception Suppressed {0}", ex);
+                }
                 try
                 {
-                    width = ndColumn.Attributes["Width"].Value;
+                    displayName = column.Attributes["Display"].Value;
                 }
-                catch { }
-                XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-                ndNewColumn.InnerText = displayname;
-                
-                XmlAttribute attrType = docXml.CreateAttribute("type");
-                XmlAttribute attrWidth = docXml.CreateAttribute("width");
-                XmlAttribute attrAlign = docXml.CreateAttribute("align");
-                
-                attrAlign.Value = "left";
-                attrWidth.Value = width;
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+                try
+                {
+                    width = column.Attributes["Width"].Value;
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+                var newColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+                newColumn.InnerText = displayName;
 
-                if (name == "Title")
-                {
-                    attrType.Value = "tree";
-                }
-                else if (name == "~Icon")
-                {
-                    ndNewColumn.InnerText = "Type";
-                    attrWidth.Value = "50";
-                    attrAlign.Value = "center";
-                    attrType.Value = "img";
-                }
-                else if (name == "~Complete")
-                {
-                    ndNewColumn.InnerText = "Complete";
-                    attrWidth.Value = "80";
-                    attrAlign.Value = "center";
-                    attrType.Value = "ch";
-                }
-                else if (name == "~List")
-                {
-                    ndNewColumn.InnerText = "List Name";
-                    attrWidth.Value = "150";
-                    attrAlign.Value = "left";
-                    attrType.Value = "ro";
-                }
-                else if (name == "~Site")
-                {
-                    ndNewColumn.InnerText = "Site Name";
-                    attrWidth.Value = "150";
-                    attrAlign.Value = "left";
-                    attrType.Value = "ro";
-                }
-                else
-                {
-                    if (format == "Percent")
-                    {
-                        attrType.Value = "edn";
-                        attrWidth.Value = "90";
-                        attrAlign.Value = "right";
-                        XmlNode callNode = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
-                        XmlAttribute attr = docXml.CreateAttribute("command");
-                        attr.Value = "setNumberFormat";
-                        callNode.Attributes.Append(attr);
-                        callNode.InnerXml = "<param>000%</param><param>" + counter.ToString() + "</param>";
-                        beforeInitNode.AppendChild(callNode);
-                    }
-                    else if (format == "DateTime" || format=="DateOnly" || format== "Currency")
-                    {
-                        attrType.Value = "ro";
-                        attrWidth.Value = "80";
-                        attrAlign.Value = "right";
-                    }
-                    else if (format == "Indicator")
-                    {
-                        attrType.Value = "ro";
-                        attrWidth.Value = "80";
-                        attrAlign.Value = "center";
-                    }
+                XmlAttribute attributeWidth;
+                XmlAttribute attributeAlign;
+                XmlAttribute attributeId;
 
-                    else if (format == "Number")
-                    {
-                        attrType.Value = "edn";
-                    }
-                    else
-                        attrType.Value = "ed";
-                }
-                if(width != "*")
-                    attrWidth.Value = width;
+                GetAttributes(
+                    width,
+                    name,
+                    newColumn,
+                    format,
+                    counter,
+                    beforeInitNode,
+                    out attributeWidth,
+                    out attributeAlign,
+                    out attributeId);
 
-                XmlAttribute attrId = docXml.CreateAttribute("id");
-                attrId.Value = name;
-
-                if(attrType.Value != "")
-                    ndNewColumn.Attributes.Append(attrType);
-
-                ndNewColumn.Attributes.Append(attrWidth);
-                ndNewColumn.Attributes.Append(attrId);
-                ndNewColumn.Attributes.Append(attrAlign);
-                ndHead.AppendChild(ndNewColumn);
+                WriteAttributes(newColumn, attributeWidth, attributeId, attributeAlign, head);
 
                 arrColumns.Add(name);
                 counter++;
             }
-            //try
-            //{
-            //    if (ndCurrentView.Attributes["ShowCompleteCheck"].Value == "1")
-            //    {
-            //        XmlNode ndNewColumn = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            //        ndNewColumn.InnerText = "Complete";
+        }
 
-            //        XmlAttribute attrType = docXml.CreateAttribute("type");
-            //        attrType.Value = "ch";
-            //        XmlAttribute attrWidth = docXml.CreateAttribute("width");
-            //        attrWidth.Value = "70";
-            //        XmlAttribute attrAlign = docXml.CreateAttribute("align");
-            //        attrAlign.Value = "center";
-            //        XmlAttribute attrId = docXml.CreateAttribute("id");
-            //        attrId.Value = "~CompleteCheck";
+        private static void WriteAttributes(
+            XmlNode newColumn,
+            XmlAttribute attributeWidth,
+            XmlAttribute attributeId,
+            XmlAttribute attributeAlign,
+            XmlNode head)
+        {
+            newColumn.Attributes.Append(attributeWidth);
+            newColumn.Attributes.Append(attributeId);
+            newColumn.Attributes.Append(attributeAlign);
+            head.AppendChild(newColumn);
+        }
 
-            //        ndNewColumn.Attributes.Append(attrType);
-            //        ndNewColumn.Attributes.Append(attrWidth);
-            //        ndNewColumn.Attributes.Append(attrAlign);
-            //        ndNewColumn.Attributes.Append(attrId);
-            //        ndHead.AppendChild(ndNewColumn);
+        private void GetAttributes(
+            string width,
+            string name,
+            XmlNode newColumn,
+            string format,
+            int counter,
+            XmlNode beforeInitNode,
+            out XmlAttribute attributeWidth,
+            out XmlAttribute attributeAlign,
+            out XmlAttribute attributeId)
+        {
+            var attributeType = docXml.CreateAttribute("type");
+            attributeWidth = docXml.CreateAttribute("width");
+            attributeAlign = docXml.CreateAttribute("align");
 
-            //        arrColumns.Add("~CompleteCheck");
-            //    }
-            //}
-            //catch { }
-            
+            attributeAlign.Value = "left";
+            attributeWidth.Value = width;
+
+            if (name == "Title")
+            {
+                attributeType.Value = "tree";
+            }
+            else if (name == "~Icon")
+            {
+                newColumn.InnerText = "Type";
+                attributeWidth.Value = "50";
+                attributeAlign.Value = CenterAlignment;
+                attributeType.Value = "img";
+            }
+            else if (name == "~Complete")
+            {
+                newColumn.InnerText = "Complete";
+                attributeWidth.Value = "80";
+                attributeAlign.Value = CenterAlignment;
+                attributeType.Value = "ch";
+            }
+            else if (name == "~List")
+            {
+                newColumn.InnerText = "List Name";
+                attributeWidth.Value = "150";
+                attributeAlign.Value = "left";
+                attributeType.Value = "ro";
+            }
+            else if (name == "~Site")
+            {
+                newColumn.InnerText = "Site Name";
+                attributeWidth.Value = "150";
+                attributeAlign.Value = "left";
+                attributeType.Value = "ro";
+            }
+            else
+            {
+                GetNumericAttributes(format, counter, beforeInitNode, attributeWidth, attributeAlign, attributeType);
+            }
+            if (width != "*")
+            {
+                attributeWidth.Value = width;
+            }
+
+            attributeId = docXml.CreateAttribute("id");
+            attributeId.Value = name;
+
+            if (attributeType.Value != string.Empty)
+            {
+                newColumn.Attributes.Append(attributeType);
+            }
+        }
+
+        private void GetNumericAttributes(
+            string format,
+            int counter,
+            XmlNode beforeInitNode,
+            XmlAttribute attributeWidth,
+            XmlAttribute attributeAlign,
+            XmlAttribute attributeType)
+        {
+            if (format == "Percent")
+            {
+                attributeType.Value = "edn";
+                attributeWidth.Value = "90";
+                attributeAlign.Value = "right";
+                var callNode = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
+                var attr = docXml.CreateAttribute("command");
+                attr.Value = "setNumberFormat";
+                callNode.Attributes.Append(attr);
+                callNode.InnerXml = string.Format("<param>000%</param><param>{0}</param>", counter);
+                beforeInitNode.AppendChild(callNode);
+            }
+            else if (format == "DateTime" || format == "DateOnly" || format == "Currency")
+            {
+                attributeType.Value = "ro";
+                attributeWidth.Value = "80";
+                attributeAlign.Value = "right";
+            }
+            else if (format == "Indicator")
+            {
+                attributeType.Value = "ro";
+                attributeWidth.Value = "80";
+                attributeAlign.Value = CenterAlignment;
+            }
+
+            else if (format == "Number")
+            {
+                attributeType.Value = "edn";
+            }
+            else
+            {
+                attributeType.Value = "ed";
+            }
         }
     }
 }
