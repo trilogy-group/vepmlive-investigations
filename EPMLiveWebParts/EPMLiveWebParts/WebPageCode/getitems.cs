@@ -5,6 +5,7 @@ using System.Xml;
 using Microsoft.SharePoint;
 using System.Xml.XPath;
 using static System.Diagnostics.Trace;
+using System.Text;
 
 namespace EPMLiveWebParts
 {
