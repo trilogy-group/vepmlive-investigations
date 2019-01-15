@@ -1,17 +1,16 @@
 ﻿using System;
-using EPMLiveCore.Infrastructure;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using System.Web;
 using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Web.CommandUI;
 using System.Reflection;
 using System.Text;
 using System.Web.UI.WebControls;
 using System.Data;
-using System.Data.SqlClient;
+using EPMLiveCore.Infrastructure;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebControls;
+using DiagnosticTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveWorkPlanner.Layouts.epmlive
 {
@@ -99,6 +98,10 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         protected EPMLiveCore.TimeDebug tb;
         protected string timerString;
+
+        private const int AssignmentsIndex = 9;
+        private const int SummaryIndex = 10;
+        private const int AllocationIndex = 11;
 
         public string EPMLiveVersion
         {
@@ -749,155 +752,94 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         }
 
-        private StringBuilder GetViewString(string[] props, string[] agileprops)
+        private StringBuilder GetViewString(string[] properties, string[] agileProperties)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (props.Length > 1)
+            var viewString = new StringBuilder();
+            if (properties.Length <= 1)
             {
-
-                sb.Append("\"");
-                sb.Append(GetCleanString(props[0].ToString()));
-                sb.Append("\"");
-                sb.Append(": {");
-                sb.Append("title: \"");
-                sb.Append(HttpUtility.HtmlEncode(props[0].ToString()).Replace("'", ""));
-                sb.Append("\",");
-                sb.Append("leftCols: \"");
-                sb.Append(props[1]);
-                sb.Append("\",");
-                sb.Append("cols: \"");
-                sb.Append(props[2]);
-                sb.Append("\",");
-                sb.Append("filters: \"");
-                sb.Append(props[3]);
-                sb.Append("\",");
-                sb.Append("grouping: \"");
-                sb.Append(props[4]);
-                sb.Append("\",");
-                sb.Append("sorting: \"");
-                sb.Append(props[5]);
-                sb.Append("\",");
-                sb.Append("gantt: \"");
-                sb.Append(props[6]);
-                sb.Append("\",");
-                sb.Append("details: \"");
-                sb.Append(props[7]);
-                sb.Append("\",");
-
-                try
-                {
-                    if (props.Length > 9)
-                    {
-                        sb.Append("assignments: \"");
-                        sb.Append(props[9]);
-                        sb.Append("\",");
-                    }
-                }
-                catch { }
-                try
-                {
-                    if (props.Length > 10)
-                    {
-                        sb.Append("summary: \"");
-                        sb.Append(props[10]);
-                        sb.Append("\",");
-                    }
-                }
-                catch { }
-                try
-                {
-                    if (props.Length > 11)
-                    {
-                        sb.Append("allocation: \"");
-                        sb.Append(props[11]);
-                        sb.Append("\",");
-                    }
-                }
-                catch { }
-
-               
-                if (bAgile)
-                {
-                    try
-                    {
-                        if (agileprops.Length > 0)
-                        {
-                            sb.Append("agileleft: \"");
-                            sb.Append(agileprops[0]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        if (agileprops.Length > 1)
-                        {
-                            sb.Append("agilecols: \"");
-                            sb.Append(agileprops[1]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        if (agileprops.Length > 2)
-                        {
-                            sb.Append("agilefilters: \"");
-                            sb.Append(agileprops[2]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        if (agileprops.Length > 3)
-                        {
-                            sb.Append("agilegrouping: \"");
-                            sb.Append(agileprops[3]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        if (agileprops.Length > 4)
-                        {
-                            sb.Append("agilesorting: \"");
-                            sb.Append(agileprops[4]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        if (agileprops.Length > 5)
-                        {
-                            sb.Append("agilegantt: \"");
-                            sb.Append(agileprops[5]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        if (agileprops.Length > 6)
-                        {
-                            sb.Append("backlog: \"");
-                            sb.Append(agileprops[6]);
-                            sb.Append("\",");
-                        }
-                    }
-                    catch { }
-                }
-
-                sb.Append("folders: \"");
-                sb.Append(props[8]);
-                sb.Append("\"");
-                sb.Append("}");
+                return viewString;
             }
-            return sb;
+
+            viewString.Append("\"");
+            viewString.Append(GetCleanString(properties[0]));
+            viewString.Append("\"");
+            viewString.Append(": {");
+            viewString.Append("title: \"");
+            viewString.Append(HttpUtility.HtmlEncode(properties[0]).Replace("'", string.Empty));
+            viewString.Append("\",");
+            viewString.Append("leftCols: \"");
+            viewString.Append(properties[1]);
+            viewString.Append("\",");
+            viewString.Append("cols: \"");
+            viewString.Append(properties[2]);
+            viewString.Append("\",");
+            viewString.Append("filters: \"");
+            viewString.Append(properties[3]);
+            viewString.Append("\",");
+            viewString.Append("grouping: \"");
+            viewString.Append(properties[4]);
+            viewString.Append("\",");
+            viewString.Append("sorting: \"");
+            viewString.Append(properties[5]);
+            viewString.Append("\",");
+            viewString.Append("gantt: \"");
+            viewString.Append(properties[6]);
+            viewString.Append("\",");
+            viewString.Append("details: \"");
+            viewString.Append(properties[7]);
+            viewString.Append("\",");
+            
+            if (properties.Length > AssignmentsIndex)
+            {
+                viewString.Append($"assignments: \"{properties[AssignmentsIndex]}\",");
+            }
+
+            if (properties.Length > SummaryIndex)
+            {
+                viewString.Append($"summary: \"{properties[SummaryIndex]}\",");
+            }
+
+            if (properties.Length >= AllocationIndex)
+            {
+                viewString.Append($"allocation: \"{properties[AllocationIndex]}\",");
+            }
+
+            if (bAgile)
+            {
+                AddAgileViewString(agileProperties, viewString);
+            }
+
+            viewString.Append("folders: \"");
+            viewString.Append(properties[8]);
+            viewString.Append("\"");
+            viewString.Append("}");
+            return viewString;
+        }
+        
+        private void AddAgileViewString(string[] agileProperties, StringBuilder viewString)
+        {
+            var viewStringArray = new string[]
+            {
+                "agileleft",
+                "agilecols",
+                "agilefilters",
+                "agilegrouping",
+                "agilesorting",
+                "agilegantt",
+                "backlog"
+            };
+
+            for (var index = 0; index < agileProperties.Length; index++)
+            {
+                try
+                {
+                    viewString.Append($"{viewStringArray[index]}: \"{agileProperties[index]}\",");
+                }
+                catch (Exception ex)
+                {
+                    DiagnosticTrace.TraceError("Exception thrown: {0}", ex);
+                }
+            }
         }
 
         protected void GetResourceList(SPWeb web)

@@ -21,7 +21,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         private getworkspacexml _testEntity;
         private PrivateObject _privateObject;
 
-        private const string AddWebsMethodName = "addWebs";
+        private const string AddWebsMethodName = "AddWebs";
 
         private ShimSPWeb _spWeb;
         private XmlDocument _doc;
