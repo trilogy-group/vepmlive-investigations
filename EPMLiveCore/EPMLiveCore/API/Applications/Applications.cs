@@ -7,12 +7,14 @@ using System.Net;
 using System.Xml;
 using Microsoft.SharePoint;
 using System.Collections;
+using System.Diagnostics;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.SharePoint.Navigation;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.IO;
+using EPMLiveCore.WorkEngineSolutionStoreListSvc;
 
 namespace EPMLiveCore.API
 {
@@ -65,6 +67,7 @@ namespace EPMLiveCore.API
         private const string QuickLaunchFieldName = "QuickLaunch";
         private const string ExtIdFieldName = "EXTID";
         private const string DescriptionFieldName = "Description";
+        private const string RowLimit = "10000";
 
         public static string getAttribute(XmlNode nd, string attribute)
         {
@@ -1577,135 +1580,56 @@ namespace EPMLiveCore.API
 
         public static ApplicationDef GetApplicationInfo(string id)
         {
-            string storeurl = CoreFunctions.getFarmSetting("workenginestore");
+            var storeUrl = CoreFunctions.getFarmSetting("workenginestore");
 
-            ServicePointManager.ServerCertificateValidationCallback +=
-            delegate(
-                object sender,
-                X509Certificate certificate,
-                X509Chain chain,
-                SslPolicyErrors sslPolicyErrors)
+            ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
+
+            var listSvc = new Lists
             {
-                return true;
+                Url = string.Format("{0}_vti_bin/lists.asmx", storeUrl),
+                Credentials = CoreFunctions.GetStoreCreds()
             };
 
-            WorkEngineSolutionStoreListSvc.Lists listSvc = new WorkEngineSolutionStoreListSvc.Lists();
-            listSvc.Url = storeurl + "_vti_bin/lists.asmx";
-            listSvc.Credentials = CoreFunctions.GetStoreCreds();
+            var applicationDefinition = new ApplicationDef();
+            var nodes = GetDocumentNodes(id, listSvc);
 
-            ApplicationDef appDef = new ApplicationDef();
-
-            XmlDocument xDoc = new XmlDocument();
-
-            XmlNode ndQuery = xDoc.CreateNode(XmlNodeType.Element, "Query", "");
-            ndQuery.InnerXml = "<Where><Eq><FieldRef Name='UID' /><Value Type='Text'>" + id + "</Value></Eq></Where>";
-
-            XmlNode ndQueryOptions = xDoc.CreateNode(XmlNodeType.Element, "QueryOptions", "");
-            ndQueryOptions.InnerXml = "";
-
-            XmlNode ndViewFields = xDoc.CreateNode(XmlNodeType.Element, "ViewFields", "");
-            ndViewFields.InnerXml = "<FieldRef Name='Title'/><FieldRef Name='ShortDescription'/><FieldRef Name='PreReqs'/><FieldRef Name='Icon'/><FieldRef Name='AppVersion'/><FieldRef Name='PreReqs_x003a_UID'/>";
-
-            XmlNode ndItems = listSvc.GetListItems("Applications", null, ndQuery, ndViewFields, "10000", ndQueryOptions, null);
-
-
-
-            foreach (XmlNode nd in ndItems.ChildNodes)
+            foreach (XmlNode node in nodes.ChildNodes)
             {
-                if (nd.Name == "rs:data")
+                if (node.Name == "rs:data")
                 {
-                    foreach (XmlNode ndChild in nd.ChildNodes)
+                    foreach (XmlNode childNode in node.ChildNodes)
                     {
-                        if (ndChild.Name == "z:row")
+                        if (childNode.Name == "z:row")
                         {
-                            string versionInfo = GetVersionFolder(listSvc, getAttribute(ndChild, "ows_Title"));
+                            string rootFilePath;
+                            string xml;
+                            SetApplicationDefinitionProperties(
+                                id,
+                                listSvc,
+                                childNode,
+                                applicationDefinition,
+                                out rootFilePath,
+                                out xml);
 
-                            if (versionInfo != "")
+                            if (!LoadApplicationDefinition(rootFilePath, xml, applicationDefinition))
                             {
-                                appDef.AppAssemblyVersion = versionInfo;
-                                versionInfo = "/VERSION_" + versionInfo;
+                                return applicationDefinition;
                             }
 
-                            string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
-                            string sXml = "";
-                            appDef.fullurl = rootFilePath;
-                            appDef.appurl = "Applications/" + getAttribute(ndChild, "ows_Title") + versionInfo;
-                            appDef.Title = getAttribute(ndChild, "ows_Title");
-                            appDef.Icon = getAttribute(ndChild, "ows_Icon");
-                            if (appDef.AppAssemblyVersion != "")
-                            {
-                                appDef.Version = appDef.AppAssemblyVersion + "_" + getAttribute(ndChild, "ows_AppVersion");
-                            }
-                            else
-                                appDef.Version = getAttribute(ndChild, "ows_AppVersion");
+                            GetApplicationDefinitionAttributes(applicationDefinition);
 
-                            try
+                            var lookUpValues = getAttribute(childNode, "ows_PreReqs");
+                            if (lookUpValues != string.Empty)
                             {
-                                appDef.Icon = new SPFieldUrlValue(appDef.Icon).Url;
-                            }
-                            catch { }
-                            appDef.Id = int.Parse(id);
-
-
-                            try
-                            {
-                                using (WebClient webClient = new WebClient())
+                                var counter = 0;
+                                var lookUpUId = new SPFieldLookupValueCollection(
+                                    getAttribute(childNode, "ows_PreReqs_x003a_UID"));
+                                var lookupValueCollection = new SPFieldLookupValueCollection(lookUpValues);
+                                foreach (var lookupValue in lookupValueCollection)
                                 {
-                                    webClient.Credentials = CoreFunctions.GetStoreCreds();
-                                    byte[] fileBytes = null;
-                                    fileBytes = webClient.DownloadData(rootFilePath + "/Feature.xml");
-                                    System.Text.Encoding enc = System.Text.Encoding.ASCII;
-                                    sXml = enc.GetString(fileBytes).TrimStart('?');
-                                    fileBytes = null;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                if (ex.Message.EndsWith("(404) Not Found."))
-                                {
-                                    appDef.loadErrorMessage = "No application for your version was found.";
-                                    return appDef;
-                                }
-                            }
-                            appDef.ApplicationXml.LoadXml(sXml);
-
-                            try
-                            {
-                                if (appDef.ApplicationXml.FirstChild.SelectSingleNode("//Features/Feature[@ID='12345678-0000-0000-0000-000000000000']") != null)
-                                {
-                                    appDef.loadErrorMessage = "No application for your version was found.";
-                                    return appDef;
-                                }
-                            }
-                            catch { }
-
-                            try
-                            {
-                                appDef.Visible = bool.Parse(appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application").Attributes["Visible"].Value);
-                            }
-                            catch { }
-
-                            try
-                            {
-                                appDef.ParentApplications = appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application").Attributes["ParentApplications"].Value.Split(',');
-                            }
-                            catch { }
-
-                            try
-                            {
-                                appDef.Community = appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application").Attributes["Community"].Value;
-                            }
-                            catch { }
-
-                            string sLvc = getAttribute(ndChild, "ows_PreReqs");
-                            if (sLvc != "")
-                            {
-                                int counter = 0;
-                                SPFieldLookupValueCollection lvcuid = new SPFieldLookupValueCollection(getAttribute(ndChild, "ows_PreReqs_x003a_UID"));
-                                SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(sLvc);
-                                foreach (SPFieldLookupValue lv in lvc)
-                                {
-                                    appDef.PreReqs.Add(lvcuid[counter].LookupValue, lv.LookupValue);
+                                    applicationDefinition.PreReqs.Add(
+                                        lookUpUId[counter].LookupValue,
+                                        lookupValue.LookupValue);
                                     counter++;
                                 }
                             }
@@ -1714,7 +1638,162 @@ namespace EPMLiveCore.API
                 }
             }
 
-            return appDef;
+            return applicationDefinition;
+        }
+
+        private static void SetApplicationDefinitionProperties(
+            string id,
+            Lists listSvc,
+            XmlNode childNode,
+            ApplicationDef applicationDefinition,
+            out string rootFilePath,
+            out string xml)
+        {
+            var versionInfo = GetVersionFolder(listSvc, getAttribute(childNode, "ows_Title"));
+
+            if (versionInfo != string.Empty)
+            {
+                applicationDefinition.AppAssemblyVersion = versionInfo;
+                versionInfo = $"/VERSION_{versionInfo}";
+            }
+
+            rootFilePath = string.Format(
+                "{0}Applications/{1}{2}",
+                CoreFunctions.getFarmSetting("WorkEngineStore"),
+                getAttribute(childNode, "ows_Title"),
+                versionInfo);
+            xml = string.Empty;
+            applicationDefinition.fullurl = rootFilePath;
+            applicationDefinition.appurl = string.Format(
+                "Applications/{0}{1}",
+                getAttribute(childNode, "ows_Title"),
+                versionInfo);
+            applicationDefinition.Title = getAttribute(childNode, "ows_Title");
+            applicationDefinition.Icon = getAttribute(childNode, "ows_Icon");
+            applicationDefinition.Version = applicationDefinition.AppAssemblyVersion != string.Empty
+                ? string.Format(
+                    "{0}_{1}",
+                    applicationDefinition.AppAssemblyVersion,
+                    getAttribute(childNode, "ows_AppVersion"))
+                : getAttribute(childNode, "ows_AppVersion");
+
+            try
+            {
+                applicationDefinition.Icon = new SPFieldUrlValue(applicationDefinition.Icon).Url;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            applicationDefinition.Id = int.Parse(id);
+        }
+
+        private static bool LoadApplicationDefinition(
+            string rootFilePath,
+            string xml,
+            ApplicationDef applicationDefinition)
+        {
+            try
+            {
+                using (var webClient = new WebClient())
+                {
+                    webClient.Credentials = CoreFunctions.GetStoreCreds();
+                    var fileBytes = webClient.DownloadData(string.Format("{0}/Feature.xml", rootFilePath));
+                    var encoding = Encoding.ASCII;
+                    xml = encoding.GetString(fileBytes).TrimStart('?');
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                if (ex.Message.EndsWith("(404) Not Found."))
+                {
+                    applicationDefinition.loadErrorMessage = "No application for your version was found.";
+                    return false;
+                }
+            }
+            applicationDefinition.ApplicationXml.LoadXml(xml);
+
+            try
+            {
+                if (applicationDefinition.ApplicationXml.FirstChild.SelectSingleNode(
+                        "//Features/Feature[@ID='12345678-0000-0000-0000-000000000000']")
+                    != null)
+                {
+                    applicationDefinition.loadErrorMessage = "No application for your version was found.";
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception has been Suppressed {0}", ex);
+            }
+            return true;
+        }
+
+        private static void GetApplicationDefinitionAttributes(ApplicationDef applicationDefinition)
+        {
+            var firstChild = applicationDefinition.ApplicationXml.FirstChild;
+            try
+            {
+                bool.TryParse(
+                    firstChild.SelectSingleNode("//Application").Attributes["Visible"].Value,
+                    out applicationDefinition.Visible);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Suppressed Exception {0}", ex);
+            }
+
+            try
+            {
+                applicationDefinition.ParentApplications = firstChild.SelectSingleNode("//Application")
+                    .Attributes["ParentApplications"]
+                    .Value.Split(',');
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed: {0}", ex);
+            }
+
+            try
+            {
+                applicationDefinition.Community =
+                    firstChild.SelectSingleNode("//Application").Attributes["Community"].Value;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Suppressed Exception: {0}", ex);
+            }
+        }
+
+        private static XmlNode GetDocumentNodes(string id, Lists listSvc)
+        {
+            var xmlDocument = new XmlDocument();
+
+            var query = xmlDocument.CreateNode(XmlNodeType.Element, "Query", string.Empty);
+            query.InnerXml = string.Format(
+                "<Where><Eq><FieldRef Name='UID' /><Value Type='Text'>{0}</Value></Eq></Where>",
+                id);
+
+            var queryOptions = xmlDocument.CreateNode(XmlNodeType.Element, "QueryOptions", string.Empty);
+            queryOptions.InnerXml = string.Empty;
+
+            var viewFields = xmlDocument.CreateNode(XmlNodeType.Element, "ViewFields", string.Empty);
+            viewFields.InnerXml =
+                "<FieldRef Name='Title'/><FieldRef Name='ShortDescription'/><FieldRef Name='PreReqs'/>"
+                + "<FieldRef Name='Icon'/><FieldRef Name='AppVersion'/><FieldRef Name='PreReqs_x003a_UID'/>";
+
+            var nodes = listSvc.GetListItems(
+                "Applications",
+                null,
+                query,
+                viewFields,
+                RowLimit,
+                queryOptions,
+                null);
+            return nodes;
         }
 
         public static DataTable GetApplications(string dataxml)
