@@ -103,156 +103,165 @@ namespace EPMLiveCore.Jobs
             LogDetailedErrors = false;
             ErrorLogDetailLevel = ErrorLogDetailLevelEnum.SectionLevelErrors;
 
-            //using (SPWeb web = site.RootWeb)
+            sMainURL = web.Url;
+
+            try
             {
-                //==========================================
-                sMainURL = web.Url;
-
-                try
+                var properties = web.Properties;
+                if (properties.ContainsKey("EPMLiveNotificationLists"))
                 {
-                    if (web.Properties.ContainsKey("EPMLiveNotificationLists"))
+                    if (properties["EPMLiveNotificationLists"] != null && properties["EPMLiveNotificationLists"].Trim() != "")
                     {
-                        if ((web.Properties["EPMLiveNotificationLists"] != null && web.Properties["EPMLiveNotificationLists"].Trim() != ""))
+                        using (dsSectionTables = new DataSet())
                         {
-                            using (dsSectionTables = new DataSet())
+                            var notificationLists = properties["EPMLiveNotificationLists"];
+                            createSectionTables(notificationLists); // create tables that will be re-used per user loop to minimize memory overhead
+
+                            SetNotificationEmail(properties);
+                            OverrideNotificationSubject(properties);
+                            SetNotificationNote(properties);
+                            SetBlogDetailErrors(properties);
+
+                            if (sFromEmail != string.Empty)
                             {
+                                var notificationUserList = new StringBuilder(string.Empty);
 
-                                string sNotificationLists = web.Properties["EPMLiveNotificationLists"];
-                                createSectionTables(sNotificationLists); // create tables that will be re-used per user loop to minimize memory overhead
+                                EnumerateSiteUsers(site, properties, notificationUserList);
 
+                                ProcessNotification(web, notificationUserList, notificationLists);
 
-                                if (web.Properties.ContainsKey("EPMLiveNotificationEmail"))
-                                {
-                                    sFromEmail = web.Properties["EPMLiveNotificationEmail"];
-                                }
-
-                                // override the default subject line
-                                if (web.Properties.ContainsKey("EPMLiveNotificationEmailSubject"))
-                                {
-                                    sSubject = web.Properties["EPMLiveNotificationEmailSubject"];
-                                }
-
-                                if (web.Properties.ContainsKey("EPMLiveNotificationNote"))
-                                {
-                                    sNote = web.Properties["EPMLiveNotificationNote"];
-                                }
-
-                                //-- EPML 1901
-                                if (web.Properties.ContainsKey("EPMLiveLogDetailedErrors"))
-                                {
-                                    if (web.Properties["EPMLiveLogDetailedErrors"].ToUpper() == "TRUE")
-                                        bLogDetailedErrors = true;
-                                    else
-                                        bLogDetailedErrors = false;
-                                }
-
-                                if (sFromEmail != "")
-                                {
-                                    StringBuilder sNotificationUserList = new StringBuilder(string.Empty);
-
-                                    //Loop through all site users
-                                    foreach (SPUser siteUser in site.RootWeb.SiteUsers)
-                                    {
-                                        if (siteUser.Name.ToLower() != "system account")
-                                        {
-                                            bool bFound = false;
-                                            //Get all OptedOut users
-                                            string sOptedOutUsers = web.Properties["EPMLiveNotificationOptedOutUsers"];
-                                            if (sOptedOutUsers != null && sOptedOutUsers.Trim() != string.Empty)
-                                            {
-                                                string[] arrOptedOutUsers = sOptedOutUsers.Split('|');
-                                                bFound = false;
-                                                foreach (string sUser in arrOptedOutUsers)
-                                                {
-                                                    if (sUser.Trim().Length > 0)
-                                                    {
-                                                        string[] sUserIDNameSplit = sUser.Replace("#", "").Split(';');
-                                                        try
-                                                        {
-                                                            if (siteUser.ID.ToString().Trim() == sUserIDNameSplit[0].Trim())
-                                                            {
-                                                                bFound = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                        catch (Exception ex)
-                                                        {
-                                                            throw ex; //TODO anything else to do here??
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            //If the Site user is NOT present in the OptedOut list then send notification to the user
-                                            if (!bFound)
-                                            {
-                                                //sNotificationOptedOutUsers += li.Value + ";#" + li.Text + "|";
-                                                sNotificationUserList.Append(siteUser.ID.ToString());
-                                                sNotificationUserList.Append(";#");
-                                                sNotificationUserList.Append((siteUser.Email != string.Empty) ? siteUser.Name + " (" + siteUser.Email + ")" : siteUser.Name);
-                                                sNotificationUserList.Append("|");
-                                            }
-                                        }
-                                    }
-
-                                    //Process Notification
-                                    //try
-                                    //{
-                                    float processedUsers = 0;
-                                    //Get all users to send notification                                    
-                                    if (sNotificationUserList != null)
-                                    {
-                                        string[] arrNotificationUsers = sNotificationUserList.ToString().Split('|');
-                                        totalCount = arrNotificationUsers.Length;
-
-                                        foreach (string sUser in arrNotificationUsers)
-                                        {
-                                            if (sUser != null && sUser.Trim().Length > 0)
-                                            {
-                                                try
-                                                {
-                                                    // tables are created. fill with data
-                                                    SPFieldLookupValue lv = new SPFieldLookupValue(sUser);
-                                                    SPUser spUser = null;
-                                                    try
-                                                    {
-                                                        spUser = web.AllUsers.GetByID(lv.LookupId);
-                                                    }
-                                                    catch { }
-                                                    if (spUser != null)
-                                                    {
-                                                        processUser(spUser, web, lv.LookupId, sNotificationLists);
-                                                    }
-                                                    updateProgress(processedUsers++);
-                                                }
-                                                catch (Exception exc)
-                                                {
-                                                    logException("NotificationListsJob.ExecuteJob", exc.Message, "User: " + sUser);
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                    //}
-                                    //catch (Exception exc)
-                                    //{
-                                    //logException("NotificationListsJob.ExecuteJob", exc.Message, "User: " + siteUser.ID.ToString() + siteUser.Name);
-                                    //}
-
-                                    //-- End EPML 1901 --
-                                }
+                                //-- End EPML 1901 --
                             }
                         }
                     }
                 }
-                catch (Exception exc)
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("Exception Suppressed {0}", exc);
+                logException("NotificationListsJob.ExecuteJob", exc.Message, string.Empty);
+            }
+            finally
+            {
+                GC.Collect();
+            }
+        }
+
+        private void SetNotificationEmail(SPPropertyBag properties)
+        {
+            if (properties.ContainsKey("EPMLiveNotificationEmail"))
+            {
+                sFromEmail = properties["EPMLiveNotificationEmail"];
+            }
+        }
+
+        private void OverrideNotificationSubject(SPPropertyBag properties)
+        {
+            // override the default subject line
+            if (properties.ContainsKey("EPMLiveNotificationEmailSubject"))
+            {
+                sSubject = properties["EPMLiveNotificationEmailSubject"];
+            }
+        }
+
+        private void SetNotificationNote(SPPropertyBag properties)
+        {
+            if (properties.ContainsKey("EPMLiveNotificationNote"))
+            {
+                sNote = properties["EPMLiveNotificationNote"];
+            }
+        }
+
+        private void SetBlogDetailErrors(SPPropertyBag properties)
+        {
+            //-- EPML 1901
+            if (properties.ContainsKey("EPMLiveLogDetailedErrors"))
+            {
+                bLogDetailedErrors = string.Equals(properties["EPMLiveLogDetailedErrors"], bool.TrueString, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        private static void EnumerateSiteUsers(SPSite site, SPPropertyBag properties, StringBuilder notificationUserList)
+        {
+            //Loop through all site users
+            foreach (SPUser siteUser in site.RootWeb.SiteUsers)
+            {
+                if (!string.Equals(siteUser.Name, "system account", StringComparison.OrdinalIgnoreCase))
                 {
-                    logException("NotificationListsJob.ExecuteJob", exc.Message, "");
+                    var found = false;
+
+                    //Get all OptedOut users
+                    var optedOutUsers = properties["EPMLiveNotificationOptedOutUsers"];
+                    if (optedOutUsers != null && optedOutUsers.Trim() != string.Empty)
+                    {
+                        var optedOutUsersList = optedOutUsers.Split('|');
+                        foreach (var user in optedOutUsersList)
+                        {
+                            if (user.Trim().Length > 0)
+                            {
+                                var userIdNameSplit = user.Replace("#", string.Empty).Split(';');
+                                if (siteUser.ID.ToString().Trim() == userIdNameSplit[0].Trim())
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    //If the Site user is NOT present in the OptedOut list then send notification to the user
+                    if (!found)
+                    {
+                        notificationUserList.Append(siteUser.ID.ToString());
+                        notificationUserList.Append(";#");
+                        notificationUserList.Append(
+                            siteUser.Email != string.Empty
+                                ? string.Format("{0} ({1})", siteUser.Name, siteUser.Email)
+                                : siteUser.Name);
+                        notificationUserList.Append("|");
+                    }
                 }
-                finally
+            }
+        }
+
+        private void ProcessNotification(SPWeb web, StringBuilder notificationUserList, string notificationLists)
+        {
+            //Process Notification
+            float processedUsers = 0;
+
+            //Get all users to send notification                                    
+            if (notificationUserList != null)
+            {
+                var notificationUsers = notificationUserList.ToString().Split('|');
+                totalCount = notificationUsers.Length;
+
+                foreach (var user in notificationUsers.Where(user => user != null && user.Trim().Length > 0))
                 {
-                    GC.Collect();
+                    try
+                    {
+                        // tables are created. fill with data
+                        var lookupValue = new SPFieldLookupValue(user);
+                        SPUser spUser = null;
+                        try
+                        {
+                            spUser = web.AllUsers.GetByID(lookupValue.LookupId);
+                        }
+                        catch (Exception exc)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", exc);
+                        }
+                        if (spUser != null)
+                        {
+                            processUser(spUser, web, lookupValue.LookupId, notificationLists);
+                        }
+                        updateProgress(processedUsers++);
+                    }
+                    catch (Exception exc)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", exc);
+                        logException("NotificationListsJob.ExecuteJob", exc.Message, string.Format("User: {0}", user));
+                    }
                 }
-                //==========================================
             }
         }
 
