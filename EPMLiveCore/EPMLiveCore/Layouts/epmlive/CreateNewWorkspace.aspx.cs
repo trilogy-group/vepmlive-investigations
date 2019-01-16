@@ -364,8 +364,6 @@ namespace EPMLiveCore
                 switch (templateGalleryUrl)
                 {
                     case "{Site}":
-                        _templateResourceUrl = _cWeb.ServerRelativeUrl;
-                        break;
                     case "{site}":
                         _templateResourceUrl = _cWeb.ServerRelativeUrl;
                         break;
