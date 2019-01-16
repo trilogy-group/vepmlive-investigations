@@ -108,30 +108,29 @@ namespace EPMLiveCore.Jobs
             try
             {
                 var properties = web.Properties;
-                if (properties.ContainsKey("EPMLiveNotificationLists"))
+                if (properties.ContainsKey("EPMLiveNotificationLists")
+                    && properties["EPMLiveNotificationLists"] != null
+                    && properties["EPMLiveNotificationLists"].Trim() != string.Empty)
                 {
-                    if (properties["EPMLiveNotificationLists"] != null && properties["EPMLiveNotificationLists"].Trim() != "")
+                    using (dsSectionTables = new DataSet())
                     {
-                        using (dsSectionTables = new DataSet())
+                        var notificationLists = properties["EPMLiveNotificationLists"];
+                        createSectionTables(notificationLists); // create tables that will be re-used per user loop to minimize memory overhead
+
+                        SetNotificationEmail(properties);
+                        OverrideNotificationSubject(properties);
+                        SetNotificationNote(properties);
+                        SetBlogDetailErrors(properties);
+
+                        if (sFromEmail != string.Empty)
                         {
-                            var notificationLists = properties["EPMLiveNotificationLists"];
-                            createSectionTables(notificationLists); // create tables that will be re-used per user loop to minimize memory overhead
+                            var notificationUserList = new StringBuilder(string.Empty);
 
-                            SetNotificationEmail(properties);
-                            OverrideNotificationSubject(properties);
-                            SetNotificationNote(properties);
-                            SetBlogDetailErrors(properties);
+                            EnumerateSiteUsers(site, properties, notificationUserList);
 
-                            if (sFromEmail != string.Empty)
-                            {
-                                var notificationUserList = new StringBuilder(string.Empty);
+                            ProcessNotification(web, notificationUserList, notificationLists);
 
-                                EnumerateSiteUsers(site, properties, notificationUserList);
-
-                                ProcessNotification(web, notificationUserList, notificationLists);
-
-                                //-- End EPML 1901 --
-                            }
+                            //-- End EPML 1901 --
                         }
                     }
                 }
@@ -183,7 +182,7 @@ namespace EPMLiveCore.Jobs
 
         private static void EnumerateSiteUsers(SPSite site, SPPropertyBag properties, StringBuilder notificationUserList)
         {
-            //Loop through all site users
+            // Loop through all site users
             foreach (SPUser siteUser in site.RootWeb.SiteUsers)
             {
                 if (!string.Equals(siteUser.Name, "system account", StringComparison.OrdinalIgnoreCase))
