@@ -63,7 +63,8 @@ namespace WorkEnginePPM
                     }
                     lastRunLabel.Text = ndTimer.Attributes["LastRun"].Value;
                     lastRunResultLabel.Text = ndTimer.Attributes["LastResult"].Value;
-                    logLabel.Text = ndTimer.InnerText;
+                    if(logLabel != null)
+                        logLabel.Text = ndTimer.InnerText;
                 }
             }
             else
