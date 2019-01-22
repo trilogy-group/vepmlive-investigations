@@ -649,7 +649,7 @@ namespace TimeSheets
             output.WriteLine($"mygrid{sFullGridId}._gridid = '{sFullGridId}';");
             output.WriteLine($"mygrid{sFullGridId}._formmenus = \"{GetFormsMenus(web)}\";");
             output.WriteLine(Properties.Resources.txtTimesheetApprovalsRibbonFunctions.Replace("#gridid#", sFullGridId));
-            output.Write("mygrid{sFullGridId}.init();\r\n\r\n\r\n");
+            output.Write($"mygrid{sFullGridId}.init();\r\n\r\n\r\n");
         }
 
         private string GetListPermsValue()
