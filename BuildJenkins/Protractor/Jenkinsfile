@@ -2,7 +2,11 @@ pipeline {
 	agent {
 		label 'skyvera-jenkins-protractor'
 	}
-	  parameters {
+	options {
+		timestamps()
+		timeout(time: 2, unit: 'HOURS')
+    }
+	parameters {
 		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
 		string(name: 'FullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
 		string(name: 'BaseUrl', defaultValue: 'http://tenant02.epmldev.com', description: 'Protractor baseUrl')
