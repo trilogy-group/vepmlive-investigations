@@ -23,10 +23,8 @@ namespace TimeSheets
         StringBuilder sbErrors = null;
 
         private const string TsItemHoursDeleteSql = "DELETE FROM TSITEMHOURS WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
-        private const string TsItemHoursInsertSql = "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)";
         private const string TsItemHoursUpdateSql = "UPDATE TSITEMHOURS SET TS_ITEM_HOURS=@hours, TS_ITEM_TYPE_ID=@type WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
         private const string TsItemNotesDeleteSql = "DELETE FROM TSNOTES WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
-        private const string TsItemNotesInsertSql = "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)";
         private const string TsItemNotesUpdateSql = "UPDATE TSNOTES SET TS_ITEM_NOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
         private const string TsItemHoursSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID FROM TSITEMHOURS WHERE TS_ITEM_UID IN ({0})";
         private const string TsItemNotesSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES FROM TSNOTES WHERE TS_ITEM_UID IN ({0})";
@@ -44,12 +42,17 @@ namespace TimeSheets
         private const string TypeAttribute = "Type";
         private const string TypeDefaultValue = "0";
         private const string NotesXPath = "Notes";
+        private const string TsItemHoursTableName = "TSITEMHOURS";
+        private const string TsNotesTableName = "TSNOTES";
 
         private readonly Dictionary<string, List<TsItemHour>> _jobItemHours = new Dictionary<string, List<TsItemHour>>();
         private readonly Dictionary<string, List<TsItemHour>> _dbItemHours = new Dictionary<string, List<TsItemHour>>();
         private readonly Dictionary<string, List<TsItemNote>> _jobItemNotes = new Dictionary<string, List<TsItemNote>>();
         private readonly Dictionary<string, List<TsItemNote>> _dbItemNotes = new Dictionary<string, List<TsItemNote>>();
         private readonly Dictionary<string, List<DateTime>> _jobItemDates = new Dictionary<string, List<DateTime>>();
+
+        private DataTable _itemHoursToInsert;
+        private DataTable _itemNotesToInsert;
 
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
@@ -764,6 +767,8 @@ namespace TimeSheets
                                                     }
                                                 }
 
+                                                ProcessInserts(cn);
+
                                                 using (SqlCommand cmd5 = new SqlCommand("update TSQUEUE set percentcomplete=98 where TSQUEUE_ID=@QueueUid", cn))
                                                 {
                                                     cmd5.Parameters.AddWithValue("@queueuid", QueueUid);
@@ -907,18 +912,20 @@ namespace TimeSheets
             }
         }
 
-        private void InsertItemHours(string id, SqlConnection connection, List<TsItemHour> items)
+        private void InsertItemHours(List<TsItemHour> items)
         {
-            foreach (var tsItemHour in items)
+            if (_itemHoursToInsert == null)
             {
-                using (var cmd = new SqlCommand(TsItemHoursInsertSql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@dt", tsItemHour.Date);
-                    cmd.Parameters.AddWithValue("@hours", tsItemHour.Hours);
-                    cmd.Parameters.AddWithValue("@type", tsItemHour.Type);
-                    cmd.ExecuteNonQuery();
-                }
+                _itemHoursToInsert = new DataTable(TsItemHoursTableName);
+                _itemHoursToInsert.Columns.Add(new DataColumn(TsItemUidColumnName, typeof(Guid)));
+                _itemHoursToInsert.Columns.Add(new DataColumn(TsItemDateColumnName, typeof(DateTime)));
+                _itemHoursToInsert.Columns.Add(new DataColumn(TsItemHoursColumnName, typeof(string)));
+                _itemHoursToInsert.Columns.Add(new DataColumn(TsItemTypeIdColumnName, typeof(string)));
+            }
+
+            foreach (var item in items)
+            {
+                _itemHoursToInsert.Rows.Add(item.Id, item.Date, item.Hours, item.Type);
             }
         }
 
@@ -957,17 +964,19 @@ namespace TimeSheets
             }
         }
 
-        private void InsertItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
+        private void InsertItemNotes(List<TsItemNote> items)
         {
-            foreach (var tsItemNote in items)
+            if (_itemNotesToInsert == null)
             {
-                using (var cmd = new SqlCommand(TsItemNotesInsertSql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@dt", tsItemNote.Date);
-                    cmd.Parameters.AddWithValue("@notes", tsItemNote.Notes);
-                    cmd.ExecuteNonQuery();
-                }
+                _itemNotesToInsert = new DataTable(TsNotesTableName);
+                _itemNotesToInsert.Columns.Add(new DataColumn(TsItemUidColumnName, typeof(Guid)));
+                _itemNotesToInsert.Columns.Add(new DataColumn(TsItemDateColumnName, typeof(DateTime)));
+                _itemNotesToInsert.Columns.Add(new DataColumn(TsItemNotesColumnName, typeof(string)));
+            }
+            
+            foreach (var item in items)
+            {
+                _itemNotesToInsert.Rows.Add(item.Id, item.Date, item.Notes);
             }
         }
 
@@ -1040,7 +1049,7 @@ namespace TimeSheets
 
             if (itemsToInsert.Any())
             {
-                InsertItemHours(id, connection, itemsToInsert);
+                InsertItemHours(itemsToInsert);
             }
         }
 
@@ -1107,7 +1116,28 @@ namespace TimeSheets
 
             if (itemsToInsert.Any())
             {
-                InsertItemNotes(id, connection, itemsToInsert);
+                InsertItemNotes(itemsToInsert);
+            }
+        }
+
+        private void ProcessInserts(SqlConnection connection)
+        {
+            if (_itemHoursToInsert?.Rows.Count > 0)
+            {
+                using (var bulkCopy = new SqlBulkCopy(connection))
+                {
+                    bulkCopy.DestinationTableName = TsItemHoursTableName;
+                    bulkCopy.WriteToServer(_itemHoursToInsert);
+                }
+            }
+
+            if (_itemNotesToInsert?.Rows.Count > 0)
+            {
+                using (var bulkCopy = new SqlBulkCopy(connection))
+                {
+                    bulkCopy.DestinationTableName = TsNotesTableName;
+                    bulkCopy.WriteToServer(_itemNotesToInsert);
+                }
             }
         }
 
