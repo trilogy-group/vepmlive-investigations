@@ -652,7 +652,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var expectedSqlCommands = new List<string>
             {
                 "DELETE FROM TSNOTES WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN (@dt0)",
-                "UPDATE TSNOTES SET TSNOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt",
+                "UPDATE TSNOTES SET TS_ITEM_NOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt",
                 "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)",
                 "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)"
             };
