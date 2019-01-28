@@ -449,7 +449,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             var dummyDate = DateTime.Now.Date;
             var row = new ShimXmlNode(new XmlDocument()).Instance;
             var dummyHours = "10";
-            var dummyType = "";
+            var dummyType = string.Empty;
             var expectedType = "0";
 
             ShimXmlNode.AllInstances.SelectNodesString = (_, name) =>
@@ -640,8 +640,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             privateObject.Invoke(ProcessItemHoursMethodName, DummyString, sqlConnection, periods);
 
             // Assert
-            saveJob.ShouldSatisfyAllConditions(
-                () => sqlCommands.ShouldBeEmpty());
+            sqlCommands.ShouldBeEmpty();
         }
 
         [TestMethod]

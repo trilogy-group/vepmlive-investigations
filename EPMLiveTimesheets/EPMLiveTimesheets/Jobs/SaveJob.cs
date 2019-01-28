@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Xml;
+using System.Web;
 using System.Data.SqlClient;
 using Microsoft.SharePoint;
 using System.Collections;
@@ -839,6 +840,7 @@ namespace TimeSheets
                 data = null;
             }
         }
+
         public class TsItemHour
         {
             public TsItemHour(string id, DateTime date, string hours, string type)
@@ -869,7 +871,7 @@ namespace TimeSheets
             public string Notes { get; }
         }
 
-        private void DeleteItemHours(string id, SqlConnection cn, List<TsItemHour> items)
+        private void DeleteItemHours(string id, SqlConnection connection, List<TsItemHour> items)
         {
             var dates = items.Select(item => item.Date)
                              .Distinct()
@@ -877,7 +879,7 @@ namespace TimeSheets
 
             var parameters = string.Join(",", Enumerable.Range(0, dates.Length).Select(i => $"@dt{i}"));
 
-            using (var cmd = new SqlCommand(string.Format(TsItemHoursDeleteSql, parameters), cn))
+            using (var cmd = new SqlCommand(string.Format(TsItemHoursDeleteSql, parameters), connection))
             {
                 cmd.Parameters.AddWithValue("@id", id);
 
@@ -890,11 +892,11 @@ namespace TimeSheets
             }
         }
 
-        private void UpdateItemHours(string id, SqlConnection cn, List<TsItemHour> items)
+        private void UpdateItemHours(string id, SqlConnection connection, List<TsItemHour> items)
         {
             foreach (var tsItemHour in items)
             {
-                using (var cmd = new SqlCommand(TsItemHoursUpdateSql, cn))
+                using (var cmd = new SqlCommand(TsItemHoursUpdateSql, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.Parameters.AddWithValue("@dt", tsItemHour.Date);
@@ -905,11 +907,11 @@ namespace TimeSheets
             }
         }
 
-        private void InsertItemHours(string id, SqlConnection cn, List<TsItemHour> items)
+        private void InsertItemHours(string id, SqlConnection connection, List<TsItemHour> items)
         {
             foreach (var tsItemHour in items)
             {
-                using (var cmd = new SqlCommand(TsItemHoursInsertSql, cn))
+                using (var cmd = new SqlCommand(TsItemHoursInsertSql, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.Parameters.AddWithValue("@dt", tsItemHour.Date);
@@ -920,7 +922,7 @@ namespace TimeSheets
             }
         }
 
-        private void DeleteItemNotes(string id, SqlConnection cn, List<TsItemNote> items)
+        private void DeleteItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
         {
             var dates = items.Select(item => item.Date)
                              .Distinct()
@@ -928,7 +930,7 @@ namespace TimeSheets
 
             var parameters = string.Join(",", Enumerable.Range(0, dates.Length).Select(i => $"@dt{i}"));
 
-            using (var cmd = new SqlCommand(string.Format(TsItemNotesDeleteSql, parameters), cn))
+            using (var cmd = new SqlCommand(string.Format(TsItemNotesDeleteSql, parameters), connection))
             {
                 cmd.Parameters.AddWithValue("@id", id);
 
@@ -941,11 +943,11 @@ namespace TimeSheets
             }
         }
 
-        private void UpdateItemNotes(string id, SqlConnection cn, List<TsItemNote> items)
+        private void UpdateItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
         {
             foreach (var tsItemNote in items)
             {
-                using (var cmd = new SqlCommand(TsItemNotesUpdateSql, cn))
+                using (var cmd = new SqlCommand(TsItemNotesUpdateSql, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.Parameters.AddWithValue("@dt", tsItemNote.Date);
@@ -955,11 +957,11 @@ namespace TimeSheets
             }
         }
 
-        private void InsertItemNotes(string id, SqlConnection cn, List<TsItemNote> items)
+        private void InsertItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
         {
             foreach (var tsItemNote in items)
             {
-                using (var cmd = new SqlCommand(TsItemNotesInsertSql, cn))
+                using (var cmd = new SqlCommand(TsItemNotesInsertSql, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.Parameters.AddWithValue("@dt", tsItemNote.Date);
@@ -969,7 +971,7 @@ namespace TimeSheets
             }
         }
 
-        private void ProcessItemHours(string id, SqlConnection cn, ArrayList arrPeriods)
+        private void ProcessItemHours(string id, SqlConnection connection, ArrayList arrPeriods)
         {
             var jobItems = _jobItemHours.ContainsKey(id) 
                 ? _jobItemHours[id] 
@@ -1028,21 +1030,21 @@ namespace TimeSheets
             
             if (dbItems.Any())
             {
-                DeleteItemHours(id, cn, dbItems);
+                DeleteItemHours(id, connection, dbItems);
             }
 
             if (itemsToUpdate.Any())
             {
-                UpdateItemHours(id, cn, itemsToUpdate);
+                UpdateItemHours(id, connection, itemsToUpdate);
             }
 
             if (itemsToInsert.Any())
             {
-                InsertItemHours(id, cn, itemsToInsert);
+                InsertItemHours(id, connection, itemsToInsert);
             }
         }
 
-        private void ProcessItemNotes(string id, SqlConnection cn, ArrayList arrPeriods)
+        private void ProcessItemNotes(string id, SqlConnection connection, ArrayList arrPeriods)
         {
             var jobNotes = _jobItemNotes.ContainsKey(id) 
                 ? _jobItemNotes[id] 
@@ -1095,17 +1097,17 @@ namespace TimeSheets
             
             if (dbNotes.Any())
             {
-                DeleteItemNotes(id, cn, dbNotes);
+                DeleteItemNotes(id, connection, dbNotes);
             }
 
             if (itemsToUpdate.Any())
             {
-                UpdateItemNotes(id, cn, itemsToUpdate);
+                UpdateItemNotes(id, connection, itemsToUpdate);
             }
 
             if (itemsToInsert.Any())
             {
-                InsertItemNotes(id, cn, itemsToInsert);
+                InsertItemNotes(id, connection, itemsToInsert);
             }
         }
 
@@ -1160,14 +1162,12 @@ namespace TimeSheets
                     var ndNotes = ndDate.SelectSingleNode(NotesXPath);
                     if (ndNotes != null)
                     {
-                        var notes = System.Web.HttpUtility.UrlDecode(ndNotes.InnerText);
+                        var notes = HttpUtility.UrlDecode(ndNotes.InnerText);
                         itemNotes.Add(new TsItemNote(id, date, notes));
                     }
                 }
             }
         }
-        
-
 
         private void LoadDbItems(SqlConnection connection)
         {
