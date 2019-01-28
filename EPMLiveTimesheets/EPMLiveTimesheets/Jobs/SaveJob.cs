@@ -26,7 +26,7 @@ namespace TimeSheets
         private const string TsItemHoursUpdateSql = "UPDATE TSITEMHOURS SET TS_ITEM_HOURS=@hours, TS_ITEM_TYPE_ID=@type WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
         private const string TsItemNotesDeleteSql = "DELETE FROM TSNOTES WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
         private const string TsItemNotesInsertSql = "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)";
-        private const string TsItemNotesUpdateSql = "UPDATE TSNOTES SET TSNOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
+        private const string TsItemNotesUpdateSql = "UPDATE TSNOTES SET TS_ITEM_NOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
         private const string TsItemHoursSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID FROM TSITEMHOURS WHERE TS_ITEM_UID IN ({0})";
         private const string TsItemNotesSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES FROM TSNOTES WHERE TS_ITEM_UID IN ({0})";
 
@@ -1166,7 +1166,7 @@ namespace TimeSheets
                 }
             }
         }
-
+        
 
 
         private void LoadDbItems(SqlConnection connection)
