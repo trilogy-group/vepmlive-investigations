@@ -26,7 +26,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V702,
         V703,
         V710,
-        V711,
         GENERIC
     }
 
@@ -118,9 +117,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                         break;
                     case EPMLiveVersion.V710:
                         version = "7.1.0";
-                        break;
-                    case EPMLiveVersion.V711:
-                        version = "7.1.1";
                         break;
                     case EPMLiveVersion.GENERIC:
                         version = "GENERIC";
