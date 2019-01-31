@@ -66,7 +66,6 @@ END"
         const string TASK_CENTER_LIST_NAME = "Task Center";
         public override bool Perform()
         {
-            Guid webAppId = Web.Site.WebApplication.Id;
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() =>
