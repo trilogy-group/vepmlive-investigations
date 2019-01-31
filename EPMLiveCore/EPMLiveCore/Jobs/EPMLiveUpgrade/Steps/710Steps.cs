@@ -55,4 +55,48 @@ END"
             return result;
         }
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2, Description = "Disable throttling for the task center list")]
+    internal class DisableTaskCenterThrolling : UpgradeStep
+    {
+        public DisableTaskCenterThrolling(SPWeb web, bool isPfeSite)
+            : base(web, isPfeSite)
+        {
+        }
+        const string TASK_CENTER_LIST_NAME = "Task Center";
+        public override bool Perform()
+        {
+            Guid webAppId = Web.Site.WebApplication.Id;
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    var list = Web.Lists.TryGetList(TASK_CENTER_LIST_NAME);
+
+                    if (list != null)
+                    {
+                        list.EnableThrottling = false;
+
+                        LogMessage("Throttling was disabled successfully", MessageKind.SUCCESS, 4);
+                    }
+                    else
+                    {
+                        LogMessage("List cannot not found", MessageKind.SKIPPED, 4);
+                    }
+                });
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                string message = exception.InnerException != null
+                    ? exception.InnerException.Message
+                    : exception.Message;
+
+                LogMessage(message, MessageKind.FAILURE, 4);
+                return false;
+            }
+        }
+
+    }
 }
