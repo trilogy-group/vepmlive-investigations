@@ -8,14 +8,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     [UpgradeStep(Version = EPMLiveVersion.V711, Order = 1.0, Description = "Updating My Work table")]
     internal class AddUpdateMyWorkColumn : UpgradeStep
     {
-        #region Constructors (1) 
-
         public AddUpdateMyWorkColumn(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
-
-        #endregion Constructors 
-
-
-
+        
         public override bool Perform()
         {
             Guid webAppId = Web.Site.WebApplication.Id;
@@ -66,8 +60,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             }
 
         }
-
-
         private bool CheckColumn()
         {
             using (SPWeb mySite = Web.Site.OpenWeb())
@@ -76,8 +68,5 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 return list.Fields.ContainsField("IsAssignment");
             }
         }
-
-
-
     }
 }
