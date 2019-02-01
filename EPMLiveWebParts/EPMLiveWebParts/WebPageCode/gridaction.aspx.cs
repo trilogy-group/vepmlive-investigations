@@ -546,7 +546,7 @@ namespace EPMLiveWebParts
                                 w.Close();
 
                                 string epkurl1 = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKURL");
-                                url += "/_layouts/ppm/" + Request["subaction"] + ".aspx?listid=" + Request["listid"] + "&itemid=" + Request["webid"] + "." + Request["listid"] + "." + Request["id"] + "&epkurl=" + HttpUtility.UrlEncode(epkurl1) + "&view=" + view + "&IsDlg=" + Request["IsDlg"];
+                                url += "/_layouts/ppm/" + Request["subaction"] + ".aspx?listid=" + Request["listid"] + "&itemid=" + Request["webid"] + "." + Request["listid"] + "." + Request["id"] + "&epkurl=" + HttpUtility.UrlEncode(epkurl1) + "&view=" + view;
                             }
                             break;
                         case "gotoplanner":
