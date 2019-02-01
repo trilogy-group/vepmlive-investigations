@@ -63,14 +63,15 @@ END"
             : base(web, isPfeSite)
         {
         }
-        const string TASK_CENTER_LIST_NAME = "Task Center";
+
+        private const string TaskCenterListName = "Task Center";
         public override bool Perform()
         {
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    var list = Web.Lists.TryGetList(TASK_CENTER_LIST_NAME);
+                    var list = Web.Lists.TryGetList(TaskCenterListName);
 
                     if (list != null)
                     {
@@ -88,11 +89,8 @@ END"
             }
             catch (Exception exception)
             {
-                string message = exception.InnerException != null
-                    ? exception.InnerException.Message
-                    : exception.Message;
-
-                LogMessage(message, MessageKind.FAILURE, 4);
+                var logException = exception.InnerException ?? exception;
+                LogMessage(logException.ToString(), MessageKind.FAILURE, 4);
                 return false;
             }
         }
