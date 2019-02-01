@@ -76,6 +76,7 @@ END"
                     if (list != null)
                     {
                         list.EnableThrottling = false;
+                        list.Update();
 
                         LogMessage("Throttling was disabled successfully", MessageKind.SUCCESS, 4);
                     }
