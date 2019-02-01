@@ -23,10 +23,10 @@ namespace TimeSheets
         StringBuilder sbErrors = null;
 
         private const string TsItemHoursDeleteSql = "DELETE FROM TSITEMHOURS WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
-        private const string TsItemHoursInsertSql = "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)";
+        private const string TsItemHoursInsertSql = "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES ";
         private const string TsItemHoursUpdateSql = "UPDATE TSITEMHOURS SET TS_ITEM_HOURS=@hours, TS_ITEM_TYPE_ID=@type WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
         private const string TsItemNotesDeleteSql = "DELETE FROM TSNOTES WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
-        private const string TsItemNotesInsertSql = "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)";
+        private const string TsItemNotesInsertSql = "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES ";
         private const string TsItemNotesUpdateSql = "UPDATE TSNOTES SET TS_ITEM_NOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
         private const string TsItemHoursSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID FROM TSITEMHOURS WHERE TS_ITEM_UID IN ({0})";
         private const string TsItemNotesSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES FROM TSNOTES WHERE TS_ITEM_UID IN ({0})";
@@ -909,17 +909,28 @@ namespace TimeSheets
 
         private void InsertItemHours(string id, SqlConnection connection, List<TsItemHour> items)
         {
-            foreach (var tsItemHour in items)
-            {
-                using (var cmd = new SqlCommand(TsItemHoursInsertSql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@dt", tsItemHour.Date);
-                    cmd.Parameters.AddWithValue("@hours", tsItemHour.Hours);
-                    cmd.Parameters.AddWithValue("@type", tsItemHour.Type);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+			if (!items.Any())
+				return;
+			StringBuilder insertStatement = new StringBuilder(TsItemHoursInsertSql);
+
+			using (var cmd = new SqlCommand())
+			{
+				cmd.Connection = connection;
+				cmd.CommandTimeout = 0;
+				int itemIndex = 0;
+				foreach (var tsItemHour in items)
+				{
+					insertStatement.Append(string.Format("(@id{0}, @dt{0}, @hours{0}, @type{0}),", itemIndex));
+	
+					cmd.Parameters.AddWithValue("@id" + itemIndex, id);
+					cmd.Parameters.AddWithValue("@dt" + itemIndex, tsItemHour.Date);
+					cmd.Parameters.AddWithValue("@hours" + itemIndex, tsItemHour.Hours);
+					cmd.Parameters.AddWithValue("@type" + itemIndex, tsItemHour.Type);
+					itemIndex++;
+				}
+				cmd.CommandText = insertStatement.ToString().TrimEnd(',');
+				cmd.ExecuteNonQuery();
+			}
         }
 
         private void DeleteItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
@@ -959,16 +970,27 @@ namespace TimeSheets
 
         private void InsertItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
         {
-            foreach (var tsItemNote in items)
-            {
-                using (var cmd = new SqlCommand(TsItemNotesInsertSql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@dt", tsItemNote.Date);
-                    cmd.Parameters.AddWithValue("@notes", tsItemNote.Notes);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+			if (!items.Any())
+				return;
+			StringBuilder insertStatement = new StringBuilder(TsItemNotesInsertSql);
+
+			using (var cmd = new SqlCommand())
+			{
+				cmd.Connection = connection;
+				cmd.CommandTimeout = 0;
+				int itemIndex = 0;
+				foreach (var tsItemNote in items)
+				{
+					insertStatement.Append(string.Format("(@id{0}, @dt{0}, @notes{0}),", itemIndex));
+
+					cmd.Parameters.AddWithValue("@id" + itemIndex, id);
+					cmd.Parameters.AddWithValue("@dt" + itemIndex, tsItemNote.Date);
+					cmd.Parameters.AddWithValue("@notes" + itemIndex, tsItemNote.Notes);
+					itemIndex++;
+				}
+				cmd.CommandText = insertStatement.ToString().TrimEnd(',');
+				cmd.ExecuteNonQuery();
+			}
         }
 
         private void ProcessItemHours(string id, SqlConnection connection, ArrayList arrPeriods)
