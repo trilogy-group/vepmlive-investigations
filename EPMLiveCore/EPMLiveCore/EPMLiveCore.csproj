@@ -4249,7 +4249,6 @@
     <Content Include="Resources\0Tables01.sql" />
     <Content Include="Resources\0Tables02.sql" />
     <Content Include="Resources\1Views01.sql" />
-    <Content Include="Resources\spTSgetTSHoursPM.sql" />
     <Content Include="Resources\2SPs01.sql" />
     <Content Include="Resources\9Data01.sql" />
     <Content Include="Resources\9Data02.sql" />
