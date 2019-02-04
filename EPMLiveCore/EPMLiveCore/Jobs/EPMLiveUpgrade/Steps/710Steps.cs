@@ -56,6 +56,48 @@ END"
         }
     }
 
+
+    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 3.0, Description = "Disable throttling for the task center list")]
+    internal class DisableTaskCenterThrolling : UpgradeStep
+    {
+        public DisableTaskCenterThrolling(SPWeb web, bool isPfeSite)
+            : base(web, isPfeSite)
+        {
+        }
+
+        private const string TaskCenterListName = "Task Center";
+        public override bool Perform()
+        {
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    var list = Web.Lists.TryGetList(TaskCenterListName);
+
+                    if (list != null)
+                    {
+                        list.EnableThrottling = false;
+                        list.Update();
+
+                        LogMessage("Throttling was disabled successfully", MessageKind.SUCCESS, 4);
+                    }
+                    else
+                    {
+                        LogMessage("List cannot not found", MessageKind.SKIPPED, 4);
+                    }
+                });
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                var logException = exception.InnerException ?? exception;
+                LogMessage(logException.ToString(), MessageKind.FAILURE, 4);
+                return false;
+            }
+        }
+    }
+
     [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2.0, Description = "Updating My Work table")]
     internal class AddUpdateMyWorkColumn : UpgradeStep
     {
