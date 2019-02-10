@@ -559,9 +559,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 "DELETE FROM TSITEMHOURS WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN (@dt0,@dt1,@dt2)",
                 "UPDATE TSITEMHOURS SET TS_ITEM_HOURS=@hours, TS_ITEM_TYPE_ID=@type WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt",
                 "UPDATE TSITEMHOURS SET TS_ITEM_HOURS=@hours, TS_ITEM_TYPE_ID=@type WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt",
-                "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)",
-                "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)",
-                "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)"
+                "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id0, @dt0, @hours0, @type0),(@id1, @dt1, @hours1, @type1),(@id2, @dt2, @hours2, @type2)"
             };
             var sqlCommands = new List<string>();
             var sqlConnection = new ShimSqlConnection().Instance;
@@ -652,8 +650,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             {
                 "DELETE FROM TSNOTES WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN (@dt0)",
                 "UPDATE TSNOTES SET TS_ITEM_NOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt",
-                "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)",
-                "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)"
+                "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id0, @dt0, @notes0),(@id1, @dt1, @notes1)"
             };
             var sqlCommands = new List<string>();
             var sqlConnection = new ShimSqlConnection().Instance;
