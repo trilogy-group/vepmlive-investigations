@@ -501,12 +501,12 @@ end
 		   
 if not exists(select * from sys.indexes where name = 'IX_ITEMSEC_QUEUE')
 begin
-	CREATE INDEX [IX_ITEMSEC_QUEUE] ON [dbo].[ITEMSEC] ([QUEUE], [STATUS]) INCLUDE ([USER_ID], [dtadded], [PRIORITY]) WITH (ONLINE=ON)
+	CREATE INDEX [IX_ITEMSEC_QUEUE] ON [dbo].[ITEMSEC] ([QUEUE], [STATUS]) INCLUDE ([USER_ID], [dtadded], [PRIORITY])
 end 
 
 if not exists(select * from sys.indexes where name = 'IX_TSRESMETA_TS_UID')
 begin
-	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID]) WITH (ONLINE=ON)
+	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID])
 end
 													  
 													  
