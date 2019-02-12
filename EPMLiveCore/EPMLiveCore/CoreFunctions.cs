@@ -533,9 +533,9 @@ namespace EPMLiveCore
         }
 
         private static void AddParentWorkOrAgilePlanner(
-            SPWeb lockedWeb, 
-            SPWeb inWeb, 
-            Dictionary<string, PlannerDefinition> plannerList, 
+            SPWeb lockedWeb,
+            SPWeb inWeb,
+            Dictionary<string, PlannerDefinition> plannerList,
             string listTitle,
             string settingKey,
             string plannerDefinition)
@@ -546,14 +546,14 @@ namespace EPMLiveCore
                 && string.Equals(projectCenter, listTitle, StringComparison.InvariantCultureIgnoreCase))
             {
                 plannerList.Add(
-                    $"WorkEngine{plannerDefinition}Planner", 
+                    $"WorkEngine{plannerDefinition}Planner",
                     CreatePlannerDef(
                         $"{plannerDefinition} Planner",
                         "/_layouts/images/epmlivelogosmall.gif",
                         true,
                         $"Planner{settingKey}",
-                        $"WorkEngine {plannerDefinition} Planner", 
-                        3, 
+                        $"WorkEngine {plannerDefinition} Planner",
+                        3,
                         string.Empty));
             }
         }
@@ -622,10 +622,10 @@ namespace EPMLiveCore
 
         private static bool CanAddPlanner(
             SPWeb lockedWeb,
-            SPWeb inWeb, 
-            string settingKey, 
-            out string projectCenter, 
-            out SPList projectCenterList, 
+            SPWeb inWeb,
+            string settingKey,
+            out string projectCenter,
+            out SPList projectCenterList,
             out SPList taskCenterList)
         {
             var isEnable = false;
@@ -1379,10 +1379,10 @@ namespace EPMLiveCore
         }
 
         public static DataTable getSiteItems(
-            SPWeb web, 
-            SPView view, 
-            string spQuery, 
-            string filterFieldName, 
+            SPWeb web,
+            SPView view,
+            string spQuery,
+            string filterFieldName,
             string useWbs,
             string listTitlePattern,
             IList<string> groupByFieldNames)
@@ -1419,18 +1419,18 @@ namespace EPMLiveCore
                         var fieldsXml = new List<string>();
 
                         GenerateSiteItemFields(
-                            view, 
-                            spQuery, 
-                            filterFieldName, 
-                            useWbs, 
-                            groupByFieldNames, 
-                            fieldInternalNames, 
+                            view,
+                            spQuery,
+                            filterFieldName,
+                            useWbs,
+                            groupByFieldNames,
+                            fieldInternalNames,
                             fieldsXml);
 
                         try
                         {
                             var listIds = GetSiteItemsListIds(
-                                web, 
+                                web,
                                 view,
                                 listTitlePattern,
                                 sqlConnection,
@@ -1439,11 +1439,11 @@ namespace EPMLiveCore
                             if (listIds.Count > 0)
                             {
                                 dataTable = GetSiteItemsData(
-                                    web, 
-                                    spQuery, 
-                                    listTitlePattern, 
-                                    dataTable, 
-                                    fieldsXml, 
+                                    web,
+                                    spQuery,
+                                    listTitlePattern,
+                                    dataTable,
+                                    fieldsXml,
                                     listIds);
                             }
                         }
@@ -1467,11 +1467,11 @@ namespace EPMLiveCore
         }
 
         private static DataTable GetSiteItemsData(
-            SPWeb web, 
-            string spQuery, 
-            string listTitlePattern, 
-            DataTable dataTable, 
-            IList<string> fieldsXml, 
+            SPWeb web,
+            string spQuery,
+            string listTitlePattern,
+            DataTable dataTable,
+            IList<string> fieldsXml,
             IList<Guid> listIds)
         {
             var listsXml = string.Join(string.Empty, listIds.Select(id => $"<List ID='{id}'/>"));
@@ -1551,12 +1551,12 @@ namespace EPMLiveCore
         }
 
         private static void GenerateSiteItemFields(
-            SPView view, 
-            string spQuery, 
-            string filterFieldName, 
-            string useWbs, 
-            IList<string> groupByFieldNames, 
-            ArrayList fieldInternalNames, 
+            SPView view,
+            string spQuery,
+            string filterFieldName,
+            string useWbs,
+            IList<string> groupByFieldNames,
+            ArrayList fieldInternalNames,
             IList<string> fieldsXml)
         {
             foreach (string viewFieldName in view.ViewFields)
@@ -1957,7 +1957,7 @@ namespace EPMLiveCore
             {
                 Trace.WriteLine(ex.ToString());
             }
-            
+
             return dataTable;
         }
 
@@ -2340,17 +2340,17 @@ namespace EPMLiveCore
         }
 
         public static string createSite(
-            string title, 
-            string description, 
-            string inputUrl, 
-            string template, 
-            string user, 
-            bool unique, 
+            string title,
+            string description,
+            string inputUrl,
+            string template,
+            string user,
+            bool unique,
             bool toplink,
-            SPWeb parentWeb, 
-            out Guid createdWebId, 
-            out string createdWebUrl, 
-            out string createdWebServerRelativeUrl, 
+            SPWeb parentWeb,
+            out Guid createdWebId,
+            out string createdWebUrl,
+            out string createdWebServerRelativeUrl,
             out string createdWebTitle)
         {
             createdWebId = Guid.Empty;
@@ -2391,8 +2391,8 @@ namespace EPMLiveCore
                         unique,
                         user,
                         out createdWebId,
-                        out createdWebUrl, 
-                        out createdWebServerRelativeUrl, 
+                        out createdWebUrl,
+                        out createdWebServerRelativeUrl,
                         out createdWebTitle);
                 }
                 catch (Exception ex)
@@ -2411,15 +2411,15 @@ namespace EPMLiveCore
                 return $"1:{ex.Message}";
             }
         }
-        
+
         private static string ProceedWebCreation(
             SPWeb web,
             bool toplink,
             bool unique,
-            string user, 
-            out Guid createdWebId, 
-            out string createdWebUrl, 
-            out string createdWebServerRelativeUrl, 
+            string user,
+            out Guid createdWebId,
+            out string createdWebUrl,
+            out string createdWebServerRelativeUrl,
             out string createdWebTitle)
         {
             createdWebId = web.ID;
@@ -2610,7 +2610,7 @@ namespace EPMLiveCore
                             using (SPWeb spWeb = spSite.OpenWeb())
                             {
                                 SPUtilities.SPListUtility.MapListsReporting(
-                                    spWeb, 
+                                    spWeb,
                                     spList => !listsNotToBeMapped.Contains(spList.Title)
                                 );
                             }
@@ -3037,7 +3037,6 @@ namespace EPMLiveCore
 
                     case "EPMLiveUseLiveTemplates":
                         return "True";
-
                     case "EPMLivePlannerParentChild":
                         return "Portfolio Item,Project Item";
 
@@ -3047,6 +3046,11 @@ namespace EPMLiveCore
                         return "False";
                     case "EPMPortManagerColumn":
                         return "OwnerID";
+                    case "EPMRPDepartmentValidation":
+                        return bool.TrueString;
+                    default:
+                        Trace.TraceWarning("Unexpected setting value: " + setting);
+                        break;
                 };
             }
 
@@ -3497,23 +3501,23 @@ namespace EPMLiveCore
                                     {
                                         web.AllowUnsafeUpdates = true;
                                         site.AllowUnsafeUpdates = true;
-                                //SPWebApplication app = site.WebApplication;
-                                //SPFarm farm = app.Farm;
-                                //UserManager _chrono = app.GetChild<UserManager>("UserManager" + checkFeatureId);
-                                //if (_chrono == null)
-                                //{
-                                //    _chrono = new UserManager("UserManager" + checkFeatureId, farm, Guid.NewGuid());
-                                //    _chrono.Update();
-                                //}
+                                        //SPWebApplication app = site.WebApplication;
+                                        //SPFarm farm = app.Farm;
+                                        //UserManager _chrono = app.GetChild<UserManager>("UserManager" + checkFeatureId);
+                                        //if (_chrono == null)
+                                        //{
+                                        //    _chrono = new UserManager("UserManager" + checkFeatureId, farm, Guid.NewGuid());
+                                        //    _chrono.Update();
+                                        //}
 
-                                //arr.Add(username);
+                                        //arr.Add(username);
 
-                                //_chrono.UserList = arr; 
-                                //_chrono.Update();
-                                //site.Update();
-                                //uCount = arr.Count;
+                                        //_chrono.UserList = arr; 
+                                        //_chrono.Update();
+                                        //site.Update();
+                                        //uCount = arr.Count;
 
-                                string userlist = "";
+                                        string userlist = "";
                                         try
                                         {
                                             userlist = site.RootWeb.Properties["workengineusers" + checkFeatureId].ToString();
@@ -3558,57 +3562,57 @@ namespace EPMLiveCore
                             else
                                 uCount = totalAvailableUserCount + 1;
                         }
-                //string sConn = "";
-                //sConn = CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id);
+                        //string sConn = "";
+                        //sConn = CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id);
 
-                //SqlConnection cn = new SqlConnection(sConn);
-                //cn.Open();
+                        //SqlConnection cn = new SqlConnection(sConn);
+                        //cn.Open();
 
-                //SqlCommand cmd = new SqlCommand("select count(featureuserid) from featureusers where username like @username and featureid=@featureid", cn);
-                //cmd.CommandType = CommandType.Text;
-                //cmd.Parameters.AddWithValue("@featureid", checkFeatureId);
-                //cmd.Parameters.AddWithValue("@username", username);
+                        //SqlCommand cmd = new SqlCommand("select count(featureuserid) from featureusers where username like @username and featureid=@featureid", cn);
+                        //cmd.CommandType = CommandType.Text;
+                        //cmd.Parameters.AddWithValue("@featureid", checkFeatureId);
+                        //cmd.Parameters.AddWithValue("@username", username);
 
-                //SqlDataReader dr = cmd.ExecuteReader();
-                //int myCount = 0;
-                //int curCount = 0;
-                //if (dr.Read())
-                //{
-                //    myCount = dr.GetInt32(0);
-                //}
-                //dr.Close();
+                        //SqlDataReader dr = cmd.ExecuteReader();
+                        //int myCount = 0;
+                        //int curCount = 0;
+                        //if (dr.Read())
+                        //{
+                        //    myCount = dr.GetInt32(0);
+                        //}
+                        //dr.Close();
 
-                //cmd = new SqlCommand("select count(featureuserid) from featureusers where featureid=@featureid", cn);
-                //cmd.CommandType = CommandType.Text;
-                //cmd.Parameters.AddWithValue("@featureid", checkFeatureId);
+                        //cmd = new SqlCommand("select count(featureuserid) from featureusers where featureid=@featureid", cn);
+                        //cmd.CommandType = CommandType.Text;
+                        //cmd.Parameters.AddWithValue("@featureid", checkFeatureId);
 
-                //dr = cmd.ExecuteReader();
-                //if (dr.Read())
-                //{
-                //    curCount = dr.GetInt32(0);
-                //}
-                //dr.Close();
+                        //dr = cmd.ExecuteReader();
+                        //if (dr.Read())
+                        //{
+                        //    curCount = dr.GetInt32(0);
+                        //}
+                        //dr.Close();
 
-                //if (myCount >= 1 && curCount <= totalAvailableUserCount)
-                //{
-                //    uCount = curCount;
-                //}
-                //else if (curCount < totalAvailableUserCount)
-                //{
-                //    cmd = new SqlCommand("INSERT INTO featureusers (featureid,username) VALUES (@featureid,@username)", cn);
-                //    cmd.CommandType = CommandType.Text;
-                //    cmd.Parameters.AddWithValue("@featureid", checkFeatureId);
-                //    cmd.Parameters.AddWithValue("@username", username);
-                //    cmd.ExecuteNonQuery();
-                //    uCount = curCount + 1;
-                //}
-                //else
-                //{
-                //    uCount = totalAvailableUserCount + 1;
-                //}
+                        //if (myCount >= 1 && curCount <= totalAvailableUserCount)
+                        //{
+                        //    uCount = curCount;
+                        //}
+                        //else if (curCount < totalAvailableUserCount)
+                        //{
+                        //    cmd = new SqlCommand("INSERT INTO featureusers (featureid,username) VALUES (@featureid,@username)", cn);
+                        //    cmd.CommandType = CommandType.Text;
+                        //    cmd.Parameters.AddWithValue("@featureid", checkFeatureId);
+                        //    cmd.Parameters.AddWithValue("@username", username);
+                        //    cmd.ExecuteNonQuery();
+                        //    uCount = curCount + 1;
+                        //}
+                        //else
+                        //{
+                        //    uCount = totalAvailableUserCount + 1;
+                        //}
 
-                //cn.Close();
-            }
+                        //cn.Close();
+                    }
                     catch { uCount = -1; }
                 });
             }
@@ -3662,7 +3666,7 @@ namespace EPMLiveCore
 
                 return Convert.ToBase64String(cipherTextBytes);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                 return string.Empty;
@@ -3697,7 +3701,7 @@ namespace EPMLiveCore
                         }
                     }
                 }
-                
+
                 return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
             }
             catch (Exception ex)
@@ -3920,21 +3924,21 @@ namespace EPMLiveCore
 
 
 
-            //foreach (XmlNode nd in doc.FirstChild.ChildNodes)
-            //{
-            //    try
-            //    {
-            //        string val = nd.Attributes["value"].Value;
-            //        string s = nd.InnerText;
-            //        if (EPMLiveCore.CoreFunctions.computerCode(val) == s)
-            //        {
-            //            if(!list.Contains(val))
-            //                list.Add(val);
-            //        }
-            //    }
-            //    catch { }
-            //}
-        }
+                    //foreach (XmlNode nd in doc.FirstChild.ChildNodes)
+                    //{
+                    //    try
+                    //    {
+                    //        string val = nd.Attributes["value"].Value;
+                    //        string s = nd.InnerText;
+                    //        if (EPMLiveCore.CoreFunctions.computerCode(val) == s)
+                    //        {
+                    //            if(!list.Contains(val))
+                    //                list.Add(val);
+                    //        }
+                    //    }
+                    //    catch { }
+                    //}
+                }
                 catch
                 {
 
@@ -4208,7 +4212,7 @@ namespace EPMLiveCore
             object apiClass = Activator.CreateInstance(thisClass);
             return (string)m.Invoke(apiClass, new object[] { null, spWeb });
         }
-        
+
         public static string CreateProjectInNewWorkspace(SPWeb web, string listTitle, string url, string title)
         {
             if (web == null)
