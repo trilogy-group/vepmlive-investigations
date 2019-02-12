@@ -333,6 +333,7 @@
     function dialogEvent(action) { rpeditor.externalEvent(action); }
     function NotesDialogEvent(action) { rpeditor.NotesDialogEvent(action); }
     amountCheck('idSpreadAmount');
+    var DepartmentValidation = '<%=DepartmentValidation%>';
     var params = {};
     try {
         params.ClientID = '<%=ClientID%>';
