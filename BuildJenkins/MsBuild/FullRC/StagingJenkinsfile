@@ -24,10 +24,10 @@ pipeline {
         string(name: 'Staging2Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 
         string(name: 'ProtractorBranch', defaultValue: 'TestAutomation', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-    	string(name: 'ProtractorTargetHost', defaultValue: '10.25.1.146', description: 'Target host for protractor')
+    	string(name: 'ProtractorTargetHost', defaultValue: '10.25.2.54', description: 'Target host for protractor')
 		string(name: 'ProtractorHostsName', defaultValue: 'apps22.epmlive.com', description: 'Target full host name for protractor')
 		string(name: 'ProtractorBaseUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Target baseUrl for protractor')
-		string(name: 'ProtractorSiteCollection', defaultValue: '/sites/NYISO', description: 'Protractor siteCollection')
+		string(name: 'ProtractorSiteCollection', defaultValue: '/sites/AUT', description: 'Protractor siteCollection')
 		string(name: 'ProtractorUsername', defaultValue: 'servicedesk', description: 'Protractor username')
 		string(name: 'ProtractorPassword', defaultValue: 'A123456*', description: 'Protractor password')
 		
