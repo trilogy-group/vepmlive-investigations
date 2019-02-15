@@ -214,7 +214,7 @@ namespace EPMLiveCore.API
                                                   ") ON [PRIMARY] " +
                                     
                                                   "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID] " +
-                                
+                                                  "ALTER TABLE[dbo].[RPTWEBGROUPS]      ADD CONSTRAINT UQ_RPTWEBGROUPS_SITEID_WEBID_GROUPID UNIQUE(SITEID, WEBID, GROUPID)" +
                                                   "IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS') " +
                                                   "ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS] " +
                                 
