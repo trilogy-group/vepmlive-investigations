@@ -22,6 +22,7 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortfolioEngineCore.WEIntegration.Fakes;
 using Shouldly;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReporting.Tests.Jobs
 {
@@ -102,9 +103,9 @@ namespace EPMLiveReporting.Tests.Jobs
             {
                 Dispose = () => { }
             };
-            ShimProcessSecurity.ProcessSecurityGroupsSPSiteSqlConnectionString = 
+            ShimProcessSecurity.ProcessSecurityGroupsSPSiteSqlConnectionString =
                 (site, conn, users) => processSecurityGroupsWasCalled = true;
-            ShimCollectJob.AllInstances.setRPTSettingsEPMDataSPSite = 
+            ShimCollectJob.AllInstances.setRPTSettingsEPMDataSPSite =
                 (_, epmData, site) => setRPTSettingsWasCalled = true;
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
             ReturnValue = true;
@@ -114,12 +115,13 @@ namespace EPMLiveReporting.Tests.Jobs
                 executeReportExtractWasCalled = true;
                 return DummyString;
             };
-            ShimCollectJob.AllInstances.CheckReqSPSqlConnection = 
+            string errMsg = string.Empty;
+            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
                 (_, connection) => checkReqSPWasCalled = true;
-            ShimCollectJob.AllInstances.CheckSchemaSqlConnection = 
+            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
                 (_, connection) => checkSchemaWasCalled = true;
-            ShimDataScrubber.CleanTablesSPSiteEPMData = 
-                (site, epmData) => cleanTablesWasCalled = true;
+            ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRef;
+            cleanTablesWasCalled = true;
             ShimDataSet.AllInstances.TablesGet = _ => new ShimDataTableCollection
             {
                 ItemGetInt32 = index => new ShimDataTable
@@ -136,7 +138,7 @@ namespace EPMLiveReporting.Tests.Jobs
                     }
                 }
             };
-            ShimCacheStore.AllInstances.RemoveSafelyStringStringString = 
+            ShimCacheStore.AllInstances.RemoveSafelyStringStringString =
                 (_, url, category, key) => removeSafelyWasCalled = true;
 
             // Act
@@ -210,8 +212,8 @@ namespace EPMLiveReporting.Tests.Jobs
                 executeReportExtractWasCalled = true;
                 return DummyString;
             };
-            ShimSqlParameterCollection.AllInstances.AddWithValueStringObject = 
-                (_, name, value) => 
+            ShimSqlParameterCollection.AllInstances.AddWithValueStringObject =
+                (_, name, value) =>
                 {
                     if (value.ToString() == Error)
                     {
@@ -226,8 +228,8 @@ namespace EPMLiveReporting.Tests.Jobs
                 (_, connection) => checkReqSPWasCalled = true;
             ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
                 (_, connection) => checkSchemaWasCalled = true;
-            ShimDataScrubber.CleanTablesSPSiteEPMData =
-                (site, epmData) => cleanTablesWasCalled = true;
+            ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRef;
+            cleanTablesWasCalled = true;
             ShimDataSet.AllInstances.TablesGet = _ => new ShimDataTableCollection
             {
                 ItemGetInt32 = index => new ShimDataTable
@@ -327,7 +329,7 @@ namespace EPMLiveReporting.Tests.Jobs
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
             ReturnValue = true;
             ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheetsException;
-            ShimWEIntegration.AllInstances.ExecuteReportExtractString = 
+            ShimWEIntegration.AllInstances.ExecuteReportExtractString =
                 (_, dataToExtract) =>
                 {
                     throw new Exception(DummyError);
@@ -342,11 +344,8 @@ namespace EPMLiveReporting.Tests.Jobs
                 {
                     throw new Exception(DummyError);
                 };
-            ShimDataScrubber.CleanTablesSPSiteEPMData =
-                (site, epmData) =>
-                {
-                    throw new Exception(DummyError);
-                };
+            ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRefException;
+
             ShimDataSet.AllInstances.TablesGet = _ => null;
             ShimCacheStore.AllInstances.RemoveSafelyStringStringString =
                 (_, url, category, key) =>
@@ -389,7 +388,7 @@ namespace EPMLiveReporting.Tests.Jobs
         public void CheckSchema_Should_ExecuteCorrectly()
         {
             // Arrange
-            const string ExpectedCommand = "IF NOT EXISTS (SELECT TABLE_NAME FROM " + 
+            const string ExpectedCommand = "IF NOT EXISTS (SELECT TABLE_NAME FROM " +
                 "INFORMATION_SCHEMA.tables WHERE TABLE_NAME = 'ReportListIds')";
             var commandExecuted = string.Empty;
             ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
@@ -411,7 +410,7 @@ namespace EPMLiveReporting.Tests.Jobs
         public void GetReportingConnection_Should_ReturnExpectedValue()
         {
             // Arrange
-            const string ExpectedValue = "Data Source=dummyString;Initial Catalog=dummyString;" + 
+            const string ExpectedValue = "Data Source=dummyString;Initial Catalog=dummyString;" +
                 "User ID=dummyString;Password=dummyString";
             var spWeb = new ShimSPWeb
             {
@@ -563,9 +562,9 @@ namespace EPMLiveReporting.Tests.Jobs
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
         private bool UpdateRPTSettings(
-            EPMData epmData, 
-            string nonWorkingDays, 
-            int workHours, 
+            EPMData epmData,
+            string nonWorkingDays,
+            int workHours,
             out string results)
         {
             results = string.Empty;
@@ -575,10 +574,35 @@ namespace EPMLiveReporting.Tests.Jobs
         /// <summary>
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
+        private bool CleanTablesSPSiteEPMDataGuidStringRef(
+            SPSite site,
+            EPMData epmData,
+            Guid jobId,
+            ref string error)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private bool CleanTablesSPSiteEPMDataGuidStringRefException(
+            SPSite site,
+            EPMData epmData,
+            Guid jobId,
+            ref string error)
+        {
+            const string DummyError = "Dummy Error";
+            throw new Exception(DummyError);
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
         private bool RefreshTimesheets(
-            EPMData empData, 
-            out string message, 
-            Guid jobUid, 
+            EPMData empData,
+            out string message,
+            Guid jobUid,
             bool consolidationDone)
         {
             RefreshTimeSheetWasCalled = true;
@@ -590,9 +614,9 @@ namespace EPMLiveReporting.Tests.Jobs
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
         private bool RefreshTimesheetsException(
-            EPMData empData, 
-            out string message, 
-            Guid jobUid, 
+            EPMData empData,
+            out string message,
+            Guid jobUid,
             bool consolidationDone)
         {
             throw new Exception();

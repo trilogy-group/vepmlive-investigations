@@ -286,7 +286,7 @@ namespace EPMLiveReportsAdmin
             Guard.ArgumentIsNotNull(longMsg, nameof(longMsg));
             Guard.ArgumentIsNotNull(epmData, nameof(epmData));
 
-            epmData.LogStatus(string.Empty, string.Empty, shortMsg, longMsg, 2, 3, string.Empty);
+            epmData.LogStatus(string.Empty, string.Empty, shortMsg, longMsg, 2, 3, Convert.ToString(timerJobId));
         }
 
         private static void LogStatusDataCleaning(string shortMsg, string longMsg, EPMData epmData)
