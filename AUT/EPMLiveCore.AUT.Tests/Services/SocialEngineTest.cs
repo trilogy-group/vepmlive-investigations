@@ -1132,37 +1132,6 @@ namespace EPMLiveCore.Services
 
         #endregion
 
-        #region Method Call : (AddUser) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SocialEngine_AddUser_Method_Call_Void_With_3_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var activities = CreateType<SEActivities>();
-            var activity = CreateType<SEActivities.Thread.Activity>();
-            var ar = CreateType<DataRow>();
-            var methodAddUserPrametersTypes = new Type[] { typeof(SEActivities), typeof(SEActivities.Thread.Activity), typeof(DataRow) };
-            object[] parametersOfAddUser = { activities, activity, ar };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAddUser, methodAddUserPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_socialEngineInstanceFixture, parametersOfAddUser);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAddUser.ShouldNotBeNull();
-            parametersOfAddUser.Length.ShouldBe(3);
-            methodAddUserPrametersTypes.Length.ShouldBe(3);
-            methodAddUserPrametersTypes.Length.ShouldBe(parametersOfAddUser.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (AddUser) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]

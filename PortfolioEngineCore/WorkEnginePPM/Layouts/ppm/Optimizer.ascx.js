@@ -1961,6 +1961,17 @@
                     if (selectView.selectedIndex >= 0) {
                         var selectedItem = selectView.options[selectView.selectedIndex];
                         var deleteViewGuid = selectedItem.value;
+
+                        for (var i = 0; i < this.Views.length; i++) {
+
+                            var view = this.Views[i];
+
+                            if (view != undefined && view.ViewGUID === deleteViewGuid && view.Default === "1") {
+                                alert('Default view cannot be deleted');
+                                return;
+                            }
+                        }
+
                         var sbd = new StringBuilder();
                         sbd.append('<Execute Function="DeleteOptimizerView">');
                         sbd.append('<View ViewGUID="' + XMLValue(deleteViewGuid) + '" />');

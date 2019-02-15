@@ -85,35 +85,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region General Initializer : Class (ContextualHelpSlideOut) All Properties Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="ContextualHelpSlideOut" />) explore and verify properties for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(PropertyChromeType)]
-        [TestCase(PropertyContentLocation)]
-        [TestCase(PropertySlideOutOffSet)]
-        [TestCase(PropertySlideOutTitle)]
-        public void AUT_ContextualHelpSlideOut_All_Properties_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var propertyInfo = GetPropertyInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreProperty(_contextualHelpSlideOutInstanceFixture,
-                                              Fixture,
-                                              propertyInfo);
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region General Initializer : Class (ContextualHelpSlideOut) All Fields Explore By Name
 
         /// <summary>
@@ -195,24 +167,7 @@ namespace EPMLiveWebParts
         #endregion
 
         #region Category : GetterSetter
-
-        #region General Getters/Setters : Class (ContextualHelpSlideOut) => all properties (non-static) explore and verify type tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT GetterSetter")]
-        [TestCaseGeneric(typeof(PartChromeType) , PropertyChromeType)]
-        [TestCaseGeneric(typeof(string) , PropertyContentLocation)]
-        [TestCaseGeneric(typeof(int) , PropertySlideOutOffSet)]
-        [TestCaseGeneric(typeof(string) , PropertySlideOutTitle)]
-        public void AUT_ContextualHelpSlideOut_Property_Type_Verify_Explore_By_Name_Test<T>(string propertyName)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.PropertyTypeVerify<ContextualHelpSlideOut, T>(_contextualHelpSlideOutInstance, propertyName, Fixture);
-        }
-
-        #endregion
-
+        
         #region General Getters/Setters : Class (ContextualHelpSlideOut) => Property (ChromeType) Property Type Test Except String
 
         [Test]

@@ -497,7 +497,8 @@ begin
 	[TS_UID] ASC
 	)WITH (SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [PRIMARY]
 end
-
+-------------------------------------------
+		   
 if not exists(select * from sys.indexes where name = 'IX_ITEMSEC_QUEUE')
 begin
 	CREATE INDEX [IX_ITEMSEC_QUEUE] ON [dbo].[ITEMSEC] ([QUEUE], [STATUS]) INCLUDE ([USER_ID], [dtadded], [PRIORITY])
@@ -505,10 +506,7 @@ end
 
 if not exists(select * from sys.indexes where name = 'IX_TSRESMETA_TS_UID')
 begin
-	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID]) 
+	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID])
 end
-
-
-
-
-
+													  
+													  

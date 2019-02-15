@@ -3174,37 +3174,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (MyFormat) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_MyFormat_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var obj = CreateType<object>();
-            var lt = CreateType<int>();
-            var sCodes = CreateType<string>();
-            var sRes = CreateType<string>();
-            var methodMyFormatPrametersTypes = new Type[] { typeof(object), typeof(int), typeof(string), typeof(string) };
-            object[] parametersOfMyFormat = { obj, lt, sCodes, sRes };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodMyFormat, methodMyFormatPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfMyFormat);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfMyFormat.ShouldNotBeNull();
-            parametersOfMyFormat.Length.ShouldBe(4);
-            methodMyFormatPrametersTypes.Length.ShouldBe(4);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (MyFormat) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -3269,27 +3238,6 @@ namespace ModelDataCache
             // Assert
             Should.NotThrow(currentAction);
             methodMyFormatPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (MyFormat) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_MyFormat_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodMyFormat, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelCacheInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion
@@ -5037,35 +4985,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (SortCollection) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_SortCollection_Method_Call_Void_With_1_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var i = CreateType<int>();
-            var methodSortCollectionPrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfSortCollection = { i };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSortCollection, methodSortCollectionPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfSortCollection);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSortCollection.ShouldNotBeNull();
-            parametersOfSortCollection.Length.ShouldBe(1);
-            methodSortCollectionPrametersTypes.Length.ShouldBe(1);
-            methodSortCollectionPrametersTypes.Length.ShouldBe(parametersOfSortCollection.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SortCollection) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -5159,37 +5078,6 @@ namespace ModelDataCache
         {
             var methodConCatCollectionPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_modelCacheInstance, MethodConCatCollection, Fixture, methodConCatCollectionPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (ConCatCollection) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_ConCatCollection_Method_Call_Void_With_3_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var i = CreateType<int>();
-            var groupfid = CreateType<int>();
-            var sgroup = CreateType<string>();
-            var methodConCatCollectionPrametersTypes = new Type[] { typeof(int), typeof(int), typeof(string) };
-            object[] parametersOfConCatCollection = { i, groupfid, sgroup };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodConCatCollection, methodConCatCollectionPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfConCatCollection);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfConCatCollection.ShouldNotBeNull();
-            parametersOfConCatCollection.Length.ShouldBe(3);
-            methodConCatCollectionPrametersTypes.Length.ShouldBe(3);
-            methodConCatCollectionPrametersTypes.Length.ShouldBe(parametersOfConCatCollection.Length);
-            Should.Throw<Exception>(currentAction);
         }
 
         #endregion
@@ -5661,32 +5549,6 @@ namespace ModelDataCache
 
             // Assert
             Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (ProcessAndCreateDistplayLists) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_ProcessAndCreateDistplayLists_Method_Call_Void_With_No_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodProcessAndCreateDistplayListsPrametersTypes = null;
-            object[] parametersOfProcessAndCreateDistplayLists = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodProcessAndCreateDistplayLists, methodProcessAndCreateDistplayListsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfProcessAndCreateDistplayLists);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfProcessAndCreateDistplayLists.ShouldBeNull();
-            methodProcessAndCreateDistplayListsPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -6516,32 +6378,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (GetBottomGrid) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetBottomGrid_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGetBottomGridPrametersTypes = null;
-            object[] parametersOfGetBottomGrid = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetBottomGrid, methodGetBottomGridPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfGetBottomGrid);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetBottomGrid.ShouldBeNull();
-            methodGetBottomGridPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetBottomGrid) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -6605,27 +6441,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (GetBottomGrid) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetBottomGrid_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetBottomGrid, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelCacheInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetBottomGridLayout) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]
@@ -6652,32 +6467,6 @@ namespace ModelDataCache
 
             // Assert
             Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetBottomGridLayout) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetBottomGridLayout_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodGetBottomGridLayoutPrametersTypes = null;
-            object[] parametersOfGetBottomGridLayout = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetBottomGridLayout, methodGetBottomGridLayoutPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfGetBottomGridLayout);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetBottomGridLayout.ShouldBeNull();
-            methodGetBottomGridLayoutPrametersTypes.ShouldBeNull();
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -6741,27 +6530,6 @@ namespace ModelDataCache
             // Assert
             Should.NotThrow(currentAction);
             methodGetBottomGridLayoutPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (GetBottomGridLayout) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetBottomGridLayout_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetBottomGridLayout, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelCacheInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion
@@ -7078,64 +6846,6 @@ namespace ModelDataCache
 
             // Assert
             Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetFTEMode) (Return Type : int) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetFTEMode_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodGetFTEModePrametersTypes = null;
-            object[] parametersOfGetFTEMode = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetFTEMode, methodGetFTEModePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<ModelCache, int>(_modelCacheInstanceFixture, out exception1, parametersOfGetFTEMode);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ModelCache, int>(_modelCacheInstance, MethodGetFTEMode, parametersOfGetFTEMode, methodGetFTEModePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGetFTEMode.ShouldBeNull();
-            methodGetFTEModePrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (GetFTEMode) (Return Type : int) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetFTEMode_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetFTEModePrametersTypes = null;
-            object[] parametersOfGetFTEMode = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetFTEMode, methodGetFTEModePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<ModelCache, int>(_modelCacheInstanceFixture, out exception1, parametersOfGetFTEMode);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ModelCache, int>(_modelCacheInstance, MethodGetFTEMode, parametersOfGetFTEMode, methodGetFTEModePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGetFTEMode.ShouldBeNull();
-            methodGetFTEModePrametersTypes.ShouldBeNull();
         }
 
         #endregion
@@ -8553,34 +8263,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (GetFilterGridData) (Return Type : String) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetFilterGridData_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodGetFilterGridDataPrametersTypes = null;
-            object[] parametersOfGetFilterGridData = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetFilterGridData, methodGetFilterGridDataPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<ModelCache, String>(_modelCacheInstanceFixture, out exception1, parametersOfGetFilterGridData);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ModelCache, String>(_modelCacheInstance, MethodGetFilterGridData, parametersOfGetFilterGridData, methodGetFilterGridDataPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetFilterGridData.ShouldBeNull();
-            methodGetFilterGridDataPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetFilterGridData) (Return Type : String) No Exception with encapsulation Thrown
 
         [Test]
@@ -8640,27 +8322,6 @@ namespace ModelDataCache
             // Assert
             Should.NotThrow(currentAction);
             methodGetFilterGridDataPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (GetFilterGridData) (Return Type : String) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetFilterGridData_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetFilterGridData, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelCacheInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
         }
 
         #endregion
@@ -9902,35 +9563,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (SetSortAndGroup) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_SetSortAndGroup_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sng = CreateType<SortGroupDefn>();
-            var methodSetSortAndGroupPrametersTypes = new Type[] { typeof(SortGroupDefn) };
-            object[] parametersOfSetSortAndGroup = { sng };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetSortAndGroup, methodSetSortAndGroupPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfSetSortAndGroup);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetSortAndGroup.ShouldNotBeNull();
-            parametersOfSetSortAndGroup.Length.ShouldBe(1);
-            methodSetSortAndGroupPrametersTypes.Length.ShouldBe(1);
-            methodSetSortAndGroupPrametersTypes.Length.ShouldBe(parametersOfSetSortAndGroup.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetSortAndGroup) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -11073,28 +10705,6 @@ namespace ModelDataCache
         {
             var methodGetVersionsPIListsPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_modelCacheInstance, MethodGetVersionsPILists, Fixture, methodGetVersionsPIListsPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (GetVersionsPILists) (Return Type : void) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetVersionsPILists_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var sng = CreateType<SortGroupDefn>();
-            var fromVer = CreateType<int>();
-            var toVer = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _modelCacheInstance.GetVersionsPILists(ref sng, fromVer, toVer);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
         }
 
         #endregion
@@ -12626,38 +12236,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (BuildCatJSon) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_BuildCatJSon_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var rdata = CreateType<CSRatesAndCategory>();
-            var index = CreateType<int>();
-            var max = CreateType<int>();
-            var methodBuildCatJSonPrametersTypes = new Type[] { typeof(CSRatesAndCategory), typeof(int), typeof(int) };
-            object[] parametersOfBuildCatJSon = { rdata, index, max };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodBuildCatJSon, methodBuildCatJSonPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<ModelCache, string>(_modelCacheInstanceFixture, out exception1, parametersOfBuildCatJSon);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ModelCache, string>(_modelCacheInstance, MethodBuildCatJSon, parametersOfBuildCatJSon, methodBuildCatJSonPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfBuildCatJSon.ShouldNotBeNull();
-            parametersOfBuildCatJSon.Length.ShouldBe(3);
-            methodBuildCatJSonPrametersTypes.Length.ShouldBe(3);
-        }
-
-        #endregion
-
         #region Method Call : (BuildCatJSon) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -12721,27 +12299,6 @@ namespace ModelDataCache
             // Assert
             Should.NotThrow(currentAction);
             methodBuildCatJSonPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (BuildCatJSon) (Return Type : string) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_BuildCatJSon_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodBuildCatJSon, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelCacheInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
         }
 
         #endregion
@@ -14799,34 +14356,6 @@ namespace ModelDataCache
 
         #endregion
 
-        #region Method Call : (GetUserViewSlug) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetUserViewSlug_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var sZoomTo = CreateType<string>();
-            var methodGetUserViewSlugPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfGetUserViewSlug = { sZoomTo };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetUserViewSlug, methodGetUserViewSlugPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_modelCacheInstanceFixture, parametersOfGetUserViewSlug);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetUserViewSlug.ShouldNotBeNull();
-            parametersOfGetUserViewSlug.Length.ShouldBe(1);
-            methodGetUserViewSlugPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetUserViewSlug) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -14888,27 +14417,6 @@ namespace ModelDataCache
             // Assert
             Should.NotThrow(currentAction);
             methodGetUserViewSlugPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetUserViewSlug) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ModelCache_GetUserViewSlug_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetUserViewSlug, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelCacheInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

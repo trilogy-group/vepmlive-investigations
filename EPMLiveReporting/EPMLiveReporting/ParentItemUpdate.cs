@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.SharePoint;
 using System.Data.SqlClient;
+using EPMLiveCore;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin
 {
@@ -49,48 +46,59 @@ namespace EPMLiveReportsAdmin
                 }
             }
 
-            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            using (var connection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
             {
-                foreach (string sItem in arrProcessItems)
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn.Open();
-
-                    string []sItemInfo = sItem.Split('.');
-
-                    bool found = false;
-
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM ROLLUPQUEUE WHERE listid=@listid and itemid = @itemid and status = 0", cn);
-                    cmd.Parameters.AddWithValue("@listid", sItemInfo[1]);
-                    cmd.Parameters.AddWithValue("@itemid", sItemInfo[0]);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    foreach (string sItem in arrProcessItems)
                     {
-                        found = true;
-                    }
-                    dr.Close();
+                        connection.Open();
 
-                    if (found)
-                    {
-                        cmd = new SqlCommand("UPDATE ROLLUPQUEUE SET EVENTTIME=GETDATE() WHERE listid=@listid and itemid=@itemid and status = 0", cn);
-                        cmd.Parameters.AddWithValue("@listid", sItemInfo[1]);
-                        cmd.Parameters.AddWithValue("@itemid", sItemInfo[0]);
-                        cmd.ExecuteNonQuery();
+                        string[] sItemInfo = sItem.Split('.');
+
+                        var found = false;
+
+                        using (var cmd = new SqlCommand("SELECT * FROM ROLLUPQUEUE WHERE listid=@listid and itemid = @itemid and status = 0", connection))
+                        {
+                            cmd.Parameters.AddWithValue("@listid", sItemInfo[1]);
+                            cmd.Parameters.AddWithValue("@itemid", sItemInfo[0]);
+
+                            using (var dataReader = cmd.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    found = true;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            using (var cmd = new SqlCommand(
+                                "UPDATE ROLLUPQUEUE SET EVENTTIME=GETDATE() WHERE listid=@listid and itemid=@itemid and status = 0",
+                                connection))
+                            {
+                                cmd.Parameters.AddWithValue("@listid", sItemInfo[1]);
+                                cmd.Parameters.AddWithValue("@itemid", sItemInfo[0]);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            using (var cmd = new SqlCommand(
+                                "INSERT INTO ROLLUPQUEUE (SiteId, WebId, ListId, ItemId, EventTime, Status) VALUES (@SiteId, @WebId, @ListId, @ItemId, GETDATE(), 0)",
+                                connection))
+                            {
+                                cmd.Parameters.AddWithValue("@SiteId", properties.SiteId);
+                                cmd.Parameters.AddWithValue("@WebId", web.ID);
+                                cmd.Parameters.AddWithValue("@ListId", sItemInfo[1]);
+                                cmd.Parameters.AddWithValue("@ItemId", sItemInfo[0]);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
                     }
-                    else
-                    {
-                        cmd = new SqlCommand("INSERT INTO ROLLUPQUEUE (SiteId, WebId, ListId, ItemId, EventTime, Status) VALUES (@SiteId, @WebId, @ListId, @ItemId, GETDATE(), 0)", cn);
-                        cmd.Parameters.AddWithValue("@SiteId", properties.SiteId);
-                        cmd.Parameters.AddWithValue("@WebId", web.ID);
-                        cmd.Parameters.AddWithValue("@ListId", sItemInfo[1]);
-                        cmd.Parameters.AddWithValue("@ItemId", sItemInfo[0]);
-                        cmd.ExecuteNonQuery();
-                    }
-                    cn.Close();
-                }
-            });
+                });
+            }
         }
     }
 }

@@ -947,8 +947,17 @@ namespace EPMLiveCore
                     }
                 });
             }
+
             if (p != null)
+            {
+                // semicolon causes issues in list cleanup and potentially in other modules.
+                if (p.Name.Contains(";"))
+                {
+                    throw new SPException("Semicolon is not allowed for AD username.");
+                }
+
                 return p.ID + ";#" + p.Name;
+            }
 
             return "";
         }

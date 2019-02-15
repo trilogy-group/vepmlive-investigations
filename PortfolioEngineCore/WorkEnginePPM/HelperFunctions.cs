@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using Microsoft.SharePoint;
 using System.Data;
+using System.Diagnostics;
 using System.Xml;
-using System.DirectoryServices;
 using System.Web;
 using System.Web.UI;
 using System.Runtime.Caching;
-//using Microsoft.SharePoint.Administration;
-//using Microsoft.SharePoint.Administration.Claims;
+using EPMLiveCore.Helpers;
+using CoreEditableFieldDisplay = EPMLiveCore.EditableFieldDisplay;
 
 namespace WorkEnginePPM
 {
@@ -518,6 +518,85 @@ namespace WorkEnginePPM
 
             return memoryCache.Get("ResPoolDt_" + web.ID, null) as DataTable;
 
+        }
+
+        public static bool IsEditable(SPListItem listItem, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        {
+            try
+            {
+                Guard.ArgumentIsNotNull(fieldProperties, nameof(fieldProperties));
+                Guard.ArgumentIsNotNull(field, nameof(field));
+
+                const string EditKey = "Edit";
+                const string EditableKey = "Editable";
+                const string DisplaySettingsNever = "never";
+
+                if (!fieldProperties[field.InternalName].ContainsKey(EditKey))
+                {
+                    return true;
+                }
+
+                var displaySettings = fieldProperties[field.InternalName][EditKey];
+                var renderField = RenderField(listItem, field, displaySettings);
+
+                if (!renderField)
+                {
+                    return false;
+                }
+
+                displaySettings = fieldProperties[field.InternalName][EditableKey];
+
+                if (displaySettings.Split(";".ToCharArray())[0].Equals(DisplaySettingsNever, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                return RenderField(listItem, field, displaySettings);
+            }
+            catch (Exception exception)
+            {
+                Trace.WriteLine(exception);
+            }
+
+            return true;
+        }
+
+        private static bool RenderField(SPListItem listItem, SPField field, string displaySettings)
+        {
+            const string SemiColon = ";";
+            var renderField = true;
+
+            if (displaySettings.Split(SemiColon.ToCharArray())[0].Equals("where", StringComparison.OrdinalIgnoreCase))
+            {
+                var whereField = displaySettings.Split(SemiColon.ToCharArray())[1];
+                var conditionField = string.Empty;
+                string condition;
+                var groupField = string.Empty;
+                var valueCondition = string.Empty;
+
+                if (whereField.Equals("[Me]"))
+                {
+                    condition = displaySettings.Split(SemiColon.ToCharArray())[2];
+                    groupField = displaySettings.Split(SemiColon.ToCharArray())[3];
+                }
+                else
+                {
+                    conditionField = displaySettings.Split(SemiColon.ToCharArray())[2];
+                    condition = displaySettings.Split(SemiColon.ToCharArray())[3];
+                    valueCondition = displaySettings.Split(SemiColon.ToCharArray())[4];
+                }
+
+                renderField = CoreEditableFieldDisplay.RenderField(
+                    field,
+                    whereField,
+                    conditionField,
+                    condition,
+                    groupField,
+                    valueCondition,
+                    listItem);
+            }
+
+            return renderField;
         }
     }
 }

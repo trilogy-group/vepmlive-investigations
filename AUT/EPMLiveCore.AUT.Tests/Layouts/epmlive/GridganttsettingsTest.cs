@@ -3886,89 +3886,6 @@ namespace EPMLiveCore.Layouts.epmlive
 
         #endregion
 
-        #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Gridganttsettings_ReplaceXmlAttributeValue_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xml = CreateType<string>();
-            var attributeName = CreateType<string>();
-            var value = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _gridganttsettingsInstance.ReplaceXmlAttributeValue(xml, attributeName, value);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Gridganttsettings_ReplaceXmlAttributeValue_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var xml = CreateType<string>();
-            var attributeName = CreateType<string>();
-            var value = CreateType<string>();
-            var methodReplaceXmlAttributeValuePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfReplaceXmlAttributeValue = { xml, attributeName, value };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodReplaceXmlAttributeValue, methodReplaceXmlAttributeValuePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<gridganttsettings, string>(_gridganttsettingsInstanceFixture, out exception1, parametersOfReplaceXmlAttributeValue);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<gridganttsettings, string>(_gridganttsettingsInstance, MethodReplaceXmlAttributeValue, parametersOfReplaceXmlAttributeValue, methodReplaceXmlAttributeValuePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfReplaceXmlAttributeValue.ShouldNotBeNull();
-            parametersOfReplaceXmlAttributeValue.Length.ShouldBe(3);
-            methodReplaceXmlAttributeValuePrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(() => ReflectionAnalyzer.GetResultOfMethod<gridganttsettings, string>(_gridganttsettingsInstance, MethodReplaceXmlAttributeValue, parametersOfReplaceXmlAttributeValue, methodReplaceXmlAttributeValuePrametersTypes));
-        }
-
-        #endregion
-
-        #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Gridganttsettings_ReplaceXmlAttributeValue_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var xml = CreateType<string>();
-            var attributeName = CreateType<string>();
-            var value = CreateType<string>();
-            var methodReplaceXmlAttributeValuePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string) };
-            object[] parametersOfReplaceXmlAttributeValue = { xml, attributeName, value };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodReplaceXmlAttributeValue, methodReplaceXmlAttributeValuePrametersTypes, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfReplaceXmlAttributeValue.ShouldNotBeNull();
-            parametersOfReplaceXmlAttributeValue.Length.ShouldBe(3);
-            methodReplaceXmlAttributeValuePrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(() => methodInfo.Invoke(_gridganttsettingsInstanceFixture, parametersOfReplaceXmlAttributeValue));
-        }
-
-        #endregion
-
         #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -3992,26 +3909,6 @@ namespace EPMLiveCore.Layouts.epmlive
 
         #endregion
 
-        #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Gridganttsettings_ReplaceXmlAttributeValue_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            var methodReplaceXmlAttributeValuePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_gridganttsettingsInstance, MethodReplaceXmlAttributeValue, Fixture, methodReplaceXmlAttributeValuePrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodReplaceXmlAttributeValuePrametersTypes.Length.ShouldBe(3);
-        }
-
-        #endregion
-
         #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -4029,27 +3926,6 @@ namespace EPMLiveCore.Layouts.epmlive
             // Assert
             Should.NotThrow(currentAction);
             methodReplaceXmlAttributeValuePrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (ReplaceXmlAttributeValue) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Gridganttsettings_ReplaceXmlAttributeValue_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodReplaceXmlAttributeValue, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_gridganttsettingsInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

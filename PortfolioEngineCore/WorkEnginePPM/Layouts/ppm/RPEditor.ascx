@@ -334,6 +334,7 @@
     function NotesDialogEvent(action) { rpeditor.NotesDialogEvent(action); }
     var DepartmentValidation = '<%=DepartmentValidation%>';
     amountCheck('idSpreadAmount');
+    var DepartmentValidation = '<%=DepartmentValidation%>';
     var params = {};
     try {
         params.ClientID = '<%=ClientID%>';

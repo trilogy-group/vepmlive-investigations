@@ -44,6 +44,10 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveWebParts.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -89,8 +93,7 @@
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="TimeSheets.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="TimeSheets.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\TimeSheets.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -131,7 +134,11 @@
     <Compile Include="API\TimesheetAPI.UnSubmitTimesheet.Tests.cs" />
     <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.addGroups.cs" />
+    <Compile Include="GetTsTests.PageLoad.cs" />
     <Compile Include="GetTsTests.cs" />
+    <Compile Include="Jobs\SaveJobTests.cs" />
+    <Compile Include="Layouts\epmlive\TimesheetadminTests.cs" />
+    <Compile Include="Layouts\WorkLogTest.cs" />
     <Compile Include="MyTimesheetTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -148,7 +155,9 @@
     <Compile Include="TimesheetApprovalsTest.cs" />
     <Compile Include="TimesheetTest.cs" />
     <Compile Include="PMApprovalsTest.cs" />
+    <Compile Include="WebPageCode\dotsactionTests.cs" />
     <Compile Include="WebPageCode\GetTimesheetTest.cs" />
+    <Compile Include="WebPageCode\SavetimesheetTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -170,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="EPMLiveTimesheets.Tests.snk" />
+    <Compile Include="GetTsTests.addHeader.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

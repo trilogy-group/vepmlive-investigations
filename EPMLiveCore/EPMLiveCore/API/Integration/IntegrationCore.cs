@@ -176,9 +176,12 @@ namespace EPMLiveCore.API.Integration
 
                     OpenConnection();
 
-                    SqlCommand cmd = new SqlCommand("DELETE FROM INT_CONTROLS where INT_LIST_ID=@intlistid", cn);
-                    cmd.Parameters.AddWithValue("@intlistid", intlistid);
-                    cmd.ExecuteNonQuery();
+                    const string cmdTextDeleteIntControls = "DELETE FROM INT_CONTROLS where INT_LIST_ID=@intlistid";
+                    using (var command = new SqlCommand(cmdTextDeleteIntControls, cn))
+                    {
+                        command.Parameters.AddWithValue("@intlistid", intlistid);
+                        command.ExecuteNonQuery();
+                    }
 
                     if (controls != null)
                     {
@@ -907,18 +910,28 @@ namespace EPMLiveCore.API.Integration
                                         bOpened = true;
                                         cn.Open();
                                     }
-                                    SqlCommand cmd = new SqlCommand("SELECT DATA FROM INT_EVENTS WHERE INT_EVENT_ID=@inteventid", cn);
-                                    cmd.Parameters.AddWithValue("@inteventid", dr["INT_EVENT_ID"].ToString());
-                                    string xml = "";
 
-                                    SqlDataReader dataRead = cmd.ExecuteReader();
-                                    try
+                                    var xml = string.Empty;
+                                    const string queryText = "SELECT DATA FROM INT_EVENTS WHERE INT_EVENT_ID=@inteventid";
+                                    using (var command = new SqlCommand(queryText, cn))
                                     {
-                                        if (dataRead.Read())
-                                            xml = dataRead.GetString(0);
+                                        command.Parameters.AddWithValue("@inteventid", dr["INT_EVENT_ID"].ToString());
+
+                                        using (var dataReader = command.ExecuteReader())
+                                        {
+                                            try
+                                            {
+                                                if (dataReader.Read())
+                                                {
+                                                    xml = dataReader.GetString(0);
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Trace.TraceError(ex.ToString());
+                                            }
+                                        }
                                     }
-                                    catch { }
-                                    dataRead.Close();
 
                                     if (bOpened)
                                         cn.Close();
@@ -1190,12 +1203,19 @@ namespace EPMLiveCore.API.Integration
 
             string mapping = "Username";
 
-            SqlCommand cmd = new SqlCommand("SELECT VALUE FROM INT_PROPS where INT_LIST_ID=@intlistid and PROPERTY='UserMapType'", cn);
-            cmd.Parameters.AddWithValue("@intlistid", integrationlistid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-                mapping = dr.GetString(0);
-            dr.Close();
+            const string queryReadValueFromProps = "SELECT VALUE FROM INT_PROPS where INT_LIST_ID=@intlistid and PROPERTY='UserMapType'";
+            using (var command = new SqlCommand(queryReadValueFromProps, cn))
+            {
+                command.Parameters.AddWithValue("@intlistid", integrationlistid);
+
+                using (var dataReader = command.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        mapping = dataReader.GetString(0);
+                    }
+                }
+            }
 
             switch (mapping)
             {
@@ -1208,12 +1228,20 @@ namespace EPMLiveCore.API.Integration
                     string moduleid = "";
                     string colid = "";
 
-                    cmd = new SqlCommand("SELECT MODULE_ID FROM INT_LISTS where INT_LIST_ID=@intlistid", cn);
-                    cmd.Parameters.AddWithValue("@intlistid", integrationlistid);
-                    dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                        moduleid = dr.GetGuid(0).ToString();
-                    dr.Close();
+                    const string queryReadModuleIdFromIntLists = "SELECT MODULE_ID FROM INT_LISTS where INT_LIST_ID=@intlistid";
+                    using (var command = new SqlCommand(queryReadModuleIdFromIntLists, cn))
+                    {
+                        command.Parameters.AddWithValue("@intlistid", integrationlistid);
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            if (dataReader.Read())
+                            {
+                                moduleid = dataReader.GetGuid(0).ToString();
+                            }
+                        }
+                    }
+
                     if (moduleid != "")
                     {
                         string listid = "";
@@ -1242,13 +1270,20 @@ namespace EPMLiveCore.API.Integration
 
                         if (listid != "")
                         {
-                            cmd = new SqlCommand("SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid and MODULE_ID=@moduleid", cn);
-                            cmd.Parameters.AddWithValue("@listid", listid);
-                            cmd.Parameters.AddWithValue("@moduleid", moduleid);
-                            dr = cmd.ExecuteReader();
-                            if (dr.Read())
-                                colid = dr.GetInt32(0).ToString();
-                            dr.Close();
+                            const string queryReadColIdFromIntLists = "SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid and MODULE_ID=@moduleid";
+                            using (var command = new SqlCommand(queryReadColIdFromIntLists, cn))
+                            {
+                                command.Parameters.AddWithValue("@listid", listid);
+                                command.Parameters.AddWithValue("@moduleid", moduleid);
+
+                                using (var dataReader = command.ExecuteReader())
+                                {
+                                    if (dataReader.Read())
+                                    {
+                                        colid = dataReader.GetInt32(0).ToString();
+                                    }
+                                }
+                            }
                         }
                     }
                     if (colid != "")
@@ -1752,16 +1787,22 @@ namespace EPMLiveCore.API.Integration
 
             OpenConnection();
 
-            SqlCommand cmd = new SqlCommand("SELECT     LIST_ID,INT_KEY from INT_LISTS where INT_LIST_ID=@intlistid", cn);
-            cmd.Parameters.AddWithValue("@intlistid", intlistid);
-            SqlDataReader dr = cmd.ExecuteReader();
-            Guid listid = Guid.Empty;
-            if (dr.Read())
+            var listid = Guid.Empty;
+            const string queryText = "SELECT     LIST_ID,INT_KEY from INT_LISTS where INT_LIST_ID=@intlistid";
+            using (var command = new SqlCommand(queryText, cn))
             {
-                listid = dr.GetGuid(0);
-                props.IntegrationKey = dr.GetString(1);
+                command.Parameters.AddWithValue("@intlistid", intlistid);
+
+                using (var dataReader = command.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        listid = dataReader.GetGuid(0);
+                        props.IntegrationKey = dataReader.GetString(1);
+                    }
+                }
             }
-            dr.Close();
+
             CloseConnection(false);
 
             if (listid != Guid.Empty)

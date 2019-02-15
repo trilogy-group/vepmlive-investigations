@@ -224,56 +224,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (GetById) (Return Type : UserLevel) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_UserLevels_GetById_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var id = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _userLevelsInstance.GetById(id);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetById) (Return Type : UserLevel) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_UserLevels_GetById_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var id = CreateType<int>();
-            var methodGetByIdPrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfGetById = { id };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetById, methodGetByIdPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<UserLevels, UserLevel>(_userLevelsInstanceFixture, out exception1, parametersOfGetById);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<UserLevels, UserLevel>(_userLevelsInstance, MethodGetById, parametersOfGetById, methodGetByIdPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetById.ShouldNotBeNull();
-            parametersOfGetById.Length.ShouldBe(1);
-            methodGetByIdPrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
         #region Method Call : (GetById) (Return Type : UserLevel) No Exception with encapsulation Thrown
 
         [Test]
@@ -315,27 +265,6 @@ namespace EPMLiveCore
             // Assert
             Should.NotThrow(currentAction);
             methodGetByIdPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetById) (Return Type : UserLevel) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_UserLevels_GetById_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetById, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_userLevelsInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
         }
 
         #endregion

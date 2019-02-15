@@ -18,6 +18,7 @@ namespace TimeSheets.Tests
         private IDisposable _shimContext;
         private SharepointShims _shimSharepointCalls;
         private PrivateObject _privateObject;
+        private AdoShims _adoShims;        
 
         private const string AddGroupsMethod = "addGroups";
         private const string docXmlProperty = "docXml";
@@ -59,9 +60,10 @@ namespace TimeSheets.Tests
         {
             _shimContext = ShimsContext.Create();
             _shimSharepointCalls = SharepointShims.ShimSharepointCalls();
+            _adoShims = AdoShims.ShimAdoNetCalls();
 
-            _privateObject = new PrivateObject(typeof(getts));
-
+            _privateObject = new PrivateObject(typeof(getts));            
+            
             ArrangeShims();
         }
 
@@ -219,6 +221,10 @@ namespace TimeSheets.Tests
 
                 return list.GetEnumerator();
             };
+
+            ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
+
+            ShimSPSite.AllInstances.IDGet = _ => Guid.Empty;
         }
     }
 }

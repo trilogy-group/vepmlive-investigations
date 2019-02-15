@@ -85,6 +85,9 @@
     </Compile>
     <Compile Include="API\SPRoleChecker.cs" />
     <Compile Include="API\TimesheetAPI.cs" />
+    <Compile Include="ApprovalsBase.cs" />
+    <Compile Include="ApprovalsBase.RenderWebPart.cs" />
+    <Compile Include="Jobs\AllocationNotificationJob.cs" />
     <Compile Include="Jobs\ApprovalJob.cs" />
     <Compile Include="Jobs\BaseJob.cs" />
     <Compile Include="Jobs\SaveDataJob.cs" />
@@ -131,6 +134,9 @@
     <Compile Include="Layouts\epmlive\WorkLog.aspx.designer.cs">
       <DependentUpon>WorkLog.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\WorkLog.Scripts.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Models\TimeSheetItem.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="MyTimesheet\MyTimesheet.cs" />
@@ -146,6 +152,25 @@
     <Compile Include="TimesheetsAssemblyInfo.cs" />
     <Compile Include="TimesheetSettings.cs" />
     <Compile Include="Timesheet\Timesheet.cs" />
+    <Compile Include="WebPageCode\DataSetUtils.cs" />
+    <Compile Include="WebPageCode\gettimesheet.AddItem.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\gettimesheet.Fields.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\gettimesheet.outputXml.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\gettimesheet.ProcessXmlNode.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\getts.addGroups.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebPageCode\getts.addHeader.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\timesheetapprovalpage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -184,7 +209,6 @@
     </Compile>
     <Compile Include="WebPageCode\SharedFunctions.cs" />
     <Compile Include="WebPageCode\TimesheetMenu.cs" />
-    <Compile Include="Worklog\DataQueryFactory.cs" />
     <Compile Include="Worklog\DaySettings.cs" />
     <Compile Include="Worklog\EPMData.cs" />
     <Compile Include="Worklog\TSBiz.cs" />

@@ -256,7 +256,17 @@ namespace EPMLiveCore {
         }
         else { SetCustomSelectValue(((HtmlInputText)c)); }
       }
-    } 
-    #endregion
-  }
+    }
+        #endregion
+
+        public override void Dispose()
+        {
+            for (var i = Controls.Count - 1; i >= 0; i--)
+            {
+                Controls[i]?.Dispose();
+            }
+
+            base.Dispose();
+        }
+    }
 }

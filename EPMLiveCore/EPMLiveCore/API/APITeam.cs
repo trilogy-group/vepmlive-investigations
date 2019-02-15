@@ -687,12 +687,12 @@ namespace EPMLiveCore.API
                 }
                 catch (Exception ex)
                 {
-                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.High, ex.ToString());
+                    WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                 }
             }
             catch (Exception ex)
             {
-                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.High, ex.ToString());
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                 throw new APIException(3010, ex.Message);
             }
 
@@ -884,7 +884,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception ex)
             {
-                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.High, ex.ToString());
+                WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.VerboseEx, ex.ToString());
                 userValueCollection = new SPFieldUserValueCollection();
             }
 
@@ -2866,7 +2866,7 @@ namespace EPMLiveCore.API
         }
 
         private const string WEB_GROUPS_QUERY =
-            @"SELECT    dbo.RPTWEBGROUPS.GROUPID AS Id
+            @"SELECT distinct   dbo.RPTWEBGROUPS.GROUPID AS Id
               FROM      dbo.RPTWEBGROUPS INNER JOIN dbo.LSTUserInformationList 
                             ON dbo.RPTWEBGROUPS.WEBID = dbo.LSTUserInformationList.WebId 
                             AND dbo.RPTWEBGROUPS.GROUPID = dbo.LSTUserInformationList.ID

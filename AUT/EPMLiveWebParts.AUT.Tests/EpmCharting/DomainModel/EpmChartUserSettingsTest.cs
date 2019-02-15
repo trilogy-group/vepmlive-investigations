@@ -97,47 +97,7 @@ namespace EPMLiveWebParts.EpmCharting.DomainModel
         }
 
         #endregion
-
-        #region General Initializer : Class (EpmChartUserSettings) All Properties Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="EpmChartUserSettings" />) explore and verify properties for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(PropertyKey)]
-        [TestCase(PropertyWebPartId)]
-        [TestCase(PropertyUserId)]
-        [TestCase(PropertySiteId)]
-        [TestCase(PropertyWebId)]
-        [TestCase(PropertyListId)]
-        [TestCase(PropertyXaxisField)]
-        [TestCase(PropertyXaxisFieldLabel)]
-        [TestCase(PropertyYaxisFields)]
-        [TestCase(PropertyZaxisField)]
-        [TestCase(PropertyZaxisFieldLabel)]
-        [TestCase(PropertyZaxisColorField)]
-        [TestCase(PropertyYaxisFieldsCommaSeparated)]
-        [TestCase(PropertyYaxisFieldLabel)]
-        [TestCase(PropertyIsValid)]
-        [TestCase(PropertyValue)]
-        public void AUT_EpmChartUserSettings_All_Properties_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var propertyInfo = GetPropertyInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreProperty(_epmChartUserSettingsInstanceFixture,
-                                              Fixture,
-                                              propertyInfo);
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #endregion
 
         #endregion
@@ -210,36 +170,7 @@ namespace EPMLiveWebParts.EpmCharting.DomainModel
         #endregion
 
         #region Category : GetterSetter
-
-        #region General Getters/Setters : Class (EpmChartUserSettings) => all properties (non-static) explore and verify type tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT GetterSetter")]
-        [TestCaseGeneric(typeof(string) , PropertyKey)]
-        [TestCaseGeneric(typeof(Guid?) , PropertyWebPartId)]
-        [TestCaseGeneric(typeof(string) , PropertyUserId)]
-        [TestCaseGeneric(typeof(Guid?) , PropertySiteId)]
-        [TestCaseGeneric(typeof(Guid?) , PropertyWebId)]
-        [TestCaseGeneric(typeof(Guid?) , PropertyListId)]
-        [TestCaseGeneric(typeof(string) , PropertyXaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyXaxisFieldLabel)]
-        [TestCaseGeneric(typeof(List<string>) , PropertyYaxisFields)]
-        [TestCaseGeneric(typeof(string) , PropertyZaxisField)]
-        [TestCaseGeneric(typeof(string) , PropertyZaxisFieldLabel)]
-        [TestCaseGeneric(typeof(string) , PropertyZaxisColorField)]
-        [TestCaseGeneric(typeof(string) , PropertyYaxisFieldsCommaSeparated)]
-        [TestCaseGeneric(typeof(string) , PropertyYaxisFieldLabel)]
-        [TestCaseGeneric(typeof(bool) , PropertyIsValid)]
-        [TestCaseGeneric(typeof(string) , PropertyValue)]
-        public void AUT_EpmChartUserSettings_Property_Type_Verify_Explore_By_Name_Test<T>(string propertyName)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.PropertyTypeVerify<EpmChartUserSettings, T>(_epmChartUserSettingsInstance, propertyName, Fixture);
-        }
-
-        #endregion
-
+        
         #region General Getters/Setters : Class (EpmChartUserSettings) => Property (IsValid) (Can Read) tests
 
         [Test]

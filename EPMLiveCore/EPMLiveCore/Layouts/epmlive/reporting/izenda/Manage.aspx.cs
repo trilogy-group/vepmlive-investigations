@@ -4,11 +4,16 @@ using Microsoft.SharePoint.WebControls;
 using System.Data.SqlClient;
 using System.Data;
 using System.Linq;
+using System.Web;
 
 namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
 {
     public partial class Manage : LayoutsPageBase
     {
+        private const string NameColumn = "Name";
+        private const string CategoryColumn = "Category";
+        private const string ShortNameColumn = "ShortName";
+
         protected void Page_Load(object sender, EventArgs e)
         {
             MenuTemplate propertyNameListMenu = new MenuTemplate();
@@ -25,45 +30,54 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
             this.Controls.Add(propertyNameListMenu);
 
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                cn.Open();
-
-                SqlCommand cmd = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid order by Name", cn);
-                cmd.Parameters.AddWithValue("@siteid", Convert.ToString(Web.ID));
-
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
-
-                ds.Tables[0].Columns.Add("Category");
-                ds.Tables[0].Columns.Add("ShortName");
-
-                foreach (DataRow dr in ds.Tables[0].Rows)
+                using (var connection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
                 {
-                    if (dr["Name"].ToString().Contains("\\"))
-                    {
-                        string[] sName = dr["Name"].ToString().Split('\\');
-                        dr["ShortName"] = sName[1];
-                        dr["Category"] = sName[0];
-                    }
-                    else
-                    {
-                        dr["ShortName"] = dr["Name"];
-                        dr["Category"] = "Uncategorized";
-                    }
+                    connection.Open();
 
-                    dr["Name"] = System.Web.HttpUtility.UrlEncode(dr["Name"].ToString());
+                    using (var command = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid order by Name", connection))
+                    {
+                        command.Parameters.AddWithValue("@siteid", Convert.ToString(Web.ID));
+
+                        using (var dataSet = new DataSet())
+                        {
+                            using (var dataReader = new SqlDataAdapter(command))
+                            {
+                                dataReader.Fill(dataSet);
+
+                                dataSet.Tables[0].Columns.Add(CategoryColumn);
+                                dataSet.Tables[0].Columns.Add(ShortNameColumn);
+
+                                foreach (DataRow dataRow in dataSet.Tables[0].Rows)
+                                {
+                                    if (dataRow[NameColumn].ToString().Contains("\\"))
+                                    {
+                                        var names = dataRow[NameColumn].ToString().Split('\\');
+                                        dataRow[ShortNameColumn] = names[1];
+                                        dataRow[CategoryColumn] = names[0];
+                                    }
+                                    else
+                                    {
+                                        dataRow[ShortNameColumn] = dataRow[NameColumn];
+                                        dataRow[CategoryColumn] = "Uncategorized";
+                                    }
+
+                                    dataRow[NameColumn] = HttpUtility.UrlEncode(dataRow[NameColumn].ToString());
+                                }
+
+                                var dataTable = dataSet.Tables[0]
+                                    .AsEnumerable()
+                                    .GroupBy(x => x[CategoryColumn])
+                                    .SelectMany(g => g.OrderBy(v => v[ShortNameColumn]))
+                                    .CopyToDataTable();
+
+                                gvReports.DataSource = dataTable;
+                                gvReports.DataBind();
+                            }
+                        }
+                    }
                 }
-
-                DataTable dt = ds.Tables[0];                
-                dt = dt.AsEnumerable().GroupBy(x => x["Category"]).SelectMany(g => g.OrderBy(v => v["ShortName"])).CopyToDataTable();
-                
-                gvReports.DataSource = dt;
-                gvReports.DataBind();
-
-                cn.Close();
             });
         }
     }

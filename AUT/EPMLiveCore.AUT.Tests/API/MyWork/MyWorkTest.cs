@@ -217,8 +217,8 @@ namespace EPMLiveCore.API
             var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
 
             // Act
-            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_myWorkInstanceFixture, 
-                                                                 Fixture, 
+            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_myWorkInstanceFixture,
+                                                                 Fixture,
                                                                  currentMethodInfo);
 
             // Assert
@@ -276,8 +276,8 @@ namespace EPMLiveCore.API
             var fieldInfo = GetFieldInfo(name);
 
             // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_myWorkInstanceFixture, 
-                                                                Fixture, 
+            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_myWorkInstanceFixture,
+                                                                Fixture,
                                                                 fieldInfo);
 
             // Assert
@@ -6434,7 +6434,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-        
+
         #region Method Call : (GetMyWorkFieldType) (Return Type : string) without parameters value verify result should be null.
 
         [Test]
@@ -6698,7 +6698,7 @@ namespace EPMLiveCore.API
         }
 
         #endregion
-        
+
         #region Method Call : (GetMyWorkGridData) (Return Type : string) Invoke Should Not Throw
 
         [Test]

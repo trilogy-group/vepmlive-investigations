@@ -80,53 +80,68 @@ namespace WorkEnginePPM.WebServices.Core
         /// <returns></returns>
         internal string ExecuteReportExtract(string data)
         {
+            return ExecuteAdminCoreAction(
+                data,
+                "ReportExtract",
+                adminCore => adminCore.ExecuteReportExtract(data),
+                APIError.ExecuteReportExtract);
+        }
+
+        private string ExecuteAdminCoreAction(string data, string itemName, Func<WEIntegration, string> executeAction, APIError apiError)
+        {
             try
             {
-                var xInputData = new CStruct();
-                xInputData.LoadXML(data);
-                CStruct xParmInputElement = xInputData.GetSubStruct("Params");
-                if (xParmInputElement == null) throw new Exception("Cannot find the Param element.");
-                CStruct xDataInputElement = xInputData.GetSubStruct("Data");
-                if (xDataInputElement == null) throw new Exception("Cannot find the Data element.");
-                CStruct xExtract = xDataInputElement.GetSubStruct("ReportExtract");
-                if (xExtract == null) throw new Exception("Cannot find the ReportExtract element.");
+                var inputData = new CStruct();
+                inputData.LoadXML(data);
+                var paramInputElement = inputData.GetSubStruct("Params");
+                if (paramInputElement == null)
+                {
+                    throw new Exception("Cannot find the Param element.");
+                }
+                var dataInputElement = inputData.GetSubStruct("Data");
+                if (dataInputElement == null)
+                {
+                    throw new Exception("Cannot find the Data element.");
+                }
+                var subStruct = dataInputElement.GetSubStruct(itemName);
+                if (subStruct == null)
+                {
+                    throw new Exception(string.Format("Cannot find the {0} element.", itemName));
+                }
 
-                string sResult = "";
-                bool bUpdateOK = true;
+                string result;
+                var updateOk = true;
 
-                WEIntegration adminCore = GetAdminCore(SecurityLevels.BaseAdmin);
+                var adminCore = GetAdminCore(SecurityLevels.BaseAdmin);
                 try
                 {
-                    sResult = adminCore.ExecuteReportExtract(data);
+                    result = executeAction(adminCore);
                 }
                 catch (Exception exception)
                 {
-                    var SWResultElement = new XElement("Result");
-                    Utils.SetResultError(exception, ref SWResultElement);
-                    sResult = SWResultElement.Value;
-                    bUpdateOK = false;
+                    var resultElement = new XElement("Result");
+                    Utils.SetResultError(exception, ref resultElement);
+                    result = resultElement.Value;
+                    updateOk = false;
                 }
 
-                if (bUpdateOK == false)
+                if (updateOk == false)
                 {
-                    return Response.Failure(1, sResult);
+                    return Response.Failure(1, result);
+                }
+                if (result.Length > 0)
+                {
+                    var dataElement = new XElement("Data");
+                    var resultElement = new XElement("Result");
+                    resultElement.Add(new XAttribute("Message", result));
+                    dataElement.Add(resultElement);
+                    result = dataElement.ToString();
                 }
                 else
                 {
-                    if (sResult.Length > 0)
-                    {
-                        var dataElement = new XElement("Data");
-                        var resultElement = new XElement("Result");
-                        resultElement.Add(new XAttribute("Message", sResult));
-                        dataElement.Add(resultElement);
-                        sResult = dataElement.ToString();
-                    }
-                    else
-                    {
-                        sResult = string.Empty;
-                    }
-                    return Response.Success(sResult);
+                    result = string.Empty;
                 }
+                return Response.Success(result);
             }
             catch (PFEException pfeException)
             {
@@ -134,7 +149,7 @@ namespace WorkEnginePPM.WebServices.Core
             }
             catch (Exception exception)
             {
-                return Response.Failure((int)APIError.ExecuteReportExtract, exception);
+                return Response.Failure((int)apiError, exception);
             }
         }
 
@@ -224,62 +239,11 @@ namespace WorkEnginePPM.WebServices.Core
         /// <returns></returns>
         internal string SetDatabaseVersion(string data)
         {
-            try
-            {
-                var xInputData = new CStruct();
-                xInputData.LoadXML(data);
-                CStruct xParmInputElement = xInputData.GetSubStruct("Params");
-                if (xParmInputElement == null) throw new Exception("Cannot find the Param element.");
-                CStruct xDataInputElement = xInputData.GetSubStruct("Data");
-                if (xDataInputElement == null) throw new Exception("Cannot find the Data element.");
-                CStruct xDBS = xDataInputElement.GetSubStruct("Database");
-                if (xDBS == null) throw new Exception("Cannot find the Database element.");
-
-                string sResult = "";
-                bool bUpdateOK = true;
-
-                WEIntegration adminCore = GetAdminCore(SecurityLevels.BaseAdmin);
-                try
-                {
-                    sResult = adminCore.SetDatabaseVersion(data);
-                }
-                catch (Exception exception)
-                {
-                    var SWResultElement = new XElement("Result");
-                    Utils.SetResultError(exception, ref SWResultElement);
-                    sResult = SWResultElement.Value;
-                    bUpdateOK = false;
-                }
-
-                if (bUpdateOK == false)
-                {
-                    return Response.Failure(1, sResult);
-                }
-                else
-                {
-                    if (sResult.Length > 0)
-                    {
-                        var dataElement = new XElement("Data");
-                        var resultElement = new XElement("Result");
-                        resultElement.Add(new XAttribute("Message", sResult));
-                        dataElement.Add(resultElement);
-                        sResult = dataElement.ToString();
-                    }
-                    else
-                    {
-                        sResult = string.Empty;
-                    }
-                    return Response.Success(sResult);
-                }
-            }
-            catch (PFEException pfeException)
-            {
-                return Response.PfEFailure(pfeException);
-            }
-            catch (Exception exception)
-            {
-                return Response.Failure((int)APIError.SetDatabaseVersion, exception);
-            }
+            return ExecuteAdminCoreAction(
+                data,
+                "Database",
+                adminCore => adminCore.SetDatabaseVersion(data),
+                APIError.SetDatabaseVersion);
         }
 
         #endregion Methods 

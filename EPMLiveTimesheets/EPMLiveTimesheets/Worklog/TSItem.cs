@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.UI.WebControls;
 using EPMLibrary;
 using Microsoft.SharePoint;
+using System.Linq;
 
 namespace TimeSheets
 {
@@ -301,8 +302,21 @@ namespace TimeSheets
                 // Multiple Users
                 foreach (SPFieldUserValue userValue in fieldValues as SPFieldUserValueCollection)
                 {
-                    if (userValue.User.LoginName == _userLoginName)
-                        _authorized = true;
+                    if (userValue.User != null)
+                    {
+                        if (userValue.User.LoginName == _userLoginName)
+                        {
+                            _authorized = true;
+                        }
+                    }
+                    else
+                    {
+                        SPUser user = SPContext.Current.Web.EnsureUser(_userLoginName);
+                        if (user.Groups.Cast<SPGroup>().Any(g => String.Equals(g.Name, userValue.LookupValue, StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            _authorized = true;
+                        }
+                    }
                 }
             else if (fieldValues is SPFieldUserValue)
             {

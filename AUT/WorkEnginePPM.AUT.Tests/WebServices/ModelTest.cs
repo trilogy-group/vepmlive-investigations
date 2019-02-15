@@ -10660,27 +10660,6 @@ namespace WorkEnginePPM
 
         #endregion
 
-        #region Method Call : (CheckUserGlobalPermission) (Return Type : bool) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Model_CheckUserGlobalPermission_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodCheckUserGlobalPermission, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_modelInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (CheckUserGlobalPermission) (Return Type : bool) Parameters Count verify
 
         [Test]

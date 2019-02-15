@@ -107,7 +107,6 @@ namespace EPMLiveCore
         [TestCase(FieldCOL_URL)]
         [TestCase(FieldCOL_NEW_WINDOW)]
         [TestCase(FieldCOL_IMAGE_URL)]
-        [TestCase(FieldLIST_ITEM_HTML)]
         public void AUT_CommonActionsAjaxDataHost_All_Fields_Explore_Verify_By_Name_Test(string name)
         {
             // Arrange

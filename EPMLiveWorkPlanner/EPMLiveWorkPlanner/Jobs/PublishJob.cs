@@ -169,7 +169,37 @@ namespace EPMLiveWorkPlanner
                 data = null;
             }
         }
-
+        private void SyncTaskCenterWithTimesheet(SPList list, string projectid)
+        {
+            var query = new SPQuery();
+            query.Query = "<Where><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + projectid + "</Value></Eq></Where>";
+            query.ViewFields = "<FieldRef Name=\"Title\"/><FieldRef Name=\"taskuid\"/><FieldRef Name=\"IsPublished\"/><FieldRef Name=\"AssignedTo\"/>";
+            var items = list.GetItems(query);
+            foreach (SPListItem item in items)
+            {
+                var assignedToIds = (SPFieldUserValueCollection)item["AssignedTo"];
+                if (assignedToIds == null)
+                {
+                    continue;
+                }
+                foreach (var user in assignedToIds)
+                {
+                    var epmLiveCnStr = CoreFunctions.getConnectionString(list.ParentWeb.Site.WebApplication.Id);
+                    using (var epmLiveConnection = new SqlConnection(epmLiveCnStr))
+                    {
+                        epmLiveConnection.Open();
+                        using (var sqlCommand = new SqlCommand("UPDATE TSITEM SET ITEM_ID=@itemId WHERE ITEM_ID <> @itemId AND PROJECT_ID=@projectId AND ASSIGNEDTOID=@userId AND TITLE=@title", epmLiveConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@itemId", item.ID);
+                            sqlCommand.Parameters.AddWithValue("@projectId", projectid);
+                            sqlCommand.Parameters.AddWithValue("@userId", user.LookupId);
+                            sqlCommand.Parameters.AddWithValue("@title", item.Title);
+                            sqlCommand.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+        }
         private string FormatPFEWorkJobXml(XmlDocument doc)
         {
             string resultXml = string.Empty;
@@ -203,10 +233,10 @@ namespace EPMLiveWorkPlanner
 
             try
             {
-                    oProject.Update();
+                oProject.Update();
             }
             catch
-            {  
+            {
                 //If user do not have access then  this method will update the SPList Without triggering any event.
                 using (new DisabledItemEventScope())
                 {

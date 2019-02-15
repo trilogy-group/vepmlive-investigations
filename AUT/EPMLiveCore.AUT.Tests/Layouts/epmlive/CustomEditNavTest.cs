@@ -270,32 +270,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (LoadUIContent) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CustomEditNav_LoadUIContent_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodLoadUIContentPrametersTypes = null;
-            object[] parametersOfLoadUIContent = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodLoadUIContent, methodLoadUIContentPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_customEditNavInstanceFixture, parametersOfLoadUIContent);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfLoadUIContent.ShouldBeNull();
-            methodLoadUIContentPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (LoadUIContent) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -366,32 +340,6 @@ namespace EPMLiveCore
         {
             var methodLoadHeadingDropDownListPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_customEditNavInstance, MethodLoadHeadingDropDownList, Fixture, methodLoadHeadingDropDownListPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (LoadHeadingDropDownList) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_CustomEditNav_LoadHeadingDropDownList_Method_Call_Void_With_No_Parameters_Call_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            Type [] methodLoadHeadingDropDownListPrametersTypes = null;
-            object[] parametersOfLoadHeadingDropDownList = null; // no parameter present
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodLoadHeadingDropDownList, methodLoadHeadingDropDownListPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_customEditNavInstanceFixture, parametersOfLoadHeadingDropDownList);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfLoadHeadingDropDownList.ShouldBeNull();
-            methodLoadHeadingDropDownListPrametersTypes.ShouldBeNull();
-            Should.Throw<Exception>(currentAction);
         }
 
         #endregion

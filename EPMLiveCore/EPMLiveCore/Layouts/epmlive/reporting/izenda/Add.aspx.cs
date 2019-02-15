@@ -1,8 +1,9 @@
 ﻿using System;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using System.Data.SqlClient;
-using System.Data;
+using System.Web;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
 {
@@ -14,47 +15,53 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            var found = false;
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
+                {
+                    using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id)))
+                    {
+                        sqlConnection.Open();
+                        var nameText = txtName.Text;
 
-            bool bFound = false;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+                        if (!string.IsNullOrWhiteSpace(txtCategory.Text))
+                        {
+                            nameText = $"{txtCategory.Text}\\{nameText}";
+                        }
+
+                        using (var sqlCommand = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid and name=@name", sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@siteid", Web.ID);
+                            sqlCommand.Parameters.AddWithValue("@name", nameText);
+
+                            using (var dataReader = sqlCommand.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    found = true;
+                                }
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            using (var sqlCommand = new SqlCommand(
+                                "INSERT INTO IzendaAdHocReports (Name,TenantID,CreatedDate,ModifiedDate,Xml) VALUES (@name,@siteid,GETDATE(),GETDATE(),@xml)",
+                                sqlConnection))
+                            {
+                                sqlCommand.Parameters.AddWithValue("@siteid", Web.ID.ToString().ToLower());
+                                sqlCommand.Parameters.AddWithValue("@name", nameText);
+                                sqlCommand.Parameters.AddWithValue("@xml", txtXml.Text);
+                                sqlCommand.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                });
+
+            if (!found)
             {
-                SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
-                cn.Open();
-                string newname = txtName.Text;
-                if (txtCategory.Text != "")
-                    newname = txtCategory.Text + "\\" + newname;
-
-
-                SqlCommand cmd = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid and name=@name", cn);
-                cmd.Parameters.AddWithValue("@siteid", Web.ID);
-                cmd.Parameters.AddWithValue("@name", newname);
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                
-
-                if (dr.Read())
-                    bFound = true;
-
-                dr.Close();
-
-                if (!bFound)
-                {
-                    cmd = new SqlCommand("INSERT INTO IzendaAdHocReports (Name,TenantID,CreatedDate,ModifiedDate,Xml) VALUES (@name,@siteid,GETDATE(),GETDATE(),@xml)", cn);
-                    cmd.Parameters.AddWithValue("@siteid", Web.ID.ToString().ToLower());
-                    cmd.Parameters.AddWithValue("@name", newname);
-                    cmd.Parameters.AddWithValue("@xml", txtXml.Text);
-                    cmd.ExecuteNonQuery();
-                }
-                else
-                {
-
-                }
-                cn.Close();
-            });
-
-            if(!bFound)
-                Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/reporting/izenda/manage.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
-
+                SPUtility.Redirect("epmlive/reporting/izenda/manage.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+            }
         }
 
         protected void btnCancel_Click(object sender, EventArgs e)

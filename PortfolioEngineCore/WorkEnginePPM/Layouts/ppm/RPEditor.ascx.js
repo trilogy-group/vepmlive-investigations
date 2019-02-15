@@ -1424,6 +1424,8 @@
                 sb.append(" upload_url='" + this.params.Webservice + "'");
                 sb.append(" upload_type='Body'");
                 sb.append(" upload_method='Soap'");
+                sb.append(" upload_timeout='0'");
+                sb.append(" upload_repeat='2'");
                 sb.append(" upload_function='Execute'");
                 sb.append(" upload_namespace='PortfolioEngine'");
                 sb.append(" upload_param_Function='ResourcePlans'");

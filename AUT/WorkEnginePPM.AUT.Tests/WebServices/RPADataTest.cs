@@ -758,64 +758,6 @@ namespace RPADataCache
 
         #endregion
 
-        #region Method Call : (IsCSRoleAllowed) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_IsCSRoleAllowed_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodIsCSRoleAllowedPrametersTypes = null;
-            object[] parametersOfIsCSRoleAllowed = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodIsCSRoleAllowed, methodIsCSRoleAllowedPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, bool>(_rPADataInstanceFixture, out exception1, parametersOfIsCSRoleAllowed);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, bool>(_rPADataInstance, MethodIsCSRoleAllowed, parametersOfIsCSRoleAllowed, methodIsCSRoleAllowedPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfIsCSRoleAllowed.ShouldBeNull();
-            methodIsCSRoleAllowedPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (IsCSRoleAllowed) (Return Type : bool) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_IsCSRoleAllowed_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Type [] methodIsCSRoleAllowedPrametersTypes = null;
-            object[] parametersOfIsCSRoleAllowed = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodIsCSRoleAllowed, methodIsCSRoleAllowedPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, bool>(_rPADataInstanceFixture, out exception1, parametersOfIsCSRoleAllowed);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, bool>(_rPADataInstance, MethodIsCSRoleAllowed, parametersOfIsCSRoleAllowed, methodIsCSRoleAllowedPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfIsCSRoleAllowed.ShouldBeNull();
-            methodIsCSRoleAllowedPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (IsCSRoleAllowed) (Return Type : bool) No Exception Thrown
 
         [Test]
@@ -1431,68 +1373,6 @@ namespace RPADataCache
         {
             var methodMapCCR2RolePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_rPADataInstance, MethodMapCCR2Role, Fixture, methodMapCCR2RolePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (MapCCR2Role) (Return Type : int) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_MapCCR2Role_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var ccr = CreateType<int>();
-            var methodMapCCR2RolePrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfMapCCR2Role = { ccr };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodMapCCR2Role, methodMapCCR2RolePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, int>(_rPADataInstanceFixture, out exception1, parametersOfMapCCR2Role);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, int>(_rPADataInstance, MethodMapCCR2Role, parametersOfMapCCR2Role, methodMapCCR2RolePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfMapCCR2Role.ShouldNotBeNull();
-            parametersOfMapCCR2Role.Length.ShouldBe(1);
-            methodMapCCR2RolePrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
-        #region Method Call : (MapCCR2Role) (Return Type : int) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_MapCCR2Role_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var ccr = CreateType<int>();
-            var methodMapCCR2RolePrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfMapCCR2Role = { ccr };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodMapCCR2Role, methodMapCCR2RolePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, int>(_rPADataInstanceFixture, out exception1, parametersOfMapCCR2Role);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, int>(_rPADataInstance, MethodMapCCR2Role, parametersOfMapCCR2Role, methodMapCCR2RolePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfMapCCR2Role.ShouldNotBeNull();
-            parametersOfMapCCR2Role.Length.ShouldBe(1);
-            methodMapCCR2RolePrametersTypes.Length.ShouldBe(1);
         }
 
         #endregion
@@ -2292,35 +2172,6 @@ namespace RPADataCache
 
         #endregion
 
-        #region Method Call : (setupdispcolns) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_setupdispcolns_Method_Call_Void_With_1_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var errlog = CreateType<string>();
-            var methodsetupdispcolnsPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfsetupdispcolns = { errlog };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(Methodsetupdispcolns, methodsetupdispcolnsPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_rPADataInstanceFixture, parametersOfsetupdispcolns);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfsetupdispcolns.ShouldNotBeNull();
-            parametersOfsetupdispcolns.Length.ShouldBe(1);
-            methodsetupdispcolnsPrametersTypes.Length.ShouldBe(1);
-            methodsetupdispcolnsPrametersTypes.Length.ShouldBe(parametersOfsetupdispcolns.Length);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (setupdispcolns) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -2514,68 +2365,6 @@ namespace RPADataCache
         {
             var methodDoIShowReqTypePrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_rPADataInstance, MethodDoIShowReqType, Fixture, methodDoIShowReqTypePrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (DoIShowReqType) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_DoIShowReqType_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var stat = CreateType<int>();
-            var methodDoIShowReqTypePrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfDoIShowReqType = { stat };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodDoIShowReqType, methodDoIShowReqTypePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, bool>(_rPADataInstanceFixture, out exception1, parametersOfDoIShowReqType);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, bool>(_rPADataInstance, MethodDoIShowReqType, parametersOfDoIShowReqType, methodDoIShowReqTypePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfDoIShowReqType.ShouldNotBeNull();
-            parametersOfDoIShowReqType.Length.ShouldBe(1);
-            methodDoIShowReqTypePrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
-        #region Method Call : (DoIShowReqType) (Return Type : bool) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_DoIShowReqType_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            var stat = CreateType<int>();
-            var methodDoIShowReqTypePrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfDoIShowReqType = { stat };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodDoIShowReqType, methodDoIShowReqTypePrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, bool>(_rPADataInstanceFixture, out exception1, parametersOfDoIShowReqType);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, bool>(_rPADataInstance, MethodDoIShowReqType, parametersOfDoIShowReqType, methodDoIShowReqTypePrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfDoIShowReqType.ShouldNotBeNull();
-            parametersOfDoIShowReqType.Length.ShouldBe(1);
-            methodDoIShowReqTypePrametersTypes.Length.ShouldBe(1);
         }
 
         #endregion
@@ -2835,36 +2624,6 @@ namespace RPADataCache
 
         #endregion
 
-        #region Method Call : (GetMajorCat) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetMajorCat_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var mcat = CreateType<int>();
-            var methodGetMajorCatPrametersTypes = new Type[] { typeof(int) };
-            object[] parametersOfGetMajorCat = { mcat };
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetMajorCat, methodGetMajorCatPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, string>(_rPADataInstanceFixture, out exception1, parametersOfGetMajorCat);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, string>(_rPADataInstance, MethodGetMajorCat, parametersOfGetMajorCat, methodGetMajorCatPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfGetMajorCat.ShouldNotBeNull();
-            parametersOfGetMajorCat.Length.ShouldBe(1);
-            methodGetMajorCatPrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
         #region Method Call : (GetMajorCat) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -2926,27 +2685,6 @@ namespace RPADataCache
             // Assert
             Should.NotThrow(currentAction);
             methodGetMajorCatPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetMajorCat) (Return Type : string) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetMajorCat_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetMajorCat, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_rPADataInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
         }
 
         #endregion
@@ -8972,35 +8710,6 @@ namespace RPADataCache
 
         #endregion
 
-        #region Method Call : (GetCSDeptUIDs) (Return Type : string) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetCSDeptUIDs_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetCSDeptUIDsPrametersTypes = null;
-            object[] parametersOfGetCSDeptUIDs = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetCSDeptUIDs, methodGetCSDeptUIDsPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, string>(_rPADataInstanceFixture, out exception1, parametersOfGetCSDeptUIDs);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, string>(_rPADataInstance, MethodGetCSDeptUIDs, parametersOfGetCSDeptUIDs, methodGetCSDeptUIDsPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGetCSDeptUIDs.ShouldBeNull();
-            methodGetCSDeptUIDsPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetCSDeptUIDs) (Return Type : string) No Exception Thrown
 
         [Test]
@@ -9137,35 +8846,6 @@ namespace RPADataCache
 
             // Assert
             Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetCSDeptList) (Return Type : string) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetCSDeptList_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetCSDeptListPrametersTypes = null;
-            object[] parametersOfGetCSDeptList = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetCSDeptList, methodGetCSDeptListPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, string>(_rPADataInstanceFixture, out exception1, parametersOfGetCSDeptList);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, string>(_rPADataInstance, MethodGetCSDeptList, parametersOfGetCSDeptList, methodGetCSDeptListPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGetCSDeptList.ShouldBeNull();
-            methodGetCSDeptListPrametersTypes.ShouldBeNull();
         }
 
         #endregion
@@ -9936,64 +9616,6 @@ namespace RPADataCache
 
             // Assert
             Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetCalledFromResources) (Return Type : bool) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetCalledFromResources_Method_Call_With_No_Parameters_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            Type [] methodGetCalledFromResourcesPrametersTypes = null;
-            object[] parametersOfGetCalledFromResources = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetCalledFromResources, methodGetCalledFromResourcesPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, bool>(_rPADataInstanceFixture, out exception1, parametersOfGetCalledFromResources);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, bool>(_rPADataInstance, MethodGetCalledFromResources, parametersOfGetCalledFromResources, methodGetCalledFromResourcesPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGetCalledFromResources.ShouldBeNull();
-            methodGetCalledFromResourcesPrametersTypes.ShouldBeNull();
-        }
-
-        #endregion
-
-        #region Method Call : (GetCalledFromResources) (Return Type : bool) Results Not Null and no exception thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_RPAData_GetCalledFromResources_Method_Call_With_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Type [] methodGetCalledFromResourcesPrametersTypes = null;
-            object[] parametersOfGetCalledFromResources = null; // no parameter present
-            Exception exception, exception1;
-            var methodInfo = GetMethodInfo(MethodGetCalledFromResources, methodGetCalledFromResourcesPrametersTypes, out exception);
-
-            // Act
-            var result1 = methodInfo.GetResultMethodInfo<RPAData, bool>(_rPADataInstanceFixture, out exception1, parametersOfGetCalledFromResources);
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<RPAData, bool>(_rPADataInstance, MethodGetCalledFromResources, parametersOfGetCalledFromResources, methodGetCalledFromResourcesPrametersTypes);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldNotBeNull();
-            result2.ShouldNotBeNull();
-            result1.ShouldBe(result2);
-            parametersOfGetCalledFromResources.ShouldBeNull();
-            methodGetCalledFromResourcesPrametersTypes.ShouldBeNull();
         }
 
         #endregion

@@ -443,7 +443,6 @@ BEGIN
       -- SET NOCOUNT ON added to prevent extra result sets from
       -- interfering with SELECT statements.
       SET NOCOUNT ON;
-
     -- Insert statements for procedure here
     
     DECLARE @MaxInt INT
@@ -1102,12 +1101,12 @@ exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
 AS
 BEGIN
-
+declare @topthreads varchar(2) = CONVERT(varchar(2), CONVERT(int, @maxthreads) / 2)
 declare @sql varchar(MAX)
 
 set @sql = '';WITH CTE AS 
 ( 
-SELECT TOP '' + @maxthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
 FROM TSQUEUE 
 WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and JOBTYPE_ID = 32
 order by DTCREATED
@@ -1116,7 +1115,7 @@ UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0;
 
 WITH CTE2 AS 
 ( 
-SELECT TOP 200 TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
 FROM TSQUEUE 
 WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
@@ -2141,6 +2140,7 @@ SELECT * FROM vwNReadyEmails WHERE QUEUESERVER = @servername
 END
 ')
 
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSgetTSHoursPM')
 begin
     Print 'Creating Stored Procedure spTSgetTSHoursPM'
@@ -2185,3 +2185,4 @@ WHERE period_id=@period_id and tstimesheet.site_uid = @siteguid and username lik
 
 END
 ')
+

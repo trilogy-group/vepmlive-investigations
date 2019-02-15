@@ -51,9 +51,9 @@ namespace EPMLiveCore.Tests.API.MyWork
         private const string DeletePersonalViewMethodName = "DeletePersonalView";
         private const string GenerateColDictionaryMethodName = "GenerateColDictionary";
         private const string GetDataFromListsMethodName = "GetDataFromLists";
-        private const string GetDataFromReportingDBMethodName = "GetDataFromReportingDB";
+        private const string GetDataFromReportingDBMethodName = "GetDataFromReportingDb";
         private const string DeleteGlobalViewMethodName = "DeleteGlobalView";
-        private const string GetDataFromSPMethodName = "GetDataFromSP";
+        private const string GetDataFromSPMethodName = "GetDataFromSp";
         private const string GetExampleDateFormatMethodName = "GetExampleDateFormat";
         private const string GetGridSafeValueMethodName = "GetGridSafeValue";
         private const string GetLeftColsMethodName = "GetLeftCols";
@@ -379,7 +379,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             const string expectedType = "expectedType";
             const string expectedFormat = "expectedFormat";
 
-            ShimMyWork.GetTypeAndFormatDictionaryOfStringSPFieldStringStringOutStringOut = (Dictionary<string, SPField> fieldTypes, string selectedField, out string type, out string format) =>
+            ShimMyWork.GetTypeAndFormatIDictionaryOfStringSPFieldStringStringOutStringOut = (IDictionary<string, SPField> fieldTypes, string selectedField, out string type, out string format) =>
             {
                 type = expectedType;
                 format = expectedFormat;
@@ -530,12 +530,12 @@ namespace EPMLiveCore.Tests.API.MyWork
             const string expectedFormat = "expectedFormat";
 
             var actualCount = 0;
-            var fieldTypes = new Dictionary<string, SPField>();
-            var selectedLists = new List<string>()
+            GetMyWorkParams.FieldTypes = new Dictionary<string, SPField>();
+            GetMyWorkParams.SelectedLists = new List<string>()
            {
                DummyString
            };
-            var selectedFields = new List<string>()
+            GetMyWorkParams.SelectedFields = new List<string>()
            {
                DummyString
            };
@@ -558,7 +558,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                Guid.NewGuid()
            };
             ShimMyWork.GetWorkingOnSPWeb = _ => dTable;
-            ShimMyWork.GetTypeAndFormatDictionaryOfStringSPFieldStringStringOutStringOut = (Dictionary<string, SPField> fieldTypesParam, string selectedField, out string type, out string format) =>
+            ShimMyWork.GetTypeAndFormatIDictionaryOfStringSPFieldStringStringOutStringOut = (IDictionary<string, SPField> fieldTypesParam, string selectedField, out string type, out string format) =>
             {
                 type = expectedType;
                 format = expectedFormat;
@@ -584,7 +584,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             privateObj.Invoke(
                 GetDataFromListsMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[] { result, fieldTypes, query, spSite.Instance, spWeb.Instance, selectedFields, selectedLists });
+                new object[] { result, query, spSite.Instance, spWeb.Instance });
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -603,17 +603,17 @@ namespace EPMLiveCore.Tests.API.MyWork
             const string fieldsTableQuery = "FROM dbo.RPTColumn";
             const string flagsTableQuery = "FROM dbo.PERSONALIZATIONS";
 
-            var workTypes = new Dictionary<string, string>();
-            var selectedFields = new List<string>()
+            GetMyWorkParams.WorkTypes = new Dictionary<string, string>();
+            GetMyWorkParams.SelectedFields = new List<string>()
            {
                ListIdColumn,
                ItemIdColumn
            };
-            var archivedWebs = new List<Guid>()
+            GetMyWorkParams.ArchivedWebs = new List<Guid>()
            {
                guid
            };
-            var selectedLists = new List<string>()
+            GetMyWorkParams.SelectedLists = new List<string>()
            {
                DummyString
            };
@@ -658,7 +658,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimMyWork.MapCompleteFieldSPWebMyWorkReportData = (_, __) => { };
             ShimMyWork.GenerateColDictionaryDataTableIEnumerableOfString = (_, __) => columnDictionary;
             ShimMyWork.GetWorkingOnSPWeb = _ => workingTable;
-            ShimMyWork.GetMyWorkFieldValueStringDataRowDictionaryOfStringInt32EnumerableRowCollectionOfDataRowDataTable =
+            ShimMyWork.GetMyWorkFieldValueStringDataRowIDictionaryOfStringInt32EnumerableRowCollectionOfDataRowDataTable =
                 (_, _1, _2, _3, _4) => DummyString;
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (_, query) =>
             {
@@ -687,7 +687,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             var actual = (List<DataTable>)privateObj.Invoke(
                 GetDataFromReportingDBMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[] { workTypes, selectedFields, archivedWebs, spWeb.Instance, selectedLists, data });
+                new object[] { spWeb.Instance, data });
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -752,15 +752,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             var selectedListIds = new List<string>();
             var spSiteDataQuery = new SPSiteDataQuery();
             var row = default(DataRow);
-            var selectedLists = new List<string>()
-           {
-               DummyString
-           };
-            var archivedWebs = new List<Guid>()
-           {
-               guid
-           };
-
+          
             var dataTable = new DataTable();
             dataTable.Columns.Add(ListIdColumn);
             dataTable.Columns.Add(IDColumn);
@@ -786,11 +778,20 @@ namespace EPMLiveCore.Tests.API.MyWork
             spWeb.GetSiteDataSPSiteDataQuery = _ => dataTable;
             ShimMyWork.GetWorkingOnSPWeb = _ => workingTable;
 
+            GetMyWorkParams.SelectedLists = new List<string>()
+            {
+                DummyString
+            };
+            GetMyWorkParams.ArchivedWebs = new List<Guid>()
+            {
+                guid
+            };
+
             // Act
             var actual = (List<DataTable>)privateObj.Invoke(
                 GetDataFromSPMethodName,
                 BindingFlags.Static | BindingFlags.NonPublic,
-                new object[] { selectedListIds, spSiteDataQuery, spWeb.Instance, spSite.Instance, archivedWebs, selectedLists });
+                new object[] { selectedListIds, spSiteDataQuery, spWeb.Instance, spSite.Instance });
 
             // Assert
             actual.ShouldSatisfyAllConditions(

@@ -633,5 +633,44 @@ namespace EPMLiveCore
 
             return returnValue;
         }
+
+        public override void Dispose()
+        {
+            if (Controls != null)
+            {
+                for (var i = Controls.Count - 1; i >= 0; i--)
+                {
+                    var table = Controls[i] as Table;
+                    DisposeTable(table);
+                    Controls[i]?.Dispose();
+                }
+            }
+
+            base.Dispose();
+        }
+
+        private void DisposeTable(Table table)
+        {
+            if (table == null)
+            {
+                return;
+            }
+
+            for (var i = table.Rows.Count - 1; i >= 0; i--)
+            {
+                var row = table.Rows[i];
+                for (var j = row.Cells.Count - 1; j >= 0; j--)
+                {
+                    var cell = row.Cells[j];
+                    for (var k = cell.Controls.Count - 1; k >= 0; k--)
+                    {
+                        cell.Controls[k]?.Dispose();
+                    }
+                    cell.Dispose();
+                }
+
+                row.Dispose();
+            }
+        }
     }
 }

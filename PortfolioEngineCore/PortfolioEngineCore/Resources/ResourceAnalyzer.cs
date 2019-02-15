@@ -417,48 +417,8 @@ namespace PortfolioEngineCore
 
         public bool RenameResourceAnalyzerViewXML(Guid guidView, string sName)
         {
-            string sCommand;
-            CStruct xView = null;
-            if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-            _sqlConnection.Open();
-
-            sCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32000 AND VIEW_GUID=@guid";
-            //string sCommand = "SELECT WAU_UID,UINF_VIEWNAME,UINF_XML FROM EPGT_LOCALVIEWS WHERE UINF_VIEWNAME=" + _dba.PrepareText(sViewName) + " ORDER BY UINF_VIEWNAME";
-
-            SqlCommand oCommand = new SqlCommand(sCommand,  _sqlConnection);
-            oCommand.Parameters.AddWithValue("@guid", guidView);
-            SqlDataReader reader = oCommand.ExecuteReader();
-
-            if (reader.Read())
-            {
-                string sXML = DBAccess.ReadStringValue(reader["VIEW_DATA"]);
-                if (sXML != string.Empty)
-                {
-                    xView = new CStruct();
-                    xView.LoadXML(sXML);
-                }
-            }
-            reader.Close();
-
-            if (xView == null)
-                return false;
-
-            xView.SetStringAttr("Name", sName);
-
-            sCommand = "UPDATE EPG_VIEWS SET VIEW_NAME=@name,VIEW_DATA = @vdata WHERE VIEW_GUID=@guid";
-            SqlCommand cmd = new SqlCommand(sCommand,  _sqlConnection);
-            cmd.Parameters.AddWithValue("@name", sName);
-            cmd.Parameters.AddWithValue("@vdata", xView.XML());
-            cmd.Parameters.AddWithValue("@guid", guidView);
-            int nRowsAffected = cmd.ExecuteNonQuery();
-
-            if (nRowsAffected == 0)
-            {
-                return false;
-            }
-
-
-            return true; // (_dba.Status == StatusEnum.rsSuccess);
+            const string InitialCommand = "SELECT VIEW_DATA FROM EPG_VIEWS WHERE VIEW_CONTEXT=32000 AND VIEW_GUID=@guid";
+            return OptimizerData.RenameViewXml(guidView, sName, InitialCommand, _sqlConnection);
         }
 
         public bool SetResourceAnalyzerDraggedDataXML(string dataXML)

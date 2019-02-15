@@ -358,6 +358,7 @@
     <Compile Include="ListReportView\ListReportViewToolPart.cs" />
     <Compile Include="ListReportView\ReportingServicesToolPart.cs" />
     <Compile Include="ListSummary\ListSummary.cs" />
+    <Compile Include="ListSummary\ListSummaryProcessHelper.cs" />
     <Compile Include="ListSummary\ListSummaryToolpart.cs" />
     <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
       <DependentUpon>MyWorkSummary.ascx</DependentUpon>
@@ -406,6 +407,10 @@
     <Compile Include="ReportWebPartBase.cs" />
     <Compile Include="ResourceGrid\ResourceGrid.cs" />
     <Compile Include="ResourcePlanning\ResourcePlanning.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.Fields.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.HtmlWriterOutput.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.renderGantt.cs" />
+    <Compile Include="ResourcePlanning\ResourcePlanning.RenderWebPart.cs" />
     <Compile Include="RollupSummary\RollupSummary.cs" />
     <Compile Include="RollupSummary\SummaryRollupToolpart.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizard.cs" />
@@ -438,6 +443,7 @@
     <Compile Include="WebPageCode\contextualslideout.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\FormatHelper.cs" />
     <Compile Include="WebPageCode\getedititem.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -483,12 +489,14 @@
     <Compile Include="WebPageCode\gridlistribbon.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\GroupHelper.cs" />
     <Compile Include="WebPageCode\listedititem.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\savegrid.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\SaveHelper.cs" />
     <Compile Include="WebPageCode\saveresplan.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -515,12 +523,15 @@
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
     </None>
+    <None Include="bundleconfig.json" />
     <None Include="javascripts\EPMLive.SocialStream.Logs.min.js.map" />
     <None Include="javascripts\EPMLive.SocialStream.min.js.map" />
     <None Include="javascripts\libraries\bundles\moment.js.bundle" />
     <None Include="javascripts\libraries\bundles\moment.min.js.map" />
     <None Include="javascripts\libraries\moment-timezone.data.min.js.map" />
-    <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map">
+      <DependentUpon>GanttGrid.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.css.map" />
     <None Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.less" />
     <None Include="Layouts\epmlive\Stylesheets\SocialStream.css.map" />
@@ -1035,7 +1046,9 @@
     <Content Include="Layouts\epmlive\images\User.png" />
     <Content Include="Layouts\epmlive\images\white-avatar.png" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
-    <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js">
+      <DependentUpon>GanttGrid.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\jquery.fancybox.js" />
     <Content Include="Layouts\epmlive\javascripts\nativeviewer.js" />

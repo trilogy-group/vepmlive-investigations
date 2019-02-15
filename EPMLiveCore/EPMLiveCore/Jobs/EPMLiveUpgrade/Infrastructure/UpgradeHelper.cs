@@ -25,6 +25,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V701,
         V702,
         V703,
+        V710,
         GENERIC
     }
 
@@ -114,6 +115,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                     case EPMLiveVersion.V703:
                         version = "7.0.3";
                         break;
+                    case EPMLiveVersion.V710:
+                        version = "7.1.0";
+                        break;
                     case EPMLiveVersion.GENERIC:
                         version = "GENERIC";
                         break;
@@ -133,14 +137,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                 long sequence = 0;
                 string[] splitSequence;
                 if (Version != EPMLiveVersion.GENERIC)
-                   
+
                 {
-                     splitSequence = Name.Split(new char[] { '.' });
+                    splitSequence = Name.Split(new char[] { '.' });
                 }
                 else
                 {
                     int upper = (int)Order;
-                    int lower = (int) ((Order * 100.0) - (upper * 100));
+                    int lower = (int)((Order * 100.0) - (upper * 100));
                     splitSequence = new string[] { upper.ToString(), lower.ToString() };
                 }
                 int multiplier = 1;

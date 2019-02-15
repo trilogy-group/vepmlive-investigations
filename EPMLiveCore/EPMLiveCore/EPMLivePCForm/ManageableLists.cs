@@ -50,6 +50,25 @@ namespace EPMLiveCore
         {
             base.Render(writer);
         }
+
+        private bool _disposed = false;
+
+        public override void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            foreach (Control control in base.Controls)
+            {
+                control?.Dispose();
+            }
+
+            base.Dispose();
+
+            _disposed = true;
+        }
     }
 
 }

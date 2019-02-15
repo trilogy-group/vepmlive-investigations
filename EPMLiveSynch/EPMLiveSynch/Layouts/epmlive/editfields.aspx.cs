@@ -295,5 +295,21 @@ namespace EPMLiveSynch.Layouts
         //    {
         //    }
         //}
+
+        private bool _disposed = false;
+
+        public override void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            btnDone.Dispose();
+
+            base.Dispose();
+
+            _disposed = true;
+        }
     }
 }

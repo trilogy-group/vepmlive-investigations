@@ -52,13 +52,11 @@ namespace EPMLiveWebParts
         private const string FieldresWeb = "resWeb";
         private const string FieldcurWeb = "curWeb";
         private const string FieldviewList = "viewList";
-        private const string FieldstrCurrentView = "strCurrentView";
         private const string FieldstrAction = "strAction";
         private const string Fieldlnk = "lnk";
         private const string Fieldact = "act";
         private const string FieldsResourceList = "sResourceList";
         private const string Fielderror = "error";
-        private const string FieldsParams = "sParams";
         private const string FieldsFullGridId = "sFullGridId";
         private Type _resourcePlanningInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
@@ -163,13 +161,11 @@ namespace EPMLiveWebParts
         [TestCase(FieldresWeb)]
         [TestCase(FieldcurWeb)]
         [TestCase(FieldviewList)]
-        [TestCase(FieldstrCurrentView)]
         [TestCase(FieldstrAction)]
         [TestCase(Fieldlnk)]
         [TestCase(Fieldact)]
         [TestCase(FieldsResourceList)]
         [TestCase(Fielderror)]
-        [TestCase(FieldsParams)]
         [TestCase(FieldsFullGridId)]
         public void AUT_ResourcePlanning_All_Fields_Explore_Verify_By_Name_Test(string name)
         {

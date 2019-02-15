@@ -734,26 +734,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         #endregion
 
-        #region Method Call : (getReportParameters) (Return Type : string) Parameters Count verify
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_SSRSReportRedirect_getReportParameters_Method_Call_Parameters_Count_Verification_Test()
-        {
-            // Arrange
-            var methodInfo = GetMethodInfo(MethodgetReportParameters, 0);
-            const int parametersCount = 2;
-
-            // Act
-            var parameters = methodInfo.GetParameters();
-
-            // Assert
-            parameters.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
         #endregion
 
         #endregion
