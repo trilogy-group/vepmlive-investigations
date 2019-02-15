@@ -2875,6 +2875,11 @@ namespace EPMLiveCore
                         return "False";
                     case "EPMPortManagerColumn":
                         return "OwnerID";
+                    case "EPMRPDepartmentValidation":
+                        return bool.TrueString;
+                    default:
+                        Trace.TraceWarning("Unexpected setting value: " + setting);
+                        break;
                 };
             }
 
