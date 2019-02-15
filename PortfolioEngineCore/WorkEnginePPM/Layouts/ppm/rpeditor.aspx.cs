@@ -116,7 +116,7 @@ namespace WorkEnginePPM
                 {
                     WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
                     ctl.WEPID = Request["itemid"];
-                    ctl.DepartmentValidation = CoreFunctions.getConfigSetting(Web, "EPMRPDepartmentValidation", true, false); 
+                    ctl.DepartmentValidation = CoreFunctions.getConfigSetting(Web, "EPMRPDepartmentValidation", true, false);
                     ctl.TicketVal = Request["dataid"];
                     ctl.IsResource = Request["isresource"];
                     ctl.IsDlg = string.IsNullOrEmpty(Request["IsDlg"]) ? "0" : Request["IsDlg"];
