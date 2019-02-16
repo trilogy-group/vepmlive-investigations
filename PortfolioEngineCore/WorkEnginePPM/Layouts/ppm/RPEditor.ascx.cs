@@ -93,12 +93,7 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             }
             set { m_sWebservice = value?.Trim(); }
         }
-        private string m_sDepartmentValidation = "";
-        public string DepartmentValidation
-        {
-            get { return m_sDepartmentValidation; }
-            set { m_sDepartmentValidation = value; }
-        }
+       
         protected void Page_Load(object sender, EventArgs e)
         {
             sm1.Services.Add(new ServiceReference(Webservice));

@@ -160,11 +160,12 @@ END"
             }
         }
     }
+
     [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2.1, Description = "Add unique Contraints on RPTWEBGROUPS ")]
-    internal class AddRPTWEBGROUPSUniqueContraints : UpgradeStep
+    internal class AddRPTWEBGROUPSUniqueContraints_710 : UpgradeStep
     {
         private const string ContraintName = "UQ_RPTWEBGROUPS_SITEID_WEBID_GROUPID";
-        public AddRPTWEBGROUPSUniqueContraints(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        public AddRPTWEBGROUPSUniqueContraints_710(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
         public override bool Perform()
         {
