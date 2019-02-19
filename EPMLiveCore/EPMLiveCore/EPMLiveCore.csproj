@@ -252,7 +252,8 @@
     <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\WebServicesHelper.cs" />
-    <Compile Include="Jobs\EPMLiveUpgrade\Steps\706Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\706.1.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\706.2.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\703Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\702Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\701Steps.cs" />
