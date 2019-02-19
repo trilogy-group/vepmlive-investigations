@@ -2,6 +2,8 @@
 using System.Data.SqlClient;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using Microsoft.Win32;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -56,8 +58,7 @@ END"
         }
     }
 
-
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 3.0, Description = "Disable throttling for the task center list")]
+    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2.0, Description = "Disable throttling for the task center list")]
     internal class DisableTaskCenterThrolling : UpgradeStep
     {
         public DisableTaskCenterThrolling(SPWeb web, bool isPfeSite)
@@ -66,6 +67,7 @@ END"
         }
 
         private const string TaskCenterListName = "Task Center";
+	
         public override bool Perform()
         {
             try
@@ -98,7 +100,7 @@ END"
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2.0, Description = "Updating My Work table")]
+    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 3.0, Description = "Updating My Work table")]
     internal class AddUpdateMyWorkColumn : UpgradeStep
     {
         public AddUpdateMyWorkColumn(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
@@ -161,7 +163,7 @@ END"
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2.1, Description = "Add unique Contraints on RPTWEBGROUPS ")]
+    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 4.0, Description = "Add unique Contraints on RPTWEBGROUPS ")]
     internal class AddRPTWEBGROUPSUniqueContraints_710 : UpgradeStep
     {
         private const string ContraintName = "UQ_RPTWEBGROUPS_SITEID_WEBID_GROUPID";
@@ -204,6 +206,91 @@ END"
                                                                 END", ContraintName), con))
                 {
                     cmd.ExecuteNonQuery();
+                }
+            }
+        }
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 5.0, Description = "Unregister EPMLive Regitery From Application Folder")]
+    internal class UnregisterEPMLiveRegitery : UpgradeStep
+    {
+        private const string EventLogApplicationRegistryKeyPath = @"SYSTEM\CurrentControlSet\services\eventlog\Application";
+        private const string EventLogEventLogRegistryKeyPath = @"SYSTEM\CurrentControlSet\services\eventlog";
+        private const string EPMLiveRegistryKeyPrefix = @"EPM Live";
+        
+        public UnregisterEPMLiveRegitery(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
+        {
+        }
+
+        public override bool Perform()
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                SPFarm farm = SPFarm.Local.Farm;
+                if (farm != null)
+                {
+                    foreach (SPServer server in farm.Servers)
+                    {
+                        ProcessRegisteryKeys(server);
+                    }
+                }
+            });
+            return true;
+        }
+
+        private void ProcessRegisteryKeys(SPServer server)
+        {
+            try
+            {
+                var baseKey = RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, server.Address);
+                var key = Registry.LocalMachine.OpenSubKey(EventLogApplicationRegistryKeyPath);
+                foreach (var subKeyName in key.GetSubKeyNames())
+                {
+                    var productKey = key.OpenSubKey(subKeyName);
+                    var EPkey = productKey.Name.Substring(productKey.Name.LastIndexOf("\\") + 1);
+                    if (EPkey.Contains(EPMLiveRegistryKeyPrefix))
+                    {
+                        DeRegisterKey(baseKey, EPkey);
+                    }
+                }
+                RegisterKey(baseKey, EPMLiveRegistryKeyPrefix);
+                LogMessage($"Registries process successed for {server.Address}", MessageKind.SUCCESS, 4);
+            }
+            catch (Exception exception)
+            {
+                LogMessage($"Registries process failed for server :  {server.Address}, Error: {exception.ToString()}", MessageKind.FAILURE, 4);
+            }
+        }
+
+        private void DeRegisterKey(RegistryKey baseKey, string key)
+        {
+            if (baseKey != null)
+            {
+                var eventLogKey = baseKey.OpenSubKey(EventLogApplicationRegistryKeyPath, true);
+                if (eventLogKey != null)
+                {
+                    var loggingServiceKey = eventLogKey.OpenSubKey(key);
+                    if (loggingServiceKey != null)
+                    {
+                        eventLogKey.DeleteSubKey(key);
+                    }
+                }
+            }
+        }
+
+        private void RegisterKey(RegistryKey baseKey, string key)
+        {
+            if (baseKey != null)
+            {
+                var eventLogKey = baseKey.OpenSubKey(EventLogEventLogRegistryKeyPath, true);
+                if (eventLogKey != null)
+                {
+                    var loggingServiceKey = eventLogKey.OpenSubKey(key);
+                    if (loggingServiceKey == null)
+                    {
+                        loggingServiceKey = eventLogKey.CreateSubKey(key, RegistryKeyPermissionCheck.ReadWriteSubTree);
+                        loggingServiceKey.SetValue("EventMessageFile", @"C:\Windows\Microsoft.NET\Framework\v2.0.50727\EventLogMessages.dll", RegistryValueKind.String);
+                    }
                 }
             }
         }
