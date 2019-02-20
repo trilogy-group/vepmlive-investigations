@@ -2866,7 +2866,7 @@ namespace EPMLiveCore.API
         }
 
         private const string WEB_GROUPS_QUERY =
-            @"SELECT  distinct  dbo.RPTWEBGROUPS.GROUPID AS Id
+            @"SELECT   dbo.RPTWEBGROUPS.GROUPID AS Id
               FROM      dbo.RPTWEBGROUPS INNER JOIN dbo.LSTUserInformationList 
                             ON dbo.RPTWEBGROUPS.WEBID = dbo.LSTUserInformationList.WebId 
                             AND dbo.RPTWEBGROUPS.GROUPID = dbo.LSTUserInformationList.ID
