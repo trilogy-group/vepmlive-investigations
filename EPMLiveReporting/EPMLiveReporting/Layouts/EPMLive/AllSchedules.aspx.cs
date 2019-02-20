@@ -180,26 +180,31 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     cn.Open();
 
                     Guid timerjobuid = Guid.Empty;
-                    var cmd =
+                    using (var cmd =
                         new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=5",
-                            cn);
-                    cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                    object obj = cmd.ExecuteScalar();
-                    if (obj != null)
+                            cn))
                     {
-                        timerjobuid = new Guid(obj.ToString());
+                        cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                        object obj = cmd.ExecuteScalar();
+                        if (obj != null)
+                        {
+                            timerjobuid = new Guid(obj.ToString());
+                        }
                     }
-                    else
+
+                    if (timerjobuid == Guid.Empty)
                     {
                         timerjobuid = Guid.NewGuid();
-                        cmd =
+                        using (var cmd =
                             new SqlCommand(
-                                "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', 0, @webguid)",
-                                cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                        cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
-                        cmd.ExecuteNonQuery();
+                                "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', 2, @webguid)",
+                                cn))
+                        {
+                            cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                            cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
+                            cmd.ExecuteNonQuery();
+                        }
                     }
 
                     if (timerjobuid != Guid.Empty)
