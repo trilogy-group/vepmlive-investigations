@@ -17,10 +17,12 @@ namespace TimerService
     public class TimerClass : ProcessorBase
     {
         bool highPriority = false;
+		bool queueJobs = true;
 
-        public TimerClass(bool highPriority)
+        public TimerClass(bool highPriority, bool queueJobs = true)
         {
             this.highPriority = highPriority;
+			this.queueJobs = queueJobs;
         }
 
 
@@ -79,7 +81,7 @@ namespace TimerService
                             try
                             {
                                 cn.Open();
-                                if (highPriority)
+                                if (queueJobs)
                                 {
                                     DateTime newRun = DateTime.Now;
                                     if (newRun.Minute < lastRun.Minute)
