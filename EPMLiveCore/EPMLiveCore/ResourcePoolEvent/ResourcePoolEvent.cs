@@ -760,7 +760,6 @@ namespace EPMLiveCore
                 {
                     u = properties.Web.EnsureUser(uv.LookupValue);
                 }
-
                 SPUser u_new = null;
                 if (uv_new != null)
                 {
@@ -971,8 +970,11 @@ namespace EPMLiveCore
                     }
                 });
             }
+
             if (p != null)
+            {               
                 return p.ID + ";#" + p.Name;
+            }
 
             return "";
         }

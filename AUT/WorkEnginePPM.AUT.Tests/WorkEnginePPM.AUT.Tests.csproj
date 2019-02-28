@@ -142,6 +142,7 @@
     <Compile Include="Layouts\ppm\AddListTest.cs" />
     <Compile Include="Layouts\ppm\Admin\InstallDataSyncEventsTest.cs" />
     <Compile Include="Layouts\ppm\AutoAdjustPeriodsTest.cs" />
+    <Compile Include="Layouts\ppm\BasicDialogPropertiesTest.cs" />
     <Compile Include="Layouts\ppm\CalendarsTest.cs" />
     <Compile Include="Layouts\ppm\CostCategoriesTest.cs" />
     <Compile Include="Layouts\ppm\CostCategoryRolesTest.cs" />
@@ -219,7 +220,6 @@
     <Compile Include="WebServices\ClsColDispTest.cs" />
     <Compile Include="WebServices\ClsOptmizerDataCacheTest.cs" />
     <Compile Include="WebServices\ClsRXDispTest.cs" />
-    <Compile Include="WebServices\CostAnalyzerDataCacheTest.cs" />
     <Compile Include="WebServices\CostAnalyzerTest.cs" />
     <Compile Include="WebServices\EditCalendarTest.cs" />
     <Compile Include="WebServices\IntegrationTest.cs" />
@@ -245,10 +245,8 @@
     <Compile Include="WebServices\PriWeightTest.cs" />
     <Compile Include="WebServices\ResPlanAnalyzerTest.cs" />
     <Compile Include="WebServices\RPAColumnFieldDefnTest.cs" />
-    <Compile Include="WebServices\RPADataTest.cs" />
     <Compile Include="WebServices\RPAGridHelperTest.cs" />
     <Compile Include="WebServices\RPConstantsTest.cs" />
-    <Compile Include="WebServices\SortAndGroupTest.cs" />
     <Compile Include="WebServices\WebServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -12,10 +12,11 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
 
 using System.Data;
+using System.Diagnostics;
 
 namespace Dashboard
 {
-    class ProjectData
+    partial class ProjectData
     {
         public SPGridView gvPJSummary;
         public SPGridView gvPJSummary2;
@@ -46,132 +47,35 @@ namespace Dashboard
 
         public string error = "";
 
-        public string buildData(bool pTasks, bool pRisks, bool pIssues)
+        private void PopulateSummaryGrid()
         {
-            try
+            gvPJSummary = new SPGridView
             {
-                dt = new DataTable();
-                dt.Columns.Add("name");
-                dt.Columns.Add("pctcomplete");
-                dt.Columns.Add("latetasks");
-                dt.Columns.Add("schedulestatus");
-                dt.Columns.Add("issuestatus");
-                dt.Columns.Add("riskstatus");
+                AutoGenerateColumns = false
+            };
 
-                gvPJSummary = new SPGridView();
-                gvPJSummary.AutoGenerateColumns = false;
-
-                BoundField colTitle = new BoundField();
-                colTitle.DataField = "name";
-                colTitle.HeaderText = "Project Name";
-                colTitle.HtmlEncode = false;
-                //colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "pctcomplete";
-                colTitle.HeaderText = "% Complete";
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "latetasks";
-                colTitle.HeaderText = "# of Late Tasks";
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "schedulestatus";
-                colTitle.HeaderText = "Schedule Status";
-                colTitle.HtmlEncode = false;
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "issuestatus";
-                colTitle.HeaderText = "Issue Status";
-                colTitle.HtmlEncode = false;
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                colTitle = new BoundField();
-                colTitle.DataField = "riskstatus";
-                colTitle.HeaderText = "Risk Status";
-                colTitle.HtmlEncode = false;
-                colTitle.ControlStyle.CssClass = "ms-vh";
-                colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-                gvPJSummary.Columns.Add(colTitle);
-
-                //gvPJSummary.GroupField = "Status";
-                //gvPJSummary.GroupFieldDisplayName = "Status";
-
-                gvPJSummary.AllowGrouping = false;
-                gvPJSummary.ID = "gvPJSummary";
-                gvPJSummary.Width = Unit.Percentage(100);
-                gvPJSummary.HeaderStyle.CssClass = "ms-vh";
-
-                try
-                {
-                    projectList = site.Lists["Project Center"];
-                }
-                catch
-                {
-                    return "The Project Center list does not exist on this site.";
-                }
-                try
-                {
-                    taskList = site.Lists["Task Center"];
-                }
-                catch
-                {
-                    try
-                    {
-                        taskList = site.Lists["My Tasks"];
-                        return "In order to take advantage of the new EPM Live functionality, please follow the instructions located <a href=\"http://www.projectpublisher.com/downloads/ProjectPublisherUpdateProcess.pdf\" target=\"_blank\">here</a>.";
-                    }
-                    catch { return "No Tasks List Found"; }
-
-                }
-
-                try
-                {
-                    issueList = site.Lists["Issues"];
-                }
-                catch
-                {
-                    pIssues = false;
-                }
-                try
-                {
-                    riskList = site.Lists["Risks"];
-                }
-                catch
-                {
-                    pRisks = false;
-                }
-                
-                foreach (SPListItem li in projectList.Items)
-                {
-                    try
-                    {
-                        if (li["State"].ToString() == "(2) Active")
-                        {
-                            processProjectSummaryItem(li, pTasks, pRisks, pIssues);
-                        }
-                    }
-                    catch { }
-                }
-                gvPJSummary.DataSource = dt;
-                gvPJSummary.DataBind();
-                return "";
-            }
-            catch (Exception ex)
+            var colTitle = new BoundField
             {
-                return ex.Message + ex.StackTrace;
-            }
+                DataField = "name",
+                HeaderText = "Project Name",
+                HtmlEncode = false
+            };
+
+            gvPJSummary.Columns.Add(colTitle);
+
+            AddField("pctcomplete", "% Complete", HorizontalAlign.Center);
+            AddField("latetasks", "# of Late Tasks", HorizontalAlign.Center);
+            AddField("schedulestatus", "Schedule Status", HorizontalAlign.Center, false);
+            AddField("issuestatus", "Issue Status", HorizontalAlign.Center, false);
+            AddField("riskstatus", "Risk Status", HorizontalAlign.Center, false, "ms-vh");
+
+            gvPJSummary.AllowGrouping = false;
+            gvPJSummary.ID = "gvPJSummary";
+            gvPJSummary.Width = Unit.Percentage(100);
+            gvPJSummary.HeaderStyle.CssClass = "ms-vh";
         }
 
-        public string buildData2()
+        private void PopulateDataTable()
         {
             dt = new DataTable();
             dt.Columns.Add("name");
@@ -180,382 +84,62 @@ namespace Dashboard
             dt.Columns.Add("schedulestatus");
             dt.Columns.Add("issuestatus");
             dt.Columns.Add("riskstatus");
-
-            gvPJSummary2 = new SPGridView();
-            gvPJSummary2.AutoGenerateColumns = false;
-
-            BoundField colTitle = new BoundField();
-            colTitle.DataField = "name";
-            colTitle.HeaderText = "Project Name";
-            colTitle.HtmlEncode = false;
-            //colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary2.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "pctcomplete";
-            colTitle.HeaderText = "% Complete";
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary2.Columns.Add(colTitle);
-
-
-            colTitle = new BoundField();
-            colTitle.DataField = "schedulestatus";
-            colTitle.HeaderText = "Schedule";
-            colTitle.HtmlEncode = false;
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary2.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "issuestatus";
-            colTitle.HeaderText = "Issues";
-            colTitle.HtmlEncode = false;
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary2.Columns.Add(colTitle);
-
-            colTitle = new BoundField();
-            colTitle.DataField = "riskstatus";
-            colTitle.HeaderText = "Risks";
-            colTitle.HtmlEncode = false;
-            colTitle.ControlStyle.CssClass = "ms-vh";
-            colTitle.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
-            gvPJSummary2.Columns.Add(colTitle);
-
-            //gvPJSummary.GroupField = "Status";
-            //gvPJSummary.GroupFieldDisplayName = "Status";
-
-            gvPJSummary2.AllowGrouping = false;
-            gvPJSummary2.ID = "gvPJSummary";
-            gvPJSummary2.Width = Unit.Percentage(100);
-            gvPJSummary2.HeaderStyle.CssClass = "ms-vh";
-
-            projectList = site.Lists["Project Center"];
-
-            try
-            {
-                taskList = site.Lists["Task Center"];
-            }
-            catch
-            {
-                try
-                {
-                    taskList = site.Lists["My Tasks"];
-                    return "In order to take advantage of the new EPM Live functionality, please follow the instructions located <a href=\"http://www.projectpublisher.com/downloads/ProjectPublisherUpdateProcess.pdf\" target=\"_blank\">here</a>.";
-                }
-                catch { return "No Tasks List Found"; }
-            }
-
-            issueList = site.Lists["Issues"];
-            riskList = site.Lists["Risks"];
-
-            foreach (SPListItem li in projectList.Items)
-            {
-                try
-                {
-                    if (li["State"].ToString() == "(2) Active")
-                    {
-                        processProjectSummaryItem2(li);
-                    }
-                }
-                catch { }
-            }
-            gvPJSummary2.DataSource = dt;
-            gvPJSummary2.DataBind();
-            return "";
         }
 
-        private void processProjectSummaryItem2(SPListItem li)
+        private void AddField(
+            string fieldName,
+            string fieldHeader,
+            HorizontalAlign horizontalAlignment,
+            bool? fieldEncode = null,
+            string controlStyleCss = null)
         {
-            string title = "<a href=\"" + site.Url + "/Lists/Project%20Center/DispForm.aspx?ID=" + li.ID.ToString() + "\">" + li.Title + "</a>";
-            DateTime start = new DateTime();
-            DateTime finish = new DateTime();
-            float pctComplete = 0;
-            int taskCount = 0;
-            string schedulestatus = "";
-            string riskstatus = "";
-            string issuestatus = "";
-
-            try
+            var boundField = new BoundField();
+            boundField.DataField = fieldName;
+            boundField.HeaderText = fieldHeader;
+            if (fieldEncode.HasValue)
             {
-                start = DateTime.Parse(li["Start"].ToString());
+                boundField.HtmlEncode = fieldEncode.Value;
             }
-            catch { }
-            try
+            if (controlStyleCss != null)
             {
-                finish = DateTime.Parse(li["Finish"].ToString());
+                boundField.ControlStyle.CssClass = controlStyleCss;
             }
-            catch { }
-            try
-            {
-                pctComplete = float.Parse(li["PercentComplete"].ToString()) * 100;
-            }
-            catch { }
-            try
-            {
-                schedulestatus = li["Status"].ToString();
-            }
-            catch { }
-
-            try
-            {
-                schedulestatus = li["Project"].ToString();
-            }
-            catch { }
-
-            //taskCount = getTaskCount(li.ID.ToString() + ";#" + li.Title);
-
-            if (schedulestatus == "Late")
-            {
-                schedulestatus = "<img src=\"/_layouts/images/red.gif\">";
-            }
-            else
-            {
-                schedulestatus = "<img src=\"/_layouts/images/green.gif\">";
-            }
-
-            riskstatus = "<img src=\"/_layouts/images/" + getRiskStatus(li.Title) + ".gif\">";
-            issuestatus = "<img src=\"/_layouts/images/" + getIssueStatus(li.Title) + ".gif\">";
-
-
-            dt.Rows.Add(title, pctComplete.ToString() + "%", "", schedulestatus, issuestatus, riskstatus);
+            boundField.ItemStyle.HorizontalAlign = horizontalAlignment;
+            gvPJSummary.Columns.Add(boundField);
         }
 
         private void processProjectSummaryItem(SPListItem li, bool pTasks, bool pRisks, bool pIssues)
         {
-            string title = "<a href=\"" + site.Url + "/Lists/Project%20Center/DispForm.aspx?ID=" + li.ID.ToString() + "\">" + li.Title + "</a>";
-            DateTime start = new DateTime();
-            DateTime finish = new DateTime();
-            float pctComplete = 0;
-            int taskCount = 0;
-            string schedulestatus = "";
-            string riskstatus = "";
-            string issuestatus = "";
-            string project = "";
+            DateTime start;
+            DateTime finish;
+            string scheduleStatus;
+            string riskStatus;
+            string issueStatus;
+            int taskCount;
+            float percentComplete;
+            string title;
 
-            try
-            {
-                start = DateTime.Parse(li["Start"].ToString());
-            }
-            catch { }
-            try
-            {
-                finish = DateTime.Parse(li["Finish"].ToString());
-            }
-            catch { }
-            try
-            {
-                pctComplete = float.Parse(li["PercentComplete"].ToString()) * 100;
-            }
-            catch { }
-            try
-            {
-                schedulestatus = li["Status"].ToString();
-            }
-            catch { }
+            TaskHelper.ProcessProjectSummaryItem(
+                site,
+                li,
+                pTasks,
+                pRisks,
+                pIssues,
+                getTaskCount,
+                getRiskStatus,
+                getIssueStatus,
+                out start,
+                out finish,
+                out title,
+                out percentComplete,
+                out taskCount,
+                out scheduleStatus,
+                out riskStatus,
+                out issueStatus);
 
-            try
-            {
-                schedulestatus = li["Project"].ToString();
-            }
-            catch { }
-
-            if (pTasks)
-                taskCount = getTaskCount(li.Title);
-
-            if (schedulestatus == "Late")
-            {
-                schedulestatus = "<img src=\"/_layouts/images/red.gif\">";
-            }
-            else
-            {
-                schedulestatus = "<img src=\"/_layouts/images/green.gif\">";
-            }
-
-            if(pRisks)
-                riskstatus = "<img src=\"/_layouts/images/" + getRiskStatus(li.Title) + ".gif\">";
-            if(pIssues)
-                issuestatus = "<img src=\"/_layouts/images/" + getIssueStatus(li.Title) + ".gif\">";
-
-            
-            dt.Rows.Add(title, pctComplete.ToString() + "%", taskCount.ToString(), schedulestatus, issuestatus, riskstatus);
+            dt.Rows.Add(title, $"{percentComplete}%", taskCount.ToString(), scheduleStatus, issueStatus, riskStatus);
         }
 
-        private string getIssueStatus(string project)
-        {
-            try
-            {
-                string status = "green";
-
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Project'/><Value Type='Text'>" + project + "</Value></Eq></Where>";
-
-                foreach (SPListItem liTask in issueList.GetItems(query))
-                {
-                    string pjName = "";
-                    string tskStatus = "";
-                    DateTime dtDue = DateTime.Now;
-                    try
-                    {
-                        tskStatus = liTask["Status"].ToString();
-                    }
-                    catch { }
-                    try
-                    {
-                        dtDue = DateTime.Parse(liTask["DueDate"].ToString());
-                    }
-                    catch { }
-                    if (tskStatus == "Active")
-                    {
-                        issue_active++;
-                        if (status == "green")
-                            status = "yellow";
-                        if (dtDue < DateTime.Now)
-                            status = "red";
-                    }
-                    else if (tskStatus == "Postponed")
-                        issue_postponed++;
-                    else if (tskStatus == "Closed")
-                        issue_closed++;
-                }
-
-                return status;
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        private string getRiskStatus(string project)
-        {
-            try
-            {
-
-                string status = "green";
-
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Project'/><Value Type='Text'>" + project + "</Value></Eq></Where>";
-
-                foreach (SPListItem liTask in riskList.GetItems(query))
-                {
-                    string pjName = "";
-                    string tskStatus = "";
-                    DateTime dtDue = DateTime.Now;
-
-                    try
-                    {
-                        tskStatus = liTask["Status"].ToString();
-                    }
-                    catch { }
-                    try
-                    {
-                        dtDue = DateTime.Parse(liTask["DueDate"].ToString());
-                    }
-                    catch { }
-                    if (tskStatus == "Active")
-                    {
-                        risk_active++;
-                        if (status == "green")
-                            status = "yellow";
-                        if (dtDue < DateTime.Now)
-                            status = "red";
-                    }
-                    else if (tskStatus == "Postponed")
-                        risk_postponed++;
-                    else if (tskStatus == "Closed")
-                        risk_closed++;
-                }
-
-                return status;
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        private int getTaskCount(string project)
-        {
-            int taskCount = 0;
-            try
-            {
-                //taskList.GetItems();
-                SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Project'/><Value Type='Text'>" + project + "</Value></Eq></Where>";
-
-                foreach (SPListItem liTask in taskList.GetItems(query))
-                {
-                    string pjName = "";
-                    DateTime tskFinish = DateTime.Now;
-                    DateTime tskStart = DateTime.Now;
-                    float pctComplete = 0;
-                    string isMS = "False";
-                    try
-                    {
-                        tskStart = DateTime.Parse(liTask["StartDate"].ToString());
-                    }
-                    catch {
-                    }
-                    try
-                    {
-                        tskFinish = DateTime.Parse(liTask["DueDate"].ToString());
-                    }
-                    catch {
-                    }
-                    try
-                    {
-                        pctComplete = float.Parse(liTask["PercentComplete"].ToString()) * (float)100;
-                    }
-                    catch { }
-                    try
-                    {
-                        isMS = liTask["Milestone"].ToString();
-                    }
-                    catch { }
-
-                    if (tskFinish < DateTime.Now.AddDays(-1) && pctComplete < 100)
-                    {
-                        taskCount++;
-                    }
-                    if (pctComplete >= 100)
-                    {
-                        if (isMS == "True")
-                            ms_complete++;
-                        else
-                            task_complete++;
-                    }
-                    else
-                    {
-                        if (tskStart > DateTime.Now && pctComplete == 0)
-                        {
-                            if (isMS == "True")
-                                ms_future++;
-                            else
-                                task_future++;
-                        }
-                        else if (tskFinish < DateTime.Now.AddDays(-1))
-                        {
-                            if (isMS == "True")
-                                ms_late++;
-                            else
-                                task_late++;
-                        }
-                        else
-                        {
-                            if (isMS == "True")
-                                ms_current++;
-                            else
-                                task_current++;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                error = ex.Message;
-                return -1;
-            }
-            return taskCount;
-        }
         public string buildHeader(string title)
         {
             StringBuilder sb = new StringBuilder();

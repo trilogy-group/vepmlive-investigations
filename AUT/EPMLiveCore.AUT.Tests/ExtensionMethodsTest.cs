@@ -3040,62 +3040,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (Mid) (Return Type : string) Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_Mid_Static_Method_DirectCall_Throw_Exception_Test()
-        {
-            // Arrange
-            var param = CreateType<string>();
-            var startIndex = CreateType<int>();
-            var length = CreateType<int>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => ExtensionMethods.Mid(param, startIndex, length);
-
-            // Assert
-            Should.Throw<Exception>(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (Mid) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_Mid_Static_Method_Call_With_Call_Results_ShouldBe_Null_If_Not_Premitive_Type_Test()
-        {
-            // Arrange
-            var param = CreateType<string>();
-            var startIndex = CreateType<int>();
-            var length = CreateType<int>();
-            var methodMidPrametersTypes = new Type[] { typeof(string), typeof(int), typeof(int) };
-            object[] parametersOfMid = { param, startIndex, length };
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodMid, methodMidPrametersTypes, out exception);
-
-            // Act
-            var result1 = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _extensionMethodsInstanceType, MethodMid, Fixture, methodMidPrametersTypes);
-            var result2 = ReflectionAnalyzer.GetResultOfStaticMethod<string>(null, _extensionMethodsInstanceType, MethodMid, parametersOfMid, methodMidPrametersTypes);
-            Action currentAction = () => methodInfo.Invoke(null, parametersOfMid);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            result1.ShouldBeNull();
-            result2.ShouldBeNull();
-            parametersOfMid.ShouldNotBeNull();
-            parametersOfMid.Length.ShouldBe(3);
-            methodMidPrametersTypes.Length.ShouldBe(3);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (Mid) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -3122,26 +3066,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (Mid) (Return Type : string) Results Null (if not primitive type) Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_Mid_Static_Method_Call_Dynamic_Invoking_Results_Null_If_Not_Primitive_Type_Test()
-        {
-            // Arrange
-            var methodMidPrametersTypes = new Type[] { typeof(string), typeof(int), typeof(int) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(null, _extensionMethodsInstanceType, MethodMid, Fixture, methodMidPrametersTypes);
-
-            // Assert
-            result.ShouldBeNull();
-            methodMidPrametersTypes.Length.ShouldBe(3);
-        }
-
-        #endregion
-
         #region Method Call : (Mid) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -3159,27 +3083,6 @@ namespace EPMLiveCore
             // Assert
             Should.NotThrow(currentAction);
             methodMidPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (Mid) (Return Type : string) without parameters value verify result should be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ExtensionMethods_Mid_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodMid, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(null, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldBeNull();
         }
 
         #endregion

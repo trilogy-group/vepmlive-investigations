@@ -720,27 +720,7 @@ namespace PortfolioEngineCore
         }
 
         #endregion
-
-        #region Method Call : (Prorate) (Return Type : bool) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AllWorkhours_Prorate_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            var methodProratePrametersTypes = new Type[] { typeof(int), typeof(int), typeof(DateTime), typeof(DateTime), typeof(double) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_allWorkhoursInstance, MethodProrate, Fixture, methodProratePrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodProratePrametersTypes.Length.ShouldBe(5);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Prorate) (Return Type : bool) Invoke Should Not Throw
 
         [Test]

@@ -17,6 +17,18 @@ else
 	begin
 		Print 'Updating Table TSUSER'
 	end
+
+IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='I_TSUSER_TSUSERUID' AND object_id = OBJECT_ID('dbo.TSUSER'))
+BEGIN
+	CREATE NONCLUSTERED INDEX [I_TSUSER_TSUSERUID]
+	ON [dbo].[TSUSER] ([TSUSERUID])
+END
+
+IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='I_TSUSER_USER_ID' AND object_id = OBJECT_ID('dbo.TSUSER'))
+BEGIN
+	CREATE NONCLUSTERED INDEX [I_TSUSER_USER_ID]
+	ON [dbo].[TSUSER] ([USER_ID])
+END
 ---------------TABLE: TSTIMESHEET----------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'TSTIMESHEET')
 	begin
@@ -210,6 +222,11 @@ else
 		Print 'Updating Table TSNOTES'
 	end
 
+IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='I_TSNOTES_TS_ITEM_UID' AND object_id = OBJECT_ID('dbo.TSNOTES'))
+BEGIN
+	CREATE NONCLUSTERED INDEX [I_TSNOTES_TS_ITEM_UID]
+	ON [dbo].[TSNOTES] ([TS_ITEM_UID])
+END
 ------------------TABLE: TSPERIOD---------------------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'TSPERIOD')
 	begin
@@ -497,7 +514,8 @@ begin
 	[TS_UID] ASC
 	)WITH (SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF) ON [PRIMARY]
 end
-
+-------------------------------------------
+		   
 if not exists(select * from sys.indexes where name = 'IX_ITEMSEC_QUEUE')
 begin
 	CREATE INDEX [IX_ITEMSEC_QUEUE] ON [dbo].[ITEMSEC] ([QUEUE], [STATUS]) INCLUDE ([USER_ID], [dtadded], [PRIORITY])
@@ -505,10 +523,7 @@ end
 
 if not exists(select * from sys.indexes where name = 'IX_TSRESMETA_TS_UID')
 begin
-	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID]) 
+	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID])
 end
-
-
-
-
-
+													  
+													  

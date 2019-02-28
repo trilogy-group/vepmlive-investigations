@@ -42,6 +42,7 @@
     <Reference Include="EPMLiveReportsAdmin.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPMLiveReportsAdmin.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
     </Reference>
     <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
@@ -52,6 +53,12 @@
     </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="PortfolioEngineCore.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Shouldly, Version=3.0.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Shouldly.3.0.0\lib\net40\Shouldly.dll</HintPath>
     </Reference>
     <Reference Include="SPEmulators">
       <HintPath>..\..\Libraries\SPEmulators.dll</HintPath>
@@ -83,10 +90,19 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Jobs\CollectJobTests.cs" />
+    <Compile Include="Layouts\EPMLive\ReportSchedule.apsx.Tests.cs" />
+    <Compile Include="ListRefreshTestst2.cs" />
+    <Compile Include="ParentItemUpdateTests.cs" />
+    <Compile Include="ViewLogDetailTests.cs" />
     <Compile Include="AllSnapshotsTests.cs" />
     <Compile Include="EventAuditTests.cs" />
     <Compile Include="DataScrubberTests.cs" />
+    <Compile Include="ListRefreshTests.cs" />
+    <Compile Include="ProcessSecurityTests.cs" />
+    <Compile Include="LstEventsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnapshotTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -97,11 +113,19 @@
       <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
+      <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
+      <Name>PortfolioEngineCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveReporting\EPMLiveReporting.csproj">
       <Project>{b56160fe-490c-462a-bc9a-feffd2f1487c}</Project>
       <Name>EPMLiveReporting</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

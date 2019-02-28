@@ -34,3 +34,4 @@ using System.Security;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
+[assembly: InternalsVisibleTo("EPMLiveDashboards.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100b5420e8471d92ece3076f46e767ecb4833acf710d9c662ce5f3297324c287aa78efd1e7880280d8edc092e85fde97041a0e79c6f5c38b77175371ce98d9b8e7cd8f6e4a43d2cd6f6b4a80623289c7bf72dc8e11ef6d530f454564be8530a63f62ae5dc3b0b5db85a73d39d77aafb8f0794800b5772f6ecf791f1c50e5a5cf087")]

@@ -18,7 +18,7 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
-namespace EPMLiveCore.Tests.API.Notification
+namespace EPMLiveCore.Tests.API
 {
     [TestClass]
     public class APIEmailTests

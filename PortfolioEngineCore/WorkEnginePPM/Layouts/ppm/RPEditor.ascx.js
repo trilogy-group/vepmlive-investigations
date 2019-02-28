@@ -1424,6 +1424,8 @@
                 sb.append(" upload_url='" + this.params.Webservice + "'");
                 sb.append(" upload_type='Body'");
                 sb.append(" upload_method='Soap'");
+                sb.append(" upload_timeout='0'");
+                sb.append(" upload_repeat='2'");
                 sb.append(" upload_function='Execute'");
                 sb.append(" upload_namespace='PortfolioEngine'");
                 sb.append(" upload_param_Function='ResourcePlans'");
@@ -5585,14 +5587,16 @@
             var canEdit = plangrid.GetAttribute(parentplanrow, null, "UserCanEdit");
             if (canEdit != 1) return false;
             if (this.CanAddResourceToLevel(parentplanrow, resrow) == false) return false;
-            if (parentstatus != const_Project) {
-                var isPrivate = plangrid.GetAttribute(parentplanrow, null, "Private");
-                // if commitment row still private then don't worry about dept match
-                if (isPrivate != 1 || parentstatus != const_Commitment || parentIsGeneric == true) {
-                    var resdeptUid = resgrid.GetAttribute(resrow, null, "Dept_UID");
-                    if (plandeptUid != resdeptUid) {
-                        alert("Departments must match");
-                        return false;
+            if (DepartmentValidation === "True") {
+                if (parentstatus !== const_Project) {
+                    var isPrivate = plangrid.GetAttribute(parentplanrow, null, "Private");
+                    // if commitment row still private then don't worry about dept match
+                    if (isPrivate !== 1 || parentstatus !== const_Commitment || parentIsGeneric === true) {
+                        var resdeptUid = resgrid.GetAttribute(resrow, null, "Dept_UID");
+                        if (plandeptUid !== resdeptUid) {
+                            alert("Departments must match");
+                            return false;
+                        }
                     }
                 }
             }

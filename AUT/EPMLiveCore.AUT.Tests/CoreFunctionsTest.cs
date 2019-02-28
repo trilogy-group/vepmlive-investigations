@@ -56,7 +56,7 @@ namespace EPMLiveCore
 
         private const string MethodCreatePlannerDef = "CreatePlannerDef";
         private const string MethodiGetListEventType = "iGetListEventType";
-        private const string MethodiGetPlannerList = "iGetPlannerList";
+        private const string MethodiGetPlannerList = "ItemGetPlannerList";
         private const string MethodGetPlannerList = "GetPlannerList";
         private const string MethodGetJustUsername = "GetJustUsername";
         private const string MethodGetCleanUserNameWithDomain = "GetCleanUserNameWithDomain";

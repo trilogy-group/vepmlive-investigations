@@ -5,27 +5,13 @@ using System.Data.SqlClient;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint.WebControls;
 using PortfolioEngineCore;
+using WorkEnginePPM.Layouts.ppm2;
 
 namespace WorkEnginePPM.Layouts.ppm3
 {
     public partial class calendarform : LayoutsPageBase
     {
-        protected string DialogTitle = "";
-        private int c_id = 0;
-        public int id
-        {
-            get { return c_id; }
-        }
-        private string c_name = "";
-        public string Name
-        {
-            get { return c_name; }
-        }
-        private string c_desc = "";
-        public string Desc
-        {
-            get { return c_desc; }
-        }
+        public BasicDialogProperties BasicDialogProperties { get; } = new BasicDialogProperties();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -38,24 +24,20 @@ namespace WorkEnginePPM.Layouts.ppm3
                     string m_sId = Request.QueryString["id"].ToString();
                     string m_sMode = Request.QueryString["mode"].ToString();
 
-                    //if (!PPM.WebAdmin.HasPagePermission("CustomFieldForm", m_sMode))
-                    //    HttpContext.Current.Response.Redirect("NoPermForm.aspx");
-
-                    //lblMode.Text = "Unknown Mode";
                     switch (m_sMode)
                     {
                         case "Add":
-                            DialogTitle = "Add a Calendar";
+                            BasicDialogProperties.DialogTitle = "Add a Calendar";
                             btnOK.Visible = true;
                             btnDelete.Visible = false;
                             break;
                         case "Modify":
-                            DialogTitle = "Modify a Calendar";
+                            BasicDialogProperties.DialogTitle = "Modify a Calendar";
                             btnOK.Visible = true;
                             btnDelete.Visible = false;
                             break;
                         case "Delete":
-                            DialogTitle = "Delete a Calendar";
+                            BasicDialogProperties.DialogTitle = "Delete a Calendar";
                             btnOK.Visible = false;
                             btnDelete.Visible = true;
                             txtName.Enabled = false;
@@ -129,7 +111,12 @@ namespace WorkEnginePPM.Layouts.ppm3
         protected void btnDelete_Click(object sender, EventArgs e)
         {
             DBAccess dba = null;
-            Int32.TryParse(txtId.Text, out c_id);
+
+            int id;
+            if (int.TryParse(txtId.Text, out id))
+            {
+                BasicDialogProperties.Id = id;
+            }
 
             string basePath = hiddenData.Value;
             string sDBConnect = WebAdmin.GetConnectionString(basePath);
@@ -163,9 +150,14 @@ namespace WorkEnginePPM.Layouts.ppm3
                 return;
             }
 
-            Int32.TryParse(txtId.Text, out c_id);
-            c_name = txtName.Text;
-            c_desc = txtDesc.Text;
+            int id;
+            if (int.TryParse(txtId.Text, out id))
+            {
+                BasicDialogProperties.Id = id;
+            }
+
+            BasicDialogProperties.Name = txtName.Text;
+            BasicDialogProperties.Desc = txtDesc.Text;
 
             //// Stick clicked permissions into collection
             //DataTable dtResult = treetable1.GetData();
@@ -213,9 +205,9 @@ namespace WorkEnginePPM.Layouts.ppm3
             StatusEnum eStatus = StatusEnum.rsSuccess;
             lRowsAffected = 0;
 
-            int nGroupId = Group.id;
-            string sGroupName = Group.Name;
-            string sGroupDesc = Group.Desc;
+            var nGroupId = Group.BasicDialogProperties.Id;
+            var sGroupName = Group.BasicDialogProperties.Name;
+            var sGroupDesc = Group.BasicDialogProperties.Desc;
 
             SqlCommand oCommand;
             string cmdText;

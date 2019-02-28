@@ -31,6 +31,27 @@ namespace EPMLiveCore
         protected string _authorId = string.Empty;
         protected string _assigneeIds = string.Empty;
 
+        /// <inheritdoc />
+        public sealed override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                spanCommenters?.Dispose();
+                CCPeopleEditor?.Dispose();
+                pnlCommentsContainer?.Dispose();
+                hdnItemId?.Dispose();
+                hdnListId?.Dispose();
+                hdnCommentItemId?.Dispose();
+                hdnUserId?.Dispose();
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             //ScriptLink.RegisterScriptAfterUI(this.Page, "SP.Core.js", false, false);

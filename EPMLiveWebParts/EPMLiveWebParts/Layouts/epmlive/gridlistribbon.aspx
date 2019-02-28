@@ -16,7 +16,7 @@ ContextualTabWebPart.CustomPageComponent = function ContextualTabWebPart_CustomP
     this.$DataProc = dproc;
     this.$curWebUrl = wurl;
     this.$curUrl = rurl;
-    ContextualTabWebPart.CustomPageComponent.initializeBase(this);
+    ContextualTabWebPart.CustomPageComponent.initializeBase(this);    
 }
 
 ContextualTabWebPart.CustomPageComponent.prototype = {
@@ -240,7 +240,14 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     },
 
     canHandleCommand: function ContextualTabWebPart_CustomPageComponent$canHandleCommand(commandId) {
+        var canHandle = this.canHandleCommandCore(commandId);
+        try {
+            this.updateRibbonLinks(commandId, canHandle);
+        } catch (e) { if (window.console) window.console.log(e); };
+        return canHandle;
+    },
 
+    canHandleCommandCore: function(commandId) {
         switch(commandId)
         {
             case "NewFolder":
@@ -466,8 +473,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 if(this.canHandleCommandGlobal(commandId))
                     return true;
                 return this.$Grid.canHandleCommand(this.$Grid, commandId);
-        }
-       
+        }       
     },
 
     canHandleCommandGlobal: function(p0) 
@@ -492,6 +498,195 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
 
         return false;
+    },
+
+    updateRibbonLinks: function(commandId, canHandle) {
+        var supportedEpkSingleActions = [ { id: 'Ribbon.ListItem.Manage.EPKCosts', type: 'Large' }, 
+            { id: 'Ribbon.ListItem.Manage.EPKResourcePlanner.SingleAction', type: 'Large'},
+            { id: 'Ribbon.ListItem.Manage.EPKWorkPlan', type: 'Large'},
+            { id: 'Ribbon.ListItem.Manage.EPKDetails', type: 'Large'}];
+
+        var supportedEpkMultiActions = [ { id: 'Ribbon.ListItem.Manage.EPKResourceAnalyzer', type: 'Large' }, 
+            { id: 'Ribbon.ListItem.Manage.EPKResourcePlanner.MultiAction', type: 'Large'},
+            { id: 'Ribbon.ListItem.Manage.EPKCostAnalyzer', type: 'Large'},
+            { id: 'Ribbon.ListItem.Manage.EPKModeler', type: 'Large'},
+            { id: 'Ribbon.ListItem.Manage.EPKOptimizer', type: 'Large'}];
+
+        var supportedCommands = { "EPMLivePlanner": { id: "Ribbon.ListItem.EPMLive.Planner", type: 'Large' },
+            "ViewProperties": { id: "Ribbon.ListItem.Manage.ViewProperties", type: 'Large' },
+            "EditProperties": { id: "Ribbon.ListItem.Manage.EditProperties", type: 'Large' },
+            "ViewVersions": { id: "Ribbon.ListItem.Manage.ViewVersions", type: 'Large' },
+            "ManagePermissions": { id: "Ribbon.ListItem.Manage.ManagePermissions", type: 'Large' }};
+
+        if (commandId === 'EPKSingleAction') {
+            for (var i = 0; i < supportedEpkSingleActions.length; i++) {
+                var urlData = canHandle ? this.getEpkSingleActionLinkInfo(this.$Grid, supportedEpkSingleActions[i].id) : {};                
+                this.updateRibbonLink(supportedEpkSingleActions[i].id, supportedEpkSingleActions[i].type, urlData);
+            }
+        } 
+        else if (commandId === 'EPKMultiAction') {
+            for (var i = 0; i < supportedEpkMultiActions.length; i++) {
+                var urlData = canHandle ? this.getEpkMultiActionLinkInfo(this.$Grid, supportedEpkMultiActions[i].id) : {};
+                this.updateRibbonLink(supportedEpkMultiActions[i].id, supportedEpkMultiActions[i].type, urlData);
+            }
+        } else {
+            var command = supportedCommands[commandId];
+            if (command) {
+                var urlData = canHandle ? this.getSingleActionLinkInfo(this.$Grid, commandId, this.$curUrl) : {};
+                this.updateRibbonLink(command.id, command.type, urlData);
+            }
+        };
+    },
+
+    updateRibbonLink: function(controlId, buttonType, urlData) {
+        var buttonId = controlId + '-' + buttonType;
+        var hrefValue = 'javascript:;';
+
+        if (urlData && urlData.webUrl) {
+            hrefValue = urlData.webUrl;            
+        };
+
+        var element = document.getElementById(buttonId);
+        if (element) {
+            element.setAttribute('href', hrefValue);
+        }
+    },
+
+    getErrorMessageLinkInfo: function(grid, message) {
+        var result = {
+            errorMessage: message,
+            webUrl: (grid._webrelurl + '/_layouts/15/epmlive/gridaction.aspx?action=errorMessage&message=' + escape(message)).replace(/\/\//g, '/'),
+            dialogUrl: ""
+        };
+        return result;
+    },
+
+    getGridUserData: function(grid, overwriteWithParent) {
+        var result = {};
+        var rowId = grid.getSelectedRowId();
+        result.rowId = grid.getSelectedRowId();
+        result.siteUrl = grid.getUserData(rowId, "SiteUrl");
+        result.listId = grid.getUserData(rowId, "listid");
+        result.itemId = grid.getUserData(rowId, "itemid");
+        result.webId = grid.getUserData(rowId, "webid");
+        result.epkUrl = grid._epkurl;
+        result.view = grid._epkcostview;
+        
+        result.fullId = result.webId + "." + result.listId + "." + result.itemId;
+        
+        if (overwriteWithParent && grid._useparent) {
+            var parentId = grid.getUserData(rowId, "parentitemId");
+            if (parentId && parentId != "") {
+                var newids = parentId.toString().split(".");
+                result.fullId = parentId;
+                result.webId = newids[0];
+                result.listId = newids[1];
+                result.itemId = newids[2];
+            }
+        }
+
+        return result;
+    },
+
+    getEpkSingleActionLinkInfo: function(grid, controlId) {
+        var supportedControls = { "Ribbon.ListItem.Manage.EPKResourcePlanner.SingleAction": { id: "rpeditor", name: "Resource Planner", checkForResourceImportRunning: true },
+            "Ribbon.ListItem.Manage.EPKCosts": { id: "costs" },
+            "Ribbon.ListItem.Manage.EPKWorkPlan": { id: "workitems" },
+            "Ribbon.ListItem.Manage.EPKDetails": { id: "details"}};
+        var gridData = this.getGridUserData(grid, true);
+        var listId = grid.getUserData(gridData.rowId, "listid");
+        
+        // get the control, return if controlId not supported 
+        var control = supportedControls[controlId];
+        if (!control) {
+            return this.getErrorMessageLinkInfo(grid, "The source control id " + controlId + " is unexpected.");    
+        }
+
+        // check for resource is running if needed
+        if (control.checkForResourceImportRunning) {
+            var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+            if (isResImportRunning) {
+                return this.getErrorMessageLinkInfo(grid, "The " + control.name + " cannot be opened because there is an active resource import job running.");
+            }
+        }
+
+        // set the result
+        var redirectUrl = grid._webrelurl + "/_layouts/15/ppm/" + control.id + ".aspx?itemid=" + gridData.fullId + "&epkurl=" + gridData.epkUrl + "&view=" + gridData.view + "&listid=" + listId;
+        var result = {
+            dialogUrl: redirectUrl,
+            webUrl: redirectUrl + "&IsDlg=0"
+        }
+
+        return result;
+    },
+
+    getEpkMultiActionLinkInfo: function(grid, controlId) {
+        var ids = grid.getCheckedIds();
+        var supportedControls = { "Ribbon.ListItem.Manage.EPKResourceAnalyzer": { id: "rpanalyzer", name: "Resource Analyzer", checkForResourceImportRunning: true },
+            "Ribbon.ListItem.Manage.EPKResourcePlanner.MultiAction": { id: "rpeditor", name: "Resource Planner", checkForResourceImportRunning: true },
+            "Ribbon.ListItem.Manage.EPKCostAnalyzer": { id: "costanalyzer" },
+            "Ribbon.ListItem.Manage.EPKModeler": { id: "modeler" },
+            "Ribbon.ListItem.Manage.EPKOptimizer": { id: "optimizer"}};
+        
+        // fix the ids
+        if (ids != "" && ids[0] == ',') {
+            ids = ids.substring(1);
+        }
+
+        // return if no ids specified
+        if (ids == "") {
+            return this.getErrorMessageLinkInfo(grid, "Could not get project ids.");
+        }
+        
+        // get the control, return if controlId not supported 
+        var control = supportedControls[controlId];
+        if (!control) {
+            return this.getErrorMessageLinkInfo(grid, "The source control id " + controlId + " is unexpected.");    
+        }
+
+        // check for resource is running if needed
+        if (control.checkForResourceImportRunning) {
+            var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+            if (isResImportRunning) {
+                return this.getErrorMessageLinkInfo(grid, "The " + control.name + " cannot be opened because there is an active resource import job running.");
+            }
+        }
+            
+        // set the result
+        var redirectUrl = grid._webrelurl + "/_layouts/ppm/gridaction.aspx?action=epkmultipage&IDs=" + ids + "&epkcontrol=" + control.id + "&view=" + grid._epkcostview + "&listid=" + grid._listid;
+        var result = {
+            dialogUrl: "", // not supported, for dialog url there are 2 requests to the server - one calling create tickets and to get the redirect url.
+            webUrl: redirectUrl + "&IsDlg=0"
+        }
+
+        return result;
+    },
+
+    getSingleActionLinkInfo: function(grid, commandId, currentUrl) {
+        var supportedCommands = { "EPMLivePlanner": { action: "GoToPlanner", useDialogArgumentForWebUrl: true },
+            "ViewProperties": { action: "view" },
+            "EditProperties": { action: "edit" },
+            "ViewVersions": { action: "version" },
+            "ManagePermissions": { action: "perms"}};
+        var gridData = this.getGridUserData(grid, true);        
+        
+        // get the command
+        var command = supportedCommands[commandId];
+        if (!command) {
+            return this.getErrorMessageLinkInfo(grid, "The command id " + commandId + " do not support open in new tab / window action.");
+        }
+        
+        // set the result
+        var redirectUrl = gridData.siteUrl + "/_layouts/epmlive/gridaction.aspx?action=" + command.action + "&webid=" + gridData.webId + "&listid=" + gridData.listId + "&id=" + gridData.itemId + "&Source=" + escape(currentUrl);
+        var result = {
+            dialogUrl: redirectUrl,
+            webUrl: redirectUrl
+        }
+
+        // extra options: add IsDlg if needed for web url (new tab and window)
+        if (command && command.useDialogArgumentForWebUrl) result.webUrl += '&IsDlg=0';
+
+        return result;
     },
 
     handleCommand: function ContextualTabWebPart_CustomPageComponent$handleCommand(commandId, properties, sequence) {
@@ -579,29 +774,17 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             }catch(e){}
         }
         else if(commandId === 'EPMLivePlanner')
-        {
-            
+        {            
             try
             {
-                var rowId = this.$Grid.getSelectedRowId();
-                var siteurl = this.$Grid.getUserData(rowId,"SiteUrl");
-        	    var listid = this.$Grid.getUserData(rowId,"listid");
-        	    var itemid = this.$Grid.getUserData(rowId,"itemid");
-        	    var webid = this.$Grid.getUserData(rowId,"webid");
-
-                if (this.$Grid._useparent) {
-                    var parentid = this.$Grid.getUserData(rowId, "parentitemid");
-                    if (parentid && parentid != "") {
-                        var newids = parentid.toString().split(".");
-                        webid = newids[0];
-                        listid = newids[1];
-                        itemid = newids[2];
-                    }
+                var linkInfo = this.getSingleActionLinkInfo(this.$Grid, commandId, this.$curUrl);
+                if (linkInfo.dialogUrl) {
+                    // redirect to dialog url (used always when opening in same window)
+                    location.href = linkInfo.dialogUrl;
+                } 
+                else if (linkInfo.errorMessage) {
+                    alert(linkInfo.errorMessage);
                 }
-
-        	    var weburl = siteurl + "/_layouts/epmlive/gridaction.aspx?action=GoToPlanner&webid=" + webid + "&listid=" + listid + "&id=" + itemid + "&Source=" + this.$curUrl;
-
-                location.href = weburl;
             }catch(e){}
         }
         else if(commandId === 'ListEPMLivePlanner')
@@ -1282,61 +1465,26 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if(commandId === 'EPKSingleAction')
         {
-            curRow = this.$Grid.getSelectedRowId();
+            var rowId = this.$Grid.getSelectedRowId();        
+            curRow = rowId;
             curGrid = this.$Grid;
 
-            var rowId = this.$Grid.getSelectedRowId();
-            var weburl = this.$Grid.getUserData(rowId,"SiteUrl");
-        	var listid = this.$Grid.getUserData(rowId,"listid");
-        	var itemid = this.$Grid.getUserData(rowId,"itemid");
-        	var webid = this.$Grid.getUserData(rowId,"webid");
+            var linkInfo = this.getEpkSingleActionLinkInfo(this.$Grid, properties.SourceControlId);
 
-            var FullId = webid + "." + listid + "." + itemid;
-            var epkurl = this.$Grid._epkurl;
-            var view = this.$Grid._epkcostview;
-            var epkcontrol = "";
-
-            if (this.$Grid._useparent) {
-                var parentid = this.$Grid.getUserData(rowId, "parentitemid");
-                if (parentid && parentid != "") {
-                    FullId = parentid;
-                    var newids = parentid.toString().split(".");
-                    webid = newids[0];
-                    //listid = newids[1];
-                    itemid = newids[2];
-                }
+            if (linkInfo.errorMessage) {
+                alert(linkInfo.errorMessage);
+                return;
             }
 
-            switch(properties.SourceControlId)
-            {
-                case "Ribbon.ListItem.Manage.EPKResourcePlanner":
-                    epkcontrol = "rpeditor";
-                    var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
-                    if(isResImportRunning)
-                    {
-                        alert("The Resource Planner cannot be opened because there is an active resource import job running.");
-                        return;
-                    }
-                    break;
-                case "Ribbon.ListItem.Manage.EPKCosts":
-                    epkcontrol = "costs";
-                    break;
-                case "Ribbon.ListItem.Manage.EPKWorkPlan":
-                    epkcontrol = "workitems";
-                    break;
-                case "Ribbon.ListItem.Manage.EPKDetails":
-                    epkcontrol = "details";
-                    break;
+            if (!linkInfo.dialogUrl) {
+                alert('Action for button is not defined');
+                return;
             }
 
             CurrentGrid = Grids["GanttGrid" + this.$Grid._gridid];
             CurrentRow = CurrentGrid.GetRowById(rowId);
 
-            weburl = this.$Grid._webrelurl + "/_layouts/ppm/" + epkcontrol + ".aspx?itemid=" + FullId + "&epkurl=" + epkurl + "&view=" + view + "&listid=" + listid;
-
-            //function myCallback(dialogResult, returnValue){}
-
-        	var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback:this.gridactioncallback };
+            var options = { url: linkInfo.dialogUrl, showMaximized: true, showClose: false, dialogReturnValueCallback:this.gridactioncallback };
 
         	SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -1370,7 +1518,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                         epkcontrol = "rpanalyzer";
                         controlName = "Resource Analyzer";
                         break;
-                    case "Ribbon.ListItem.Manage.EPKResourcePlanner":
+                    case "Ribbon.ListItem.Manage.EPKResourcePlanner.MultiAction":
                         epkcontrol = "rpeditor";
                         controlName = "Resource Planner";
                         break;

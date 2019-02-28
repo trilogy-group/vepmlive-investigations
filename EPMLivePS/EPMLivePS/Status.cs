@@ -238,8 +238,10 @@ namespace EPMLiveEnterprise
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                EventLog myLog = new EventLog("Epm Live", ".", "Publisher Statusing");
-                myLog.WriteEntry(logEntry, EventLogEntryType.Error, eventId);
+                using (var myLog = new EventLog("Epm Live", ".", "Publisher Statusing"))
+                {
+                    myLog.WriteEntry(logEntry, EventLogEntryType.Error, eventId);
+                }
             });
         }
 

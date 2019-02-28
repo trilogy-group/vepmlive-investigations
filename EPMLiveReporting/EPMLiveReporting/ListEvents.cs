@@ -51,11 +51,20 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting Item Added"))
                         EventLog.CreateEventSource("EPMLive Reporting Item Added", "EPM Live");
 
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Added");
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(
-                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID + " : " + ex.Message +
-                        ex.StackTrace, EventLogEntryType.Error, 2001);
+                    using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Added"))
+                    {
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            string.Format(
+                                "Name: {0} Url: {1} ID: {2} : {3}{4}",
+                                _SiteName,
+                                _SiteUrl,
+                                _SiteID,
+                                ex.Message,
+                                ex.StackTrace),
+                            EventLogEntryType.Error,
+                            2001);
+                    }
                 });
             }
             finally
@@ -91,11 +100,20 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting Item Updated"))
                         EventLog.CreateEventSource("EPMLive Reporting Item Updated", "EPM Live");
 
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Updated");
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(
-                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID + " : " + ex.Message +
-                        ex.StackTrace, EventLogEntryType.Error, 2002);
+                    using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Updated"))
+                    {
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            string.Format(
+                                "Name: {0} Url: {1} ID: {2} : {3}{4}",
+                                _SiteName,
+                                _SiteUrl,
+                                _SiteID,
+                                ex.Message,
+                                ex.StackTrace),
+                            EventLogEntryType.Error,
+                            2002);
+                    }
                 });
             }
             finally
@@ -122,14 +140,13 @@ namespace EPMLiveReportsAdmin
                         //EPMLCID-6274: Delete RPTITEMGROUPS Security Groups Of Deleted Item.
                         SPSecurity.RunWithElevatedPrivileges(delegate
                         {
-                            var cmd =
-                                        new SqlCommand(
-                                            "DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid",
-                                             _DAO.GetClientReportingConnection());
-                            cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
-                            cmd.Parameters.AddWithValue("@listid", properties.ListId);
-                            cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
-                            cmd.ExecuteNonQuery();
+                            using (var sqlCommand = new SqlCommand("DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid", _DAO.GetClientReportingConnection()))
+                            {
+                                sqlCommand.Parameters.AddWithValue("@siteid", properties.SiteId);
+                                sqlCommand.Parameters.AddWithValue("@listid", properties.ListId);
+                                sqlCommand.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                                sqlCommand.ExecuteNonQuery();
+                            }
                         });
                     }
 
@@ -150,11 +167,20 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting Item Deleting"))
                         EventLog.CreateEventSource("EPMLive Reporting Item Deleting", "EPM Live");
 
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Deleting");
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(
-                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID + " : " + ex.Message +
-                        ex.StackTrace, EventLogEntryType.Error, 2003);
+                    using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Deleting"))
+                    {
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            string.Format(
+                                "Name: {0} Url: {1} ID: {2} : {3}{4}",
+                                _SiteName,
+                                _SiteUrl,
+                                _SiteID,
+                                ex.Message,
+                                ex.StackTrace),
+                            EventLogEntryType.Error,
+                            2003);
+                    }
                 });
             }
             finally
@@ -197,14 +223,13 @@ namespace EPMLiveReportsAdmin
                             SPList list = web.Lists[properties.ListId];
                             SPListItem li = list.GetItemById(properties.ListItemId);
 
-                            var cmd =
-                                new SqlCommand(
-                                    "DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid",
-                                    cn);
-                            cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
-                            cmd.Parameters.AddWithValue("@listid", properties.ListId);
-                            cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
-                            cmd.ExecuteNonQuery();
+                            using (var deleteCommand = new SqlCommand("DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid", cn))
+                            {
+                                deleteCommand.Parameters.AddWithValue("@siteid", properties.SiteId);
+                                deleteCommand.Parameters.AddWithValue("@listid", properties.ListId);
+                                deleteCommand.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                                deleteCommand.ExecuteNonQuery();
+                            }
 
                             foreach (SPRoleAssignment ra in li.RoleAssignments)
                             {
@@ -222,29 +247,27 @@ namespace EPMLiveReportsAdmin
                                 }
                                 if (found)
                                 {
-                                    cmd =
-                                        new SqlCommand(
-                                            "INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)",
-                                            cn);
-                                    cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
-                                    cmd.Parameters.AddWithValue("@listid", properties.ListId);
-                                    cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
-                                    cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
-                                    cmd.Parameters.AddWithValue("@sectype", type);
-                                    cmd.ExecuteNonQuery();
+                                    using (var insertFromFoundCommand = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn))
+                                    {
+                                        insertFromFoundCommand.Parameters.AddWithValue("@siteid", properties.SiteId);
+                                        insertFromFoundCommand.Parameters.AddWithValue("@listid", properties.ListId);
+                                        insertFromFoundCommand.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                                        insertFromFoundCommand.Parameters.AddWithValue("@groupid", ra.Member.ID);
+                                        insertFromFoundCommand.Parameters.AddWithValue("@sectype", type);
+                                        insertFromFoundCommand.ExecuteNonQuery();
+                                    }
                                 }
                             }
 
-                            cmd =
-                                new SqlCommand(
-                                    "INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)",
-                                    cn);
-                            cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
-                            cmd.Parameters.AddWithValue("@listid", properties.ListId);
-                            cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
-                            cmd.Parameters.AddWithValue("@groupid", 999999);
-                            cmd.Parameters.AddWithValue("@sectype", 1);
-                            cmd.ExecuteNonQuery();
+                            using (var insertNewCommand = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn))
+                            {
+                                insertNewCommand.Parameters.AddWithValue("@siteid", properties.SiteId);
+                                insertNewCommand.Parameters.AddWithValue("@listid", properties.ListId);
+                                insertNewCommand.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                                insertNewCommand.Parameters.AddWithValue("@groupid", 999999);
+                                insertNewCommand.Parameters.AddWithValue("@sectype", 1);
+                                insertNewCommand.ExecuteNonQuery();
+                            }
                         }
                     }
                 }

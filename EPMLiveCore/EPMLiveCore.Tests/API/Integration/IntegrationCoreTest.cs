@@ -7,12 +7,13 @@ using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
 using System.Reflection;
+using EPMLive.TestFakes.Utility;
+using EPMLiveCore.API.Fakes;
 using EPMLiveCore.API.Integration;
 using EPMLiveCore.API.Integration.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveIntegration;
 using Microsoft.QualityTools.Testing.Fakes;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,6 +40,8 @@ namespace EPMLiveCore.Tests.API.Integration
         private const string ColumnNameItemId = "ITEM_ID";
         private const string ColumnNameListId = "LIST_ID";
         private const string ColumnNameColId = "COL_ID";
+        private const string ColumnNameLiveIncoming = "LIVEINCOMING";
+        private const string ColumnNameModuleId = "MODULE_ID";
         private const string ColNameFieldName = "Fieldname";
         private const string ColNameType = "Type";
         private const string ColNameLookupIntColId = "LookupIntColID";
@@ -49,8 +52,17 @@ namespace EPMLiveCore.Tests.API.Integration
         private const string ColNameSpid = "SPID";
         private const string ColNameIntColId = "INT_COLID";
         private const string ColNameIntListId = "INT_LIST_ID";
+        private const string ColNameIntEventId = "INT_EVENT_ID";
         private const string TextIntUid = "INTUID";
         private const string TextId = "ID";
+        private const string CmdTextDeleteIntControls = "DELETE FROM INT_CONTROLS where INT_LIST_ID=@intlistid";
+        private const string QueryReadIntColumns = "SELECT * FROM INT_COLUMNS where INT_LIST_ID=@intlistid";
+        private const string QueryReadIntLists = "SELECT * FROM INT_LISTS where LIST_ID=@listid and INT_COLID=@colid";
+        private const string QueryReadtDataFromIntEvents = "SELECT DATA FROM INT_EVENTS WHERE INT_EVENT_ID=@inteventid";
+        private const string QueryReadValueFromIntProps = "SELECT VALUE FROM INT_PROPS where INT_LIST_ID=@intlistid and PROPERTY='UserMapType'";
+        private const string QueryReadModuleIdFromIntLists = "SELECT MODULE_ID FROM INT_LISTS where INT_LIST_ID=@intlistid";
+        private const string QueryReadColIdFromIntLists = "SELECT INT_COLID FROM INT_LISTS where LIST_ID=@listid and MODULE_ID=@moduleid";
+        private const string QueryReadListIdAndKeyFromIntLists = "SELECT     LIST_ID,INT_KEY from INT_LISTS where INT_LIST_ID=@intlistid";
         private static readonly Guid _siteId = Guid.NewGuid();
         private static readonly Guid _webId = Guid.NewGuid();
 
@@ -59,6 +71,7 @@ namespace EPMLiveCore.Tests.API.Integration
         private PrivateObject _testEntityPrivate;
         private SqlConnection _sqlConnection;
         private ConnectionState _sqlConnectionState;
+        private AdoShims _adoShims;
 
         [TestInitialize]
         public void TestInitialize()
@@ -1914,6 +1927,222 @@ namespace EPMLiveCore.Tests.API.Integration
                     row[ColNameIntegration].ShouldBe(TextId);
                     row[ColNameSetting].ShouldBe(string.Empty);
                 });
+        }
+
+        [TestMethod]
+        public void InstallIntegration_IfInstallIntegrationReturnsTrue_DeletesIntegrationControls()
+        {
+            // Arrange
+            _adoShims = AdoShims.ShimAdoNetCalls();
+
+            var integratorOutMessage = string.Empty;
+            var mockIntegrator = new Mock<IIntegrator>();
+            mockIntegrator.Setup(intg => intg.InstallIntegration(It.IsAny<WebProperties>(),
+                                                                 It.IsAny<IntegrationLog>(),
+                                                                 out integratorOutMessage,
+                                                                 It.IsAny<string>(),
+                                                                 It.IsAny<string>()))
+                                             .Returns(true);
+
+            var integratorDef = new IntegratorDef { iIntegrator = mockIntegrator.Object };
+            ShimIntegrationCore.AllInstances.GetIntegratorGuid = (_1, _2) => integratorDef;
+            ShimIntegrationCore.AllInstances.GetPropertiesGuid = (_1, _2) => new Hashtable();
+            ShimIntegrationCore.AllInstances.GetWebPropsHashtableGuid = (_1, _2, _3) => new WebProperties();
+
+            // Act
+            _testEntity.InstallIntegration(Guid.Empty, Guid.Empty, out integratorOutMessage);
+
+            // Assert
+            _adoShims.ShouldSatisfyAllConditions(
+                () => _adoShims.CommandsCreated.ShouldContain(
+                    cmd => cmd.CommandText.Equals(CmdTextDeleteIntControls) &&
+                           cmd.Parameters.Count == 1 &&
+                           cmd.Parameters.OfType<SqlParameter>().Any(param => param.ParameterName == "@intlistid")),
+                () => _adoShims.IsCommandExecuted(CmdTextDeleteIntControls).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(CmdTextDeleteIntControls).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void ProcessItemIncoming_IfTypeIsUpdateAndModuleIdIsExpectedGuid_ReadsIntEvent()
+        {
+            // Arrange
+            const string moduleId = "a0950b9b-3525-40b8-a456-6403156dc49c";
+            const string liveIncoming = "true";
+            const string type = "1";
+            var guid = Guid.NewGuid();
+
+            _adoShims = AdoShims.ShimAdoNetCalls();
+
+            var dataTable = new DataTable();
+            dataTable.Columns.Add(ColumnNameLiveIncoming);
+            dataTable.Columns.Add(ColumnNameModuleId);
+            dataTable.Columns.Add(ColNameIntListId);
+
+            var dataRowIntegration = dataTable.NewRow();
+            dataRowIntegration[ColumnNameLiveIncoming] = liveIncoming;
+            dataRowIntegration[ColumnNameModuleId] = moduleId;
+            dataRowIntegration[ColNameIntListId] = guid;
+            dataTable.Rows.Add(dataRowIntegration);
+
+            ShimIntegrationCore.AllInstances.GetPropertiesGuid = (_1, _2) => new Hashtable();
+            ShimIntegrationCore.AllInstances.LogMessageStringStringStringInt32 = (_1, _2, _3, _4, _5) => { };
+            ShimIntegrationCore.AllInstances.GetDataSetStringHashtable = (_1, query, parms) =>
+            {
+                var dataSet = new DataSet();
+
+                if (query == QueryReadIntLists)
+                {
+                    dataSet.Tables.Add(dataTable);
+                }
+                else
+                {
+                    dataSet.Tables.Add(new DataTable());
+                }
+
+                return dataSet;
+            };
+
+            var list = new ShimSPList() { IDGet = () => guid };
+
+            var listCollection = new ShimSPListCollection();
+            listCollection.ItemGetGuid = _ => list.Instance;
+            ShimSPWeb.AllInstances.ListsGet = _ => listCollection.Instance;
+
+            var dataTableArg = new DataTable();
+            dataTableArg.Columns.Add(ColumnNameColId);
+            dataTableArg.Columns.Add(ColumnNameListId);
+            dataTableArg.Columns.Add(ColumnNameType);
+            dataTableArg.Columns.Add(ColumnNameIntItemId);
+            dataTableArg.Columns.Add(ColNameIntEventId);
+
+            var dataRow = dataTableArg.NewRow();
+            dataRow[ColumnNameColId] = guid;
+            dataRow[ColumnNameListId] = guid;
+            dataRow[ColumnNameIntItemId] = guid;
+            dataRow[ColumnNameType] = type;
+            dataRow[ColNameIntEventId] = guid;
+            dataTableArg.Rows.Add(dataRow);
+
+            // Act
+            _testEntityPrivate.Invoke("ProcessItemIncoming", dataRow);
+
+            // Assert
+            _adoShims.ShouldSatisfyAllConditions(
+                () => _adoShims.CommandsCreated.ShouldContain(
+                    cmd => cmd.CommandText.Equals(QueryReadtDataFromIntEvents) &&
+                           cmd.Parameters.Count == 1 &&
+                           cmd.Parameters.OfType<SqlParameter>()
+                                         .Any(param => param.ParameterName.Equals("@inteventid"))),
+                () => _adoShims.IsCommandExecuted(QueryReadtDataFromIntEvents).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadtDataFromIntEvents).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetUserMap_Always_SelectsValueFromIntPropsTable()
+        {
+            // Arrange
+            _adoShims = AdoShims.ShimAdoNetCalls();
+
+            const bool reverse = true;
+            var integrationListId = Guid.NewGuid();
+
+            ShimAPITeam.GetResourcePoolStringSPWeb = (_1, _2) => new DataTable();
+
+            // Act
+            _testEntity.GetUserMap(integrationListId.ToString(), reverse);
+
+            // Assert
+            _adoShims.ShouldSatisfyAllConditions(
+                () => _adoShims.CommandsCreated.ShouldContain(
+                    cmd => cmd.CommandText.Equals(QueryReadValueFromIntProps) &&
+                           cmd.Parameters.Count == 1 &&
+                           cmd.Parameters.OfType<SqlParameter>()
+                                         .Any(param => param.ParameterName.Equals("@intlistid"))),
+                () => _adoShims.IsCommandExecuted(QueryReadValueFromIntProps).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadValueFromIntProps).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetUserMap_IfMappingIsUid_SelectsModuleIdFromIntListsTable()
+        {
+            // Arrange
+            _adoShims = AdoShims.ShimAdoNetCalls();
+
+            const bool reverse = true;
+            var integrationListId = Guid.NewGuid();
+
+            ShimAPITeam.GetResourcePoolStringSPWeb = (_1, _2) => new DataTable();
+
+            var readCount = 0;
+            ShimSqlDataReader.AllInstances.Read = _ => ++readCount == OneCall;
+            ShimSqlDataReader.AllInstances.GetStringInt32 = (_1, _2) => "UID";
+
+            // Act
+            _testEntity.GetUserMap(integrationListId.ToString(), reverse);
+
+            // Assert
+            _adoShims.ShouldSatisfyAllConditions(
+                () => _adoShims.CommandsCreated.ShouldContain(
+                    cmd => cmd.CommandText.Equals(QueryReadModuleIdFromIntLists) &&
+                           cmd.Parameters.Count == 1 &&
+                           cmd.Parameters.OfType<SqlParameter>()
+                                         .Any(param => param.ParameterName.Equals("@intlistid"))),
+                () => _adoShims.IsCommandExecuted(QueryReadModuleIdFromIntLists).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadModuleIdFromIntLists).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetUserMap_IfModuleIdIsNotEmpty_SelectsColIdFromIntListsTable()
+        {
+            // Arrange
+            _adoShims = AdoShims.ShimAdoNetCalls();
+            ShimAPITeam.GetResourcePoolStringSPWeb = (_1, _2) => new DataTable();
+            ShimSqlDataReader.AllInstances.Read = _ => true;
+            ShimSqlDataReader.AllInstances.GetStringInt32 = (_1, _2) => "UID";
+            ShimSqlDataReader.AllInstances.GetGuidInt32 = (_1, _2) => Guid.Empty;
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Empty;
+
+            var list = new ShimSPList() { IDGet = () => Guid.NewGuid() };
+            var listCollection = new ShimSPListCollection();
+            listCollection.TryGetListString = _ => list;
+            ShimSPWeb.AllInstances.ListsGet = _ => listCollection.Instance;
+
+            // Act
+            _testEntity.GetUserMap(Guid.Empty.ToString(), true);
+
+            // Assert
+            _adoShims.ShouldSatisfyAllConditions(
+                () => _adoShims.CommandsCreated.ShouldContain(
+                    cmd => cmd.CommandText.Equals(QueryReadColIdFromIntLists) &&
+                           cmd.Parameters.Count == 2 &&
+                           cmd.Parameters.OfType<SqlParameter>()
+                                         .Any(param => param.ParameterName.Equals("@listid")) &&
+                           cmd.Parameters.OfType<SqlParameter>()
+                                         .Any(param => param.ParameterName.Equals("@moduleid"))),
+                () => _adoShims.IsCommandExecuted(QueryReadColIdFromIntLists).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadColIdFromIntLists).ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void GetWebProps_Always_SelectsListIdAndKeyFromIntLists()
+        {
+            // Arrange
+            _adoShims = AdoShims.ShimAdoNetCalls();
+            var shimRootWeb = new ShimSPWeb() { TitleGet = () => string.Empty };
+            ShimSPSite.AllInstances.RootWebGet = _ => shimRootWeb.Instance;
+            ShimSPSite.AllInstances.UrlGet = _ => string.Empty;
+
+            // Act
+            _testEntityPrivate.Invoke("GetWebProps", new Hashtable(), Guid.Empty);
+
+            // Assert
+            _adoShims.ShouldSatisfyAllConditions(
+                () => _adoShims.CommandsCreated.ShouldContain(
+                    cmd => cmd.CommandText.Equals(QueryReadListIdAndKeyFromIntLists) &&
+                           cmd.Parameters.OfType<SqlParameter>()
+                                         .Any(param => param.ParameterName.Equals("@intlistid"))),
+                () => _adoShims.IsCommandExecuted(QueryReadListIdAndKeyFromIntLists).ShouldBeTrue(),
+                () => _adoShims.IsCommandDisposed(QueryReadListIdAndKeyFromIntLists).ShouldBeTrue());
         }
 
         private static void FakesForSpSecurity()

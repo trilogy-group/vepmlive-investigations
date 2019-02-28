@@ -52,6 +52,7 @@ namespace EPMLiveCore.Tests
         private const string AString = "A";
         private const string TimeFormat = "hh:mm:ss tt";
         private const string DateFormat = "M/dd/yyyy";
+        private readonly DateTime DummyDate = new DateTime(2018, 10, 10, 10, 10, 10);
 
         [TestInitialize]
         public void TestInitialize()
@@ -60,6 +61,7 @@ namespace EPMLiveCore.Tests
 
             _currentCulture = Thread.CurrentThread.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+            ShimDateTime.TodayGet = () => DummyDate;
         }
 
         [TestCleanup]
@@ -611,11 +613,10 @@ namespace EPMLiveCore.Tests
         public void ToFriendlyDateAndTime_WhenToday_ConfirmResult()
         {
             // Arrange
-            var date = DateTime.Now;
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
+            var time = DummyDate.ToString(TimeFormat);
 
             // Act
-            var result = ExtensionMethods.ToFriendlyDateAndTime(date);
+            var result = ExtensionMethods.ToFriendlyDateAndTime(DummyDate);
 
             // Assert
             result.ShouldBe($"Today at {time}");
@@ -642,8 +643,10 @@ namespace EPMLiveCore.Tests
         public void ToFriendlyDateAndTime_WhenTomorrow_ConfirmResult()
         {
             // Arrange
-            var date = DateTime.Now.AddDays(1);
+            var today = new DateTime(2018, 10, 10);
+            var date = today.AddDays(1);
             var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
+            ShimDateTime.TodayGet = () => today;
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -656,9 +659,11 @@ namespace EPMLiveCore.Tests
         public void ToFriendlyDateAndTime_WhenBeforeLastWeek_ConfirmResult()
         {
             // Arrange
-            var date = DateTime.Now.AddDays(-25);
+            var today = new DateTime(2018, 10, 10);
+            var date = today.AddDays(-25);
             var time = new DateTime(date.TimeOfDay.Ticks).ToString(TimeFormat);
             var dateToString = date.ToString(DateFormat);
+            ShimDateTime.TodayGet = () => today;
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date);
@@ -757,12 +762,11 @@ namespace EPMLiveCore.Tests
         {
             // Arrange
             var timeFormatPattern = CultureInfo.GetCultureInfo(Convert.ToInt32(LocaleId)).DateTimeFormat.LongTimePattern;
-            var date = DateTime.Now;
-            var time = new DateTime(date.TimeOfDay.Ticks).ToString(timeFormatPattern);
+            var time = DummyDate.ToString(timeFormatPattern);
             SetupShims();
 
             // Act
-            var result = ExtensionMethods.ToFriendlyDateAndTime(date, _web);
+            var result = ExtensionMethods.ToFriendlyDateAndTime(DummyDate, _web);
 
             // Assert
             result.ShouldBe($"Today at {time}");
@@ -791,10 +795,12 @@ namespace EPMLiveCore.Tests
         public void ToFriendlyDateAndTimeSPWeb_WhenTomorrow_ConfirmResult()
         {
             // Arrange
+            var today = new DateTime(2018, 10, 10);
             var timeFormatPattern = CultureInfo.GetCultureInfo(Convert.ToInt32(LocaleId)).DateTimeFormat.LongTimePattern;
-            var date = DateTime.Now.AddDays(1);
+            var date = today.AddDays(1);
             var time = new DateTime(date.TimeOfDay.Ticks).ToString(timeFormatPattern);
             SetupShims();
+            ShimDateTime.TodayGet = () => today;
 
             // Act
             var result = ExtensionMethods.ToFriendlyDateAndTime(date, _web);
@@ -809,7 +815,7 @@ namespace EPMLiveCore.Tests
             // Arrange
             var dateFormatPattern = CultureInfo.GetCultureInfo(Convert.ToInt32(LocaleId)).DateTimeFormat.ShortDatePattern;
             var timeFormatPattern = CultureInfo.GetCultureInfo(Convert.ToInt32(LocaleId)).DateTimeFormat.LongTimePattern;
-            var date = DateTime.Now.AddDays(-25);
+            var date = DummyDate.AddDays(-25);
             var time = new DateTime(date.TimeOfDay.Ticks).ToString(timeFormatPattern);
             var dateToString = date.ToString(dateFormatPattern);
             SetupShims();

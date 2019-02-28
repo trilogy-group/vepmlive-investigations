@@ -345,38 +345,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (SetDefaultVue) (Return Type : void) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ViewPermissionUtil_SetDefaultVue_Static_Method_Call_Void_With_5_Parameters_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var defaultUserView = CreateType<string>();
-            var listDefaultVue = CreateType<string>();
-            var groupId = CreateType<int>();
-            var currentList = CreateType<SPList>();
-            var defaultViews = CreateType<Dictionary<int, string>>();
-            var methodSetDefaultVuePrametersTypes = new Type[] { typeof(string), typeof(string), typeof(int), typeof(SPList), typeof(Dictionary<int, string>) };
-            object[] parametersOfSetDefaultVue = { defaultUserView, listDefaultVue, groupId, currentList, defaultViews };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodSetDefaultVue, methodSetDefaultVuePrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_viewPermissionUtilInstanceFixture, parametersOfSetDefaultVue);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfSetDefaultVue.ShouldNotBeNull();
-            parametersOfSetDefaultVue.Length.ShouldBe(5);
-            methodSetDefaultVuePrametersTypes.Length.ShouldBe(5);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (SetDefaultVue) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -630,35 +598,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (GetDefautView) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ViewPermissionUtil_GetDefautView_Static_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var groupValues = CreateType<Dictionary<int, string>>();
-            var groupId = CreateType<int>();
-            var methodGetDefautViewPrametersTypes = new Type[] { typeof(Dictionary<int, string>), typeof(int) };
-            object[] parametersOfGetDefautView = { groupValues, groupId };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetDefautView, methodGetDefautViewPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_viewPermissionUtilInstanceFixture, parametersOfGetDefautView);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetDefautView.ShouldNotBeNull();
-            parametersOfGetDefautView.Length.ShouldBe(2);
-            methodGetDefautViewPrametersTypes.Length.ShouldBe(2);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetDefautView) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -725,27 +664,6 @@ namespace EPMLiveCore
 
         #endregion
 
-        #region Method Call : (GetDefautView) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ViewPermissionUtil_GetDefautView_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetDefautView, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_viewPermissionUtilInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
         #region Method Call : (GetDefautView) (Return Type : string) Parameters Count verify
 
         [Test]
@@ -773,36 +691,6 @@ namespace EPMLiveCore
         {
             var methodIsViewAllowedPrametersTypes = types;
             ReflectionAnalyzer.InvokeStaticMethodWithDynamicParameters(_viewPermissionUtilInstanceFixture, _viewPermissionUtilInstanceType, MethodIsViewAllowed, Fixture, methodIsViewAllowedPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (IsViewAllowed) (Return Type : bool) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ViewPermissionUtil_IsViewAllowed_Static_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var groupValues = CreateType<Dictionary<int, string>>();
-            var groupId = CreateType<int>();
-            var viewToTest = CreateType<string>();
-            var methodIsViewAllowedPrametersTypes = new Type[] { typeof(Dictionary<int, string>), typeof(int), typeof(string) };
-            object[] parametersOfIsViewAllowed = { groupValues, groupId, viewToTest };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodIsViewAllowed, methodIsViewAllowedPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_viewPermissionUtilInstanceFixture, parametersOfIsViewAllowed);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfIsViewAllowed.ShouldNotBeNull();
-            parametersOfIsViewAllowed.Length.ShouldBe(3);
-            methodIsViewAllowedPrametersTypes.Length.ShouldBe(3);
-            Should.NotThrow(currentAction);
         }
 
         #endregion
@@ -850,27 +738,6 @@ namespace EPMLiveCore
             // Assert
             Should.NotThrow(currentAction);
             methodIsViewAllowedPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (IsViewAllowed) (Return Type : bool) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ViewPermissionUtil_IsViewAllowed_Static_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodIsViewAllowed, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_viewPermissionUtilInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

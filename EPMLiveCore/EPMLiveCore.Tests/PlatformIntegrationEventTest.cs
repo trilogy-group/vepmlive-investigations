@@ -85,8 +85,8 @@ namespace EPMLiveCore.Tests
                 () => _connectionOpenedCallCount.ShouldBe(2),
                 () => _executeNonQueryCallCount.ShouldBe(2),
                 () => _executeReaderCallCount.ShouldBe(1),
-                () => _connectionDisposeCallCount.ShouldBe(2),
-                () => _sqlCommandDisposeCallCount.ShouldBe(2));
+                () => _connectionDisposeCallCount.ShouldBeGreaterThanOrEqualTo(2),
+                () => _sqlCommandDisposeCallCount.ShouldBeGreaterThanOrEqualTo(2));
         }
 
         [TestMethod]
@@ -125,8 +125,8 @@ namespace EPMLiveCore.Tests
                 () => _connectionOpenedCallCount.ShouldBe(2),
                 () => _executeNonQueryCallCount.ShouldBe(2),
                 () => _executeReaderCallCount.ShouldBe(1),
-                () => _connectionDisposeCallCount.ShouldBe(2),
-                () => _sqlCommandDisposeCallCount.ShouldBe(2));
+                () => _connectionDisposeCallCount.ShouldBeGreaterThanOrEqualTo(2),
+                () => _sqlCommandDisposeCallCount.ShouldBeGreaterThanOrEqualTo(2));
         }
 
         [TestMethod]

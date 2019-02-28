@@ -9,6 +9,7 @@ using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using static EPMLiveCore.Layouts.epmlive.LayoutsHelper;
 
 namespace EPMLiveCore
 {
@@ -229,53 +230,7 @@ namespace EPMLiveCore
 
         private void LoadHeadingDropDownList()
         {
-            if (!IsPostBack && !_isNewHeading)
-            {
-                SPNavigationNodeCollection coll = null;
-                switch (_nodeType)
-                {
-                    case "topnav":
-                        coll = _web.Navigation.TopNavigationBar;
-                        break;
-                    case "quiklnch":
-                        coll = _web.Navigation.QuickLaunch;
-                        break;
-                }
-
-                List<int> navIds = new List<int>();
-
-                if (_appId != -1)
-                {
-                    switch (_nodeType)
-                    {
-                        case "topnav":
-                            navIds = appHelper.TryGetTopNavIdsByAppId(_appId);
-                            break;
-                        case "quiklnch":
-                            navIds = appHelper.TryGetQuickLaunchIdsByAppId(_appId);
-                            break;
-                    }
-                }
-
-                foreach (SPNavigationNode node in coll)
-                {
-                    if (navIds.Count > 0)
-                    {
-                        if (navIds.Contains(node.Id))
-                        {
-                            ddlNavigationHeadings.Items.Add(
-                                new ListItem(node.Title, node.Id.ToString())
-                                );
-                        }
-                    }
-                    else
-                    {
-                        ddlNavigationHeadings.Items.Add(
-                            new ListItem(node.Title, node.Id.ToString())
-                            );
-                    }
-                }
-            }
+            LoadHeadingDropDownListHelper(!IsPostBack && !_isNewHeading, _nodeType, _web, _appId, appHelper, ddlNavigationHeadings, null);
         }
 
         private void AuthenticateUser()

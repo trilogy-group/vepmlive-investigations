@@ -242,55 +242,76 @@ namespace EPMLiveCore.API
 
         private static void UpdateTimerJob(SqlConnection cn, Guid timerjobuid, string data, string key, int runtime, int scheduletype, string days)
         {
-            SqlCommand cmd = new SqlCommand("update timerjobs set jobdata=@jobdata, [key]=@key, runtime=@runtime, scheduletype=@scheduletype,days=@days where timerjobuid=@timerjobuid", cn);
-            cmd.Parameters.AddWithValue("@jobdata", data);
-            cmd.Parameters.AddWithValue("@key", key);
-            cmd.Parameters.AddWithValue("@runtime", runtime);
-            cmd.Parameters.AddWithValue("@scheduletype", scheduletype);
-            cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-            cmd.Parameters.AddWithValue("@days", days);
-
-            cmd.ExecuteNonQuery();
-
+            using (var sqlCommand = new SqlCommand(
+                "update timerjobs set jobdata=@jobdata, [key]=@key, runtime=@runtime, scheduletype=@scheduletype,days=@days where timerjobuid=@timerjobuid",
+                cn))
+            {
+                sqlCommand.Parameters.AddWithValue("@jobdata", data);
+                sqlCommand.Parameters.AddWithValue("@key", key);
+                sqlCommand.Parameters.AddWithValue("@runtime", runtime);
+                sqlCommand.Parameters.AddWithValue("@scheduletype", scheduletype);
+                sqlCommand.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                sqlCommand.Parameters.AddWithValue("@days", days);
+                sqlCommand.ExecuteNonQuery();
+            }
         }
 
         private static Guid AddTimerJob(SqlConnection cn, Guid siteid, Guid? webid, Guid? listid, int? itemid, string jobname, int jobtype, string data, string key, int? runtime, int scheduletype, string days)
         {
             Guid job = Guid.NewGuid();
 
-            SqlCommand cmd = new SqlCommand("INSERT INTO timerjobs (timerjobuid, jobname, siteguid, webguid, listguid, itemid, jobtype, runtime, scheduletype, days, jobdata, [key]) VALUES  (@timerjobuid, @jobname, @siteguid, @webguid, @listguid, @itemid, @jobtype, @runtime, @scheduletype, @days, @jobdata, @key)", cn);
-            cmd.Parameters.AddWithValue("@timerjobuid", job);
-            cmd.Parameters.AddWithValue("@jobname", jobname);
-            cmd.Parameters.AddWithValue("@siteguid", siteid);
+            using (var sqlCommand = new SqlCommand(
+                "INSERT INTO timerjobs (timerjobuid, jobname, siteguid, webguid, listguid, itemid, jobtype, runtime, scheduletype, days, jobdata, [key]) VALUES  (@timerjobuid, @jobname, @siteguid, @webguid, @listguid, @itemid, @jobtype, @runtime, @scheduletype, @days, @jobdata, @key)",
+                cn))
+            {
+                sqlCommand.Parameters.AddWithValue("@timerjobuid", job);
+                sqlCommand.Parameters.AddWithValue("@jobname", jobname);
+                sqlCommand.Parameters.AddWithValue("@siteguid", siteid);
 
-            if (webid.HasValue)
-                cmd.Parameters.AddWithValue("@webguid", webid.Value);
-            else
-                cmd.Parameters.AddWithValue("@webguid", DBNull.Value);
+                if (webid.HasValue)
+                {
+                    sqlCommand.Parameters.AddWithValue("@webguid", webid.Value);
+                }
+                else
+                {
+                    sqlCommand.Parameters.AddWithValue("@webguid", DBNull.Value);
+                }
 
-            if (listid.HasValue)
-                cmd.Parameters.AddWithValue("@listguid", listid.Value);
-            else
-                cmd.Parameters.AddWithValue("@listguid", DBNull.Value);
+                if (listid.HasValue)
+                {
+                    sqlCommand.Parameters.AddWithValue("@listguid", listid.Value);
+                }
+                else
+                {
+                    sqlCommand.Parameters.AddWithValue("@listguid", DBNull.Value);
+                }
 
-            if (itemid.HasValue)
-                cmd.Parameters.AddWithValue("@itemid", itemid.Value);
-            else
-                cmd.Parameters.AddWithValue("@itemid", DBNull.Value);
+                if (itemid.HasValue)
+                {
+                    sqlCommand.Parameters.AddWithValue("@itemid", itemid.Value);
+                }
+                else
+                {
+                    sqlCommand.Parameters.AddWithValue("@itemid", DBNull.Value);
+                }
 
-            cmd.Parameters.AddWithValue("@jobtype", jobtype);
+                sqlCommand.Parameters.AddWithValue("@jobtype", jobtype);
 
-            if (runtime.HasValue)
-                cmd.Parameters.AddWithValue("@runtime", runtime.Value);
-            else
-                cmd.Parameters.AddWithValue("@runtime", DBNull.Value);
+                if (runtime.HasValue)
+                {
+                    sqlCommand.Parameters.AddWithValue("@runtime", runtime.Value);
+                }
+                else
+                {
+                    sqlCommand.Parameters.AddWithValue("@runtime", DBNull.Value);
+                }
 
-            cmd.Parameters.AddWithValue("@scheduletype", scheduletype);
-            cmd.Parameters.AddWithValue("@days", days);
-            cmd.Parameters.AddWithValue("@jobdata", data);
-            cmd.Parameters.AddWithValue("@key", key);
-
-            cmd.ExecuteNonQuery();
+                sqlCommand.Parameters.AddWithValue("@scheduletype", scheduletype);
+                sqlCommand.Parameters.AddWithValue("@days", days);
+                sqlCommand.Parameters.AddWithValue("@jobdata", data);
+                sqlCommand.Parameters.AddWithValue("@key", key);
+                sqlCommand.ExecuteNonQuery();
+            }
 
             return job;
         }
@@ -309,24 +330,26 @@ namespace EPMLiveCore.API
                         try
                         {
                             cn.Open();
+                            var bExists = false;
+                            var status = 0;
 
-                            SqlCommand cmd = new SqlCommand("SELECT status,timerjobuid from vwQueueTimer where siteguid=@siteuid and webguid=@webuid and listguid=@listuid and jobtype=@jobtype", cn);
-                            cmd.Parameters.AddWithValue("@siteuid", siteid);
-                            cmd.Parameters.AddWithValue("@webuid", webid);
-                            cmd.Parameters.AddWithValue("@listuid", listid);
-                            cmd.Parameters.AddWithValue("@jobtype", jobtype);
-                            bool bExists = false;
-                            int status = 0;
-                            using (SqlDataReader dr = cmd.ExecuteReader())
+                            using (var sqlCommand = new SqlCommand(
+                                "SELECT status,timerjobuid from vwQueueTimer where siteguid=@siteuid and webguid=@webuid and listguid=@listuid and jobtype=@jobtype",
+                                cn))
                             {
+                                sqlCommand.Parameters.AddWithValue("@siteuid", siteid);
+                                sqlCommand.Parameters.AddWithValue("@webuid", webid);
+                                sqlCommand.Parameters.AddWithValue("@listuid", listid);
+                                sqlCommand.Parameters.AddWithValue("@jobtype", jobtype);
 
-
-
-                                if (dr.Read())
+                                using (var dataReader = sqlCommand.ExecuteReader())
                                 {
-                                    bExists = true;
-                                    status = dr.GetInt32(0);
-                                    jobuid = dr.GetGuid(1);
+                                    if (dataReader.Read())
+                                    {
+                                        bExists = true;
+                                        status = dataReader.GetInt32(0);
+                                        jobuid = dataReader.GetGuid(1);
+                                    }
                                 }
                             }
 
@@ -377,18 +400,22 @@ namespace EPMLiveCore.API
 
                             if (scheduletype != 99)
                             {
-                                SqlCommand cmd = new SqlCommand("SELECT status,timerjobuid from vwQueueTimer where siteguid=@siteuid and webguid=@webuid and jobtype=@jobtype", cn);
-                                cmd.Parameters.AddWithValue("@siteuid", siteid);
-                                cmd.Parameters.AddWithValue("@webuid", webid);
-                                cmd.Parameters.AddWithValue("@jobtype", jobtype);
-
-                                using (SqlDataReader dr = cmd.ExecuteReader())
+                                using (var sqlCommand = new SqlCommand(
+                                    "SELECT status,timerjobuid from vwQueueTimer where siteguid=@siteuid and webguid=@webuid and jobtype=@jobtype",
+                                    cn))
                                 {
-                                    if (dr.Read())
+                                    sqlCommand.Parameters.AddWithValue("@siteuid", siteid);
+                                    sqlCommand.Parameters.AddWithValue("@webuid", webid);
+                                    sqlCommand.Parameters.AddWithValue("@jobtype", jobtype);
+
+                                    using (var dataReader = sqlCommand.ExecuteReader())
                                     {
-                                        bExists = true;
-                                        status = dr.GetInt32(0);
-                                        jobuid = dr.GetGuid(1);
+                                        if (dataReader.Read())
+                                        {
+                                            bExists = true;
+                                            status = dataReader.GetInt32(0);
+                                            jobuid = dataReader.GetGuid(1);
+                                        }
                                     }
                                 }
                             }

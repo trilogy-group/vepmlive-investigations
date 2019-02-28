@@ -619,35 +619,6 @@ namespace EPMLiveCore.SalesforceApexService
 
         #region Category : MethodCallTest
 
-        #region Method Call : NonStatic methods call tests
-
-        /// <summary>
-        ///      Class (<see cref="ApexService" />) public, non-public non-static methods exploration for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        [TestCase(MethodcompileAndTest)]
-        [TestCase(MethodOncompileAndTestOperationCompleted)]
-        [TestCase(MethodcompileClasses)]
-        [TestCase(MethodOncompileClassesOperationCompleted)]
-        [TestCase(MethodcompileTriggers)]
-        [TestCase(MethodOncompileTriggersOperationCompleted)]
-        [TestCase(MethodexecuteAnonymous)]
-        [TestCase(MethodOnexecuteAnonymousOperationCompleted)]
-        [TestCase(MethodrunTests)]
-        [TestCase(MethodOnrunTestsOperationCompleted)]
-        [TestCase(MethodwsdlToApex)]
-        [TestCase(MethodOnwsdlToApexOperationCompleted)]
-        [TestCase(MethodIsLocalFileSystemWebService)]
-        public void AUT_ApexService_NonStatic_Methods_Explore_Verify_Test(string methodName)
-        {
-            // AAA: Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyMethods<ApexService>(Fixture, methodName);
-        }
-
-        #endregion
-
         #region Method Call : (compileAndTest) (Return Type : CompileAndTestResult) private call definition
 
         [ExcludeFromCodeCoverage]

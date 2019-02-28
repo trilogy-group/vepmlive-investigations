@@ -149,32 +149,56 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
 							if (sacccount.Checked)
 							{
 								if (btnNew.Checked)
-								{
-									SqlConnection cn = new SqlConnection(string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", txtDatabaseServer.Text, "master", username.Text, password.Text));
-									cn.Open();
-									cn.Close();
-								}
-								else
-								{
-									SqlConnection cn = new SqlConnection(string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", txtDatabaseServer.Text, txtDatabaseName.Text, username.Text, password.Text));
-									cn.Open();
-									cn.Close();
-								}
+							    {
+							        using (var sqlConnection = new SqlConnection(
+							            string.Format(
+							                "Data Source={0};Initial Catalog={1};User Id={2};Password={3};",
+							                txtDatabaseServer.Text,
+							                "master",
+							                username.Text,
+							                password.Text)))
+							        {
+							            sqlConnection.Open();
+							        }
+							    }
+							    else
+							    {
+							        using (var sqlConnection = new SqlConnection(
+							            string.Format(
+							                "Data Source={0};Initial Catalog={1};User Id={2};Password={3};",
+							                txtDatabaseServer.Text,
+							                txtDatabaseName.Text,
+							                username.Text,
+							                password.Text)))
+							        {
+							            sqlConnection.Open();
+							        }
+							    }
 							}
 							else
 							{
-								if (btnNew.Checked)
-								{
-									SqlConnection cn = new SqlConnection(string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", txtDatabaseServer.Text, "master"));
-									cn.Open();
-									cn.Close();
-								}
-								else
-								{
-									SqlConnection cn = new SqlConnection(string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", txtDatabaseServer.Text, txtDatabaseName.Text));
-									cn.Open();
-									cn.Close();
-								}
+							    if (btnNew.Checked)
+							    {
+							        using (var sqlConnection = new SqlConnection(
+							            string.Format(
+							                "Data Source={0};Initial Catalog={1};Integrated Security=SSPI",
+							                txtDatabaseServer.Text,
+							                "master")))
+							        {
+							            sqlConnection.Open();
+							        }
+							    }
+							    else
+							    {
+							        using (var sqlConnection = new SqlConnection(
+							            string.Format(
+							                "Data Source={0};Initial Catalog={1};Integrated Security=SSPI",
+							                txtDatabaseServer.Text,
+							                txtDatabaseName.Text)))
+							        {
+							            sqlConnection.Open();
+							        }
+							    }
 							}
 						}
 					}

@@ -9,7 +9,6 @@ using Microsoft.SharePoint;
 using System.Collections;
 using EPMLiveCore;
 using EPMLiveCore.API;
-using System.Collections.Concurrent;
 
 namespace TimeSheets
 {
@@ -157,9 +156,8 @@ namespace TimeSheets
                 }
             }
         }
-		private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
 
-		private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
             if (id != "")
@@ -193,192 +191,191 @@ namespace TimeSheets
                                         SPListItem li = null;
 
                                         SPList list = web.Lists[new Guid(listid)];
-										lock (_locks.GetOrAdd(listid.ToLower(), s => new object()))
-										{
-											try
-											{
-												try
-												{
-													li = list.GetItemById(int.Parse(itemid));
-												}
-												catch { }
 
-												if (li != null)
-												{
-													int projectid = 0;
-													string project = "";
-													string projectlist = "";
-													try
-													{
-														SPFieldLookupValue lv = new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
-														projectid = lv.LookupId;
-														project = lv.LookupValue;
-													}
-													catch { }
+                                        try
+                                        {
+                                            try
+                                            {
+                                                li = list.GetItemById(int.Parse(itemid));
+                                            }
+                                            catch { }
 
-													//PROCESS LI
+                                            if (li != null)
+                                            {
+                                                int projectid = 0;
+                                                string project = "";
+                                                string projectlist = "";
+                                                try
+                                                {
+                                                    SPFieldLookupValue lv = new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
+                                                    projectid = lv.LookupId;
+                                                    project = lv.LookupValue;
+                                                }
+                                                catch { }
 
-													//if (iGetAttribute(ndRow, "Edited") == "1")
-													//{
-													//    GridGanttSettings gSettings = new GridGanttSettings(list);
-													//    Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-													//    if (ndRow.Attributes != null)
-													//    {
-													//        foreach (XmlAttribute attr in ndRow.Attributes)
-													//        {
-													//            if (!NonUpdatingColumns.Contains(attr.Name))
-													//            {
-													//                SPField spField = li.Fields.TryGetFieldByStaticName(attr.Name);
-													//                if (spField != null)
-													//                {
-													//                    if (EditableFieldDisplay.isEditable(li, spField, fieldProperties))
-													//                    {
-													//                        string newValue = iGetAttribute(ndRow, spField.InternalName);
+                                                //PROCESS LI
 
-													//                        switch (spField.Type)
-													//                        {
-													//                            case SPFieldType.Choice:
-													//                            case SPFieldType.Text:
-													//                                if (Convert.ToString(li[spField.InternalName]) != newValue)
-													//                                {
-													//                                    li[spField.InternalName] = newValue;
-													//                                }
-													//                                break;
-													//                            case SPFieldType.Boolean:
-													//                                if (!String.IsNullOrEmpty(newValue))
-													//                                {
-													//                                    Boolean newBooleanValue = Convert.ToBoolean(newValue);
-													//                                    if (Convert.ToBoolean(li[spField.InternalName]) != newBooleanValue)
-													//                                    {
-													//                                        li[spField.InternalName] = newBooleanValue;
-													//                                    }
-													//                                }
-													//                                break;
-													//                            case SPFieldType.Currency:
-													//                                if (!String.IsNullOrEmpty(newValue))
-													//                                {
-													//                                    Double newCurrencyValue = Convert.ToDouble(newValue);
-													//                                    if (Convert.ToDouble(li[spField.InternalName]) != newCurrencyValue)
-													//                                    {
-													//                                        li[spField.InternalName] = newCurrencyValue;
-													//                                    }
-													//                                }
-													//                                break;
-													//                            case SPFieldType.Number:
-													//                                if (!String.IsNullOrEmpty(newValue))
-													//                                {
-													//                                    Double newDoubleValue = Convert.ToDouble(newValue);
-													//                                    if (Convert.ToDouble(li[spField.InternalName]) != newDoubleValue)
-													//                                    {
-													//                                        if (((SPFieldNumber)spField).ShowAsPercentage)
-													//                                        {
-													//                                            newDoubleValue = newDoubleValue / 100;
-													//                                        }
-													//                                        li[spField.InternalName] = newDoubleValue;
-													//                                    }
-													//                                }
-													//                                break;
-													//                            case SPFieldType.DateTime:
-													//                                if (!String.IsNullOrEmpty(newValue))
-													//                                {
-													//                                    DateTime newDateTimeValue = Convert.ToDateTime(newValue);
-													//                                    if (Convert.ToDateTime(li[spField.InternalName]) != newDateTimeValue)
-													//                                    {
-													//                                        li[spField.InternalName] = newDateTimeValue;
-													//                                    }
-													//                                }
-													//                                break;
-													//                            case SPFieldType.Integer:
-													//                                if (!String.IsNullOrEmpty(newValue))
-													//                                {
-													//                                    Int64 newInt64Value = Convert.ToInt64(newValue);
-													//                                    if (Convert.ToInt64(li[spField.InternalName]) != newInt64Value)
-													//                                    {
-													//                                        li[spField.InternalName] = newInt64Value;
-													//                                    }
-													//                                }
-													//                                break;
-													//                            case SPFieldType.User:
-													//                            case SPFieldType.Lookup:
-													//                                var spFieldLookup = (SPFieldLookup)spField;
-													//                                if (spFieldLookup != null && !string.IsNullOrEmpty(spFieldLookup.LookupList))
-													//                                {
-													//                                    SPList spLookuplist = web.Lists[new Guid(spFieldLookup.LookupList)];
-													//                                    if (spLookuplist != null)
-													//                                    {
-													//                                        SPFieldLookupValueCollection spFLVCIds = new SPFieldLookupValueCollection();
+                                                //if (iGetAttribute(ndRow, "Edited") == "1")
+                                                //{
+                                                //    GridGanttSettings gSettings = new GridGanttSettings(list);
+                                                //    Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+                                                //    if (ndRow.Attributes != null)
+                                                //    {
+                                                //        foreach (XmlAttribute attr in ndRow.Attributes)
+                                                //        {
+                                                //            if (!NonUpdatingColumns.Contains(attr.Name))
+                                                //            {
+                                                //                SPField spField = li.Fields.TryGetFieldByStaticName(attr.Name);
+                                                //                if (spField != null)
+                                                //                {
+                                                //                    if (EditableFieldDisplay.isEditable(li, spField, fieldProperties))
+                                                //                    {
+                                                //                        string newValue = iGetAttribute(ndRow, spField.InternalName);
 
-													//                                        foreach (string itemId in newValue.Split(';'))
-													//                                        {
-													//                                            Int32 newInt32IdValue;
-													//                                            if (Int32.TryParse(itemId, out newInt32IdValue))
-													//                                            {
-													//                                                spFLVCIds.Add(new SPFieldLookupValue(newInt32IdValue.ToString()));
-													//                                            }
-													//                                        }
+                                                //                        switch (spField.Type)
+                                                //                        {
+                                                //                            case SPFieldType.Choice:
+                                                //                            case SPFieldType.Text:
+                                                //                                if (Convert.ToString(li[spField.InternalName]) != newValue)
+                                                //                                {
+                                                //                                    li[spField.InternalName] = newValue;
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.Boolean:
+                                                //                                if (!String.IsNullOrEmpty(newValue))
+                                                //                                {
+                                                //                                    Boolean newBooleanValue = Convert.ToBoolean(newValue);
+                                                //                                    if (Convert.ToBoolean(li[spField.InternalName]) != newBooleanValue)
+                                                //                                    {
+                                                //                                        li[spField.InternalName] = newBooleanValue;
+                                                //                                    }
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.Currency:
+                                                //                                if (!String.IsNullOrEmpty(newValue))
+                                                //                                {
+                                                //                                    Double newCurrencyValue = Convert.ToDouble(newValue);
+                                                //                                    if (Convert.ToDouble(li[spField.InternalName]) != newCurrencyValue)
+                                                //                                    {
+                                                //                                        li[spField.InternalName] = newCurrencyValue;
+                                                //                                    }
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.Number:
+                                                //                                if (!String.IsNullOrEmpty(newValue))
+                                                //                                {
+                                                //                                    Double newDoubleValue = Convert.ToDouble(newValue);
+                                                //                                    if (Convert.ToDouble(li[spField.InternalName]) != newDoubleValue)
+                                                //                                    {
+                                                //                                        if (((SPFieldNumber)spField).ShowAsPercentage)
+                                                //                                        {
+                                                //                                            newDoubleValue = newDoubleValue / 100;
+                                                //                                        }
+                                                //                                        li[spField.InternalName] = newDoubleValue;
+                                                //                                    }
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.DateTime:
+                                                //                                if (!String.IsNullOrEmpty(newValue))
+                                                //                                {
+                                                //                                    DateTime newDateTimeValue = Convert.ToDateTime(newValue);
+                                                //                                    if (Convert.ToDateTime(li[spField.InternalName]) != newDateTimeValue)
+                                                //                                    {
+                                                //                                        li[spField.InternalName] = newDateTimeValue;
+                                                //                                    }
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.Integer:
+                                                //                                if (!String.IsNullOrEmpty(newValue))
+                                                //                                {
+                                                //                                    Int64 newInt64Value = Convert.ToInt64(newValue);
+                                                //                                    if (Convert.ToInt64(li[spField.InternalName]) != newInt64Value)
+                                                //                                    {
+                                                //                                        li[spField.InternalName] = newInt64Value;
+                                                //                                    }
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.User:
+                                                //                            case SPFieldType.Lookup:
+                                                //                                var spFieldLookup = (SPFieldLookup)spField;
+                                                //                                if (spFieldLookup != null && !string.IsNullOrEmpty(spFieldLookup.LookupList))
+                                                //                                {
+                                                //                                    SPList spLookuplist = web.Lists[new Guid(spFieldLookup.LookupList)];
+                                                //                                    if (spLookuplist != null)
+                                                //                                    {
+                                                //                                        SPFieldLookupValueCollection spFLVCIds = new SPFieldLookupValueCollection();
 
-													//                                        li[spField.InternalName] = spFLVCIds;
-													//                                    }
-													//                                }
-													//                                break;
-													//                            case SPFieldType.MultiChoice:
-													//                                SPFieldMultiChoiceValue spFMCVIds = new SPFieldMultiChoiceValue();
-													//                                foreach (string itemId in newValue.Split(';'))
-													//                                {
-													//                                    spFMCVIds.Add(itemId);
-													//                                }
-													//                                li[spField.InternalName] = spFMCVIds;
-													//                                break;
-													//                            default:
-													//                                break;
-													//                        }
-													//                    }
+                                                //                                        foreach (string itemId in newValue.Split(';'))
+                                                //                                        {
+                                                //                                            Int32 newInt32IdValue;
+                                                //                                            if (Int32.TryParse(itemId, out newInt32IdValue))
+                                                //                                            {
+                                                //                                                spFLVCIds.Add(new SPFieldLookupValue(newInt32IdValue.ToString()));
+                                                //                                            }
+                                                //                                        }
 
-													//                }
-													//            }
+                                                //                                        li[spField.InternalName] = spFLVCIds;
+                                                //                                    }
+                                                //                                }
+                                                //                                break;
+                                                //                            case SPFieldType.MultiChoice:
+                                                //                                SPFieldMultiChoiceValue spFMCVIds = new SPFieldMultiChoiceValue();
+                                                //                                foreach (string itemId in newValue.Split(';'))
+                                                //                                {
+                                                //                                    spFMCVIds.Add(itemId);
+                                                //                                }
+                                                //                                li[spField.InternalName] = spFMCVIds;
+                                                //                                break;
+                                                //                            default:
+                                                //                                break;
+                                                //                        }
+                                                //                    }
 
-													//        }
-													//    }
-													//}
+                                                //                }
+                                                //            }
 
-													if (liveHours)
-													{
-														processLiveHours(li, list.ID);
-														if (li.Fields.ContainsFieldWithInternalName("PercentComplete") && li.Fields.ContainsFieldWithInternalName("Status"))
-														{
-															SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
-															SPField statusField = li.Fields.GetFieldByInternalName("Status");
-															if (percentCompleteField != null && statusField != null)
-															{
-																Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
-																if (value == 0)
-																{
-																	li[statusField.InternalName] = "Not Started";
-																}
-																else if (value > 0 & value < 1)
-																{
-																	li[statusField.InternalName] = "In Progress";
-																}
-																else if (value == 1)
-																{
-																	li[statusField.InternalName] = "Completed";
-																}
-															}
+                                                //        }
+                                                //    }
+                                                //}
 
-														}
-													}
+                                                if (liveHours)
+                                                {
+                                                    processLiveHours(li, list.ID);
+                                                    if (li.Fields.ContainsFieldWithInternalName("PercentComplete") && li.Fields.ContainsFieldWithInternalName("Status"))
+                                                    {
+                                                        SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
+                                                        SPField statusField = li.Fields.GetFieldByInternalName("Status");
+                                                        if (percentCompleteField != null && statusField != null)
+                                                        {
+                                                            Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
+                                                            if (value == 0)
+                                                            {
+                                                                li[statusField.InternalName] = "Not Started";
+                                                            }
+                                                            else if (value > 0 & value < 1)
+                                                            {
+                                                                li[statusField.InternalName] = "In Progress";
+                                                            }
+                                                            else if (value == 1)
+                                                            {
+                                                                li[statusField.InternalName] = "Completed";
+                                                            }
+                                                        }
 
-													li.Update();
+                                                    }
+                                                }
 
-												}
-											}
-											catch (Exception ex)
-											{
-												bErrors = true;
-												sErrors += "Item (" + id + ") Error: " + ex.ToString();
-											}
+                                                li.Update();
 
-										}
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            bErrors = true;
+                                            sErrors += "Item (" + id + ") Error: " + ex.ToString();
+                                        }
+
+
                                     }
 
                                 }

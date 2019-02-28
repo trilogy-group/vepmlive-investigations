@@ -30,6 +30,10 @@ namespace WorkEnginePPM
 
     public class EditCalendar : System.Web.Services.WebService
     {
+        private const int MaxHeight = 300;
+        private const int LeftWidth = 500;
+        private const string CharIds = "0123456789";
+
         private string GetSPSessionBasePath()
         {
             //using (SPWeb web = SPContext.Current.Web)
@@ -203,57 +207,7 @@ namespace WorkEnginePPM
 
             CStruct xC = null;
 
-            CStruct xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateIntAttr("MaxHeight", 300);
-
-
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("ColResizing", 1);
-
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("ExportFormat", 1);
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
-
-            xCfg.CreateIntAttr("LeftWidth", 500);
-
-
-
-            xCfg.CreateIntAttr("SuppressCfg", 1);
-
-            xCfg.CreateIntAttr("Sorting", 0);
-
+            var xGrid = CreateCalendarGrid();
 
             CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
             CStruct xHead = xGrid.CreateSubStruct("Head");
@@ -310,57 +264,7 @@ namespace WorkEnginePPM
 
             CStruct xC = null;
 
-            CStruct xGrid = new CStruct();
-            xGrid.Initialize("Grid");
-
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
-
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 1);
-            xPanel.CreateIntAttr("Delete", 0);
-
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-
-            xCfg.CreateIntAttr("MaxHeight", 300);
-
-
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateIntAttr("Deleting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("ColResizing", 1);
-
-
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("DragEdit", 0);
-            xCfg.CreateIntAttr("ExportFormat", 1);
-
-            xCfg.CreateStringAttr("IdPrefix", "R");
-            xCfg.CreateStringAttr("IdPostfix", "x");
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateIntAttr("FilterEmpty", 1);
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
-
-            xCfg.CreateIntAttr("LeftWidth", 500);
-
-
-
-            xCfg.CreateIntAttr("SuppressCfg", 1);
-
-            xCfg.CreateIntAttr("Sorting", 0);
-
+            var xGrid = CreateCalendarGrid();
 
             CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
             CStruct xHead = xGrid.CreateSubStruct("Head");
@@ -446,6 +350,57 @@ namespace WorkEnginePPM
         private static string HandleException(string sContext, int nStatus, Exception ex)
         {
             return HandleError(sContext, nStatus, "Exception in EditCalendar.asmx : '" + ex.Message.ToString() + "'");
+        }
+
+        private static CStruct CreateCalendarGrid()
+        {
+            var grid = new CStruct();
+            grid.Initialize("Grid");
+
+            var toolbar = grid.CreateSubStruct("Toolbar");
+            toolbar.CreateIntAttr("Visible", 0);
+
+            var panel = grid.CreateSubStruct("Panel");
+            panel.CreateIntAttr("Visible", 1);
+            panel.CreateIntAttr("Delete", 0);
+
+            var config = grid.CreateSubStruct("Cfg");
+
+            config.CreateIntAttr("MaxHeight", MaxHeight);
+
+            config.CreateIntAttr("ShowDeleted", 0);
+            config.CreateIntAttr("Deleting", 0);
+            config.CreateIntAttr("Selecting", 0);
+            config.CreateIntAttr("ColResizing", 1);
+
+            config.CreateBooleanAttr("DateStrings", true);
+            config.CreateBooleanAttr("NoTreeLines", true);
+
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", CharIds);
+            config.CreateIntAttr("NumberId", 1);
+            config.CreateIntAttr("FilterEmpty", 1);
+            config.CreateIntAttr("Dragging", 0);
+            config.CreateIntAttr("DragEdit", 0);
+            config.CreateIntAttr("ExportFormat", 1);
+
+            config.CreateStringAttr("IdPrefix", "R");
+            config.CreateStringAttr("IdPostfix", "x");
+            config.CreateIntAttr("CaseSensitiveId", 0);
+            config.CreateIntAttr("FilterEmpty", 1);
+
+            config.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "ResPlanAnalyzer");
+
+            config.CreateIntAttr("LeftWidth", LeftWidth);
+
+            config.CreateIntAttr("SuppressCfg", 1);
+
+            config.CreateIntAttr("Sorting", 0);
+            return grid;
         }
     }
 }

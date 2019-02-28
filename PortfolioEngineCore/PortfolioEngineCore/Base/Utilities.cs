@@ -15,6 +15,14 @@ namespace PortfolioEngineCore
 
         // Public Methods (6) 
 
+        public static void ArgumentIsNotNull(object value, string argument)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(argument);
+            }
+        }
+
         /// <summary>
         /// Gets the base message.
         /// </summary>

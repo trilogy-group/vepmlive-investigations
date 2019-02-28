@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
 using System.Text.RegularExpressions;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveWebParts
 {
@@ -21,57 +22,106 @@ namespace EPMLiveWebParts
 
         public override void getParams(SPWeb curWeb)
         {
+            GetParams(
+                str =>
+                {
+                    usePopup = false;
+                    bool.TryParse(str, out usePopup);
+                },
+                Request,
+                hshLists,
+                ref isResourcePlan,
+                ref strlist,
+                ref strview,
+                ref start,
+                ref finish,
+                ref progress,
+                ref wbsfield,
+                ref milestone,
+                ref executive,
+                ref information,
+                ref linktype,
+                ref rolluplists,
+                ref filterfield,
+                ref filtervalue,
+                ref rollupsites,
+                ref resources);
+        }
+
+        internal static void GetParams(
+            Action<string> usePopAction,
+            HttpRequest httpRequest,
+            Hashtable hashLists,
+            ref bool isResourcePlan,
+            ref string strList,
+            ref string strView,
+            ref string start,
+            ref string finish,
+            ref string progress,
+            ref string wbsField,
+            ref string milestone,
+            ref string executive,
+            ref string information,
+            ref string linkType,
+            ref string[] rollUpLists,
+            ref string filterField,
+            ref string filterValue,
+            ref string[] rollUpSites,
+            ref string resources)
+        {
             try
             {
                 isResourcePlan = true;
-                byte[] encodedDataAsBytes = System.Convert.FromBase64String(Request["data"]);
-                string[] data = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
-                strlist = data[0];
-                strview = data[1];
+                var encodedDataAsBytes = Convert.FromBase64String(httpRequest["data"]);
+                var data = Encoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
+                strList = data[0];
+                strView = data[1];
                 start = data[2];
                 finish = data[3];
                 progress = data[4];
-                wbsfield = data[5];
+                wbsField = data[5];
                 milestone = data[6];
                 executive = "on";
                 information = data[8];
-                linktype = data[9];
-                if (data[10] != "")
+                linkType = data[9];
+                if (!string.IsNullOrWhiteSpace(data[10]))
                 {
-                    string[] tRollupLists = data[10].Split(',');
-                    rolluplists = new string[tRollupLists.Length];
-                    for (int i = 0; i < tRollupLists.Length; i++)
+                    var tRollupLists = data[10].Split(',');
+                    rollUpLists = new string[tRollupLists.Length];
+                    for (var i = 0; i < tRollupLists.Length; i++)
                     {
-                        string[] tRlist = tRollupLists[i].Split('|');
-                        rolluplists[i] = tRlist[0];
-                        string icon = "";
+                        var rollUpList = tRollupLists[i].Split('|');
+                        rollUpLists[i] = rollUpList[0];
+                        var icon = string.Empty;
                         try
                         {
-                            icon = tRlist[1];
+                            icon = rollUpList[1];
                         }
-                        catch { }
-                        hshLists.Add(rolluplists[i], icon);
+                        catch (Exception ex)
+                        {
+                            TraceError("Exception Suppressed {0}", ex);
+                        }
+                        hashLists.Add(rollUpLists[i], icon);
                     }
                 }
 
+                filterField = data[11];
+                filterValue = data[12];
 
-                filterfield = data[11];
-                filtervalue = data[12];
-
-                if (data[13] != "")
+                if (!string.IsNullOrWhiteSpace(data[13]))
                 {
-                    rollupsites = data[13].Split(',');
+                    rollUpSites = data[13].Split(',');
                 }
                 resources = data[14];
-                try
-                {
-                    base.usePopup = false;
-                    base.usePopup = bool.Parse(data[15]);
-                }
-                catch { }
+
+                usePopAction?.Invoke(data[15]);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
         }
+
         protected override void outputData()
         {
             foreach (XmlNode nd in docComplete.SelectNodes("//Bar"))

@@ -159,7 +159,7 @@ namespace EPMLiveCore.Tests
             ShimStringDictionary.AllInstances.ItemGetString = (instance, key) => customProperties[key];
 
             // Act
-            var actual = (Dictionary<string, PlannerDefinition>)_privateObj.Invoke("iGetPlannerList", BindingFlags.NonPublic | BindingFlags.Static, new object[] { lWeb, web, null });
+            var actual = (Dictionary<string, PlannerDefinition>)_privateObj.Invoke("ItemGetPlannerList", BindingFlags.NonPublic | BindingFlags.Static, new object[] { lWeb, web, null });
 
             // Assert
             actual.ShouldSatisfyAllConditions(
@@ -305,7 +305,7 @@ namespace EPMLiveCore.Tests
             ShimStringDictionary.AllInstances.ItemGetString = (instance, key) => customProperties[key];
 
             // Act
-            var actual = (Dictionary<string, PlannerDefinition>)_privateObj.Invoke("iGetPlannerList", BindingFlags.NonPublic | BindingFlags.Static, new object[] { lWeb, web, listItem });
+            var actual = (Dictionary<string, PlannerDefinition>)_privateObj.Invoke("ItemGetPlannerList", BindingFlags.NonPublic | BindingFlags.Static, new object[] { lWeb, web, listItem });
 
             // Assert
             actual.ShouldSatisfyAllConditions(

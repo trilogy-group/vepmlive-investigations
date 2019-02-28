@@ -161,6 +161,7 @@ iisreset</PostDeploymentCommand>
       <DependentUpon>InstallDataSyncEvents.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\AutoAdjustPeriods.cs" />
+    <Compile Include="Layouts\ppm\BasicDialogProperties.cs" />
     <Compile Include="Layouts\ppm\calendarform.aspx.cs">
       <DependentUpon>calendarform.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -191,6 +192,9 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\ClientPrioritization.ascx.designer.cs">
       <DependentUpon>ClientPrioritization.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\ControlBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostAnalyzer.ascx.cs">
       <DependentUpon>CostAnalyzer.ascx</DependentUpon>
@@ -257,6 +261,9 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Costtypes.aspx.designer.cs">
       <DependentUpon>Costtypes.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CostTypes.Get.cs" />
+    <Compile Include="Layouts\ppm\CostTypes.Populate.cs" />
+    <Compile Include="Layouts\ppm\CostTypes.Update.cs" />
     <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.cs">
       <DependentUpon>CostTypes_NAX.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -396,6 +403,8 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\EPKRequest.ashx.cs">
       <DependentUpon>EPKRequest.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\FteHelper.cs" />
+    <Compile Include="Layouts\ppm\GenerateTicketResponse.cs" />
     <Compile Include="Layouts\ppm\gotopage.aspx.cs">
       <DependentUpon>gotopage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -427,6 +436,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Grouppermissions.aspx.designer.cs">
       <DependentUpon>Grouppermissions.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\GroupPermissionsGridHelper.cs" />
     <Compile Include="Layouts\ppm\grouppermissions_NAX.aspx.cs">
       <DependentUpon>grouppermissions_NAX.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -489,6 +499,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Models.aspx.designer.cs">
       <DependentUpon>Models.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\ModelsControlCreation.cs" />
     <Compile Include="Layouts\ppm\Models_NAX.aspx.cs">
       <DependentUpon>Models_NAX.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -714,6 +725,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\setupstatus.aspx.designer.cs">
       <DependentUpon>setupstatus.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\SPHelper.cs" />
     <Compile Include="Layouts\ppm\SPResourceFieldMapping.aspx.cs">
       <DependentUpon>SPResourceFieldMapping.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1049,6 +1061,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_dgrid.css" />
     <Content Include="Layouts\ppm\AddList.aspx" />
     <Content Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx" />
+    <Content Include="Layouts\ppm\AnalyzerHelper.js" />
     <Content Include="Layouts\ppm\CAB\WE_Client.CAB" />
     <Content Include="Layouts\ppm\calendarform.aspx" />
     <Content Include="Layouts\ppm\Calendars.aspx" />

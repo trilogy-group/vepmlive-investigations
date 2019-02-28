@@ -30,10 +30,10 @@ namespace EPMLiveCore.Tests.WebPageCode
 
         private const int DummyInt = 1;
         private const string DummyString = "DummyString";
-        private const string PageRenderField = "pageRender";
-        private const string DisplayableFields = "displayableFields";
-        private const string FieldProperties = "fieldProperties";
-        private const string GroupsProperty = "groups";
+        private const string PageRenderField = "_pageRender";
+        private const string DisplayableFields = "_displayableFields";
+        private const string FieldProperties = "_fieldProperties";
+        private const string GroupsProperty = "_groups";
         private const string MemOptionFieldWhere = "[Me]";
         private const string MemModeValue = "where";
         private const string NewMode = "New";
@@ -66,6 +66,8 @@ namespace EPMLiveCore.Tests.WebPageCode
         public void TestCleanup()
         {
             _shimsObject?.Dispose();
+            _testObj?.Dispose();
+            _privateObj = null;
         }
 
         private void InitializeUiControls()

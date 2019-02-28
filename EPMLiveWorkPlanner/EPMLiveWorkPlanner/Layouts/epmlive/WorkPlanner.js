@@ -1396,7 +1396,6 @@ function DeleteTasks() {
                             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
                         } catch (e) { }
                         grid.DeleteRow(row, 2);
-                        grid.RemoveRow(row);
                     } catch (e) { }
                 }
                 grid.ActionCorrectAllDependencies();
@@ -1947,9 +1946,8 @@ function GetAgileViewParam(key) {
 }
 
 function ClearSort() {
-    Grids.WorkPlannerGrid.ChangeSort("taskorder");
-    //Grids.WorkPlannerGrid.Sort = "";
-    //Grids.WorkPlannerGrid.SortRows();
+    var grid = Grids["WorkPlannerGrid"];
+    grid.ChangeSort("Title");
 }
 
 function isShowFilters() {

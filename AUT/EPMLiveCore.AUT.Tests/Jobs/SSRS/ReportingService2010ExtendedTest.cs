@@ -191,31 +191,6 @@ namespace EPMLiveCore.Jobs.SSRS
 
         #endregion
 
-        #region Method Call : (GetWebRequest) (Return Type : WebRequest) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingService2010Extended_GetWebRequest_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var uri = CreateType<Uri>();
-            var methodGetWebRequestPrametersTypes = new Type[] { typeof(Uri) };
-            object[] parametersOfGetWebRequest = { uri };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetWebRequest, methodGetWebRequestPrametersTypes, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetWebRequest.ShouldNotBeNull();
-            parametersOfGetWebRequest.Length.ShouldBe(1);
-            methodGetWebRequestPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(() => methodInfo.Invoke(_reportingService2010ExtendedInstanceFixture, parametersOfGetWebRequest));
-        }
-
-        #endregion
-
         #region Method Call : (GetWebRequest) (Return Type : WebRequest) No Exception with encapsulation Thrown
 
         [Test]
@@ -274,27 +249,6 @@ namespace EPMLiveCore.Jobs.SSRS
             // Assert
             Should.NotThrow(currentAction);
             methodGetWebRequestPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetWebRequest) (Return Type : WebRequest) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ReportingService2010Extended_GetWebRequest_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetWebRequest, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_reportingService2010ExtendedInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

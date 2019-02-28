@@ -660,54 +660,6 @@ namespace WorkEnginePPM.Layouts.ppm
 
         #endregion
 
-        #region Method Call : (GetXml) (Return Type : string) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AutoAdjustPeriods_GetXml_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var root = CreateType<string>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _autoAdjustPeriodsInstance.GetXml(root);
-
-            // Assert
-            Should.NotThrow(executeAction);
-        }
-
-        #endregion
-
-        #region Method Call : (GetXml) (Return Type : string) No Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AutoAdjustPeriods_GetXml_Method_Call_With_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var root = CreateType<string>();
-            var methodGetXmlPrametersTypes = new Type[] { typeof(string) };
-            object[] parametersOfGetXml = { root };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodGetXml, methodGetXmlPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_autoAdjustPeriodsInstanceFixture, parametersOfGetXml);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfGetXml.ShouldNotBeNull();
-            parametersOfGetXml.Length.ShouldBe(1);
-            methodGetXmlPrametersTypes.Length.ShouldBe(1);
-            Should.NotThrow(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (GetXml) (Return Type : string) No Exception with encapsulation Thrown
 
         [Test]
@@ -732,26 +684,6 @@ namespace WorkEnginePPM.Layouts.ppm
 
         #endregion
 
-        #region Method Call : (GetXml) (Return Type : string) Results Not Null Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AutoAdjustPeriods_GetXml_Method_Call_Dynamic_Invoking_Results_Not_Null_Test()
-        {
-            // Arrange
-            var methodGetXmlPrametersTypes = new Type[] { typeof(string) };
-
-            // Act
-            var result = ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_autoAdjustPeriodsInstance, MethodGetXml, Fixture, methodGetXmlPrametersTypes);
-
-            // Assert
-            result.ShouldNotBeNull();
-            methodGetXmlPrametersTypes.Length.ShouldBe(1);
-        }
-
-        #endregion
-
         #region Method Call : (GetXml) (Return Type : string) Invoke Should Not Throw
 
         [Test]
@@ -769,27 +701,6 @@ namespace WorkEnginePPM.Layouts.ppm
             // Assert
             Should.NotThrow(currentAction);
             methodGetXmlPrametersTypes.Length.ShouldBe(parametersCount);
-        }
-
-        #endregion
-
-        #region Method Call : (GetXml) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_AutoAdjustPeriods_GetXml_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodGetXml, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_autoAdjustPeriodsInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
         }
 
         #endregion

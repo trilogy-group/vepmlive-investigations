@@ -76,7 +76,7 @@ namespace EPMLiveCore
             bool result = false;
             if (!string.IsNullOrEmpty(name) && _fieldsData != null)
             {
-                result = _fieldsData.ContainsKey(name);
+                result = _fieldsData.ContainsKey(name) || _fieldsData.ContainsKey(name.ToPrettierName());
             }
 
             return result;

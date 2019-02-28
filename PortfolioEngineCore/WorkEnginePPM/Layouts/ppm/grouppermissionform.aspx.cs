@@ -8,22 +8,7 @@ namespace WorkEnginePPM.Layouts.ppm2
 {
     public partial class grouppermissionform : LayoutsPageBase
     {
-        protected string DialogTitle = "";
-        private int c_id = 0;
-        public int id
-        {
-            get { return c_id; }
-        }
-        private string c_name = "";
-        public string Name
-        {
-            get { return c_name; }
-        }
-        private string c_desc = "";
-        public string Desc
-        {
-            get { return c_desc; }
-        }
+        public BasicDialogProperties BasicDialogProperties { get; } = new BasicDialogProperties();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -36,24 +21,20 @@ namespace WorkEnginePPM.Layouts.ppm2
                     string m_sId = Request.QueryString["id"].ToString();
                     string m_sMode = Request.QueryString["mode"].ToString();
 
-                    //if (!PPM.WebAdmin.HasPagePermission("CustomFieldForm", m_sMode))
-                    //    HttpContext.Current.Response.Redirect("NoPermForm.aspx");
-
-                    //lblMode.Text = "Unknown Mode";
                     switch (m_sMode)
                     {
                         case "Add":
-                            DialogTitle = "Add a Permission Group";
+                            BasicDialogProperties.DialogTitle = "Add a Permission Group";
                             btnOK.Visible = true;
                             btnDelete.Visible = false;
                             break;
                         case "Modify":
-                            DialogTitle = "Modify a Permission Group";
+                            BasicDialogProperties.DialogTitle = "Modify a Permission Group";
                             btnOK.Visible = true;
                             btnDelete.Visible = false;
                             break;
                         case "Delete":
-                            DialogTitle = "Delete Permission Group";
+                            BasicDialogProperties.DialogTitle = "Delete Permission Group";
                             btnOK.Visible = false;
                             btnDelete.Visible = true;
                             txtName.Enabled = false;
@@ -139,34 +120,7 @@ namespace WorkEnginePPM.Layouts.ppm2
             CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
 
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("InEditMode", 0);
-            xCfg.CreateIntAttr("Sorting", 0);
-            xCfg.CreateIntAttr("Selecting", 0);
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("Dropping", 0);
-            xCfg.CreateIntAttr("ColsMoving", 0);
-            xCfg.CreateIntAttr("ColsPostLap", 0);
-            xCfg.CreateIntAttr("ColsLap", 0);
-            xCfg.CreateBooleanAttr("NoTreeLines", true);
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateBooleanAttr("ShowDeleted", true);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateIntAttr("SelectingCells", 1);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "RPEditor");
+            var xCfg = BuildConfig(xGrid);
 
             xCfg.CreateStringAttr("MainCol", "Permission");
 
@@ -202,6 +156,45 @@ namespace WorkEnginePPM.Layouts.ppm2
 
             return xGrid;
         }
+
+        internal static CStruct BuildConfig(CStruct grid)
+        {
+            if (grid == null)
+            {
+                throw new ArgumentNullException(nameof(grid));
+            }
+
+            var panel = grid.CreateSubStruct("Panel");
+            panel.CreateIntAttr("Visible", 0);
+            panel.CreateIntAttr("Delete", 0);
+            var config = grid.CreateSubStruct("Cfg");
+            config.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            config.CreateIntAttr("SuppressCfg", 3);
+            config.CreateIntAttr("InEditMode", 0);
+            config.CreateIntAttr("Sorting", 0);
+            config.CreateIntAttr("Selecting", 0);
+            config.CreateIntAttr("Dragging", 0);
+            config.CreateIntAttr("Dropping", 0);
+            config.CreateIntAttr("ColsMoving", 0);
+            config.CreateIntAttr("ColsPostLap", 0);
+            config.CreateIntAttr("ColsLap", 0);
+            config.CreateBooleanAttr("NoTreeLines", true);
+            config.CreateIntAttr("MaxHeight", 0);
+            config.CreateBooleanAttr("ShowDeleted", true);
+            config.CreateBooleanAttr("DateStrings", true);
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", "0123456789");
+            config.CreateIntAttr("NumberId", 1);
+            config.CreateIntAttr("LastId", 1);
+            config.CreateIntAttr("CaseSensitiveId", 0);
+            config.CreateIntAttr("SelectingCells", 1);
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "RPEditor");
+            return config;
+        }
+
         private CStruct BuildGridData(DataTable dt)
         {
             CStruct[] xLevels = new CStruct[2];
@@ -242,7 +235,11 @@ namespace WorkEnginePPM.Layouts.ppm2
         protected void btnDelete_Click(object sender, EventArgs e)
         {
             DBAccess dba = null;
-            Int32.TryParse(txtId.Text, out c_id);
+            int id;
+            if (int.TryParse(txtId.Text, out id))
+            {
+                BasicDialogProperties.Id = id;
+            }
 
             string basePath = hiddenData.Value;
             string sDBConnect = WebAdmin.GetConnectionString(basePath);
@@ -276,9 +273,14 @@ namespace WorkEnginePPM.Layouts.ppm2
                 return;
             }
 
-            Int32.TryParse(txtId.Text, out c_id);
-            c_name = txtName.Text;
-            c_desc = txtDesc.Text;
+            int id;
+            if (int.TryParse(txtId.Text, out id))
+            {
+                BasicDialogProperties.Id = id;
+            }
+
+            BasicDialogProperties.Name = txtName.Text;
+            BasicDialogProperties.Desc = txtDesc.Text;
 
             //// Stick clicked permissions into collection
             //DataTable dtResult = treetable1.GetData();

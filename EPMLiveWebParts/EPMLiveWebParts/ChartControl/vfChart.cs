@@ -472,52 +472,8 @@ namespace EPMLiveWebParts
 
         public string GetHtml(string uniqueId)
         {
-            var html = new StringBuilder(
-                @"
-    <script type='text/javascript' src='/_layouts/epmlive/Visifire.js?nocachetoken=" + DateTime.Now.Ticks + @"'></script>
-    <script type='text/javascript'>
-
-
-    addLoadEvent(onLoad);
-
-
-    function addLoadEvent(func) {
-      var oldonload = window.onload;
-      if (typeof window.onload != 'function') {
-        window.onload = func;
-      } else {
-        window.onload = function() {
-          if (oldonload) {
-            oldonload();
-          }
-          func();
-        }
-      }
-    }
-
-    // Returns XmlHttp object for any browser
-    function GetXMLHttpObj() {
-        var objXmlHttp; // XMLHttpRequest object
-        try {
-            objXmlHttp = new XMLHttpRequest();
-        }
-        catch (e) {
-            try {
-                objXmlHttp = new ActiveXObject('Msxml2.XMLHTTP');
-            }
-            catch (e) {
-                try {
-                    objXmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
-                }
-                catch (e) {
-                    alert('Your browser does not support AJAX!');
-                    return null;
-                }
-            }
-        }
-        return objXmlHttp;
-    }
-
+            return new StringBuilder(GetJsHeaderAndAddLoadEventAndGetXmlHttpObjMethods())
+                .AppendLine(@"
     // Loads Visifire Chart
     function onLoad() {
         var xmlHttp = GetXMLHttpObj();
@@ -567,16 +523,62 @@ namespace EPMLiveWebParts
     <div id='ChartDiagnostics' style='width:400px;#DIAGNOSTICS#'>
     <p>Querystring: #QUERYSTRING#</p>
     <a onclick=""javascript:window.open(L_Menu_BaseUrl + '#VFDATAPATH#?#QUERYSTRING#Trace=True', 'Diagnostics')"" href='#'>Trace</a>
-    </div>
-            ")
-                .Replace("#QUERYSTRING#", GetQueryString())
-                .Replace("#ID#", uniqueId)
-                .Replace("#XAPPATH#", ChartsXapPath)
-                .Replace("#VFDATAPATH#", VfDataPath)
-                .Replace("#CULTURENAME#", Thread.CurrentThread.CurrentCulture.Name)
-                .Replace("#DIAGNOSTICS#", PropTrace ? "display: block;" : "display: none;");
+    </div>").Replace("#QUERYSTRING#", GetQueryString())
+            .Replace("#ID#", uniqueId)
+            .Replace("#XAPPATH#", ChartsXapPath)
+            .Replace("#VFDATAPATH#", VfDataPath)
+            .Replace("#CULTURENAME#", Thread.CurrentThread.CurrentCulture.Name)
+            .Replace("#DIAGNOSTICS#", PropTrace ? "display: block;" : "display: none;")
+            .ToString();
+        }
 
-            return html.ToString();
+        private string GetJsHeaderAndAddLoadEventAndGetXmlHttpObjMethods()
+        {
+            return @"
+    <script type='text/javascript' src='/_layouts/epmlive/Visifire.js?nocachetoken=" + DateTime.Now.Ticks + @"'></script>
+    <script type='text/javascript'>
+
+
+    addLoadEvent(onLoad);
+
+
+    function addLoadEvent(func) {
+      var oldonload = window.onload;
+      if (typeof window.onload != 'function') {
+        window.onload = func;
+      } else {
+        window.onload = function() {
+          if (oldonload) {
+            oldonload();
+          }
+          func();
+        }
+      }
+    }
+
+    // Returns XmlHttp object for any browser
+    function GetXMLHttpObj() {
+        var objXmlHttp; // XMLHttpRequest object
+        try {
+            objXmlHttp = new XMLHttpRequest();
+        }
+        catch (e) {
+            try {
+                objXmlHttp = new ActiveXObject('Msxml2.XMLHTTP');
+            }
+            catch (e) {
+                try {
+                    objXmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
+                }
+                catch (e) {
+                    alert('Your browser does not support AJAX!');
+                    return null;
+                }
+            }
+        }
+        return objXmlHttp;
+    }
+";
         }
 
         private string GetWidth()

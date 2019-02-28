@@ -29,19 +29,12 @@ namespace WorkEnginePPM.Layouts.ppm2
 
         #region General Initializer : Class (grouppermissionform) Initializer
 
-        private const string Propertyid = "id";
-        private const string PropertyName = "Name";
-        private const string PropertyDesc = "Desc";
         private const string MethodPage_Load = "Page_Load";
         private const string MethodBuildGridLayout = "BuildGridLayout";
         private const string MethodBuildGridData = "BuildGridData";
         private const string MethodbtnDelete_Click = "btnDelete_Click";
         private const string MethodbtnOK_Click = "btnOK_Click";
         private const string MethodbtnClose_Click = "btnClose_Click";
-        private const string FieldDialogTitle = "DialogTitle";
-        private const string Fieldc_id = "c_id";
-        private const string Fieldc_name = "c_name";
-        private const string Fieldc_desc = "c_desc";
         private Type _grouppermissionformInstanceType;
         private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
         private grouppermissionform _grouppermissionformInstance;
@@ -93,61 +86,6 @@ namespace WorkEnginePPM.Layouts.ppm2
 
             // Assert
             currentMethodInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region General Initializer : Class (grouppermissionform) All Properties Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="grouppermissionform" />) explore and verify properties for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(Propertyid)]
-        [TestCase(PropertyName)]
-        [TestCase(PropertyDesc)]
-        public void AUT_Grouppermissionform_All_Properties_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var propertyInfo = GetPropertyInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreProperty(_grouppermissionformInstanceFixture,
-                                              Fixture,
-                                              propertyInfo);
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
-        #region General Initializer : Class (grouppermissionform) All Fields Explore By Name
-
-        /// <summary>
-        ///     Class (<see cref="grouppermissionform" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(FieldDialogTitle)]
-        [TestCase(Fieldc_id)]
-        [TestCase(Fieldc_name)]
-        [TestCase(Fieldc_desc)]
-        public void AUT_Grouppermissionform_All_Fields_Explore_Verify_By_Name_Test(string name)
-        {
-            // Arrange
-            var fieldInfo = GetFieldInfo(name);
-
-            // Act
-            ShouldlyExtension.ExploreFieldWithOrWithoutInstance(_grouppermissionformInstanceFixture, 
-                                                                Fixture, 
-                                                                fieldInfo);
-
-            // Assert
-            fieldInfo.ShouldNotBeNull();
         }
 
         #endregion
@@ -206,85 +144,6 @@ namespace WorkEnginePPM.Layouts.ppm2
         #endregion
 
         #region Category : GetterSetter
-
-        #region General Getters/Setters : Class (grouppermissionform) => all properties (non-static) explore and verify type tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT GetterSetter")]
-        [TestCaseGeneric(typeof(int) , Propertyid)]
-        [TestCaseGeneric(typeof(string) , PropertyName)]
-        [TestCaseGeneric(typeof(string) , PropertyDesc)]
-        public void AUT_Grouppermissionform_Property_Type_Verify_Explore_By_Name_Test<T>(string propertyName)
-        {
-            // AAA : Arrange, Act, Assert
-            ShouldlyExtension.PropertyTypeVerify<grouppermissionform, T>(_grouppermissionformInstance, propertyName, Fixture);
-        }
-
-        #endregion
-
-        #region General Getters/Setters : Class (grouppermissionform) => Property (Desc) (Can Read) tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT GetterSetter")]
-        public void AUT_Grouppermissionform_Public_Class_Desc_Coverage_For_Property_Is_Present_And_Can_Read_Test()
-        {
-            // Arrange
-            var propertyInfo  = GetPropertyInfo(PropertyDesc);
-
-            // Act
-            var canRead = propertyInfo?.CanRead;
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-            canRead.ShouldNotBeNull();
-            canRead?.ShouldBeTrue();
-        }
-
-        #endregion
-
-        #region General Getters/Setters : Class (grouppermissionform) => Property (id) (Can Read) tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT GetterSetter")]
-        public void AUT_Grouppermissionform_Public_Class_id_Coverage_For_Property_Is_Present_And_Can_Read_Test()
-        {
-            // Arrange
-            var propertyInfo  = GetPropertyInfo(Propertyid);
-
-            // Act
-            var canRead = propertyInfo?.CanRead;
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-            canRead.ShouldNotBeNull();
-            canRead?.ShouldBeTrue();
-        }
-
-        #endregion
-
-        #region General Getters/Setters : Class (grouppermissionform) => Property (Name) (Can Read) tests
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT GetterSetter")]
-        public void AUT_Grouppermissionform_Public_Class_Name_Coverage_For_Property_Is_Present_And_Can_Read_Test()
-        {
-            // Arrange
-            var propertyInfo  = GetPropertyInfo(PropertyName);
-
-            // Act
-            var canRead = propertyInfo?.CanRead;
-
-            // Assert
-            propertyInfo.ShouldNotBeNull();
-            canRead.ShouldNotBeNull();
-            canRead?.ShouldBeTrue();
-        }
-
-        #endregion
 
         #endregion
 

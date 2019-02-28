@@ -1,18 +1,17 @@
 ﻿using System;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using System.Collections.Generic;
-using System.Text;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebControls;
 
 namespace TimeSheets.Layouts.epmlive
 {
     public partial class WorkLog : LayoutsPageBase
     {
         private const string TxtHoursPrefix = "txtHours_";
+        private bool _disposed;
 
         private Guid _listId;
         private int _listItemId;
@@ -206,178 +205,16 @@ namespace TimeSheets.Layouts.epmlive
                 RegisterScript("saveclose", "<script language=\"javascript\">window.frameElement.commitPopup();</script>");
             }
         }
-
-        private void RegisterDynamicScripts(TSItem tsItem)
+        
+        public override void Dispose()
         {
-            //var workDoneTSItem = tsItem.WorkDoneTSItem.ToString();
-            //var workDoneListItem = tsItem.WorkDoneListItem.ToString();
-            var workAllocated = tsItem.WorkAllocated.ToString();
-
-            var jsvars = "";
-            int i = 0;
-            foreach (var tb in txtHours)
+            if (!_disposed)
             {
-                jsvars += string.Format("tb[{0}] = document.getElementById('{1}');", i++, tb.Value.ClientID);
+                phHours?.Dispose();
+                _disposed = true;
             }
-            var blank = "<img src='_layouts/epmlive/blank.gif' height='1' width='1'>";
-            var pre = "<table border='1' width='240' cellpadding='0' cellspacing='0' class='statustable'><tr class='noborder'>";
-            //Testing: var post = string.Format(@"</tr></table></td><td id='tdTotal'>"" + workRunningTotal + ""/{0} hours, ListItemTotal: {1}, User Daily: {2}", workAllocated, workDoneListItem, tsItem.WorkDoneUser);
-            var post = string.Format(@"</tr></table></td><td id='tdTotal'>"" + workRunningTotal + ""/{0} hours", workAllocated);
-            var js = string.Format(@"<script type=text/javascript>
 
-            var min;
-            var max;
-            var tdTotalLabel;
-            var workExisting;
-            var workUserDayTotal;
-
-            init();
-
-            function init() {{
-                //window.onbeforeunload=leavePage
-                min = {6};
-                max = {7};
-                tdTotalLabel = document.getElementById('tdTotalLabel');
-                tdTotalLabel.innerHTML = 'Total (must be between ' + min + '-' + max + ')&nbsp;';
-                calculateExisting();
-                var tdOther = document.getElementById('tdOther');
-                tdOther.innerHTML = workUserDayTotal;
-                hoursChanged();
-                dirty = false;
-            }}
-            
-            function getWorkNew()
-            {{
-                var tb = new Array();
-                {0}
-                var workNew = 0;
-                for(i=0; i < tb.length; i++)
-                {{
-                    workNew += Number(tb[i].value)
-                }}
-                return workNew;
-            }}
-
-            function calculateExisting()
-            {{
-                var workNew = getWorkNew();
-                if(workNew == undefined)
-                {{
-                    workExisting = 0;
-                    workUserDayTotal = 0;
-                }}                
-                else
-                {{
-                    workExisting = {4} - workNew;
-                    workUserDayTotal = {8} - workNew;
-                }}
-            }}
-
-            function hoursChanged() {{
-                var workNew = getWorkNew();
-                if(workNew == undefined)
-                    return;
-                setpctchart(workNew);
-                dirty = true;
-            }}
-
-            function setpctchart(workNew) {{
-                var workRunningTotal = workNew + workExisting;
-                var workUserRunningTotal = workNew + workUserDayTotal;
-                var pct = Math.round( workRunningTotal / {5} * 100 );
-                if (pct > 100)
-                    sTable = ""{2}<td class='noborder' background='/_layouts/epmlive/images/tsstatusred.gif'>{1}</td>{3}"";
-                else if (pct == 100)
-                    sTable = ""{2}<td class='noborder' background='/_layouts/epmlive/images/tsstatus.gif'>{1}</td>{3}"";
-                else if (pct == 0)
-                    sTable = ""{2}<td class='noborder'>{1}</td>{3}"";
-                else
-                    sTable = ""{2}<td class='noborder' background='/_layouts/epmlive/images/tsstatus.gif' width='"" + pct + ""%'>{1}</td><td class='noborder'>{1}</td>{3}"";
-                var tdChart = document.getElementById('tdChart');
-                tdChart.innerHTML = sTable;
-                var tdTotal = document.getElementById('tdTotal');
-                tdTotal.innerHTML = workUserRunningTotal;
-                if(workUserRunningTotal > max || workUserRunningTotal < min)
-                {{
-                    tdTotal.className = 'totalHoursException';
-                }}
-                else
-                {{
-                    tdTotal.className = '';
-                }}
-            }}
-
-            function validate(evt) {{
-                var theEvent = evt || window.event; 
-                var key = theEvent.keyCode || theEvent.which; 
-                key = String.fromCharCode( key ); 
-                var regex = /[0-9]|\./; 
-                if( !regex.test(key) ) {{
-                    theEvent.returnValue = false; 
-                    if (theEvent.preventDefault) theEvent.preventDefault(); 
-                }}
-            }}
-
-                   </script>",
-                      jsvars, blank, pre, post, tsItem.WorkDoneListItem, workAllocated, tsItem.Min, tsItem.Max, tsItem.WorkDoneUser);
-
-            RegisterScript("TSInput", js);
-        }
-
-        private void RegisterBaseScript()
-        {
-            var message = "You have not saved your changes. Are you sure you want to change the user?";
-            ddlUsers.Attributes["onchange"] = string.Format("if (dirty && !confirm('{0}')) {{ resetDDLIndex(); return false; }}; dirty = false;",
-                message.Replace("'", "\'"));
-            message = "You have not saved your changes. Are you sure you want to change the date?";
-            var dtcTextbox = dtcDate.Controls[0] as TextBox;
-            //dtcTextbox.Attributes["onchange"] = string.Format("if (dirty && !confirm('{0}')) {{ resetDTCValue(); return false; }}; dirty = false;", 
-            //    message.Replace("'", "\'"));
-            //dtcDate.OnValueChangeClientScript = string.Format("if (dirty && !confirm('{0}')) {{ resetDTCValue(); return false; }}; dirty = false;", 
-            //    message.Replace("'", "\'"));
-
-            var js = string.Format(@"<script type='text/javascript'>
-            try
-            {{
-            var dirty = false;
-            var savedDDLID = document.getElementById('{0}').value;
-            var savedDate = document.getElementById('{1}').value;
-            
-            function resetDDLIndex() {{
-               document.getElementById('{0}').value = savedDDLID;
-            }}
-
-            function resetDTCValue() {{
-               document.getElementById('{1}').value = savedDate;
-            }}
-
-            function leavePage(e)
-            {{
-                if(dirty)
-                {{
-                    if(!e) e = window.event; 
-                    //e.cancelBubble = true;
-                    e.returnValue = 'You have unsaved changes.'; //This is displayed on the dialog 
-                    //if (e.stopPropagation) {{  
-                    //    e.stopPropagation();  
-                    //    e.preventDefault(); 
-                    //    }}
-                }}
-            }}
-            }}catch(e){{}}
-            </script> 
-            ", ddlUsers.ClientID, dtcTextbox.ClientID);
-            RegisterScript("TSBase", js);
-        }
-
-        private void RegisterScript(string name, string js)
-        {
-            var cstype = GetType();
-            var cs = Page.ClientScript;
-            if (!cs.IsStartupScriptRegistered(cstype, name))
-            {
-                cs.RegisterStartupScript(cstype, name, js);
-            }
+            base.Dispose();
         }
     }
 }

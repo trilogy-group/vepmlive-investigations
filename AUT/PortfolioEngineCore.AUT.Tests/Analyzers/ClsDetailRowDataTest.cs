@@ -247,35 +247,6 @@ namespace CostDataValues
 
         #endregion
 
-        #region Method Call : (CopyData) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ClsDetailRowData_CopyData_Method_Call_Void_With_1_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var src = CreateType<clsDetailRowData>();
-            var methodCopyDataPrametersTypes = new Type[] { typeof(clsDetailRowData) };
-            object[] parametersOfCopyData = { src };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodCopyData, methodCopyDataPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_clsDetailRowDataInstanceFixture, parametersOfCopyData);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfCopyData.ShouldNotBeNull();
-            parametersOfCopyData.Length.ShouldBe(1);
-            methodCopyDataPrametersTypes.Length.ShouldBe(1);
-            methodCopyDataPrametersTypes.Length.ShouldBe(parametersOfCopyData.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (CopyData) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -393,35 +364,6 @@ namespace CostDataValues
 
         #endregion
 
-        #region Method Call : (AddToTargetData) (Return Type : void) Exception Thrown
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ClsDetailRowData_AddToTargetData_Method_Call_Void_With_1_Parameters_Throw_Exception_Thrown_Test()
-        {
-            // Arrange
-            var dest = CreateType<clsTargetRowData>();
-            var methodAddToTargetDataPrametersTypes = new Type[] { typeof(clsTargetRowData) };
-            object[] parametersOfAddToTargetData = { dest };
-            Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodAddToTargetData, methodAddToTargetDataPrametersTypes, out exception);
-
-            // Act
-            Action currentAction = () => methodInfo.Invoke(_clsDetailRowDataInstanceFixture, parametersOfAddToTargetData);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            exception.ShouldBeNull();
-            parametersOfAddToTargetData.ShouldNotBeNull();
-            parametersOfAddToTargetData.Length.ShouldBe(1);
-            methodAddToTargetDataPrametersTypes.Length.ShouldBe(1);
-            methodAddToTargetDataPrametersTypes.Length.ShouldBe(parametersOfAddToTargetData.Length);
-            Should.Throw<Exception>(currentAction);
-        }
-
-        #endregion
-
         #region Method Call : (AddToTargetData) (Return Type : void) No Exception with encapsulation Thrown
 
         [Test]
@@ -515,26 +457,6 @@ namespace CostDataValues
         {
             var methodCaputureInitialDataPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_clsDetailRowDataInstance, MethodCaputureInitialData, Fixture, methodCaputureInitialDataPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (CaputureInitialData) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ClsDetailRowData_CaputureInitialData_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var clnPer = CreateType<Dictionary<int, clsPeriodData>>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _clsDetailRowDataInstance.CaputureInitialData(clnPer);
-
-            // Assert
-            Should.NotThrow(executeAction);
         }
 
         #endregion
@@ -661,26 +583,6 @@ namespace CostDataValues
         {
             var methodRestoreInitialDataPrametersTypes = types;
             ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_clsDetailRowDataInstance, MethodRestoreInitialData, Fixture, methodRestoreInitialDataPrametersTypes);
-        }
-
-        #endregion
-
-        #region Method Call : (RestoreInitialData) (Return Type : void) No Exception Thrown Test
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_ClsDetailRowData_RestoreInitialData_Method_DirectCall_No_Exception_Thrown_Test()
-        {
-            // Arrange
-            var clnPer = CreateType<Dictionary<int, clsPeriodData>>();
-            Action executeAction = null;
-
-            // Act
-            executeAction = () => _clsDetailRowDataInstance.RestoreInitialData(clnPer);
-
-            // Assert
-            Should.NotThrow(executeAction);
         }
 
         #endregion

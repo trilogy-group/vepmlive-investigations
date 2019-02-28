@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 using PortfolioEngineCore.Infrastructure.Entities;
 
 namespace PortfolioEngineCore
 {
-    public class Admininfos : PFEBase
+    public partial class Admininfos : PFEBase
     {
         private const string MaxIdColumn = "MaxId";
         private const string WresIdColumn = "WRES_ID";
@@ -187,238 +190,346 @@ namespace PortfolioEngineCore
             // there is a version of this in Lookup.cs but that works differently - passed in a list of items and it checks each one in turn
             try
             {
-                string smessage = "";
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
+                var messageString = string.Empty;
+                var messageStringBuilder = new StringBuilder(messageString);
 
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                if (_sqlConnection.State == ConnectionState.Open)
+                {
+                    _sqlConnection.Close();
+                }
                 _sqlConnection.Open();
 
-                // we must check if this is a summary row and if so check it and all its children - read lookup and make a list
+                var lookupValues = GetLookUpValues(checklookupUID);
+                ProcessLookUpValues(checklookupUID, lookupValues, messageStringBuilder, ref messageString);
 
-                List<EPKLookupValue> LVlist = new List<EPKLookupValue>();
-                EPKLookupValue LVitem;
-
-                sCommand = "SELECT LV_UID,LV_VALUE,LV_ID,LV_LEVEL FROM EPGP_LOOKUP_VALUES" +
-                    " WHERE LOOKUP_UID =(Select LOOKUP_UID From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid)" +
-                    " ORDER BY LV_ID";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Parameters.AddWithValue("@LV_uid", checklookupUID);
-                SqlReader = SqlCommand.ExecuteReader();
-
-                bool bfound = false;
-                int levelthisvalue = 0;
-                while (SqlReader.Read())
-                {
-                    int uid = DBAccess.ReadIntValue(SqlReader["LV_UID"]);
-                    int level = DBAccess.ReadIntValue(SqlReader["LV_LEVEL"]);
-                    string name = DBAccess.ReadStringValue(SqlReader["LV_VALUE"]);
-
-                    if (bfound == false)
-                    {
-                        if (uid == checklookupUID)
-                        {
-                            bfound = true;
-                            levelthisvalue = level;
-                            LVitem = new EPKLookupValue();
-                            LVitem.UID = uid;
-                            LVitem.Name = name;
-                            LVlist.Add(LVitem);
-                        }
-                    }
-                    else
-                    {
-                        if (level <= levelthisvalue) break;
-                        else
-                        {
-                            LVitem = new EPKLookupValue();
-                            LVitem.UID = uid;
-                            LVitem.Name = name;
-                            LVlist.Add(LVitem);
-                        }
-                    }
-                }
-                SqlReader.Close();
-
-                foreach (EPKLookupValue LVcheckitem in LVlist)
-                {
-                    int lookupUID = LVcheckitem.UID;
-                    string lookupname = LVcheckitem.Name;
-
-                    // this is a complicated check, first part as per usual using SP but then much much more added
-
-                    SqlCommand = new SqlCommand("EPG_SP_ReadUsedListValue", _sqlConnection);
-                    SqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    SqlCommand.Parameters.AddWithValue("LV_UID", lookupUID);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    while (SqlReader.Read())
-                    {
-                        smessage += DBAccess.ReadStringValue(SqlReader["UsedMessage"]) + ": ";
-                        smessage += DBAccess.ReadStringValue(SqlReader["UsedData"]) + "\n";
-                    }
-                    SqlReader.Close();
-
-                    //  read list of Code fields used anywhere
-                    sCommand = "Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,0 as Table_ID,0 as Field_IN_TABLE" +
-                                 " From EPGP_FIELD_ATTRIBS" +
-                                 " Where (FA_FIELD_ID >= 9105 And FA_FIELD_ID <= 9109) Or (FA_FIELD_ID >= 9305 And FA_FIELD_ID <= 9309)" +
-                                 " Or (FA_FIELD_ID >= 9505 And FA_FIELD_ID <= 9509)Or (FA_FIELD_ID >= 11801 And FA_FIELD_ID <= 11805)" +
-                                 " Union" +
-                                 " Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,FA_TABLE_ID as Table_ID,FA_FIELD_IN_TABLE as Field_IN_TABLE" +
-                                 " From EPGC_FIELD_ATTRIBS" +
-                                 " Where FA_FORMAT = 4" +
-                                 " Order by Field_ID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    List<CField> clnFields = new List<CField>();
-                    CField oField;
-                    while (SqlReader.Read())
-                    {
-                        oField = new CField();
-                        oField.Id = DBAccess.ReadIntValue(SqlReader["Field_ID"]);
-                        oField.Name = DBAccess.ReadStringValue(SqlReader["Field_Name"]);
-                        oField.CFTable = DBAccess.ReadIntValue(SqlReader["Table_ID"]);
-                        oField.CFField = DBAccess.ReadIntValue(SqlReader["Field_IN_TABLE"]);
-                        clnFields.Add(oField);
-                    }
-                    SqlReader.Close();
-
-                    string sField;
-                    foreach (CField field in clnFields)
-                    {
-                        if (field.Id >= 9105 && field.Id <= 9109)
-                        {
-                            // TS Code fields
-                            sField = string.Format("CAT_CODE_{0:0}", field.Id - 9104);
-                            sCommand = "Select DISTINCT Top 3 RES_NAME,PRD_NAME" +
-                                " From EPG_TS_CATEGORY_VALUES cv" +
-                                " Inner Join EPG_TS_CHARGES ch ON ch.CHG_UID = cv.CAT_CHG_UID" +
-                                " Inner Join EPG_TS_TIMESHEETS ts ON ts.TS_UID = ch.TS_UID" +
-                                " Inner Join EPG_PERIODS p On p.PRD_ID = ts.PRD_ID and p.CB_ID=0" +
-                                " Inner Join EPG_RESOURCES r On r.WRES_ID = ts.WRES_ID" +
-                                " Where cv." + sField + " = " + lookupUID.ToString();
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                smessage += "Timesheet  " + DBAccess.ReadStringValue(SqlReader["PRD_NAME"]) + "  " +
-                                                           field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["RES_NAME"]) + "\n";
-                            }
-                            SqlReader.Close();
-                        }
-                        else if (field.Id >= 9305 && field.Id <= 9309)
-                        {
-                            // RP Code fields
-                            sField = string.Format("CAT_CODE_{0:0}", field.Id - 9304);
-                            sCommand = "Select DISTINCT TOP 3 PROJECT_NAME" +
-                                " From EPGP_RP_CATEGORY_VALUES cv" +
-                                " Inner Join EPG_RESOURCEPLANS c On c.CMT_UID=cv.CAT_CMT_UID" +
-                                " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=c.PROJECT_ID" +
-                                " Where cv." + sField + " = " + lookupUID.ToString();
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                smessage += "Resource Plan  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["PROJECT_NAME"]) + "\n";
-                            }
-                            SqlReader.Close();
-                        }
-                        else if (field.Id >= 11801 && field.Id <= 11805)
-                        {
-                            // CT Code fields
-                            sField = string.Format("OC_{0:00}", field.Id - 11800);
-                            sCommand = "Select DISTINCT Top 3 PROJECT_NAME,CT_NAME,BC_NAME,CB_NAME" +
-                                " From EPGP_COST_DETAILS cv" +
-                                " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=cv.PROJECT_ID" +
-                                " Inner Join EPGP_COST_TYPES ct On ct.CT_ID=cv.CT_ID" +
-                                " Inner Join EPGP_COST_CATEGORIES cc On cc.BC_UID=cv.BC_UID" +
-                                " Inner Join EPGP_COST_BREAKDOWNS cb On cb.CB_ID=cv.CB_ID" +
-                                " Where cv." + sField + " = " + lookupUID.ToString();
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                smessage += "PI Cost Value  " +
-                                    DBAccess.ReadStringValue(SqlReader["CT_NAME"]) + "  " +
-                                    DBAccess.ReadStringValue(SqlReader["CB_NAME"]) + "  " +
-                                    DBAccess.ReadStringValue(SqlReader["BC_NAME"]) + "  " +
-                                    field.Name + ":  " +
-                                    DBAccess.ReadStringValue(SqlReader["PROJECT_NAME"]) + "\n";
-                            }
-                            SqlReader.Close();
-                        }
-                        else if (field.Id > 20000)
-                        {
-                            // PI or Resource fields Code fields
-                            string tableName;
-                            string fieldName;
-                            Common.CalculateTableFieldName(field.CFField, field.CFTable, out tableName, out fieldName);
-
-                            if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.ResourceINT)
-                            {
-                                // resource code fields
-                                sCommand = "Select Top 3 RES_NAME" +
-                                    " From EPGC_RESOURCE_INT_VALUES iv" +
-                                    " Inner Join EPG_RESOURCES r On r.WRES_ID=iv.WRES_ID" +
-                                    " Where iv." + fieldName + " = " + lookupUID.ToString();
-                                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                                SqlReader = SqlCommand.ExecuteReader();
-                                while (SqlReader.Read())
-                                {
-                                    smessage += "Resource  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["RES_NAME"]) + "\n";
-                                }
-                                SqlReader.Close();
-                            }
-                            else if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.PortfolioINT)
-                            {
-                                //  PI code fields
-                                sCommand = "Select Top 3 PROJECT_NAME" +
-                                    " From EPGP_PROJECT_INT_VALUES iv" +
-                                    " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=iv.PROJECT_ID" +
-                                    " Where iv." + fieldName + " = " + lookupUID.ToString();
-                                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                                SqlReader = SqlCommand.ExecuteReader();
-                                while (SqlReader.Read())
-                                {
-                                    smessage += "PI  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["PROJECT_NAME"]) + "\n";
-                                }
-                                SqlReader.Close();
-
-                                //  PI codes also used for Program Data
-                                sCommand = "Select Top 3 LV_VALUE as Program_Name" +
-                                    " From EPGP_PROG_INT_VALUES iv" +
-                                    " Inner Join EPGP_LOOKUP_VALUES p On p.LV_UID=iv.PROG_UID" +
-                                    " Where iv." + fieldName + " = " + lookupUID.ToString();
-                                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                                SqlReader = SqlCommand.ExecuteReader();
-                                while (SqlReader.Read())
-                                {
-                                    smessage += "Program Data  " + field.Name + ":  " + DBAccess.ReadStringValue(SqlReader["Program_Name"]) + "\n";
-                                }
-                                SqlReader.Close();
-                            }
-                        }
-                    }
-                    if (smessage.Length > 0)
-                    {
-                        if (lookupUID != checklookupUID) smessage = "Child item:" + lookupname + "\n" + smessage;
-                        break;
-                    }
-                }
-                _sqlConnection.Close();
-
-                sresult = smessage;
-                return ((smessage.Length > 0) == false);
+                sresult = messageString;
+                return messageString.Length > 0 == false;
             }
             catch (Exception exception)
             {
+                Trace.TraceError("Exception Suppressed: {0}", exception);
                 throw new PFEException((int)PFEError.CanDeleteLookupValue, exception.GetBaseMessage());
+            }
+            finally
+            {
+                _sqlConnection?.Close();
             }
         }
 
+        private List<EPKLookupValue> GetLookUpValues(int checklookupUID)
+        {
+            var lookupValues = new List<EPKLookupValue>();
+
+            var command = "SELECT LV_UID,LV_VALUE,LV_ID,LV_LEVEL FROM EPGP_LOOKUP_VALUES"
+                + " WHERE LOOKUP_UID =(Select LOOKUP_UID From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid)"
+                + " ORDER BY LV_ID";
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@LV_uid", checklookupUID);
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    var found = false;
+                    var levelThisValue = 0;
+                    while (sqlReader.Read())
+                    {
+                        var uId = SqlDb.ReadIntValue(sqlReader["LV_UID"]);
+                        var level = SqlDb.ReadIntValue(sqlReader["LV_LEVEL"]);
+                        var name = SqlDb.ReadStringValue(sqlReader["LV_VALUE"]);
+
+                        if (found == false)
+                        {
+                            if (uId == checklookupUID)
+                            {
+                                found = true;
+                                levelThisValue = level;
+                                CreateAndAddItem(uId, name, lookupValues);
+                            }
+                        }
+                        else
+                        {
+                            if (level <= levelThisValue)
+                            {
+                                break;
+                            }
+                            CreateAndAddItem(uId, name, lookupValues);
+                        }
+                    }
+                }
+            }
+            return lookupValues;
+        }
+
+        private void ProcessLookUpValues(int checklookupUID, List<EPKLookupValue> lookupValues, StringBuilder messageStringBuilder, ref string messageString)
+        {
+            foreach (var LVcheckitem in lookupValues)
+            {
+                int lookupUId;
+                string lookupName;
+                List<CField> clnFields;
+
+                GetFieldsFromLookUp(LVcheckitem, messageStringBuilder, out lookupUId, out lookupName, out clnFields);
+
+                foreach (var field in clnFields)
+                {
+                    if (field.Id >= 9105 && field.Id <= 9109)
+                    {
+                        ProcessTsCodeField(field, lookupUId, messageStringBuilder);
+                    }
+                    else if (field.Id >= 9305 && field.Id <= 9309)
+                    {
+                        ProcessRpCodeField(field, lookupUId, messageStringBuilder);
+                    }
+                    else if (field.Id >= 11801 && field.Id <= 11805)
+                    {
+                        ProcessCtCodeField(field, lookupUId, messageStringBuilder);
+                    }
+                    else if (field.Id > 20000)
+                    {
+                        string tableName;
+                        string fieldName;
+                        Common.CalculateTableFieldName(field.CFField, field.CFTable, out tableName, out fieldName);
+
+                        if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.ResourceINT)
+                        {
+                            ProcessResourceField(fieldName, lookupUId, messageStringBuilder, field);
+                        }
+                        else if ((Common.CustomFieldTable)field.CFTable == Common.CustomFieldTable.PortfolioINT)
+                        {
+                            ProcessPortfolioField(fieldName, lookupUId, messageStringBuilder, field);
+                        }
+                    }
+                    messageString = messageStringBuilder.ToString();
+                }
+                if (!ProcessMessage(checklookupUID, lookupUId, lookupName, ref messageString))
+                {
+                    break;
+                }
+            }
+        }
+
+        private void GetFieldsFromLookUp(
+            EPKLookupValue LVcheckitem,
+            StringBuilder messageStringBuilder,
+            out int lookupUId,
+            out string lookupName,
+            out List<CField> clnFields)
+        {
+            lookupUId = LVcheckitem.UID;
+            lookupName = LVcheckitem.Name;
+
+            // this is a complicated check, first part as per usual using SP but then much much more added
+
+            using (var readUsedListCommand = new SqlCommand("EPG_SP_ReadUsedListValue", _sqlConnection))
+            {
+                readUsedListCommand.CommandType = CommandType.StoredProcedure;
+                readUsedListCommand.Parameters.AddWithValue("LV_UID", lookupUId);
+                using (var usedListReader = readUsedListCommand.ExecuteReader())
+                {
+                    while (usedListReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("{0}: ", SqlDb.ReadStringValue(usedListReader["UsedMessage"])));
+                        messageStringBuilder.Append(string.Format("{0}\n", SqlDb.ReadStringValue(usedListReader["UsedData"])));
+                    }
+                }
+            }
+
+            const string Command = "Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,0 as Table_ID,0 as Field_IN_TABLE"
+                + " From EPGP_FIELD_ATTRIBS"
+                + " Where (FA_FIELD_ID >= 9105 And FA_FIELD_ID <= 9109) Or (FA_FIELD_ID >= 9305 And FA_FIELD_ID <= 9309)"
+                + " Or (FA_FIELD_ID >= 9505 And FA_FIELD_ID <= 9509)Or (FA_FIELD_ID >= 11801 And FA_FIELD_ID <= 11805)"
+                + " Union"
+                + " Select FA_NAME as Field_Name,FA_FIELD_ID as Field_ID,FA_TABLE_ID as Table_ID,FA_FIELD_IN_TABLE as Field_IN_TABLE"
+                + " From EPGC_FIELD_ATTRIBS"
+                + " Where FA_FORMAT = 4"
+                + " Order by Field_ID";
+            using (var selectCommand = new SqlCommand(Command, _sqlConnection))
+            {
+                using (var selectReader = selectCommand.ExecuteReader())
+                {
+                    clnFields = new List<CField>();
+                    while (selectReader.Read())
+                    {
+                        var cField = new CField
+                        {
+                            Id = SqlDb.ReadIntValue(selectReader["Field_ID"]),
+                            Name = SqlDb.ReadStringValue(selectReader["Field_Name"]),
+                            CFTable = SqlDb.ReadIntValue(selectReader["Table_ID"]),
+                            CFField = SqlDb.ReadIntValue(selectReader["Field_IN_TABLE"])
+                        };
+                        clnFields.Add(cField);
+                    }
+                }
+            }
+        }
+
+        private void ProcessTsCodeField(CField field, int lookupUId, StringBuilder messageStringBuilder)
+        {
+            var fieldString = string.Format("CAT_CODE_{0:0}", field.Id - 9104);
+            var command = string.Format(
+                "Select DISTINCT Top 3 RES_NAME,PRD_NAME"
+                + " From EPG_TS_CATEGORY_VALUES cv"
+                + " Inner Join EPG_TS_CHARGES ch ON ch.CHG_UID = cv.CAT_CHG_UID"
+                + " Inner Join EPG_TS_TIMESHEETS ts ON ts.TS_UID = ch.TS_UID"
+                + " Inner Join EPG_PERIODS p On p.PRD_ID = ts.PRD_ID and p.CB_ID=0"
+                + " Inner Join EPG_RESOURCES r On r.WRES_ID = ts.WRES_ID"
+                + " Where cv.{0} = {1}",
+                fieldString,
+                lookupUId);
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlReader.Read())
+                    {
+                        messageStringBuilder.Append(
+                            string.Format(
+                                "Timesheet  {0}  {1}:  {2}\n",
+                                SqlDb.ReadStringValue(sqlReader["PRD_NAME"]),
+                                field.Name,
+                                SqlDb.ReadStringValue(sqlReader["RES_NAME"])));
+                    }
+                }
+            }
+        }
+
+        private void ProcessRpCodeField(CField field, int lookupUId, StringBuilder messageStringBuilder)
+        {
+            var fieldString = string.Format("CAT_CODE_{0:0}", field.Id - 9304);
+            var command = string.Format(
+                "Select DISTINCT TOP 3 PROJECT_NAME"
+                + " From EPGP_RP_CATEGORY_VALUES cv"
+                + " Inner Join EPG_RESOURCEPLANS c On c.CMT_UID=cv.CAT_CMT_UID"
+                + " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=c.PROJECT_ID"
+                + " Where cv.{0} = {1}",
+                fieldString,
+                lookupUId);
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlReader.Read())
+                    {
+                        messageStringBuilder.Append(
+                            string.Format("Resource Plan  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(sqlReader["PROJECT_NAME"])));
+                    }
+                }
+            }
+        }
+
+        private void ProcessCtCodeField(CField field, int lookupUId, StringBuilder messageStringBuilder)
+        {
+            var fieldString = string.Format("OC_{0:00}", field.Id - 11800);
+            var command = string.Format(
+                "Select DISTINCT Top 3 PROJECT_NAME,CT_NAME,BC_NAME,CB_NAME"
+                + " From EPGP_COST_DETAILS cv"
+                + " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=cv.PROJECT_ID"
+                + " Inner Join EPGP_COST_TYPES ct On ct.CT_ID=cv.CT_ID"
+                + " Inner Join EPGP_COST_CATEGORIES cc On cc.BC_UID=cv.BC_UID"
+                + " Inner Join EPGP_COST_BREAKDOWNS cb On cb.CB_ID=cv.CB_ID"
+                + " Where cv.{0} = {1}",
+                fieldString,
+                lookupUId);
+            var sqlCommand = new SqlCommand(command, _sqlConnection);
+            using (var sqlReader = sqlCommand.ExecuteReader())
+            {
+                while (sqlReader.Read())
+                {
+                    messageStringBuilder.Append(
+                        string.Format(
+                            "PI Cost Value  {0}  {1}  {2}  {3}:  {4}\n",
+                            SqlDb.ReadStringValue(sqlReader["CT_NAME"]),
+                            SqlDb.ReadStringValue(sqlReader["CB_NAME"]),
+                            SqlDb.ReadStringValue(sqlReader["BC_NAME"]),
+                            field.Name,
+                            SqlDb.ReadStringValue(sqlReader["PROJECT_NAME"])));
+                }
+            }
+        }
+
+        private void ProcessResourceField(string fieldName, int lookupUId, StringBuilder messageStringBuilder, CField field)
+        {
+            var command = string.Format(
+                "Select Top 3 RES_NAME"
+                + " From EPGC_RESOURCE_INT_VALUES iv"
+                + " Inner Join EPG_RESOURCES r On r.WRES_ID=iv.WRES_ID"
+                + " Where iv.{0} = {1}",
+                fieldName,
+                lookupUId);
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("Resource  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(sqlReader["RES_NAME"])));
+                    }
+                }
+            }
+        }
+
+        private void ProcessPortfolioField(string fieldName, int lookupUId, StringBuilder messageStringBuilder, CField field)
+        {
+            var command = string.Format(
+                "Select Top 3 PROJECT_NAME"
+                + " From EPGP_PROJECT_INT_VALUES iv"
+                + " Inner Join EPGP_PROJECTS p On p.PROJECT_ID=iv.PROJECT_ID"
+                + " Where iv.{0} = {1}",
+                fieldName,
+                lookupUId);
+            using (var selectProjectCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var projectReader = selectProjectCommand.ExecuteReader())
+                {
+                    while (projectReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("PI  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(projectReader["PROJECT_NAME"])));
+                    }
+                }
+            }
+
+            //  PI codes also used for Program Data
+            command = string.Format(
+                "Select Top 3 LV_VALUE as Program_Name"
+                + " From EPGP_PROG_INT_VALUES iv"
+                + " Inner Join EPGP_LOOKUP_VALUES p On p.LV_UID=iv.PROG_UID"
+                + " Where iv.{0} = {1}",
+                fieldName,
+                lookupUId);
+            using (var selectValueCommand = new SqlCommand(command, _sqlConnection))
+            {
+                using (var valueReader = selectValueCommand.ExecuteReader())
+                {
+                    while (valueReader.Read())
+                    {
+                        messageStringBuilder.Append(string.Format("Program Data  {0}:  {1}\n", field.Name, SqlDb.ReadStringValue(valueReader["Program_Name"])));
+                    }
+                }
+            }
+        }
+
+        private static bool ProcessMessage(int checklookupUID, int lookupUId, string lookupName, ref string messageString)
+        {
+            if (messageString.Length > 0)
+            {
+                if (lookupUId != checklookupUID)
+                {
+                    messageString = string.Format("Child item:{0}\n{1}", lookupName, messageString);
+                }
+                return false;
+            }
+            return true;
+        }
+
+        private static void CreateAndAddItem(int uId, string name, List<EPKLookupValue> LVlist)
+        {
+            EPKLookupValue LVitem;
+            LVitem = new EPKLookupValue
+            {
+                UID = uId,
+                Name = name
+            };
+            LVlist.Add(LVitem);
+        }
 
         /// <summary>
         /// checks if a lookup value can be deleted, returns reason or empty in string
@@ -768,99 +879,144 @@ namespace PortfolioEngineCore
         /// <returns></returns>
         public bool DeleteListWork(string data, out string sResult)
         {
+            return DeleteListWorkCommon(
+                data,
+                out sResult,
+                "Delete From EPGP_PI_WORK2 Where PROJECT_ID=@ProjectId And PW_ITEM_ID=@Id",
+                true,
+                PFEError.DeleteListWork);
+        }
+
+        private bool DeleteListWorkCommon(
+            string data,
+            out string resultString,
+            string deleteCommand,
+            bool hasIdParameter,
+            PFEError pfeeError,
+            [CallerMemberName] string memberName = "")
+        {
             try
             {
-                _dba.WriteImmTrace("DataSynch", "DeleteListWork", "Input", data);
+                _dba.WriteImmTrace("DataSynch", memberName, "Input", data);
 
-                string stablename = "EPGP_PI_WORK2";
-                CStruct xItems = new CStruct();
-                xItems.LoadXML(data);
-                List<CStruct> listPIs = xItems.GetList("Project");
+                var items = new CStruct();
+                items.LoadXML(data);
+                var listPIs = items.GetList("Project");
 
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                SqlTransaction transaction = null;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                if (_sqlConnection.State == ConnectionState.Open)
+                {
+                    _sqlConnection.Close();
+                }
                 _sqlConnection.Open();
 
-                bool bupdateOK = true;
-                String sErrorMessage = "empty";
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Data");
+                var updateOK = true;
+                var errorMessage = "empty";
+                var result = new CStruct();
+                result.Initialize("Data");
 
-                foreach (CStruct xProject in listPIs)
+                foreach (var project in listPIs)
                 {
-                    string PIExtId = xProject.GetStringAttr("ExtId");
-                    int nProjectID = 0;
-                    int nTotalRows = 0;
-                    // get the Project Id of this PI
-                    sCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        nProjectID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    }
-                    SqlReader.Close();
-                    if (nProjectID == 0)
-                    {
-                        sErrorMessage = "PI not found";
-                        bupdateOK = false;
-                    }
-                    else
-                    {
-                        bupdateOK = true;
-                    }
+                    string extIdAttribute;
+                    int totalRows;
+                    var projectId = GetProjectId(project, out extIdAttribute, out totalRows);
+                    updateOK = GetUpdateStatus(projectId, ref errorMessage);
 
-                    if (bupdateOK == true)
+                    if (updateOK)
                     {
-                        sCommand = "Delete From " + stablename + " Where PROJECT_ID=@ProjectId And PW_ITEM_ID=@Id";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                        SqlParameter pwid = SqlCommand.Parameters.Add("@Id", SqlDbType.NVarChar, 128);
-                        SqlCommand.Transaction = transaction;
-
-                        List<CStruct> listWIs = xProject.GetList("Item");
-                        foreach (CStruct xWI in listWIs)
-                        {
-                            string WIExtId = xWI.GetStringAttr("Id");
-                            pwid.Value = WIExtId;
-                            int nrows = SqlCommand.ExecuteNonQuery();
-                            nTotalRows += nrows;
-                        }
+                        RunDelete(deleteCommand, hasIdParameter, projectId, project, ref totalRows);
                     }
-                    CStruct xPIResult = xResult.CreateSubStruct("Project");
-                    if (bupdateOK == true)
-                    {
-                        if (transaction != null) transaction.Commit();
-                        xPIResult.CreateIntAttr("Status", 0);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection("Work rows deleted = " + nTotalRows.ToString());
-                    }
-                    else
-                    {
-                        if (transaction != null) transaction.Rollback();
-                        xPIResult.CreateIntAttr("Status", 1);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection(sErrorMessage);
-                    }
-                    transaction = null;
-                    nProjectID = 0;
-                    nTotalRows = 0;
+                    PopulateResultMessage(result, updateOK, extIdAttribute, totalRows, errorMessage);
                 }
 
                 _sqlConnection.Close();
-                sResult = xResult.XML();
-                return bupdateOK;
-
+                resultString = result.XML();
+                return updateOK;
             }
             catch (Exception exception)
             {
-                throw new PFEException((int)PFEError.DeleteListWork, exception.GetBaseMessage());
+                throw new PFEException((int)pfeeError, exception.GetBaseMessage());
+            }
+        }
+
+        private static bool GetUpdateStatus(int projectId, ref string errorMessage)
+        {
+            bool updateOK;
+            if (projectId == 0)
+            {
+                errorMessage = "PI not found";
+                updateOK = false;
+            }
+            else
+            {
+                updateOK = true;
+            }
+            return updateOK;
+        }
+
+        private static void PopulateResultMessage(CStruct result, bool updateOK, string extIdAttribute, int totalRows, string errorMessage)
+        {
+            var projectResult = result.CreateSubStruct("Project");
+            if (updateOK)
+            {
+                projectResult.CreateIntAttr("Status", 0);
+                projectResult.CreateStringAttr("ExtId", extIdAttribute);
+                projectResult.CreateCDataSection(string.Format("Work rows deleted = {0}", totalRows));
+            }
+            else
+            {
+                projectResult.CreateIntAttr("Status", 1);
+                projectResult.CreateStringAttr("ExtId", extIdAttribute);
+                projectResult.CreateCDataSection(errorMessage);
+            }
+        }
+
+        private int GetProjectId(CStruct project, out string extIdAttribute, out int totalRows)
+        {
+            extIdAttribute = project.GetStringAttr("ExtId");
+            var projectId = 0;
+            totalRows = 0;
+
+            // get the Project Id of this PI
+            var command = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ExtId", extIdAttribute);
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    if (sqlReader.Read())
+                    {
+                        projectId = SqlDb.ReadIntValue(sqlReader["PROJECT_ID"]);
+                    }
+                }
+            }
+            return projectId;
+        }
+
+        private void RunDelete(string deleteCommand, bool hasIdParameter, int projectId, CStruct project, ref int totalRows)
+        {
+            using (var sqlCommand = new SqlCommand(deleteCommand, _sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ProjectID", projectId);
+
+                if (hasIdParameter)
+                {
+                    const int IdParameterSize = 128;
+                    var id = sqlCommand.Parameters.Add("@Id", SqlDbType.NVarChar, IdParameterSize);
+
+                    var workItems = project.GetList("Item");
+                    foreach (var workItem in workItems)
+                    {
+                        var workItemId = workItem.GetStringAttr("Id");
+                        id.Value = workItemId;
+                        var rows = sqlCommand.ExecuteNonQuery();
+                        totalRows += rows;
+                    }
+                }
+                else
+                {
+                    var rows = sqlCommand.ExecuteNonQuery();
+                    totalRows += rows;
+                }
             }
         }
 
@@ -1001,182 +1157,12 @@ namespace PortfolioEngineCore
         /// <returns></returns>
         public bool DeletePIListWork(string data, out string sResult)
         {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "DeletePIListWork", "Input", data);
-
-                string stablename = "EPGP_PI_WORK2";
-                CStruct xItems = new CStruct();
-                xItems.LoadXML(data);
-                List<CStruct> listPIs = xItems.GetList("Project");
-
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                bool bupdateOK = true;
-                String sErrorMessage = "empty";
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Data");
-
-                foreach (CStruct xProject in listPIs)
-                {
-                    string PIExtId = xProject.GetStringAttr("ExtId");
-                    int nProjectID = 0;
-                    int nTotalRows = 0;
-                    // get the Project Id of this PI
-                    sCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        nProjectID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    }
-                    SqlReader.Close();
-                    if (nProjectID == 0)
-                    {
-                        sErrorMessage = "PI not found";
-                        bupdateOK = false;
-                    }
-                    else
-                    {
-                        bupdateOK = true;
-                    }
-
-                    if (bupdateOK == true)
-                    {
-                        sCommand = "Delete From " + stablename + " Where PROJECT_ID=@ProjectId";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                        int nrows = SqlCommand.ExecuteNonQuery();
-                        nTotalRows += nrows;
-                    }
-                    CStruct xPIResult = xResult.CreateSubStruct("Project");
-                    if (bupdateOK == true)
-                    {
-                        xPIResult.CreateIntAttr("Status", 0);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection("Work rows deleted = " + nTotalRows.ToString());
-                    }
-                    else
-                    {
-                        xPIResult.CreateIntAttr("Status", 1);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection(sErrorMessage);
-                    }
-                    nProjectID = 0;
-                    nTotalRows = 0;
-                }
-
-                _sqlConnection.Close();
-                sResult = xResult.XML();
-                return bupdateOK;
-
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.DeletePIListWork, exception.GetBaseMessage());
-            }
-        }
-
-        /// <summary>
-        /// Deletes Non Work entries for Personal Items for a resource.
-        /// </summary>
-        /// <param name="data">xml defn of the resources, Categories, and items.</param>
-        /// <returns></returns>
-        public bool DeleteResourceTimeoff(string data, out string sResult)
-        {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "DeleteResourceTimeoff", "Input", data);
-
-                CStruct xResource = new CStruct();
-                xResource.LoadXML(data);
-
-                int WresId = xResource.GetIntAttr("Id");
-                string ExtId = xResource.GetStringAttr("ExtId");
-                string DataId = xResource.GetStringAttr("DataId");
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
-
-                bool bupdateOK = true;
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Resource");
-                xResult.CreateIntAttr("Id", WresId);
-                xResult.CreateStringAttr("DataId", DataId);
-                xResult.CreateStringAttr("ExtId", ExtId);
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                // check if the resource exists and pick up the WresId if necessary
-                var sErrorMessage = CheckIfResourceExists(ExtId, ref WresId);
-
-                if (sErrorMessage.Length > 0)
-                {
-                    bupdateOK = false;
-                    CStruct xStatus = xResult.CreateSubStruct("Result");
-                    xStatus.CreateIntAttr("Status", 1);
-                    xStatus.CreateCDataSection(sErrorMessage);
-                }
-
-                if (bupdateOK)
-                {
-                    List<CStruct> listcats = xResource.GetList("Category");
-                    foreach (CStruct xSelCat in listcats)
-                    {
-                        int CatId = xSelCat.GetIntAttr("Id");
-                        string CatExtId = xSelCat.GetStringAttr("ExtId");
-
-                        CStruct xCatResult = xResult.CreateSubStruct("Category");
-                        xCatResult.CreateIntAttr("Id", CatId);
-                        xCatResult.CreateStringAttr("ExtId", CatExtId);
-
-                        bool bCatUpdateOK = true;
-                        List<CStruct> listItems = xSelCat.GetList("Item");
-                        int nTotalRows = 0;
-                        foreach (CStruct xSelItem in listItems)
-                        {
-                            string sHol = xSelItem.GetStringAttr("Date");
-                            DateTime dHol = DateTime.Parse(sHol);
-
-                            sCommand = "DELETE FROM EPG_NONWORK_HOURS Where NWI_ID=@NWI_uid And WRES_ID=@WresId And NWH_DATE=@date";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Parameters.AddWithValue("@NWI_uid", CatId);
-                            SqlCommand.Parameters.AddWithValue("@WresId", WresId);
-                            SqlCommand.Parameters.AddWithValue("@date", dHol);
-                            int nrows = SqlCommand.ExecuteNonQuery();
-                            nTotalRows += nrows;
-                            if (nrows == 0) bCatUpdateOK = false;
-                        }
-                        CStruct xStatus = xCatResult.CreateSubStruct("Result");
-                        if (bCatUpdateOK)
-                        {
-                            xStatus.CreateIntAttr("Status", 0);
-                        }
-                        else
-                        {
-                            xStatus.CreateIntAttr("Status", 1);
-                            xStatus.CreateCDataSection(string.Format("Rows deleted for this category = {0:0}", nTotalRows));
-                        }
-                    }
-                }
-                _sqlConnection.Close();
-
-                sResult = xResult.XML();
-                return bupdateOK;
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.DeleteResourceTimeoff, exception.GetBaseMessage());
-            }
+            return DeleteListWorkCommon(
+                data,
+                out sResult,
+                "Delete From EPGP_PI_WORK2 Where PROJECT_ID=@ProjectId",
+                false,
+                PFEError.DeletePIListWork);
         }
 
         private string CheckIfResourceExists(string extId, ref int wresId)
@@ -1559,354 +1545,6 @@ namespace PortfolioEngineCore
             return costCategories;
         }
 
-        public bool UpdateCategoriesFromRoles()
-        {
-            try
-            {
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                // are we in auto update categories mode?
-
-                // no Major Categories - this could work but it needs more work to generate Cost Categories from Categories -changed now
-                int MajorCategoryLookup = 0;
-                sCommand = "Select ADM_MC_LOOKUP From EPG_ADMIN";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlReader = SqlCommand.ExecuteReader();
-                if (SqlReader.Read())
-                    MajorCategoryLookup = DBAccess.ReadIntValue(SqlReader["ADM_MC_LOOKUP"]);
-                SqlReader.Close();
-
-                //  Sep 2012 added ability to handle Major Categories
-                //if (MajorCategoryLookup > 0) return false;  // not an autogenerate situation
-
-                //  only one Cost Category with a UOM
-                int numberCategorieswithUOM;
-                sCommand = "Select COUNT(*) as CountCategories From EPGP_CATEGORIES Where (CA_ROLE=0 Or CA_ROLE=NULL) And LEN(CA_UOM)>0";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlReader = SqlCommand.ExecuteReader();
-                if (SqlReader.Read())
-                    numberCategorieswithUOM = DBAccess.ReadIntValue(SqlReader["CountCategories"]);
-                else
-                    numberCategorieswithUOM = 0;
-                SqlReader.Close();
-                //if (numberCategorieswithUOM > 1) return false;  // not an autogenerate situation - NO LONGER SO
-
-                // read the list of roles we'd like to add in
-                sCommand = "Select LV_UID,LV_VALUE From EPGP_LOOKUP_VALUES Where LOOKUP_UID=(Select ADM_ROLE_CODE From EPG_ADMIN)" +
-                            " And LV_UID Not In (Select DISTINCT CA_ROLE From EPGP_CATEGORIES)" +
-                            " ORDER BY LV_ID";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlReader = SqlCommand.ExecuteReader();
-
-                List<PfECategory> roles = new List<PfECategory>();
-                while (SqlReader.Read())
-                {
-                    PfECategory role = new PfECategory();
-                    role.Uid = DBAccess.ReadIntValue(SqlReader["LV_UID"]);
-                    role.Name = DBAccess.ReadStringValue(SqlReader["LV_VALUE"]);
-                    roles.Add(role);
-                }
-                SqlReader.Close();
-
-                if (roles.Count == 0) return true;   // no roles to add
-
-                int lCA_UID = 0;
-                int lCA_ID = 0;
-                string sUOM = "";
-
-                //  if we need to create any new Category need MAX UID currently used in COST CATEGORIES (yes that's right!)
-                int lNextUID = 0;
-                sCommand = "Select MAX(BC_UID) as Max_UID From EPGP_COST_CATEGORIES";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlReader = SqlCommand.ExecuteReader();
-                if (SqlReader.Read())
-                    lNextUID = DBAccess.ReadIntValue(SqlReader["Max_UID"]) + 1;
-                else
-                    lNextUID = 1;
-                SqlReader.Close();
-
-                int lInsertAfter = 1;
-                int nFoundLevel = 0;
-
-                if (numberCategorieswithUOM == 0)
-                {
-                    //  create new Category to host any CCRs we will create
-                    sUOM = "hrs";
-                    lCA_UID = lNextUID;
-                    lNextUID += 1;
-                    lCA_ID = 1;
-                    sUOM = "hrs";
-                    sCommand = "INSERT Into EPGP_CATEGORIES (CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM) Values (@UId,@Name,@ID,1,0,@UOM)";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@UId", lCA_UID);
-                    SqlCommand.Parameters.AddWithValue("@Name", "Labor");
-                    SqlCommand.Parameters.AddWithValue("@ID", lCA_ID);
-                    SqlCommand.Parameters.AddWithValue("@UOM", sUOM);
-                    SqlCommand.ExecuteNonQuery();
-                    lInsertAfter = 1;
-                }
-                else //if (numberCategorieswithUOM == 1)
-                {
-                    //  pick up information for the Category we will use to host any CCRs we will create
-                    int nLevel = 0;   // plan is to add any new CCs to the first available guy at the lowest level
-                    sCommand = "Select CA_UID,CA_ID,CA_UOM,CA_LEVEL From EPGP_CATEGORIES Where (CA_ROLE=0 Or CA_ROLE=NULL) And LEN(CA_UOM)>0";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    while (SqlReader.Read())
-                    {
-                        int ltCA_UID = DBAccess.ReadIntValue(SqlReader["CA_UID"]);
-                        int ltCA_ID = DBAccess.ReadIntValue(SqlReader["CA_ID"]);
-                        string stUOM = DBAccess.ReadStringValue(SqlReader["CA_UOM"]);
-                        int ltLevel = DBAccess.ReadIntValue(SqlReader["CA_LEVEL"]);
-                        if (ltLevel > nLevel)
-                        {
-                            nLevel = ltLevel;
-                            lCA_UID = ltCA_UID;
-                            lCA_ID = ltCA_ID;
-                            sUOM = stUOM;
-                        }
-                    }
-                    //else
-                    //    {
-                    //        return false;
-                    //    }
-                    SqlReader.Close();
-                    if (lCA_UID <= 0) return false;  // this shouldn't happen
-
-                    // read in all Categories figuring where in the ID sequence we need to insert
-                    sCommand = "SELECT CA_UID,CA_ID,CA_LEVEL From EPGP_CATEGORIES Order By CA_ID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    bool bfound = false;
-                    while (SqlReader.Read())
-                    {
-                        int UID = DBAccess.ReadIntValue(SqlReader["CA_UID"]);
-                        int ID = DBAccess.ReadIntValue(SqlReader["CA_ID"]);
-                        int Level = DBAccess.ReadIntValue(SqlReader["CA_LEVEL"]);
-                        if (bfound && Level <= nFoundLevel) break;  // so we're adding at the bottom of existing CCRs
-                        if (UID == lCA_UID)
-                        {
-                            bfound = true;
-                            nFoundLevel = Level;
-                        }
-                        lInsertAfter = ID;
-                    }
-                    SqlReader.Close();
-                }
-
-                //  update the IDs for any that come after the insert point
-                SqlTransaction transaction = _sqlConnection.BeginTransaction();
-
-                sCommand = "Update EPGP_CATEGORIES Set CA_ID = CA_ID + @Incr Where CA_ID > @Insertafter";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Transaction = transaction;
-                SqlCommand.Parameters.AddWithValue("@Insertafter", lInsertAfter);
-                SqlCommand.Parameters.AddWithValue("@Incr", roles.Count);
-                SqlCommand.ExecuteNonQuery();
-
-                //  ok we can now insert the new Cost Category Roles
-                int lNewID = lInsertAfter + 1;
-                sCommand = "INSERT Into EPGP_CATEGORIES (CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM) Values (@UId,@Name,@ID,@Level,@Role,@UOM)";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Transaction = transaction;
-                SqlParameter pUID = SqlCommand.Parameters.Add("@UId", SqlDbType.Int);
-                SqlParameter pNAME = SqlCommand.Parameters.Add("@Name", SqlDbType.VarChar);
-                SqlParameter pID = SqlCommand.Parameters.Add("@ID", SqlDbType.Int);
-                SqlParameter pLevel = SqlCommand.Parameters.Add("@Level", SqlDbType.Int);
-                SqlParameter pROLE = SqlCommand.Parameters.Add("@Role", SqlDbType.Int);
-                SqlParameter pUOM = SqlCommand.Parameters.Add("@UOM", SqlDbType.VarChar);
-
-                foreach (PfECategory role in roles)  // if this isn't in the right seq then use [0 to count-1]
-                {
-                    pUID.Value = lNextUID;
-                    lNextUID += 1;
-                    pNAME.Value = role.Name;
-                    pLevel.Value = nFoundLevel + 1;
-                    pID.Value = lNewID;
-                    lNewID += 1;
-                    pROLE.Value = role.Uid;
-                    pUOM.Value = sUOM;
-                    SqlCommand.ExecuteNonQuery();
-                }
-
-                // need to generate COST_CATEGORIES from CATEGORIES plus the Major Category Lookup
-
-                // Feb 2013 - I now need this same functionality in the new Cost Categories Admin screen 
-                //                 I'll create a function there but will leave this for now (safer) but if messing here then consider using that function
-
-                if (MajorCategoryLookup <= 0)
-                {
-                    //  just copy updated CATEGORIES into COST_CATEGORIES
-                    sCommand = "Delete From EPGP_COST_CATEGORIES";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-
-                    sCommand = "Insert Into EPGP_COST_CATEGORIES (BC_UID,BC_NAME,BC_ID,BC_LEVEL,BC_ROLE,BC_UOM,MC_UID,CA_UID)" +
-                                " Select CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM,0,CA_UID as CC From EPGP_CATEGORIES";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-                }
-                else
-                {
-                    // regenerate all the Cost Categories but must keep old BC_UIDs, so first read then all into a list, then delete
-                    int lMaxUID = 0;
-                    sCommand = "Select BC_UID,BC_NAME,MC_UID,CA_UID From EPGP_COST_CATEGORIES ORDER BY BC_ID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-                    List<PfECategory> costcategories = new List<PfECategory>();
-                    while (SqlReader.Read())
-                    {
-                        PfECategory costcategory = new PfECategory();
-                        costcategory.Uid = DBAccess.ReadIntValue(SqlReader["BC_UID"]);
-                        costcategory.mc_Uid = DBAccess.ReadIntValue(SqlReader["MC_UID"]);
-                        costcategory.ID = DBAccess.ReadIntValue(SqlReader["CA_UID"]);  // saving UID from EPGP_CATEGORIES in ID
-                        costcategory.Name = DBAccess.ReadStringValue(SqlReader["BC_NAME"]);
-                        costcategories.Add(costcategory);
-                        if (costcategory.Uid > lMaxUID) lMaxUID = costcategory.Uid;
-                    }
-                    SqlReader.Close();
-
-                    sCommand = "Delete From EPGP_COST_CATEGORIES";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-
-                    // read the list of Major Categories
-                    sCommand = "Select LV_UID,LV_VALUE From EPGP_LOOKUP_VALUES Where LOOKUP_UID=@MCUID" +
-                                " ORDER BY LV_ID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.Parameters.AddWithValue("@MCUID", MajorCategoryLookup);
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    List<PfECategory> mcs = new List<PfECategory>();
-                    while (SqlReader.Read())
-                    {
-                        PfECategory mc = new PfECategory();
-                        mc.Uid = DBAccess.ReadIntValue(SqlReader["LV_UID"]);
-                        mc.Name = DBAccess.ReadStringValue(SqlReader["LV_VALUE"]);
-                        mcs.Add(mc);
-                    }
-                    SqlReader.Close();
-
-                    //  read in the Categories which will be written multiple times into Cost Categories
-                    sCommand = "Select CA_UID,CA_NAME,CA_ID,CA_LEVEL,CA_ROLE,CA_UOM From EPGP_CATEGORIES ORDER BY CA_ID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-                    List<PfECategory> categories = new List<PfECategory>();
-                    while (SqlReader.Read())
-                    {
-                        PfECategory category = new PfECategory();
-                        category.Uid = DBAccess.ReadIntValue(SqlReader["CA_UID"]);
-                        category.ID = DBAccess.ReadIntValue(SqlReader["CA_ID"]);
-                        category.Level = DBAccess.ReadIntValue(SqlReader["CA_LEVEL"]);
-                        category.Role = DBAccess.ReadIntValue(SqlReader["CA_ROLE"]);
-                        category.Name = DBAccess.ReadStringValue(SqlReader["CA_NAME"]);
-                        category.UOM = DBAccess.ReadStringValue(SqlReader["CA_UOM"]);
-                        categories.Add(category);
-                        if (category.Uid > lMaxUID) lMaxUID = category.Uid; // we might have created some new ones just now
-                    }
-                    SqlReader.Close();
-                    int lMasterCount = categories.Count + 1;
-
-                    //  ready to start inserting...
-                    sCommand = "Insert Into EPGP_COST_CATEGORIES (BC_UID,BC_NAME,BC_ID,BC_LEVEL,BC_ROLE,BC_UOM,MC_UID,CA_UID)" +
-                               " Values (@UID,@NAME,@ID,@LEVEL,@ROLE,@UOM,@MCUID,@CAUID)";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlParameter puid = SqlCommand.Parameters.Add("@UID", SqlDbType.Int);
-                    SqlParameter pname = SqlCommand.Parameters.Add("@NAME", SqlDbType.NVarChar, 255);
-                    SqlParameter pid = SqlCommand.Parameters.Add("@ID", SqlDbType.Int);
-                    SqlParameter plevel = SqlCommand.Parameters.Add("@LEVEL", SqlDbType.Int);
-                    SqlParameter prole = SqlCommand.Parameters.Add("@ROLE", SqlDbType.Int);
-                    SqlParameter puom = SqlCommand.Parameters.Add("@UOM", SqlDbType.NVarChar, 255);
-                    SqlParameter pmcuid = SqlCommand.Parameters.Add("@MCUID", SqlDbType.Int);
-                    SqlParameter pcauid = SqlCommand.Parameters.Add("@CAUID", SqlDbType.Int);
-
-                    //  make copy of categories - no Major Category
-                    foreach (PfECategory category in categories)
-                    {
-                        puid.Value = category.Uid;
-                        pname.Value = category.Name;
-                        pid.Value = category.ID;
-                        plevel.Value = category.Level;
-                        prole.Value = category.Role;
-                        puom.Value = category.UOM;
-                        pmcuid.Value = 0;
-                        pcauid.Value = category.Uid;
-                        SqlCommand.ExecuteNonQuery();
-                    }
-
-                    //  make copy of categories for each Major Category
-                    int lMajorIndex = 1;
-                    foreach (PfECategory mc in mcs)
-                    {
-                        // add an entry for the MC itself
-                        puid.Value = GetUID(costcategories, mc.Uid, 0, ref lMaxUID);
-                        pname.Value = mc.Name;
-                        pid.Value = lMajorIndex * lMasterCount;
-                        plevel.Value = 1;
-                        prole.Value = 0;
-                        puom.Value = "";
-                        pmcuid.Value = mc.Uid;
-                        pcauid.Value = 0;
-                        SqlCommand.ExecuteNonQuery();
-
-                        foreach (PfECategory category in categories)
-                        {
-                            puid.Value = GetUID(costcategories, mc.Uid, category.Uid, ref lMaxUID);
-                            pname.Value = category.Name;
-                            pid.Value = (lMajorIndex * lMasterCount) + category.ID;
-                            plevel.Value = category.Level + 1;
-                            prole.Value = category.Role;
-                            puom.Value = category.UOM;
-                            pmcuid.Value = mc.Uid;
-                            pcauid.Value = category.Uid;
-                            SqlCommand.ExecuteNonQuery();
-                        }
-                        lMajorIndex += 1;
-                    }
-
-                }
-
-                transaction.Commit();
-
-                // recalc default FTEs if appropriate
-                //SecurityLevels secLevel = SecurityLevels.AdminCalc;
-                //PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username,
-                //                                                                                _pid, _company,
-                //                                                                                _dbcnstring, secLevel);
-                //bool bret = pec.CalcAllDefaultFTEs();
-                bool bret = AdminFunctions.CalcAllDefaultFTEs(_dba);
-
-                // recalculate Cost Category Periodic Rates - not sure if this should be done by Job Server, right now there isn't an option set up so do it synchronously
-                string sReply;
-                bret = AdminFunctions.CalcCategoryRates(_dba, out sReply);
-
-                _sqlConnection.Close();
-
-                return true;
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.UpdateCategoriesFromRoles, exception.GetBaseMessage());
-            }
-        }
-
         private int GetUID(List<PfECategory> oldItems, int mcUID, int CATUID, ref int lMaxUID)
         {
             foreach (PfECategory categoryitem in oldItems)
@@ -1918,257 +1556,6 @@ namespace PortfolioEngineCore
             }
             lMaxUID += 1;
             return lMaxUID;
-        }
-
-        /// <summary>
-        /// Updates the department lookup and infos.   
-        /// </summary>
-        /// <param name="data">xmll defn of dept structure.</param>
-        /// <returns></returns>
-        public bool UpdateDepartments(string data, out string sResult)
-        {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "UpdateDepartments", "Input", data);
-
-                CStruct xDepts = new CStruct();
-                xDepts.LoadXML(data);
-                int Level = 0;
-                int ID = 0;
-                string fullname = "";
-                Dictionary<int, PFELookup> dicDepts = new Dictionary<int, PFELookup>();
-                // the result of this call is to go through the dept structure and get all depts in turn into a List
-                GetLookup(xDepts, "Department", dicDepts, Level, ref ID, fullname);
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                int nDeptLookupID = 0;
-                string sCommand;
-                bool bupdateOK = true;
-                string sErrorMessage = "";
-                List<PFELookup> errorDepts = new List<PFELookup>();
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                SqlTransaction transaction = _sqlConnection.BeginTransaction();
-                // read Dept lookup id from ADMIN
-                sCommand = "SELECT ADM_RPE_DEPT_CODE FROM EPG_ADMIN";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Transaction = transaction;
-                SqlReader = SqlCommand.ExecuteReader();
-
-                if (SqlReader.Read())
-                {
-                    nDeptLookupID = (int)SqlReader.GetInt32Safely("ADM_RPE_DEPT_CODE");
-                }
-                SqlReader.Close();
-
-                if (nDeptLookupID <= 0)
-                {
-                    // must be first time we've saved a Department Lookup
-                    //   LOOKUP_UID is Identity so read it back at same time as insert
-                    string sLookupName = "Department Lookup";
-                    sCommand = "SET NOCOUNT ON;"
-                       + "INSERT Into EPGP_LOOKUP_TABLES "
-                       + " (LOOKUP_NAME)"
-                       + " Values(@Name);"
-                       + "Select @@IDENTITY as NewID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Name", sLookupName);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-                    int nNewId = 0;
-                    if (SqlReader.Read())
-                    {
-                        nNewId = Convert.ToInt32(SqlReader["NewID"]);
-                    }
-                    SqlReader.Close();
-                    nDeptLookupID = nNewId;
-
-                    // update ADMIN record to show Lookup Table just created
-                    sCommand = @"Update EPG_ADMIN SET ADM_RPE_DEPT_CODE = @LookupUID";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@LookupUID", nDeptLookupID);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-                }
-                if (nDeptLookupID <= 0)
-                {
-                    throw new PFEException((int)PFEError.UD_NoLookupTable, "Can't Find/Create Lookup Table");
-                }
-
-                sCommand = "SELECT LOOKUP_UID,LV_UID,LV_EXT_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_INACTIVE From EPGP_LOOKUP_VALUES WHERE LOOKUP_UID = @LookupUID";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlCommand.Transaction = transaction;
-                SqlCommand.Parameters.AddWithValue("@LookupUID", nDeptLookupID);
-                DataTable dataTable = new DataTable();
-                dataTable.Load(SqlCommand.ExecuteReader());
-
-                if (dataTable != null)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        string sName = DBAccess.ReadStringValue(row["LV_VALUE"]);
-                        int nLevel = DBAccess.ReadIntValue(row["LV_LEVEL"]);
-                        //int nInActive = DBAccess.ReadIntValue(row["LV_INACTIVE"]);
-                        int nUID = DBAccess.ReadIntValue(row["LV_UID"]);
-                        int nID = DBAccess.ReadIntValue(row["LV_ID"]);
-                        string sExtID = DBAccess.ReadStringValue(row["LV_EXT_UID"]);
-                        string sFullName = DBAccess.ReadStringValue(row["LV_FULLVALUE"]);
-
-                        int nkey = GetItemKey(dicDepts, nUID, sName);
-                        if (nkey > 0)
-                        {
-                            PFELookup value = dicDepts[nkey];
-                            value.bflag = true;
-                            value.UID = nUID;   // if matched on title then set the UID we found
-
-                            if (nID != value.ID || nLevel != value.level || sName != value.name || sFullName != value.fullname || sExtID != value.ExtId)
-                            {
-                                row["LV_VALUE"] = value.name;
-                                row["LV_LEVEL"] = value.level;
-                                row["LV_EXT_UID"] = value.ExtId;
-                                row["LV_ID"] = value.ID;
-                                row["LV_FULLVALUE"] = value.fullname;
-                            }
-                        }
-                        else
-                        {
-                            //  this is an error in Data Sync as Delete not allowed as part of update, all existing items must exist in update
-                            bupdateOK = false;
-                            sErrorMessage = "Incomplete Lookup List, value missing";
-                            PFELookup oItemLookup = new PFELookup();
-                            oItemLookup.name = sName;
-                            oItemLookup.UID = nUID;
-                            oItemLookup.ExtId = sExtID;
-                            errorDepts.Add(oItemLookup);
-                        }
-                    }
-                    //  apply updates to dbs
-                    if (bupdateOK)
-                    {
-                        ApplyUpdateOnEpgpLookupValues(transaction, dataTable);
-                    }
-
-                }
-                dataTable.Dispose();
-
-                //  check for inserts
-                //     note - if an item that doesn't exist is passed in, with or without an Id, it is created - so WE should always change or check its ExtId to the new ID passed back
-                if (bupdateOK)
-                {
-                    InsertOnEpgLookupValue(dicDepts, transaction, nDeptLookupID);
-                }
-
-                //  delete and readd entries in RES_MANAGERS
-                if (bupdateOK)
-                {
-                    sCommand = @"Delete From EPG_RES_MANAGERS";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-                    sCommand = @"Insert Into EPG_RES_MANAGERS (CODE_UID,WRES_ID)" +
-                                " Values (@LV_uid,@wres_id)";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.CommandType = CommandType.Text;
-
-                    SqlParameter pUID = SqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                    SqlParameter pWRESID = SqlCommand.Parameters.Add("@wres_id", SqlDbType.Int);
-
-                    foreach (KeyValuePair<int, PFELookup> deptitem in dicDepts)
-                    {
-                        if (deptitem.Value.Managers != null && deptitem.Value.Managers.Count > 0)
-                        {
-                            pUID.Value = deptitem.Value.UID;
-                            pWRESID.Value = deptitem.Value.Managers[0];
-                            SqlCommand.ExecuteNonQuery();
-                        }
-                    }
-                }
-
-                //  delete and readd entries in DEPT_MANAGERS
-                if (bupdateOK)
-                {
-                    sCommand = @"Delete From EPG_DEPT_MANAGERS";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.CommandType = CommandType.Text;
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-                    sCommand = @"Insert Into EPG_DEPT_MANAGERS (CODE_UID,WRES_ID,CANREAD,CANWRITE)" +
-                                " Values (@LV_uid,@wres_id,@canread,@canwrite)";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.CommandType = CommandType.Text;
-
-                    SqlParameter pUID = SqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                    SqlParameter pWRESID = SqlCommand.Parameters.Add("@wres_id", SqlDbType.Int);
-                    SqlParameter pCANREAD = SqlCommand.Parameters.Add("@canread", SqlDbType.TinyInt);
-                    SqlParameter pCANWRITE = SqlCommand.Parameters.Add("@canwrite", SqlDbType.TinyInt);
-
-                    foreach (KeyValuePair<int, PFELookup> deptitem in dicDepts)
-                    {
-                        if (deptitem.Value.Managers != null && deptitem.Value.Managers.Count > 0)
-                        {
-                            pUID.Value = deptitem.Value.UID;
-                            foreach (int mgr in deptitem.Value.Managers)
-                            {
-                                pWRESID.Value = mgr;
-                                pCANREAD.Value = 1;
-                                pCANWRITE.Value = 1;
-                                SqlCommand.ExecuteNonQuery();
-                            }
-                        }
-                        if (deptitem.Value.Executives != null && deptitem.Value.Executives.Count > 0)
-                        {
-                            pUID.Value = deptitem.Value.UID;
-                            foreach (int exec in deptitem.Value.Executives)
-                            {
-                                pWRESID.Value = exec;
-                                pCANREAD.Value = 1;
-                                pCANWRITE.Value = 0;
-                                SqlCommand.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                }
-                if (bupdateOK) transaction.Commit();
-                _sqlConnection.Close();
-
-                CStruct xResult = new CStruct();
-                if (bupdateOK == false)
-                {
-                    //xResult.Initialize("Error");
-                    foreach (PFELookup deptitem in errorDepts)
-                    {
-                        sErrorMessage += ": " + deptitem.name;
-                    }
-                    //xResult.CreateIntAttr("Id", 1);
-                    //xResult.CreateCDataSection(sErrorMessage);
-                    throw new PFEException((int)PFEError.UpdateDepartments, sErrorMessage);
-                }
-                else
-                {
-                    xResult.Initialize("Data");
-                    foreach (KeyValuePair<int, PFELookup> deptitem in dicDepts)
-                    {
-                        CStruct xDept = xResult.CreateSubStruct("Department");
-                        xDept.CreateIntAttr("Id", deptitem.Value.UID);
-                        xDept.CreateStringAttr("DataId", deptitem.Value.DataId);
-                    }
-                }
-                sResult = xResult.XML();
-                return bupdateOK;
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.UpdateDepartments, exception.GetBaseMessage());
-            }
         }
 
         private void InsertOnEpgLookupValue(Dictionary<int, PFELookup> dicDepts, SqlTransaction transaction, int nLookupId)
@@ -2266,234 +1653,6 @@ namespace PortfolioEngineCore
             }
         }
 
-        /// <summary>
-        /// Updates a holiday schedule.
-        /// </summary>
-        /// <param name="sXML">xml defn of Holiday Schedule.</param>
-        /// <returns></returns>
-        public bool UpdateHolidaySchedule(string sXML, out string sresult)
-        {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "UpdateHolidaySchedule", "Input", sXML);
-
-                CStruct xHS = new CStruct();
-                xHS.LoadXML(sXML);
-                string sTitle = xHS.GetStringAttr("Title");
-                int Id = xHS.GetIntAttr("Id");
-                string dataid = xHS.GetStringAttr("DataId");
-                string sDefault = xHS.GetStringAttr("Default");
-                List<CStruct> listHols = xHS.GetList("Holiday");
-
-                CStruct xResult = new CStruct();
-                xResult.Initialize("HolidaySchedule");
-                CStruct xstatus = xResult.CreateSubStruct("Result");
-                if (dataid.Length > 0) xResult.CreateStringAttr("DataId", dataid);
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                //  the group record is updated or added - EPG_GROUPS
-                //  the holiday records are deleted and readded  -  EPG_GROUP_NONWORK_ITEMS
-
-                SqlTransaction transaction = _sqlConnection.BeginTransaction();
-
-                // check if group exists
-                //     If an Id is given then first looks by Id, if that fails then by Title, if that also fails then it's an error
-                //     If an Id not given it looks by Title and if found updates, otherwise it is new
-                //         NOTICE that ID is no good has to be Id !!
-                bool boktocontinue = true;
-                string sExistingTitle = "";
-                bool bFound = false;
-                if (Id > 0)
-                {
-                    sCommand = "SELECT GROUP_NAME FROM EPG_GROUPS Where GROUP_ID=@Id And GROUP_ENTITY=11";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Id", Id);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-
-                    if (SqlReader.Read())
-                    {
-                        sExistingTitle = DBAccess.ReadStringValue(SqlReader["GROUP_NAME"]);
-                        bFound = true;
-                    }
-                    SqlReader.Close();
-                }
-                if (bFound == false)
-                {
-                    //  check if there is a Group with the given Title - now even if Id is wrong
-                    sCommand = "SELECT GROUP_ID FROM EPG_GROUPS Where GROUP_NAME=@Name And GROUP_ENTITY=11";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Name", sTitle);
-                    SqlCommand.Transaction = transaction;
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        sExistingTitle = sTitle;
-                        Id = DBAccess.ReadIntValue(SqlReader["GROUP_ID"]);
-                        bFound = true;
-                    }
-                    SqlReader.Close();
-                }
-                if (Id > 0 && bFound == false)
-                {
-                    //  Group doesn't exist for given Id 
-                    xResult.CreateIntAttr("Id", Id);
-                    xstatus.CreateIntAttr("Status", 1);
-                    xstatus.CreateCDataSection("HolidaySchedule Group not found in PortfolioEngine");
-                    boktocontinue = false;
-                }
-
-                if (boktocontinue)
-                {
-                    if (Id > 0)
-                    {
-                        // record exists
-                        if (sExistingTitle != sTitle)
-                        {
-                            sCommand = @"Update EPG_GROUPS SET GROUP_NAME=@NewName Where GROUP_ID=@Id";
-                            InsertOrUpdateEpgGroups(transaction, sCommand, sTitle, Id);
-                        }
-                    }
-                    else
-                    {
-                        // insert new GROUPS record
-                        sCommand = "SELECT MAX(GROUP_ID) as MaxId FROM EPG_GROUPS";
-                        InitializeId(transaction, sCommand, out Id);
-
-                        sCommand = "INSERT Into EPG_GROUPS (GROUP_ID,GROUP_NAME,GROUP_ENTITY) Values (@Id,@NewName,11)";
-                        InsertOrUpdateEpgGroups(transaction, sCommand, sTitle, Id);
-                    }
-
-                    // Delete and then Insert nonwork items record
-                    int nonworkitemsId = Id + 1000000;
-                    sCommand = "Delete From EPG_GROUP_NONWORK_ITEMS Where GROUP_ID=@Id";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Id", Id);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-                    sCommand = "INSERT Into EPG_GROUP_NONWORK_ITEMS (GROUP_ID,NWI_ID,NWI_CHARGENUMBER)" +
-                                " Values (@Id,@NWI_ID,@NWI_CN)";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Id", Id);
-                    SqlCommand.Parameters.AddWithValue("@NWI_ID", nonworkitemsId);
-                    SqlCommand.Parameters.AddWithValue("@NWI_CN", "");
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-                    // delete and then add holidays
-                    sCommand = "Delete From EPG_GROUP_NONWORK_HOURS Where GROUP_ID=@Id";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@Id", Id);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-
-                    if (listHols != null && listHols.Count > 0)
-                    {
-                        sCommand = "INSERT Into EPG_GROUP_NONWORK_HOURS (GROUP_ID,NWH_DATE,NWH_HOURS,NWH_COMMENT)" +
-                                    " Values (@Id,@NWI_Date,@NWI_Hours,@NWI_Title)";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlParameter pID = SqlCommand.Parameters.Add("@Id", SqlDbType.Int);
-                        SqlParameter pDate = SqlCommand.Parameters.Add("@NWI_Date", SqlDbType.DateTime);
-                        SqlParameter pName = SqlCommand.Parameters.Add("@NWI_Title", SqlDbType.VarChar);
-                        SqlParameter pHours = SqlCommand.Parameters.Add("@NWI_Hours", SqlDbType.Decimal);
-                        SqlCommand.Transaction = transaction;
-                        foreach (CStruct xHol in listHols)
-                        {
-                            //DateTime dHol = xHol.GetDateAttr("Date");
-                            string sHol = xHol.GetStringAttr("Date");
-                            DateTime dHol = DateTime.Parse(sHol);
-                            String sName = xHol.GetStringAttr("Title");
-                            double dHours = xHol.GetDoubleAttr("Hours", 0);
-                            if (dHours == 0) dHours = 24;
-
-                            pID.Value = Id;
-                            pDate.Value = dHol;
-                            pHours.Value = dHours * 100;
-                            pName.Value = sName;
-                            SqlCommand.ExecuteNonQuery();
-                        }
-                    }
-
-                    // check out the DEFAULT setting
-                    if (sDefault == "1")
-                    {
-                        sCommand = @"Update EPG_ADMIN Set ADM_DEF_FTE_HOL=@HOLId";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Transaction = transaction;
-                        SqlCommand.Parameters.AddWithValue("@HOLId", Id);
-                        SqlCommand.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        bool bResetDefault = false;
-                        sCommand = "SELECT ADM_DEF_FTE_WH,ADM_DEF_FTE_HOL FROM EPG_ADMIN";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Transaction = transaction;
-                        SqlReader = SqlCommand.ExecuteReader();
-                        if (SqlReader.Read())
-                        {
-                            if (DBAccess.ReadIntValue(SqlReader["ADM_DEF_FTE_HOL"]) == Id) bResetDefault = true;
-                        }
-                        SqlReader.Close();
-
-                        if (bResetDefault == true)
-                        {
-                            sCommand = @"Update EPG_ADMIN Set ADM_DEF_FTE_HOL=@HOLId";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Transaction = transaction;
-                            SqlCommand.Parameters.AddWithValue("@HOLId", 0);
-                            SqlCommand.ExecuteNonQuery();
-                        }
-                    }
-
-
-                    transaction.Commit();
-
-                    // check if this HOL specification is used to calculate default FTEs
-                    bool bCalcDefaultFTEs = false;
-                    //sCommand = "SELECT ADM_DEF_FTE_WH,ADM_DEF_FTE_HOL FROM EPG_ADMIN";
-                    //SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    //SqlReader = SqlCommand.ExecuteReader();
-                    //if (SqlReader.Read())
-                    //{
-                    //    if (DBAccess.ReadIntValue(SqlReader["ADM_DEF_FTE_HOL"]) == Id) bCalcDefaultFTEs = true;
-                    //}
-                    //SqlReader.Close();
-
-                    // now we are told the answer to this (no point recalculating if just set OFF) so:
-                    if (sDefault == "1") bCalcDefaultFTEs = true;
-
-                    //SecurityLevels secLevel = SecurityLevels.AdminCalc;
-                    //PortfolioEngineCore.AdminFunctions pec = new PortfolioEngineCore.AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring, secLevel);
-                    //bool bret = pec.CalcRPAllAvailabilities();
-                    ////bool bret = pec.CalcAvailabilities(-1,"2");  // test for a single resource
-
-                    //if (bCalcDefaultFTEs == true) bret = pec.CalcAllDefaultFTEs();
-                    bool bret = AdminFunctions.CalcRPAllAvailabilities(_dba);
-                    if (bCalcDefaultFTEs == true) bret = AdminFunctions.CalcAllDefaultFTEs(_dba);
-
-                    _sqlConnection.Close();
-
-                    xResult.CreateIntAttr("Id", Id);
-                    xstatus.CreateIntAttr("Status", 0);
-                }
-
-                sresult = xResult.XML();
-                return true;
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.UpdateHolidaySchedule, exception.GetBaseMessage());
-            }
-        }
-
         private void InitializeId(SqlTransaction transaction, string sCommand, out int id)
         {
             if (transaction == null)
@@ -2546,237 +1705,6 @@ namespace PortfolioEngineCore
                 sqlCommand.Parameters.AddWithValue("@Id", id);
                 sqlCommand.Parameters.AddWithValue("@NewName", sTitle);
                 sqlCommand.ExecuteNonQuery();
-            }
-        }
-
-        /// <summary>
-        /// Updates(replaces) Work for a PI - either Work1(Planner) or Work2(MSP).
-        /// </summary>
-        /// <param name="data">xmll defn of work.</param>
-        /// <returns></returns>
-        public bool UpdateListWork(string data, out string sResult)
-        {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "UpdateListWork", "Input", data);
-
-                string stablename = "EPGP_PI_WORK2";
-                // Use to delete work from this table to avoid duplication in resource analyzer
-                string sdeleteWorkFromTable = "EPGP_PI_WORK1";
-
-                CStruct xItems = new CStruct();
-                xItems.LoadXML(data);
-                List<CStruct> listPIs = xItems.GetList("Project");
-
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                SqlTransaction transaction = null;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                bool bupdateOK = true;
-                String sErrorMessage = "empty";
-                String sWarningMessage = "";
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Data");
-
-
-                // set up all info on Workhours and Holidays so we can use to prorate work amounts
-                sCommand = "Select * From EPG_GROUP_WEEKLYHOURS";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                DataTable dataTable1 = new DataTable();
-                dataTable1.Load(SqlCommand.ExecuteReader());
-
-                sCommand = "Select * From EPG_GROUP_NONWORK_HOURS Order By GROUP_ID,NWH_DATE";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                DataTable dataTable2 = new DataTable();
-                dataTable2.Load(SqlCommand.ExecuteReader());
-
-                AllWorkhours workhours = new AllWorkhours();
-                workhours.Initialize(dataTable1, dataTable2);
-
-                dataTable1.Dispose();
-                dataTable2.Dispose();
-
-                // read in the two groups for each resource up front, much simpler than adding resources as we hit them. Probably slower if usually only a couple entries per call?
-                Dictionary<int, int> workhourgroups = new Dictionary<int, int>();
-                Dictionary<int, int> holidaygroups = new Dictionary<int, int>();
-                sCommand = "select m.*,GROUP_ENTITY from EPG_GROUP_MEMBERS m" +
-                            " Join EPG_GROUPS g On g.GROUP_ID=m.GROUP_ID" +
-                            " Where (g.GROUP_ENTITY=10 Or g.GROUP_ENTITY=11)";
-                SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                SqlReader = SqlCommand.ExecuteReader();
-                while (SqlReader.Read())
-                {
-                    int nGroupID = DBAccess.ReadIntValue(SqlReader["GROUP_ID"]);
-                    int nGroupEntity = DBAccess.ReadIntValue(SqlReader["GROUP_ENTITY"]);
-                    int nResourceID = DBAccess.ReadIntValue(SqlReader["MEMBER_UID"]);
-                    if (nGroupEntity == 10)
-                    { workhourgroups.Add(nResourceID, nGroupID); }
-                    else { holidaygroups.Add(nResourceID, nGroupID); }
-                }
-                SqlReader.Close();
-
-
-                foreach (CStruct xProject in listPIs)
-                {
-                    string PIExtId = xProject.GetStringAttr("ExtId");
-                    int PISourceId = xProject.GetIntAttr("Source");
-                    int nProjectID = 0;
-                    int nTotalRows = 0;
-
-                    if (IsBUpdateOk(PIExtId, ref sErrorMessage, ref nProjectID))
-                    {
-                        transaction = _sqlConnection.BeginTransaction();
-
-                        // Delete work from table to avoid duplicate work hours in resource analyzer 
-                        // since resource analyzer combines data from EPGP_PI_WORK1 & EPGP_PI_WORK2 tables
-                        sCommand = "Delete from " + sdeleteWorkFromTable + " Where PROJECT_ID=@ProjectID";
-                        DeleteDuplicatedWork(transaction, sCommand, nProjectID);
-
-                        List<CStruct> listWIs = xProject.GetList("Item");
-                        foreach (CStruct xWI in listWIs)
-                        {
-                            //string WIExtId = xWI.GetStringAttr("ExtId");
-                            string WIName = xWI.GetStringAttr("Id");
-
-                            // delete all existing work for the Item
-                            //sCommand = "Delete from " + stablename + " Where PROJECT_ID=@ProjectID And PW_ITEM_ID=@WIName";
-                            //  now delete the item regardless of the PI - June 13th
-                            sCommand = "Delete from " + stablename + " Where PW_ITEM_ID=@WIName";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Parameters.AddWithValue("@WIName", WIName);
-                            SqlCommand.CommandType = CommandType.Text;
-                            SqlCommand.Transaction = transaction;
-                            SqlCommand.ExecuteNonQuery();
-
-                            sCommand = "INSERT Into " + stablename + " (PROJECT_ID,WRES_ID,PW_ITEM_ID,PW_SOURCE,PW_DATE,PW_WORK,PW_MAJORCATEGORY)" +
-                                    " Values (@ProjectID,@WresId,@WI,@WIExtId,@date,@hours,'')";
-                            // MajorCategory needs to be Empty String rather than NULL to Group correctly with TSWORK from PfE
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                            SqlParameter pwresid = SqlCommand.Parameters.Add("@WresId", SqlDbType.Int);
-                            SqlParameter pwi = SqlCommand.Parameters.Add("@WI", SqlDbType.NVarChar, 255);
-                            SqlParameter pextid = SqlCommand.Parameters.Add("@WIExtId", SqlDbType.Int);
-                            SqlParameter pdate = SqlCommand.Parameters.Add("@date", SqlDbType.Date);
-                            SqlParameter phours = SqlCommand.Parameters.Add("@hours", SqlDbType.Float);
-                            SqlCommand.Transaction = transaction;
-
-
-                            List<CStruct> listResources = xWI.GetList("Resource");
-                            foreach (CStruct xResource in listResources)
-                            {
-                                int WresId = xResource.GetIntAttr("Id");
-                                double hours = xResource.GetDoubleAttr("Hours", 0);
-                                string sDate = xResource.GetStringAttr("StartDate");
-                                DateTime workstartdate = DateTime.Parse(sDate);
-                                sDate = xResource.GetStringAttr("FinishDate");
-                                DateTime workfinishdate = DateTime.Parse(sDate);
-
-                                int holidaygroup;
-                                int workhourgroup;
-                                if (!holidaygroups.TryGetValue(WresId, out holidaygroup))
-                                {
-                                    holidaygroup = -1;
-                                }
-                                if (!workhourgroups.TryGetValue(WresId, out workhourgroup))
-                                {
-                                    workhourgroup = -1;
-                                }
-                                if (workhours.Prorate(workhourgroup, holidaygroup, workstartdate, workfinishdate, hours))
-                                {
-                                    DateTime thisDate = workstartdate;
-                                    int index = 0;
-                                    double dhours;
-                                    while (workhours.Getwork(index, out dhours) == true)
-                                    {
-                                        if (dhours > 0)
-                                        {
-                                            pwresid.Value = WresId;
-                                            pwi.Value = WIName;
-                                            pextid.Value = PISourceId;
-                                            pdate.Value = thisDate;
-                                            phours.Value = dhours;
-                                            int nrows = SqlCommand.ExecuteNonQuery();
-                                            nTotalRows += nrows;
-                                        }
-                                        thisDate = thisDate.AddDays(1);
-                                        index += 1;
-                                    }
-                                }
-                                else
-                                {
-                                    // failed to spread work - invalid dates or resource has no WH group assigned
-                                    if (sWarningMessage.Length == 0) sWarningMessage = "  -- Work has not been imported for one or more resources, check date range and make sure resources have a WorkHours group assigned";
-                                }
-                            }
-                        }
-                        // we've merrily added the records requested, if there are errors then find them now and rollback - this way of doing it isn't so appropriate here but if there is a problem always good to find out
-                        if (bupdateOK == true)
-                        {
-                            sErrorMessage = "These Resources are not defined:";
-                            sCommand = "Select DISTINCT WRES_ID From " + stablename + " Where PROJECT_ID=@ProjectId And WRES_ID Not In (Select WRES_ID From EPG_RESOURCES)";
-                            SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                            SqlCommand.Parameters.AddWithValue("@ProjectId", nProjectID);
-                            SqlCommand.Transaction = transaction;
-                            SqlReader = SqlCommand.ExecuteReader();
-                            while (SqlReader.Read())
-                            {
-                                sErrorMessage += " " + DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                                bupdateOK = false;
-                            }
-                            SqlReader.Close();
-                        }
-                    }
-                    CStruct xPIResult = xResult.CreateSubStruct("Project");
-                    if (bupdateOK == true)
-                    {
-                        if (transaction != null) transaction.Commit();
-                        if (sWarningMessage.Length > 0)
-                        {
-                            xPIResult.CreateIntAttr("Status", 2);
-                            xPIResult.CreateStringAttr("ExtId", PIExtId);
-                            xPIResult.CreateCDataSection("Work rows added = " + nTotalRows.ToString() + sWarningMessage);
-                        }
-                        else
-                        {
-                            xPIResult.CreateIntAttr("Status", 0);
-                            xPIResult.CreateStringAttr("ExtId", PIExtId);
-                            xPIResult.CreateCDataSection("Work rows added = " + nTotalRows.ToString());
-                        }
-                    }
-                    else
-                    {
-                        if (transaction != null) transaction.Rollback();
-                        xPIResult.CreateIntAttr("Status", 1);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection(sErrorMessage);
-                    }
-                    transaction = null;
-                    nProjectID = 0;
-                    nTotalRows = 0;
-                    sWarningMessage = "";
-                }
-                _sqlConnection.Close();
-                sResult = xResult.XML();
-
-                // if there are any AutoPost instructions then set a job on the queue to do that
-                int[,] autoposts = new int[10, 2];
-                bool bRet = GetAutoPosts("ScheduledWork", ref autoposts);
-                if (autoposts[0, 0] > 0)
-                {
-                    // there is at least one autopost instruction so set up a job
-                    bRet = PostCostValuesForScheduledWork();
-                }
-
-                return bupdateOK;
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.UpdateListWork, exception.GetBaseMessage());
             }
         }
 

@@ -70,44 +70,7 @@ namespace EPMLiveWebParts
         #endregion
 
         #region Explore Class for Coverage Gain : Class (DisplayProfilePictures)
-
-        #region General Initializer : Class (DisplayProfilePictures) All Methods Explore Verification.
-
-        /// <summary>
-        ///     Class (<see cref="DisplayProfilePictures" />) explore and verify fields for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT Initializer")]
-        [TestCase(MethodRender, 0)]
-        [TestCase(MethodWriteJavascriptToOutput, 0)]
-        [TestCase(MethodGetToolParts, 0)]
-        [TestCase(MethodUpdateContextSoWeCanGetDataFromSiteUserInfoList, 0)]
-        [TestCase(MethodGetCurrentDate, 0)]
-        [TestCase(MethodWriteStylesToOutput, 0)]
-        [TestCase(MethodWriteSmallImageHtmlToOutput, 0)]
-        [TestCase(MethodWriteLargeImageHtmlToOutput, 0)]
-        [TestCase(MethodGetProfilePicturePath, 0)]
-        [TestCase(MethodGetProfileUser, 0)]
-        [TestCase(MethodIsSharePointSystemAccount, 0)]
-        [TestCase(MethodGetUserProfileManagerClass, 0)]
-        [TestCase(MethodHasMySite, 0)]
-        public void AUT_DisplayProfilePictures_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
-        {
-            // Arrange
-            var currentMethodInfo = GetMethodInfo(methodName, overloadingIndex);
-
-            // Act
-            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(_displayProfilePicturesInstanceFixture, 
-                                                                 Fixture, 
-                                                                 currentMethodInfo);
-
-            // Assert
-            currentMethodInfo.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region General Initializer : Class (DisplayProfilePictures) All Properties Explore By Name
 
         /// <summary>
@@ -271,35 +234,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : NonStatic methods call tests
-
-        /// <summary>
-        ///      Class (<see cref="DisplayProfilePictures" />) public, non-public non-static methods exploration for coverage gain.
-        /// </summary>
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [NUnit.Framework.Category("AUT MethodCallTest")]
-        [TestCase(MethodRender)]
-        [TestCase(MethodWriteJavascriptToOutput)]
-        [TestCase(MethodGetToolParts)]
-        [TestCase(MethodGetCurrentDate)]
-        [TestCase(MethodWriteStylesToOutput)]
-        [TestCase(MethodWriteSmallImageHtmlToOutput)]
-        [TestCase(MethodWriteLargeImageHtmlToOutput)]
-        [TestCase(MethodGetProfilePicturePath)]
-        [TestCase(MethodGetProfileUser)]
-        [TestCase(MethodIsSharePointSystemAccount)]
-        [TestCase(MethodGetUserProfileManagerClass)]
-        [TestCase(MethodHasMySite)]
-        public void AUT_DisplayProfilePictures_NonStatic_Methods_Explore_Verify_Test(string methodName)
-        {
-            // AAA: Arrange, Act, Assert
-            ShouldlyExtension.ExploreVerifyMethods<DisplayProfilePictures>(Fixture, methodName);
-        }
-
-        #endregion
-
+        
         #region Method Call : (Render) (Return Type : void) private call definition
 
         [ExcludeFromCodeCoverage]

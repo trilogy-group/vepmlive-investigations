@@ -176,8 +176,8 @@ namespace EPMLiveCore.Tests.API.MyWork
                 1, GuidString, GuidString, GuidString, "siteUrl");
 
             ShimMyWork.GetMyWorkString = input => input;
-            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
-                (string dataParam, ref List<string> selectedFields, ref List<string> selectedLists, ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) => { };
+            ShimMyWork.GetSettingsString =
+                (string dataParam) => { };
             ShimMyPersonalization.GetMyPersonalizationString = input => documentXml;
             ShimMyWork.GetGridSafeValueXElement = input => input.Value;
 
@@ -280,18 +280,20 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimResourceManager.AllInstances.GetStringStringCultureInfo = (_, _1, _2) => resultXml;
             ShimExtensionMethods.ToPrettierNameStringListOfStringSPWeb = (instance, _, _1) => instance;
             ShimMyWork.ShouldUseReportingDbSPWeb = _ => false;
-            ShimMyWork.GetMyWorkFieldTypeMyWorkFieldDictionaryOfStringSPFieldStringOut = (MyWorkField myWorkField, Dictionary<string, SPField> fieldTypes, out string format) =>
+            ShimMyWork.GetMyWorkFieldTypeMyWorkFieldIDictionaryOfStringSPFieldStringOut = (MyWorkField myWorkField, IDictionary<string, SPField> fieldTypes, out string format) =>
             {
                 format = "format";
                 return "Date";
             };
+            GetMyWorkParams.SelectedFields = new List<string>();
+
             ShimMyWork.GetRelatedGridFormatStringStringSPFieldSPWeb = (_, _1, _2, _3) => "editFormat%";
-            ShimMyWork.GetSettingsStringListOfStringRefListOfStringRefListOfStringRefBooleanRefBooleanRef =
-                (string dataParam, ref List<string> selectedFields, ref List<string> selectedLists, ref List<string> siteUrls, ref bool performanceMode, ref bool noListsSelected) =>
+            ShimMyWork.GetSettingsString =
+                (string dataParam) =>
                 {
-                    selectedFields.Add(DueDateColumn);
-                    selectedFields.Add(AuthorColumn);
-                    selectedFields.Add(EditorColumn);
+                    GetMyWorkParams.SelectedFields.Add(DueDateColumn);
+                    GetMyWorkParams.SelectedFields.Add(AuthorColumn);
+                    GetMyWorkParams.SelectedFields.Add(EditorColumn);
                 };
 
             // Act
@@ -673,7 +675,7 @@ namespace EPMLiveCore.Tests.API.MyWork
             ShimUtils.GetFieldTypes = () => myFieldTypes;
             ShimMyWork.GetWorkingOnString = _ => dataTable;
             ShimMyWork.GetGridSafeValueXElement = input => input.Value;
-            ShimMyWork.BuildFieldElementDictionaryOfStringSPFieldStringString = (_, value, name) => new XElement(name, value);
+            ShimMyWork.BuildFieldElementIDictionaryOfStringSPFieldStringString = (_, value, name) => new XElement(name, value);
 
             // Act
             var actual = XDocument.Parse((string)privateObj.Invoke(

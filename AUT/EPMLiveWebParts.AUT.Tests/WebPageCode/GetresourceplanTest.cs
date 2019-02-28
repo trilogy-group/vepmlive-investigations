@@ -504,28 +504,7 @@ namespace EPMLiveWebParts
         }
 
         #endregion
-
-        #region Method Call : (getAssignedTo) (Return Type : string) without parameters value verify result should not be null.
-
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT MethodCallTest")]
-        public void AUT_Getresourceplan_getAssignedTo_Method_Call_Dynamic_Invoking_Without_Parameters_Results_Should_Not_Be_Null_Test()
-        {
-            // Arrange
-            Exception exception;
-            var methodInfo = GetMethodInfo(MethodgetAssignedTo, 0);
-
-            // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_getresourceplanInstanceFixture, Fixture, out exception);
-
-            // Assert
-            methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
-        }
-
-        #endregion
-
+        
         #region Method Call : (getQuery) (Return Type : string) private call definition
 
         [ExcludeFromCodeCoverage]

@@ -340,9 +340,18 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 try
                 {
+                    string errMsg = string.Empty;
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Started DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                    DataScrubber.CleanTables(site, epmdata);
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Completed DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
+                    bErrors = DataScrubber.CleanTables(site, epmdata, base.JobUid, ref errMsg);
+                    if (bErrors)
+                    {
+                        sbErrors.Append("<font color=\"red\">Error while cleaning tables: " + errMsg + "</font><br>");
+                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Error while cleaning tables for site: {0} error {1}", site.Url, errMsg), 2, 3, Convert.ToString(JobUid));
+                    }
+                    else
+                    {
+                        epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Completed DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
+                    }
                 }
                 catch (Exception ex)
                 {

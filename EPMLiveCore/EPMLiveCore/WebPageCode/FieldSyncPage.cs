@@ -291,5 +291,19 @@ namespace EPMLiveCore
             return sAttribVal;
         }
 
+        public override void Dispose()
+        {
+            DisposeControls();
+            base.Dispose();
+        }
+
+        private void DisposeControls()
+        {
+            btnSynchronize?.Dispose();
+            btnSynchronize = null;
+
+            Cancel?.Dispose();
+            Cancel = null;
+        }
     }
 }

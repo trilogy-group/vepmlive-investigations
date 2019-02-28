@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Fakes;
 using System.Data;
 using System.Data.Common.Fakes;
 using System.Data.Fakes;
@@ -15,6 +16,7 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shouldly;
 
 namespace EPMLiveReporting.Tests
 {
@@ -24,6 +26,7 @@ namespace EPMLiveReporting.Tests
         private const string DummyString = "DummyString";
         private const string DummyUrl = "https://www.dummy.org/url";
         private const string ParentItemKey = "ParentItem";
+        private string ErrMsg = "ErrMsg";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private IDisposable shimContext;
         private static SPSite spSite;
@@ -168,7 +171,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid,ref ErrMsg);
 
             // Assert
             Assert.IsTrue(commandsExecuted.Contains(WipeReportListIds));
@@ -196,7 +199,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -229,7 +232,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -257,7 +260,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -290,7 +293,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -318,7 +321,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -351,7 +354,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -379,7 +382,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -413,10 +416,50 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
+        }
+
+        [TestMethod]
+        public void CleanTables_Invoke_VerifyMemoryLeak()
+        {
+            // Arrange
+            var sqlCommandConstructorInvoked = 0;
+            var sqlCommandDisposeCalled = 0;
+            var destinationTable = string.Empty;
+            const string ExpectedTableNAme = "ReportListIds";
+            var bulkInserted = false;
+            var site = new ShimSPSite();
+            var epmData = new ShimEPMData();
+            ShimSqlBulkCopy.AllInstances.WriteToServerDataTable = (_, dataTable) =>
+            {
+                if (destinationTable == ExpectedTableNAme && dataTable.Rows.Count > 0 && !bulkInserted)
+                {
+                    bulkInserted = true;
+                }
+            };
+            ShimSqlBulkCopy.AllInstances.DestinationTableNameSetString = (_, name) => destinationTable = name;
+
+            ShimSqlCommand.ConstructorStringSqlConnection = (command, s, arg3) => sqlCommandConstructorInvoked++;
+
+            ShimComponent.AllInstances.Dispose = component =>
+            {
+                if (component is SqlCommand)
+                {
+                    sqlCommandDisposeCalled++;
+                }
+            };
+
+            // Act
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => sqlCommandConstructorInvoked.ShouldBeGreaterThanOrEqualTo(7),
+                () => sqlCommandDisposeCalled.ShouldBeGreaterThanOrEqualTo(7),
+                () => sqlCommandDisposeCalled.ShouldBe(sqlCommandConstructorInvoked));
         }
     }
 }

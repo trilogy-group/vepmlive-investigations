@@ -15,6 +15,9 @@ namespace EPMLiveCore
 {
     public static class Utilities
     {
+        private const string key = "EPMLIVE";
+
+
         #region Methods (2)
 
         // Public Methods (4) 
@@ -141,21 +144,24 @@ namespace EPMLiveCore
         {
             try
             {
-                var Buffer = new byte[0];
-                string Key = "EPMLIVE";
-                var DES = new TripleDESCryptoServiceProvider();
-                var hashMD5 = new MD5CryptoServiceProvider();
-                DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
-                DES.Mode = CipherMode.ECB;
-                ICryptoTransform DESDecrypt = DES.CreateDecryptor();
-                Buffer = Convert.FromBase64String(base64Text);
+                var buffer = new byte[0];
+                using (var desProvider = new TripleDESCryptoServiceProvider())
+                {
+                    using (var hashMD5 = new MD5CryptoServiceProvider())
+                    {
+                        desProvider.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(key));
+                        desProvider.Mode = CipherMode.ECB;
+                        var desDecrypt = desProvider.CreateDecryptor();
+                        buffer = Convert.FromBase64String(base64Text);
 
-                string DecTripleDES =
-                    ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
-                return DecTripleDES;
+                        var decTripleDES = ASCIIEncoding.ASCII.GetString(desDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
+                        return decTripleDES;
+                    }
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                Trace.WriteLine(ex.ToString());
                 return base64Text;
             }
         }
