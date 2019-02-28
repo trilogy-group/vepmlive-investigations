@@ -742,15 +742,35 @@ namespace EPMLiveCore
             {
 
                 SPFieldUserValue uv = null;
+                SPFieldUserValue uv_new = null;
                 if (isAdd)
+                {
                     uv = new SPFieldUserValue(properties.Web, properties.AfterProperties["SharePointAccount"].ToString());
+                }
                 else
+                {
                     uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
+
+                    if (properties.AfterProperties["SharePointAccount"] != null)
+                        uv_new = new SPFieldUserValue(properties.Web, properties.AfterProperties["SharePointAccount"].ToString());
+                }
 
                 SPUser u = uv.User;
                 if (u == null)
                 {
                     u = properties.Web.EnsureUser(uv.LookupValue);
+                }
+
+                SPUser u_new = null;
+                if (uv_new != null)
+                {
+                    u_new = properties.Web.EnsureUser(uv_new.LookupValue);
+                }
+
+                // semicolon causes issues in list cleanup and potentially in other modules.
+                if ((isAdd && u.Name.Contains(";")) || (!isAdd && u_new != null && u_new.Name.Contains(";")))
+                {
+                    throw new InvalidOperationException("Semicolon is not allowed for AD username.");
                 }
 
                 try
@@ -810,6 +830,10 @@ namespace EPMLiveCore
                     properties.AfterProperties["Permissions"] = perms.Trim(", ".ToCharArray());
                 }
                 catch { }
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw ex;
             }
             catch { }
 
