@@ -887,7 +887,12 @@ namespace EPMLiveCore.ReportHelper
                 _sqlError = ex.Message;
                 return false;
             }
-
+            finally
+            {
+                Command = null;
+                Params.Clear();
+                CommandType = CommandType.Text;
+            }
         }
         public bool ExecuteNonQuery(SqlConnection con)
         {
