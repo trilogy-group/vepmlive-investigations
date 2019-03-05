@@ -399,13 +399,16 @@ namespace EPMLiveCore.Jobs
                 string finalName = string.Empty;
                 try
                 {
-                    var raColl = eI.RoleAssignments;
-                    var groupAlreadyCreated = (from SPRoleAssignment roleAssignment in raColl
-                                               where roleAssignment.Member.Name.Contains(grp)
-                                               select roleAssignment.Member.ID).Any();
-                    if (groupAlreadyCreated)
+                    if (eI.HasUniqueRoleAssignments)
                     {
-                        continue;
+                        var raColl = eI.RoleAssignments;
+                        var groupAlreadyCreated = (from SPRoleAssignment roleAssignment in raColl
+                                                   where roleAssignment.Member.Name.Contains(grp)
+                                                   select roleAssignment.Member.ID).Any();
+                        if (groupAlreadyCreated)
+                        {
+                            continue;
+                        }
                     }
                     finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
                     spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
