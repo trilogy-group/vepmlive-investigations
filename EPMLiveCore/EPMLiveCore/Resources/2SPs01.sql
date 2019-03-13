@@ -1153,7 +1153,8 @@ end
 exec(@createoralter + ' PROCEDURE [dbo].[spTSGetApprovedTimesheets]
 
 @siteguid uniqueidentifier,
-@dtapproved datetime
+@dtapproved datetime,
+@nextdtapproved datetime = null
 
 AS
 BEGIN
@@ -1170,7 +1171,7 @@ FROM         dbo.TSTIMESHEET INNER JOIN
                       dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID INNER JOIN
                       dbo.TSPERIOD ON dbo.TSTIMESHEET.PERIOD_ID = dbo.TSPERIOD.PERIOD_ID AND dbo.TSTIMESHEET.SITE_UID = dbo.TSPERIOD.SITE_ID LEFT OUTER JOIN
                       dbo.TSTYPE ON dbo.TSTIMESHEET.SITE_UID = dbo.TSTYPE.SITE_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID
-        where TSTIMESHEET.SITE_UID = @siteguid and APPROVAL_DATE >= @dtapproved              
+        where TSTIMESHEET.SITE_UID = @siteguid and APPROVAL_DATE >= @dtapproved  and (@nextdtapproved IS NULL OR APPROVAL_DATE < @nextdtapproved)              
                       ) AS A
 GROUP BY PROJECT_ID, TS_ITEM_DATE, USERNAME, WEB_UID, PERIOD_START, 
                       PERIOD_END, PROJECT_LIST_UID, TYPEID, TSTYPE_NAME, PROJECT_LIST_UID, PROJECT_ID, LIST, LIST_UID
