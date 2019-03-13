@@ -276,8 +276,8 @@ namespace EPMLiveCore.ReportHelper
 
             foreach (var param in parameters)
             {
-                cmdParams = param.Value != DBNull.Value 
-                    ? $"{cmdParams}[Name:{param.ParameterName} Value:{param.Value}]," 
+                cmdParams = param.Value != DBNull.Value
+                    ? $"{cmdParams}[Name:{param.ParameterName} Value:{param.Value}],"
                     : $"{cmdParams}[Name:{param.ParameterName} Value: Null],";
             }
 
@@ -790,24 +790,24 @@ namespace EPMLiveCore.ReportHelper
             return _DefaultLists;
         }
 
-		public void AddParam(string name, object value)
-		{
-			Params.Add(new SqlParameter(name, value));
-		}
+        public void AddParam(string name, object value)
+        {
+            Params.Add(new SqlParameter(name, value));
+        }
 
-		public void AddParam(string name, object value, int size)
-		{
-			var parameter = new SqlParameter(name, value);
-			parameter.Size = size;
-			Params.Add(parameter);
-		}
+        public void AddParam(string name, object value, int size)
+        {
+            var parameter = new SqlParameter(name, value);
+            parameter.Size = size;
+            Params.Add(parameter);
+        }
 
-		public static bool CheckConnection(string cs)
-		{
-			bool success = true;
-			SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
-			return success;
-		}
+        public static bool CheckConnection(string cs)
+        {
+            bool success = true;
+            SPSecurity.RunWithElevatedPrivileges(() => { success = TryToConnect(cs); });
+            return success;
+        }
 
         public static bool TryToConnect(string connectionString)
         {
@@ -1062,6 +1062,47 @@ namespace EPMLiveCore.ReportHelper
                 _sqlError = ex.Message;
 
 
+                return null;
+            }
+            finally
+            {
+                Command = null;
+                Params.Clear();
+                CommandType = CommandType.Text;
+            }
+        }
+        public DataSet GetRRDataSet(SqlConnection con, bool getFullSchema)
+        {
+            try
+            {
+                if (con == null)
+                {
+                    throw new ArgumentNullException(nameof(con));
+                }
+                using (
+                    var command = new SqlCommand { CommandType = CommandType, CommandText = Command, Connection = con })
+                {
+                    command.CommandTimeout = 7200; // 2hour
+                    command.Parameters.AddRange(Params.ToArray());
+                    using (var da = new SqlDataAdapter(command))
+                    {
+                        var ds = new DataSet();
+                        if (getFullSchema)
+                            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+                        da.Fill(ds);
+                        return ds;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
+                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, ExecuteScalarEvent);
+                });
+                _sqlErrorOccurred = true;
+                _sqlError = ex.Message;
                 return null;
             }
             finally
@@ -1850,7 +1891,7 @@ namespace EPMLiveCore.ReportHelper
         {
             Command = string.Format(
                 "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ",
-                tableNameRoot.Replace(Apostrophe, string.Empty)); 
+                tableNameRoot.Replace(Apostrophe, string.Empty));
             return GetTable(GetClientReportingConnection);
         }
 
@@ -1967,7 +2008,7 @@ namespace EPMLiveCore.ReportHelper
             objTableName = ExecuteScalar(GetClientReportingConnection);
             return objTableName.ToString();
         }
-        
+
         public string GetListName(string tableName)
         {
             object objTableName = null;
@@ -1983,6 +2024,11 @@ namespace EPMLiveCore.ReportHelper
         {
             var oTimeSheet = new ReportBiz(SiteId);
             return (consolidationdone ? oTimeSheet.RefreshTimesheetInstant(out sMessage, jobUid) : oTimeSheet.RefreshTimesheet(out sMessage, jobUid));
+        }
+        public bool RefreshTimesheetBatch(out string sMessage, Guid jobUid,int pageSize=0)
+        {
+            var oTimeSheet = new ReportBiz(SiteId);
+            return oTimeSheet.RefreshTimesheetBatch(out sMessage, jobUid, pageSize);
         }
 
         public bool SaveWork(SPListItem item)
@@ -2071,18 +2117,20 @@ namespace EPMLiveCore.ReportHelper
                     string sAssignedTo = ReportData.AddLookUpFieldValues(Convert.ToString(item["AssignedTo"]), "id");
                     object startDate = DateTime.Parse(Convert.ToString(item["StartDate"]));
                     object dueDate = DateTime.Parse(Convert.ToString(item["DueDate"]));
-                    Task saveTask = new Task(() => {
+                    Task saveTask = new Task(() =>
+                    {
                         try
                         {
                             ProcessAssignmentsAsync(sWork, sAssignedTo, startDate, dueDate, listId, SiteId, item.ID,
                                     item.ParentList.Title);
-                        }catch(Exception ex)
+                        }
+                        catch (Exception ex)
                         {
                             LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
                     }
                     );
-					saveTask.Start();
+                    saveTask.Start();
                     return saveTask;
                 }
                 // don't do anything if missing value
@@ -2091,7 +2139,7 @@ namespace EPMLiveCore.ReportHelper
             catch (Exception ex)
             {
                 LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3,
-                    string.Empty); 
+                    string.Empty);
             }
             return null;
         }
@@ -2136,7 +2184,7 @@ namespace EPMLiveCore.ReportHelper
                 connection.Open();
                 return ExecuteScalarAsync(connection, command, CommandType.StoredProcedure, sqlParams);
             }
-            
+
         }
         private int GetDbVersion()
         {
@@ -2359,7 +2407,7 @@ namespace EPMLiveCore.ReportHelper
                 return false;
             }
         }
-        
+
         public bool ListMappedAlready(string sListName, Guid siteId)
         {
             //Command = string.Format("SELECT COUNT(*) as ListCount FROM RPTList WHERE siteId='{0}' AND ListName='{1}'", _siteID, sListName); - CAT.NET
@@ -2404,7 +2452,7 @@ namespace EPMLiveCore.ReportHelper
             }
             else
             {
-                LogStatus("", "", "Reporting Refresh UpdateRPTSettings",  string.Format("UPDATE RPTSettings SET NonWorkingDays={0}, WorkHours={1} WHERE SiteID={2}", nonWorkingDays, workHrs, SiteId), 2, 3, "");
+                LogStatus("", "", "Reporting Refresh UpdateRPTSettings", string.Format("UPDATE RPTSettings SET NonWorkingDays={0}, WorkHours={1} WHERE SiteID={2}", nonWorkingDays, workHrs, SiteId), 2, 3, "");
                 Command =
                     "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
             }
@@ -2485,27 +2533,27 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-		public string GetSharepointType(string listName, string columnName)
-		{
-			const string sql =
-					"SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
-			AddParam("@listName", listName, 500);
-			AddParam("@colName", columnName, 50);
-			Command = sql;
-			object objType = ExecuteScalar(GetClientReportingConnection);
-			return objType?.ToString();
-		}
+        public string GetSharepointType(string listName, string columnName)
+        {
+            const string sql =
+                    "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
+            AddParam("@listName", listName, 500);
+            AddParam("@colName", columnName, 50);
+            Command = sql;
+            object objType = ExecuteScalar(GetClientReportingConnection);
+            return objType?.ToString();
+        }
 
-		public bool IsLookUpField(string listName, string columnName)
-		{
-			var objType = GetSharepointType(listName, columnName);
-			return objType != null & (objType.ToLower().Equals("lookup") || objType.ToLower().Equals("user") ||
-				   objType.ToLower().Equals("flookup"));
-		}
+        public bool IsLookUpField(string listName, string columnName)
+        {
+            var objType = GetSharepointType(listName, columnName);
+            return objType != null & (objType.ToLower().Equals("lookup") || objType.ToLower().Equals("user") ||
+                   objType.ToLower().Equals("flookup"));
+        }
 
-		#region HELPER METHODS
+        #region HELPER METHODS
 
-		private bool ItemHasValue(SPListItem item, string fldName)
+        private bool ItemHasValue(SPListItem item, string fldName)
         {
             string test = string.Empty;
             try
