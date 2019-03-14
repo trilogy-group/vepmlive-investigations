@@ -92,6 +92,11 @@ namespace EPMLiveCore
             var userInfos = username.Replace("i:0#.w|", "").Split(':');
             var newFeatureId = int.Parse(userInfos[1]);
 
+            if(userInfos.Length > 2 || userInfos[0].Contains(",") || userInfos[0].Contains("#"))
+            {
+                throw new InvalidOperationException("Username contains invalid characters.");
+            }
+
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
             {
                 int max;
@@ -128,22 +133,29 @@ namespace EPMLiveCore
         {
             foreach (string user in lstUsers)
             {
-                var sUserInfo = user.Split(':');
-
-                if (sUserInfo[1] == newFeatureId.ToString())
+                try
                 {
-                    counter++;
+                    var sUserInfo = user.Split(':');
+
+                    if (sUserInfo[1] == newFeatureId.ToString())
+                    {
+                        counter++;
+                    }
+
+                    if (user == username)
+                    {
+                        already = true;
+                        break;
+                    }
+
+                    if (sUserInfo[0] != userInfos[0])
+                    {
+                        newUsers.Add(user);
+                    }
                 }
-
-                if (user == username)
+                catch(Exception ex)
                 {
-                    already = true;
-                    break;
-                }
-
-                if (sUserInfo[0] != userInfos[0])
-                {
-                    newUsers.Add(user);
+                    LogEvent(ex, "Processing user failed: " + username);
                 }
             }
         }
@@ -180,6 +192,22 @@ namespace EPMLiveCore
                     : 0;
             }
             return retVal;
+        }
+
+        private static void LogEvent(Exception exception, string eventSource)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                if (!EventLog.SourceExists(eventSource))
+                {
+                    EventLog.CreateEventSource(eventSource, "EPM Live");
+                }
+
+                var eventLog = new EventLog("EPM Live", ".", eventSource) { MaximumKilobytes = 32768 };
+
+                eventLog.WriteEntry(
+                    string.Format(exception.ToString()), EventLogEntryType.Error);
+            });
         }
 
         private static int UpdateUsersOnOtherFeatures(string username, int featureId, SPFarm farm)
