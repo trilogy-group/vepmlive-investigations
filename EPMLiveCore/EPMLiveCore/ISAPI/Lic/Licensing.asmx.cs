@@ -94,7 +94,7 @@ namespace EPMLiveCore
 
             if(userInfos.Length > 2 || userInfos[0].Contains(",") || userInfos[0].Contains("#"))
             {
-                throw new Exception("Username contains invalid characters.");
+                throw new InvalidOperationException("Username contains invalid characters.");
             }
 
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
@@ -194,17 +194,19 @@ namespace EPMLiveCore
             return retVal;
         }
 
-        private static void LogEvent(Exception exp, string eventSource)
+        private static void LogEvent(Exception exception, string eventSource)
         {
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 if (!EventLog.SourceExists(eventSource))
+                {
                     EventLog.CreateEventSource(eventSource, "EPM Live");
+                }
 
                 var eventLog = new EventLog("EPM Live", ".", eventSource) { MaximumKilobytes = 32768 };
 
                 eventLog.WriteEntry(
-                    string.Format(exp.ToString()), EventLogEntryType.Error);
+                    string.Format(exception.ToString()), EventLogEntryType.Error);
             });
         }
 
