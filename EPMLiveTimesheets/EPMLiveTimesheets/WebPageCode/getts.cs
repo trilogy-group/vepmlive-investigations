@@ -63,6 +63,7 @@ namespace TimeSheets
         protected Queue queueAllItems = new Queue();
         private string curProject = string.Empty;
         private XmlNode projectNode = null;
+        private int taskIndex = 0;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -215,13 +216,14 @@ namespace TimeSheets
                     curProject = drTask[Project].ToString();
                     projectNode = docXml.CreateNode(XmlNodeType.Element, Row, docXml.NamespaceURI);
                     ProcessProject(timeSpan, listItemId, newNode, regex, curProject, projectNode);
+                    taskIndex = 0;
                 }
             }
            
             var taskNode = docXml.CreateNode(XmlNodeType.Element, Row, docXml.NamespaceURI);
 
             var attrId = docXml.CreateAttribute(Id);
-            attrId.Value = listItemId + Dot + regex.Replace(curProject, string.Empty) + Dot + regex.Replace(drTask["title"].ToString(), string.Empty);
+            attrId.Value = listItemId + Dot + regex.Replace(curProject, string.Empty) + Dot + regex.Replace(drTask["title"].ToString(), string.Empty) + "_" + taskIndex++;
             taskNode.Attributes.Append(attrId);
 
             AppendChild(taskNode, TypeConst, Ro);
