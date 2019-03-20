@@ -1101,29 +1101,38 @@ exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
 AS
 BEGIN
-declare @topthreads varchar(2) = CONVERT(varchar(2), CONVERT(int, @maxthreads) / 2)
-declare @sql varchar(MAX)
+declare 
+@Running_Type_1 int
+, @Running_Type_2 int
+, @MaxThreads_type_1 int
+, @MaxThreads_type_2 int
+, @Dividor int
 
-set @sql = '';WITH CTE AS 
-( 
-SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+set @Dividor = 2
+
+set @MaxThreads_type_2 = @maxthreads / @Dividor
+set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
+
+set @Running_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
+set @Running_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 32))
+
+
+UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+(
+SELECT top (CASE WHEN @MaxThreads_type_1 > @Running_Type_1 THEN (@MaxThreads_type_1 - @Running_Type_1) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
-WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and JOBTYPE_ID = 32
+WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
-) 
-UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0;
+)
 
-WITH CTE2 AS 
-( 
-SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+(
+SELECT TOP (CASE WHEN @MaxThreads_type_2 > @Running_Type_2 THEN (@MaxThreads_type_2 - @Running_Type_2) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
-WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
+WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
-) 
-UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0
-''
+)
 
-exec(@sql)
 
 SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.LOCKED, dbo.TSTIMESHEET.SITE_UID, 
                       dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, dbo.TSTIMESHEET.TSUSER_UID, dbo.TSTIMESHEET.APPROVAL_DATE, 
