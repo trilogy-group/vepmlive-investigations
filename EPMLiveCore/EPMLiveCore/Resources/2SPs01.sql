@@ -1106,11 +1106,11 @@ declare
 , @Running_Type_2 int
 , @MaxThreads_type_1 int
 , @MaxThreads_type_2 int
-, @Dividor int
+, @divisor int
 
-set @Dividor = 2
+set @divisor  = 2
 
-set @MaxThreads_type_2 = @maxthreads / @Dividor
+set @MaxThreads_type_2 = @maxthreads / @divisor 
 set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
 
 set @Running_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
