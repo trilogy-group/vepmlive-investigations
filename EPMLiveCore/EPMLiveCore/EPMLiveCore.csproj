@@ -167,6 +167,8 @@
     <Compile Include="API\Applications\ErrorLevels.cs" />
     <Compile Include="API\AppsStoreHelper.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
+    <Compile Include="API\AssociatedListItems\ProjectData.cs" />
+    <Compile Include="API\AssociatedListItems\SiteData.cs" />
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
