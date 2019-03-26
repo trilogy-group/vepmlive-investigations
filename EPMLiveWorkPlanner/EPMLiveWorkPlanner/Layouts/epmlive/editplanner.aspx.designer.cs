@@ -94,6 +94,15 @@ namespace EPMLiveWorkPlanner {
         protected global::System.Web.UI.WebControls.CheckBox chkDisableParentChild;
         
         /// <summary>
+        /// RequiredFieldValidator2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator2;
+        
+        /// <summary>
         /// ddlTaskCenterPJField control.
         /// </summary>
         /// <remarks>
@@ -101,6 +110,15 @@ namespace EPMLiveWorkPlanner {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlTaskCenterPJField;
+        
+        /// <summary>
+        /// RequiredFieldValidator3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator3;
         
         /// <summary>
         /// hdnId control.
@@ -371,6 +389,15 @@ namespace EPMLiveWorkPlanner {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ListBox ddlKanBanSelectedFields;
+        
+        /// <summary>
+        /// validationsummary1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ValidationSummary validationsummary1;
         
         /// <summary>
         /// PlaceHolder1 control.

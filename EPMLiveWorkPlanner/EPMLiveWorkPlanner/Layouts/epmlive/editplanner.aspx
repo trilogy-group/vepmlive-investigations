@@ -518,8 +518,8 @@
 		                <wssuc:InputFormControl LabelText="" runat="server">
 			                 <Template_Control>
 			                    <asp:DropDownList ID="ddlTaskCenter" runat="Server" AutoPostBack="True" OnSelectedIndexChanged="ddlTaskCenter_SelectedIndexChanged">
-			                    
 			                    </asp:DropDownList>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="ddlTaskCenter" ValidationGroup="vldPlanner" ForeColor="Red" ErrorMessage="Task List is required !"></asp:RequiredFieldValidator>
 			                 </Template_Control>
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
@@ -537,6 +537,7 @@
 			                    <asp:DropDownList ID="ddlTaskCenterPJField" runat="Server">
 			                    
 			                    </asp:DropDownList>
+                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="ddlTaskCenterPJField" ValidationGroup="vldPlanner" ForeColor="Red" ErrorMessage="Lookup Field is required !"></asp:RequiredFieldValidator>
 			                 </Template_Control>
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
@@ -1150,9 +1151,10 @@
     <table cellpadding="0" cellspacing="0" width="100%">
         <wssuc:ButtonSection runat="server">
             <template_buttons>
+                        <asp:validationsummary ID="validationsummary1" runat="server" ValidationGroup="vldPlanner" ForeColor="Red"></asp:validationsummary>
                     <asp:PlaceHolder ID="PlaceHolder1" runat="server">
-	                    <asp:Button UseSubmitBehavior="false" runat="server" ValidationGroup="vldPlanner" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button2" accesskey="" Width="150"/>
-                    </asp:PlaceHolder>
+	                    <asp:Button UseSubmitBehavior="false" runat="server" ValidationGroup="vldPlanner" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button2" accesskey="" Width="150"/>                        
+                    </asp:PlaceHolder>                
                 </template_buttons>
         </wssuc:ButtonSection>
     </table>
