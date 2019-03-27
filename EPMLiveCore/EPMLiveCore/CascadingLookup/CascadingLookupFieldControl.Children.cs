@@ -19,7 +19,7 @@ namespace EPMLiveCore
                 var control = FindControlRecursive(Page, child);
                 if (control != null)
                 {
-                    var childField = (CascadingLookupFieldControl)control.Parent.Parent;
+                    var childField = control.Parent?.Parent as CascadingLookupFieldControl;
                     if (childField != null)
                     {
                         control = FindControlRecursive(Page, childField.strFilterValueField);

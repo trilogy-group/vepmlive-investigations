@@ -14,7 +14,12 @@ namespace EPMLiveCore
 
             try
             {
-                if (Convert.ToBoolean(defineNone))
+                bool convertedDefineNone;
+                if (!bool.TryParse(defineNone, out convertedDefineNone))
+                {
+                    throw new InvalidOperationException("defineNone cannot be converted to bool.");
+                }
+                if (convertedDefineNone)
                 {
                     ddl.Items.Add(new ListItem("[Select One...]", string.Empty));
                 }
@@ -50,6 +55,7 @@ namespace EPMLiveCore
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 field.ReportError(ex, string.Empty);
             }
         }
@@ -112,6 +118,7 @@ namespace EPMLiveCore
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 ReportError(ex);
             }
         }

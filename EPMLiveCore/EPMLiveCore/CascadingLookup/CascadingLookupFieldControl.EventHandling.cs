@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace EPMLiveCore
 {
@@ -17,6 +18,7 @@ namespace EPMLiveCore
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception Suppressed {0}", ex);
                 ReportError(ex);
             }
         }
