@@ -109,7 +109,6 @@ namespace TimeSheets
 
         private void ProcessListFields(string id, XmlNode ndRow, SqlConnection cn, TimesheetSettings settings, SPListItem li, bool recurse, SPList list)
         {
-            ArrayList fields = null;
             DataSet ds = null;
             try
             {
@@ -123,7 +122,7 @@ namespace TimeSheets
                         ds = new DataSet();
                         da.Fill(ds);
 
-                        fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView == null ? list.DefaultViewUrl : list.DefaultView.Url)).Split(','));
+                        var fields = GetProjectListFields(list);
 
                         foreach (string field in fields)
                         {
@@ -202,7 +201,6 @@ namespace TimeSheets
             }
             finally
             {
-                fields = null;
                 if (ds != null)
                     ds.Dispose();
             }
@@ -323,7 +321,10 @@ namespace TimeSheets
 
                                             try
                                             {
-                                                li = list.GetItemById(int.Parse(itemid));
+                                                var fields = new[] {"ID", "Title", "Project"}
+                                                    .Concat(GetProjectListFields(list))
+                                                    .ToArray();
+                                                li = list.GetItemByIdSelectedFields(int.Parse(itemid), fields);
                                             }
                                             catch { }
                                             // Checking if any customer is using custom projectcenter
@@ -873,6 +874,16 @@ namespace TimeSheets
             public string Id { get; }
             public DateTime Date { get; }
             public string Notes { get; }
+        }
+
+        private static string[] GetProjectListFields(SPList list)
+        {
+            return CoreFunctions
+                .getConfigSetting(list.ParentWeb.Site.RootWeb,
+                    "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView == null
+                        ? list.DefaultViewUrl
+                        : list.DefaultView.Url))
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private void DeleteItemHours(string id, SqlConnection connection, List<TsItemHour> items)
