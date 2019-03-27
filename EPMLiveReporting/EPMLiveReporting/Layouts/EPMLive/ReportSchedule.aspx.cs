@@ -99,6 +99,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 _DAO.AddParam("@uid", Request.QueryString["uid"]);
                 var report = _DAO.GetTable(_DAO.GetEPMLiveConnection);
 
+                if (report.Rows.Count == 0)
+                {
+                    throw new InvalidOperationException("report table does not have any row.");
+                }
+
                 txtScheduleTitle.Text = report.Rows[0]["jobname"].ToString();
                 DropDownListSnapshotTime.SelectedValue = report.Rows[0]["runtime"].ToString();
                 DropDownListScheduleType.SelectedValue = report.Rows[0]["scheduletype"].ToString();
