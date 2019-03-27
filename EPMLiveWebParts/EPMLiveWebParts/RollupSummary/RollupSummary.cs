@@ -20,6 +20,8 @@ using System.Text;
 using System.Resources;
 
 using System.Data.SqlClient;
+using System.Diagnostics;
+using EPMLiveCore;
 
 namespace EPMLiveWebParts.RollupSummary
 {
@@ -99,149 +101,151 @@ namespace EPMLiveWebParts.RollupSummary
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
-            EPMLiveCore.Act act = new EPMLiveCore.Act(SPContext.Current.Web);
-            int activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WebParts);
-
-            if (activation != 0)
+            try
             {
-                output.Write(act.translateStatus(activation));
-                return;
+                var act = new Act(SPContext.Current.Web);
+                var activation = act.CheckFeatureLicense(ActFeature.WebParts);
+
+                if (activation != 0)
+                {
+                    output.Write(act.translateStatus(activation));
+                    return;
+                }
+
+                OpenConnectionWithPriviligedAccess();
+
+                arrSites = new SortedList();
+
+                var duplicateFound = false;
+
+                web = SPContext.Current.Web;
+
+                var doc = new XmlDocument();
+
+                try
+                {
+                    doc.LoadXml(MyXml);
+                    ProcesNodes(doc, ref duplicateFound);
+
+                    ProcessWeb();
+
+                    foreach (XmlNode xmlNode in doc.SelectSingleNode("Sections"))
+                    {
+                        processSection(xmlNode);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                    if (ex.Message.IndexOf("Root element is missing") > -1 || ex.Message.IndexOf("Value cannot be null") > -1)
+                    {
+                        output.Write("This webpart XML is Missing.");
+                    }
+                    else
+                    {
+                        output.Write($"Failed to load XML: {ex.Message}");
+                    }
+                    return;
+                }
+                if (duplicateFound)
+                {
+                    output.Write("Warning: Duplicate Item ID's Found");
+                }
+
+                output.Write("<table cellpadding=\"1\" cellspacing=\"1\" style=\"margin:10px;\" class=\"ms-stdtxt\">");
+                output.Write(sb.ToString());
+                output.Write("</table>");
             }
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            finally
             {
-                using (SPSite s = new SPSite(SPContext.Current.Site.ID))
+                cn?.Close();
+            }
+        }
+
+        private void ProcessWeb()
+        {
+            if (strRollupSites == null || strRollupSites.Length <= 0)
+            {
+                processWeb(web);
+            }
+            else
+            {
+                foreach (var rollupSite in strRollupSites.Split('\n'))
                 {
                     try
                     {
-                        string dbCon = s.ContentDatabase.DatabaseConnectionString;
-                        cn = new SqlConnection(dbCon);
-                        cn.Open();
-                        
-                    }
-                    catch { }
-                }
-            });
-
-            arrSites = new SortedList();
-
-            bool dupsFound = false;
-
-            web = SPContext.Current.Web;
-
-            
-
-            XmlDocument doc = new XmlDocument();
-
-            try
-            {
-                
-                doc.LoadXml(MyXml);
-                foreach (XmlNode nSections in doc.SelectSingleNode("Sections").SelectNodes("Section"))
-                {
-                    foreach (XmlNode nItem in nSections.SelectSingleNode("Items").SelectNodes("Item"))
-                    {
-                        string id = "";
-                        try
+                        if (string.Equals(web.Url, rollupSite, StringComparison.OrdinalIgnoreCase))
                         {
-                            id = nItem.Attributes["ID"].Value;
+                            processWeb(web);
                         }
-                        catch { }
-                        if (id != "")
+                        else
                         {
-                            if (!hshNodes.Contains(id))
+                            using (var spSite = new SPSite(rollupSite))
+                            using (var spWeb = spSite.OpenWeb())
                             {
-                                hshNodes.Add(id, nItem);
-                                hshCounts.Add(id, 0);
-                            }
-                            else
-                            {
-                                dupsFound = true;  
+                                processWeb(spWeb);
                             }
                         }
                     }
-                }
-
-                if (strRollupSites == null || strRollupSites.Length <= 0)
-                {
-                    processWeb(web);
-                }
-                else
-                {
-                    foreach (string strRollupSite in strRollupSites.Split('\n'))
+                    catch (Exception ex)
                     {
-                        //SPSecurity.RunWithElevatedPrivileges(delegate()
-                        //{
-                            try
-                            {
-                                if (web.Url.ToLower() == strRollupSite.ToLower())
-                                    processWeb(web);
-                                else
-                                {
-                                    using (SPSite procSite = new SPSite(strRollupSite))
-                                    {
-                                        using (SPWeb ww = procSite.OpenWeb())
-                                        {
-                                            processWeb(ww);
-                                        }
-                                    }
-                                }
-                            }
-                            catch { }
-                        //});
+                        Trace.TraceError("Exception Suppressed {0}", ex);
                     }
                 }
-                //string curSite = "";
-                //SPSite site = null;
-                //SPWeb procWeb = null;
-                //foreach(DictionaryEntry de in arrSites)
-                //{
-                //    if (curSite != de.Value.ToString())
-                //    {
-                //        if (site != null)
-                //            site.Close();
-                //        site = new SPSite(de.Key.ToString());
-                //        curSite = de.Key.ToString();
-                //    }
-
-                //    string sWeb = de.Key.ToString().Replace(de.Value.ToString(), "");
-                //    if (sWeb == "")
-                //        procWeb = site.RootWeb;
-                //    else
-                //        procWeb = site.OpenWeb(sWeb.Substring(1));
-                //    processWeb(procWeb);
-                //    procWeb.Close();
-                //    if (site != null)
-                //        site.Close();
-                //}
-
-                foreach(XmlNode n in doc.SelectSingleNode("Sections"))
-                {
-                    processSection(n);
-                }
-                cn.Close();
             }
-            catch (Exception ex)
-            {
-                if (ex.Message.IndexOf("Root element is missing") > -1 || ex.Message.IndexOf("Value cannot be null") > -1)
-                {
-                    output.Write("This webpart XML is Missing.");
-                }
-                else
-                    output.Write("Failed to load XML: " + ex.Message);
-                return;
-            }
-            if (dupsFound)
-            {
-                output.Write("Warning: Duplicate Item ID's Found");
-            }
-
-            output.Write("<table cellpadding=\"1\" cellspacing=\"1\" style=\"margin:10px;\" class=\"ms-stdtxt\">");
-            output.Write(sb.ToString());
-            output.Write("</table>");
-            
         }
 
+        private void ProcesNodes(XmlDocument doc, ref bool duplicateFound)
+        {
+            foreach (XmlNode sections in doc.SelectSingleNode("Sections").SelectNodes("Section"))
+            {
+                foreach (XmlNode item in sections.SelectSingleNode("Items").SelectNodes("Item"))
+                {
+                    var id = string.Empty;
+                    try
+                    {
+                        id = item.Attributes["ID"].Value;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    if (id != string.Empty)
+                    {
+                        if (!hshNodes.Contains(id))
+                        {
+                            hshNodes.Add(id, item);
+                            hshCounts.Add(id, 0);
+                        }
+                        else
+                        {
+                            duplicateFound = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OpenConnectionWithPriviligedAccess()
+        {
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
+                {
+                    using (var spSite = new SPSite(SPContext.Current.Site.ID))
+                    {
+                        try
+                        {
+                            var connectionString = spSite.ContentDatabase.DatabaseConnectionString;
+                            cn = new SqlConnection(connectionString);
+                            cn.Open();
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                    }
+                });
+        }
 
         //private void getWebs(SPWeb web)
         //{
