@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections;
 using System.Data;
+using System.Text;
 using System.Web;
 using System.Web.UI.WebControls;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using EPMLiveCore.ReportHelper;
+using SystemTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class ReportSchedule : LayoutsPageBase
     {
         public static Hashtable desc;
-        //protected DropDownList DropDownListScheduleType;
-        //protected DropDownList DropDownListDays;
-        protected DropDownList DropDownListSnapshotTime;
-        protected DropDownList FixTimes;
-        protected ListBox ListBoxLists;
-        protected TextBox Lists;
         private EPMData _DAO;
         protected Button btnRunNow;
         protected CheckBox chkAdmin;
         protected CheckBox chkTask;
         protected string disabled;
+        protected DropDownList DropDownListSnapshotTime;
+        protected DropDownList FixTimes;
 
         protected HyperLink hlAdmin;
         protected Label lblLastResResult;
@@ -35,15 +33,17 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected Label lblPropertyEPMLiveFixTime;
         protected Label lblPropertyEPMLiveFixTimeValue;
         protected Label lblResLog;
+        protected ListBox ListBoxLists;
+        protected TextBox Lists;
         protected ListBox lstNotificationUsers;
         protected ListBox lstSiteUsers;
         protected Panel pnlAdmin;
         protected Panel pnlMain;
         protected Panel pnlSaveResults;
         protected Panel pnlTL;
+        protected string siteid;
 
         protected string siteUrl;
-        protected string siteid;
         public string strTemplate;
         public string strTitle;
         protected TextBox txtPropertyEPMLiveFixListsValue;
@@ -62,14 +62,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             try
             {
-                //using (SPWeb web = SPContext.Current.Web)
-                //{
                 if (!IsPostBack)
                 {
                     PopulateLists();
                     loadData(SPContext.Current.Web);
                 }
-                //}
             }
             catch (Exception ex)
             {
@@ -77,93 +74,67 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
         }
 
-        private void DropDownListScheduleType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (DropDownListScheduleType.SelectedValue == "3")
-            {
-                DropDownListDays.Visible = true;
-                CheckBoxList_days.Visible = false;
-                //FrequencyOptions.LabelText = "Day of Month";
-            }
-            else
-            {
-                DropDownListDays.Visible = false;
-                CheckBoxList_days.Visible = true;
-                //FrequencyOptions.LabelText = "Day(s) of Week";
-            }
-        }
-
         protected void PopulateLists()
         {
-            DataTable dt;
-            //_DAO.Command = "SELECT ListName FROM RPTList WHERE SiteId='" + SPContext.Current.Web.Site.ID + "'"; - CAT.NET
+            DataTable dataTable;
             _DAO.Command = "SELECT ListName FROM RPTList WHERE SiteId=@siteId";
             _DAO.AddParam("@siteId", SPContext.Current.Web.Site.ID);
-            dt = _DAO.GetTable(_DAO.GetClientReportingConnection);
-
-            //using (SPContext.Current.Web)
-            //{
-            foreach (DataRow row in dt.Rows)
+            dataTable = _DAO.GetTable(_DAO.GetClientReportingConnection);
+            foreach (DataRow dataRow in dataTable.Rows)
             {
-                var item = new ListItem();
-                item.Text = row["ListName"].ToString();
-                item.Value = row["ListName"].ToString();
+                var item = new ListItem
+                {
+                    Text = dataRow["ListName"].ToString(),
+                    Value = dataRow["ListName"].ToString()
+                };
                 ListBoxLists.Items.Add(item);
             }
-            //}
         }
 
         protected void loadData(SPWeb web)
         {
             if (Request.QueryString["uid"] != null)
             {
-                DataTable dtReport;
-                //_DAO.Command = "SELECT * FROM TIMERJOBS WHERE timerjobuid='" + Request.QueryString["uid"] + "'"; - CAT.NET
                 _DAO.Command = "SELECT * FROM TIMERJOBS WHERE timerjobuid=@uid";
                 _DAO.AddParam("@uid", Request.QueryString["uid"]);
-                dtReport = _DAO.GetTable(_DAO.GetEPMLiveConnection);
+                var report = _DAO.GetTable(_DAO.GetEPMLiveConnection);
 
-                txtScheduleTitle.Text = dtReport.Rows[0]["jobname"].ToString();
-                DropDownListSnapshotTime.SelectedValue = dtReport.Rows[0]["runtime"].ToString();
-                DropDownListScheduleType.SelectedValue = dtReport.Rows[0]["scheduletype"].ToString();
+                txtScheduleTitle.Text = report.Rows[0]["jobname"].ToString();
+                DropDownListSnapshotTime.SelectedValue = report.Rows[0]["runtime"].ToString();
+                DropDownListScheduleType.SelectedValue = report.Rows[0]["scheduletype"].ToString();
 
                 if (DropDownListScheduleType.SelectedValue == "2")
                 {
-                    PopulateDays(dtReport.Rows[0]["days"].ToString());
+                    PopulateDays(report.Rows[0]["days"].ToString());
                 }
                 else
                 {
-                    if (dtReport.Rows.Count > 0)
+                    if (report.Rows.Count > 0)
                     {
-                        DropDownListDays.SelectedValue = dtReport.Rows[0]["days"].ToString();
+                        DropDownListDays.SelectedValue = report.Rows[0]["days"].ToString();
                     }
                 }
-
-                if (dtReport.Rows.Count > 0)
+                if (report.Rows.Count > 0)
                 {
-                    PopulateSelectedLists(dtReport.Rows[0]["jobdata"].ToString());
+                    PopulateSelectedLists(report.Rows[0]["jobdata"].ToString());
                 }
             }
-
             if (DropDownListScheduleType.SelectedValue == "3")
             {
                 DropDownListDays.Visible = true;
                 CheckBoxList_days.Visible = false;
-                //FrequencyOptions.LabelText = "Day of Month";
             }
             else
             {
                 DropDownListDays.Visible = false;
                 CheckBoxList_days.Visible = true;
-                //FrequencyOptions.LabelText = "Day(s) of Week";
             }
         }
 
         protected void PopulateDays(string sDays)
         {
-            char[] splitter = ",".ToCharArray();
-            Array sOptions = sDays.Split(splitter[0]);
-            foreach (string day in sOptions)
+            var splitter = ",".ToCharArray();
+            foreach (string day in (Array)sDays.Split(splitter[0]))
             {
                 foreach (ListItem item in CheckBoxList_days.Items)
                 {
@@ -177,13 +148,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void PopulateSelectedLists(string sLists)
         {
-            char[] splitter = ",".ToCharArray();
-            Array sOptions = sLists.Split(splitter[0]);
-            foreach (string list in sOptions)
+            var splitter = ",".ToCharArray();
+            foreach (string list in (Array)sLists.Split(splitter[0]))
             {
                 foreach (ListItem item in ListBoxLists.Items)
                 {
-                    if (item.Text.ToLower() == list.ToLower())
+                    if (string.Equals(item.Text, list, StringComparison.OrdinalIgnoreCase))
                     {
                         item.Selected = true;
                     }
@@ -193,31 +163,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected bool ScheduleValid()
         {
-            if (txtScheduleTitle.Text == string.Empty)
+            if (txtScheduleTitle.Text?.Length == 0)
             {
                 return false;
             }
-
-
-            if (DropDownListScheduleType.SelectedValue == "2")
-            {
-                string days = GetOptions();
-                if (days == string.Empty)
-                {
-                    return false;
-                }
-            }
-
-            if (DropDownListSnapshotTime.SelectedValue == "")
+            if (DropDownListScheduleType.SelectedValue == "2" && GetOptions()?.Length == 0)
             {
                 return false;
             }
-
-            if (ListBoxLists.SelectedValue == null || ListBoxLists.SelectedValue == string.Empty)
+            if (DropDownListSnapshotTime.SelectedValue?.Length == 0)
             {
                 return false;
             }
-            return true;
+            return !string.IsNullOrWhiteSpace(ListBoxLists.SelectedValue);
         }
 
         protected void Button1_Click(object sender, EventArgs e)
@@ -225,19 +183,72 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             try
             {
                 saveSettings(SPContext.Current.Site.RootWeb);
-                string url = SPContext.Current.Web.ServerRelativeUrl;
-                if (url.EndsWith("/"))
-                {
-                    Response.Redirect(url + "/_layouts/epmlive/AllSnapShots.aspx");
-                }
-                else
-                {
-                    Response.Redirect(url + "/_layouts/epmlive/AllSnapShots.aspx");
-                }
+                var url = SPContext.Current.Web.ServerRelativeUrl;
+                Response.Redirect(string.Format("{0}/_layouts/epmlive/AllSnapShots.aspx", url));
             }
             catch (Exception ex)
             {
-                Response.Write("Error: " + ex.Message);
+                SystemTrace.TraceError("Exception Suppressed {0}", ex);
+                Response.Write(string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        protected string GetOptions()
+        {
+            var options = string.Empty;
+            if (DropDownListScheduleType.SelectedValue == "2")
+            {
+                options = GetFromList(CheckBoxList_days.Items);
+            }
+            else
+            {
+                foreach (var unused in CheckBoxList_days.Items)
+                {
+                    options = DropDownListDays.SelectedValue;
+                }
+            }
+            return options;
+        }
+
+        protected string GetLists()
+        {
+            return GetFromList(ListBoxLists.Items);
+        }
+
+        private string GetFromList(ListItemCollection listItemCollection)
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (ListItem item in listItemCollection)
+            {
+                if (item.Selected)
+                {
+                    stringBuilder.Append(string.Format("{0},", item.Value));
+                }
+            }
+            var result = stringBuilder.ToString();
+            if (result.EndsWith(","))
+            {
+                result = result.Remove(result.LastIndexOf(","));
+            }
+            return result;
+        }
+
+        protected void Page_LoadComplete(object sender, EventArgs e)
+        {
+            _DAO.Dispose();
+        }
+
+        private void DropDownListScheduleType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (DropDownListScheduleType.SelectedValue == "3")
+            {
+                DropDownListDays.Visible = true;
+                CheckBoxList_days.Visible = false;
+            }
+            else
+            {
+                DropDownListDays.Visible = false;
+                CheckBoxList_days.Visible = true;
             }
         }
 
@@ -245,58 +256,31 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             if (ScheduleValid())
             {
-                string sTime = DropDownListSnapshotTime.SelectedValue;
-                string sTitle = txtScheduleTitle.Text;
-                int iTime = 0;
-
-                if (sTime != string.Empty)
+                var time = 0;
+                if (DropDownListSnapshotTime.SelectedValue != string.Empty)
                 {
-                    iTime = int.Parse(sTime);
+                    time = int.Parse(DropDownListSnapshotTime.SelectedValue);
                 }
-
-                int iScheduleType = int.Parse(DropDownListScheduleType.SelectedValue);
-
-                if (Request.QueryString["uid"] == null) //ADD NEW JOB
+                var scheduleType = int.Parse(DropDownListScheduleType.SelectedValue);
+                if (Request.QueryString["uid"] == null)
                 {
-                    Guid timerjobuid = Guid.NewGuid();
-                    _DAO.Command =
-                        "INSERT INTO TIMERJOBS ([timerjobuid],[jobname],[siteguid],[webguid],[listguid],[jobtype],[enabled],[runtime],[scheduletype],[days],[jobdata],[lastqueuecheck],[parentjobuid]) " +
-                        " VALUES(@timejobuid,@jobname,@siteguid,@webguid,@listguid,@jobtype,@enabled,@runtime,@scheduletype,@days,@jobdata,@lastqueuecheck,@parentjobuid)";
-                    _DAO.AddParam("@timejobuid", timerjobuid);
-                    _DAO.AddParam("@jobname", sTitle);
-                    _DAO.AddParam("@siteguid", currWeb.Site.ID);
-                    _DAO.AddParam("@webguid", currWeb.ID);
-                    _DAO.AddParam("@listguid", DBNull.Value);
-                    _DAO.AddParam("@jobtype", 7);
-                    _DAO.AddParam("@enabled", true);
-                    _DAO.AddParam("@runtime", iTime);
-                    _DAO.AddParam("@scheduletype", iScheduleType);
-                    _DAO.AddParam("@days", GetOptions());
-                    _DAO.AddParam("@jobdata", GetLists());
-                    _DAO.AddParam("@lastqueuecheck", DBNull.Value);
-                    _DAO.AddParam("@parentjobuid", DBNull.Value);
-                    _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
+                    AddNewJob(currWeb, time, scheduleType);
                 }
-                else //Udate Existing Job
+                else
                 {
-                    _DAO.Command =
-                        "UPDATE TIMERJOBS SET jobname=@jobname,enabled=@enabled,scheduletype=@scheduletype,runtime=@runtime,days=@days,jobdata=@jobdata WHERE timerjobuid=@timerjobuid";
-                    _DAO.AddParam("@jobname", sTitle);
-                    _DAO.AddParam("@timerjobuid", Request.QueryString["uid"]);
-                    _DAO.AddParam("@enabled", true);
-                    _DAO.AddParam("@scheduletype", iScheduleType);
-                    _DAO.AddParam("@runtime", iTime);
-                    _DAO.AddParam("@days", GetOptions());
-                    _DAO.AddParam("@jobdata", GetLists());
-                    _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
+                    UpdateNewJob(scheduleType, time);
                 }
-
                 if (_DAO.SqlErrorOccurred)
                 {
-                    _DAO.LogStatus(string.Empty, string.Empty, "Error Saving Schedule", _DAO.SqlError, 2, 1,
+                    _DAO.LogStatus(
+                        string.Empty,
+                        string.Empty,
+                        "Error Saving Schedule",
+                        _DAO.SqlError,
+                        2,
+                        1,
                         string.Empty);
                 }
-
                 lblErrorSite.Visible = false;
             }
             else
@@ -306,54 +290,40 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
         }
 
-        protected string GetOptions()
+        private void UpdateNewJob(int scheduleType, int time)
         {
-            string sOptions = string.Empty;
-            if (DropDownListScheduleType.SelectedValue == "2")
-            {
-                foreach (ListItem item in CheckBoxList_days.Items)
-                {
-                    if (item.Selected)
-                    {
-                        sOptions = sOptions + item.Value + ",";
-                    }
-                }
-
-                if (sOptions.EndsWith(","))
-                {
-                    sOptions = sOptions.Remove(sOptions.LastIndexOf(","));
-                }
-            }
-            else
-            {
-                foreach (ListItem item in CheckBoxList_days.Items)
-                {
-                    sOptions = DropDownListDays.SelectedValue;
-                }
-            }
-            return sOptions;
+            _DAO.Command =
+                "UPDATE TIMERJOBS SET jobname=@jobname,enabled=@enabled,scheduletype=@scheduletype,runtime=@runtime,days=@days,jobdata=@jobdata WHERE timerjobuid=@timerjobuid";
+            _DAO.AddParam("@jobname", txtScheduleTitle.Text);
+            _DAO.AddParam("@timerjobuid", Request.QueryString["uid"]);
+            _DAO.AddParam("@enabled", true);
+            _DAO.AddParam("@scheduletype", scheduleType);
+            _DAO.AddParam("@runtime", time);
+            _DAO.AddParam("@days", GetOptions());
+            _DAO.AddParam("@jobdata", GetLists());
+            _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
         }
 
-        protected string GetLists()
+        private void AddNewJob(SPWeb currWeb, int time, int scheduleType)
         {
-            string sLists = string.Empty;
-            foreach (ListItem item in ListBoxLists.Items)
-            {
-                if (item.Selected)
-                {
-                    sLists = sLists + item.Value + ",";
-                }
-            }
-            if (sLists.EndsWith(","))
-            {
-                sLists = sLists.Remove(sLists.LastIndexOf(","));
-            }
-            return sLists;
-        }
-
-        protected void Page_LoadComplete(object sender, EventArgs e)
-        {
-            _DAO.Dispose();
+            var timerJobUId = Guid.NewGuid();
+            _DAO.Command =
+                "INSERT INTO TIMERJOBS ([timerjobuid],[jobname],[siteguid],[webguid],[listguid],[jobtype],[enabled],[runtime],[scheduletype],[days],[jobdata],[lastqueuecheck],[parentjobuid]) "
+                + " VALUES(@timejobuid,@jobname,@siteguid,@webguid,@listguid,@jobtype,@enabled,@runtime,@scheduletype,@days,@jobdata,@lastqueuecheck,@parentjobuid)";
+            _DAO.AddParam("@timejobuid", timerJobUId);
+            _DAO.AddParam("@jobname", txtScheduleTitle.Text);
+            _DAO.AddParam("@siteguid", currWeb.Site.ID);
+            _DAO.AddParam("@webguid", currWeb.ID);
+            _DAO.AddParam("@listguid", DBNull.Value);
+            _DAO.AddParam("@jobtype", 7);
+            _DAO.AddParam("@enabled", true);
+            _DAO.AddParam("@runtime", time);
+            _DAO.AddParam("@scheduletype", scheduleType);
+            _DAO.AddParam("@days", GetOptions());
+            _DAO.AddParam("@jobdata", GetLists());
+            _DAO.AddParam("@lastqueuecheck", DBNull.Value);
+            _DAO.AddParam("@parentjobuid", DBNull.Value);
+            _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
         }
     }
 }
