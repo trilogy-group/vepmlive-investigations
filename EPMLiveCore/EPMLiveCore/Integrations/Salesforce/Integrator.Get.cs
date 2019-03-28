@@ -13,17 +13,17 @@ namespace EPMLiveCore.Integrations.Salesforce
             out bool isSandbox)
         {
             username = webProps.Properties["Username"].ToString();
-            if (string.IsNullOrEmpty(username))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 throw new Exception("Please provide the username.");
             }
             password = webProps.Properties["Password"].ToString();
-            if (string.IsNullOrEmpty(password))
+            if (string.IsNullOrWhiteSpace(password))
             {
                 throw new Exception("Please provide the password.");
             }
             securityToken = webProps.Properties["SecurityToken"].ToString();
-            if (string.IsNullOrEmpty(securityToken))
+            if (string.IsNullOrWhiteSpace(securityToken))
             {
                 throw new Exception("Please provide the security token.");
             }
@@ -51,20 +51,20 @@ namespace EPMLiveCore.Integrations.Salesforce
 
         private string GetMatchingListColumn(string displayName, string internalName, string appNamespace)
         {
-            switch (internalName)
+            if (internalName == "Id")
             {
-                case "Id":
-                    return "INTUID";
-                case "Name":
-                    return "Title";
+                return "INTUID";
             }
-
-            if (internalName.Equals(appNamespace + "__EPM_Live_ID__c"))
+            if (internalName == "Name")
+            {
+                return "Title";
+            }
+            if (internalName.Equals(string.Format("{0}__EPM_Live_ID__c", appNamespace)))
             {
                 return "SPID";
             }
 
-            //@todo: setup matching columns.
+            // @todo: setup matching columns.
 
             return displayName.Replace("%", "Percent").Replace(" ", string.Empty);
         }

@@ -11,6 +11,10 @@ namespace EPMLiveCore.Integrations.Salesforce
     {
         public List<ColumnProperty> GetColumns(WebProperties webProps, IntegrationLog log, string listName)
         {
+            if (webProps == null)
+            {
+                throw new ArgumentNullException(nameof(webProps));
+            }
             var columnProperties = new List<ColumnProperty>();
 
             try

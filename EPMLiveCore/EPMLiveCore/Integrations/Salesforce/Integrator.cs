@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
-using System.Linq;
 using EPMLiveCore.SalesforcePartnerService;
-using EPMLiveIntegration;
 
 namespace EPMLiveCore.Integrations.Salesforce
 {

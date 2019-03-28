@@ -12,20 +12,17 @@ namespace EPMLiveCore.Integrations.Salesforce
     {
         private static void LogDeletingErrors(IntegrationLog log, DeleteResult deleteResult, string sfId, string spId)
         {
-            if (deleteResult.errors.Any())
+            foreach (var error in deleteResult.errors)
             {
-                foreach (var error in deleteResult.errors)
-                {
-                    log.LogMessage(
-                        string.Format(
-                            "Could not delete record with Salesforce ID: {0}, SharePoint ID: {1}. Status code: {2}. Message: {3}. Fields: {4}",
-                            sfId,
-                            spId,
-                            error.statusCode,
-                            error.message,
-                            string.Join(",", error.fields)),
-                        IntegrationLogType.Warning);
-                }
+                log.LogMessage(
+                    string.Format(
+                        "Could not delete record with Salesforce ID: {0}, SharePoint ID: {1}. Status code: {2}. Message: {3}. Fields: {4}",
+                        sfId,
+                        spId,
+                        error.statusCode,
+                        error.message,
+                        string.Join(",", error.fields)),
+                    IntegrationLogType.Warning);
             }
         }
 
@@ -82,7 +79,7 @@ namespace EPMLiveCore.Integrations.Salesforce
             }
             catch (Exception e)
             {
-                log.LogMessage(e.Message, IntegrationLogType.Error);
+                log.LogMessage(e.ToString(), IntegrationLogType.Error);
             }
 
             return transactionTable;
