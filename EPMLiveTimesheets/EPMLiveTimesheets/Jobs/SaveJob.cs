@@ -10,6 +10,7 @@ using Microsoft.SharePoint;
 using System.Collections;
 using EPMLiveCore;
 using EPMLiveCore.API;
+using System.Diagnostics;
 
 namespace TimeSheets
 {
@@ -384,6 +385,9 @@ namespace TimeSheets
                                                     {
                                                         SPFieldLookup fieldlookup = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
                                                         projectlist = fieldlookup.LookupList;
+
+                                                        LogEvent("ProcessItemRow", string.Format("Adding item id: {0} to TS: {1}, user id: {2}, assigned To: {3}", li.ID, TSUID, assignedtoid, userid),
+                                                            site.Url, EventLogEntryType.Information);
                                                     }
                                                     catch { }
                                                     using (SqlCommand itemInsertCmd = new SqlCommand(@"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
@@ -1257,5 +1261,18 @@ namespace TimeSheets
                 }
             }
         }
+
+        private void LogEvent(string eventSource, string message, string siteName, EventLogEntryType type = EventLogEntryType.Information)
+        {
+            if (!EventLog.SourceExists(eventSource))
+                EventLog.CreateEventSource(eventSource, "EPM Live");
+
+            var eventLog = new EventLog("EPM Live", ".", eventSource) { MaximumKilobytes = 32768 };
+
+            eventLog.WriteEntry(
+                string.Format($"Name: {siteName}, Source: {eventSource}: {message}"), type);
+        }
     }
 }
+
+

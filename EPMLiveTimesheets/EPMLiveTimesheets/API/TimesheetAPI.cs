@@ -1164,6 +1164,8 @@ namespace TimeSheets
 
                 string tsuid = docTimesheet.FirstChild.Attributes["TSUID"].Value;
 
+                Logger.WriteLog(Logger.Category.Medium, "Saving TS: ", tsuid);
+
                 SqlConnection connection = null;
                 try
                 {
@@ -4203,6 +4205,9 @@ namespace TimeSheets
                                     }
 
                                     command.ExecuteNonQuery();
+
+                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ", 
+                                        string.Format("Adding item id: {0} to TS: {1}, user id: {2}", itemRow["ITEM_ID"].ToString(), timesheetGuid, user.ID));
                                 }
                             }
                         }
@@ -4823,6 +4828,8 @@ namespace TimeSheets
                                             cmd.Parameters.AddWithValue("@projectid", projectid);
                                         }
                                         cmd.ExecuteNonQuery();
+
+                                        Logger.WriteLog(Logger.Category.Medium, "AddWorkItem: ", string.Format("Adding item id: {0} to TS: {1}, user id: {2}", li.ID, id, assignedtoid));
                                     }
                                 }
                                 catch { }
