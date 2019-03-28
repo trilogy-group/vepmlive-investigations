@@ -8,11 +8,6 @@ namespace EPMLiveCore
 {
     public partial class CascadingLookupFieldControl
     {
-        protected override string DefaultTemplateName
-        {
-            get { return "CascadingLookupFieldControl"; }
-        }
-
         public override object Value
         {
             get
@@ -49,6 +44,11 @@ namespace EPMLiveCore
                     }
                 }
             }
+        }
+
+        protected override string DefaultTemplateName
+        {
+            get { return "CascadingLookupFieldControl"; }
         }
 
         public override void Focus()

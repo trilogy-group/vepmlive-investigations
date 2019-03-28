@@ -79,9 +79,11 @@ namespace EPMLiveCore
 
             if (drRows != null)
             {
-                foreach (var dataRow in drRows.Where(dataRow => field.ddlCLField.Items.FindByValue(dataRow[FieldName].ToString()) == null))
+                foreach (var dataRow in drRows.Where(
+                    dataRow => field.ddlCLField.Items.FindByValue(dataRow[FieldName].ToString()) == null))
                 {
-                    field.ddlCLField.Items.Add(new ListItem(dataRow[FieldName].ToString(), dataRow[FieldName].ToString()));
+                    field.ddlCLField.Items.Add(
+                        new ListItem(dataRow[FieldName].ToString(), dataRow[FieldName].ToString()));
                 }
             }
 
@@ -108,7 +110,11 @@ namespace EPMLiveCore
                 else
                 {
                     var filterValueField = (DropDownList)FindControlRecursive(Page, strFilterValueField);
-                    var query = BuildQuery(strField, strParentField, strFilterValueField, filterValueField.SelectedValue);
+                    var query = BuildQuery(
+                        strField,
+                        strParentField,
+                        strFilterValueField,
+                        filterValueField.SelectedValue);
                     var queryResults = ExecuteQuery(strUrl, strList, strField, query);
                     if (queryResults != null)
                     {

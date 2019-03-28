@@ -1,11 +1,6 @@
-﻿using System;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore
@@ -30,14 +25,6 @@ namespace EPMLiveCore
             return null;
         }
 
-        private string GetProperty(string propertyName)
-        {
-            var customProperty = Field.GetCustomProperty(propertyName);
-            return customProperty != null
-                ? customProperty.ToString()
-                : string.Empty;
-        }
-
         private DropDownList ddlCLField;
         private Label lblError;
         private string strUrl;
@@ -51,6 +38,14 @@ namespace EPMLiveCore
         private string lblErrorID
         {
             get { return string.Format("lblError_{0}", Field.InternalName); }
+        }
+
+        private string GetProperty(string propertyName)
+        {
+            var customProperty = Field.GetCustomProperty(propertyName);
+            return customProperty != null
+                ? customProperty.ToString()
+                : string.Empty;
         }
     }
 }
