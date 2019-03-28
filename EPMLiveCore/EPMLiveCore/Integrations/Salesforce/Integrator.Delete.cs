@@ -79,7 +79,8 @@ namespace EPMLiveCore.Integrations.Salesforce
             }
             catch (Exception e)
             {
-                log.LogMessage(e.ToString(), IntegrationLogType.Error);
+                Trace.TraceError("Exception suppressed {0}", e);
+                log.LogMessage(e.Message, IntegrationLogType.Error);
             }
 
             return transactionTable;
