@@ -1073,7 +1073,10 @@ namespace EPMLiveTimesheets.Tests.Jobs
                     {
                         ItemGetGuid = _ => new ShimSPList
                         {
-                            GetItemByIdSelectedFieldsInt32StringArray = (id, fields) => new ShimSPListItem()
+                            GetItemsSPQuery = (query) => new ShimSPListItemCollection
+                            {
+                                GetItemByIdInt32 = (id) => new ShimSPListItem()
+                            }
                         },
                         ItemGetString = name => new ShimSPList()
                     }
@@ -1144,13 +1147,16 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 return new string[0];
             };
 
+            var executeCache = new SaveJob.ExecuteCache(spSite);
+            executeCache.PreloadListItems(new[] { Tuple.Create(DummyGuid.ToString(), DummyGuid.ToString(), DummyInt.ToString()) });
+
             // Act
             privateObject.Invoke(ProcessItemRowMethodName,
                 row,
                 dtItems,
                 connection,
                 spSite,
-                new SaveJob.ExecuteCache(spSite),
+                executeCache,
                 timesheetSettings,
                 DummyString,
                 DummyString,
@@ -1186,7 +1192,10 @@ namespace EPMLiveTimesheets.Tests.Jobs
                     {
                         ItemGetGuid = _ => new ShimSPList
                         {
-                            GetItemByIdSelectedFieldsInt32StringArray = (id, fields) => new ShimSPListItem()
+                            GetItemsSPQuery = (query) => new ShimSPListItemCollection
+                            {
+                                GetItemByIdInt32 = (id) => new ShimSPListItem()
+                            }
                         },
                         ItemGetString = name => new ShimSPList()
                     }
@@ -1257,13 +1266,16 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 return new string[0];
             };
 
+            var executeCache = new SaveJob.ExecuteCache(spSite);
+            executeCache.PreloadListItems(new[] { Tuple.Create(DummyGuid.ToString(), DummyGuid.ToString(), DummyInt.ToString()) });
+
             // Act
             privateObject.Invoke(ProcessItemRowMethodName,
                 row,
                 dtItems,
                 connection,
                 spSite,
-                new SaveJob.ExecuteCache(spSite),
+                executeCache,
                 timesheetSettings,
                 DummyString,
                 DummyString,
@@ -1299,7 +1311,10 @@ namespace EPMLiveTimesheets.Tests.Jobs
                     {
                         ItemGetGuid = _ => new ShimSPList
                         {
-                            GetItemByIdSelectedFieldsInt32StringArray = (id, fields) => new ShimSPListItem()
+                            GetItemsSPQuery = (query) => new ShimSPListItemCollection
+                            {
+                                GetItemByIdInt32 = (id) => new ShimSPListItem()
+                            }
                         },
                         ItemGetString = name => new ShimSPList()
                     }
@@ -1369,13 +1384,16 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 return new string[0];
             };
 
-            // Act
+            var executeCache = new SaveJob.ExecuteCache(spSite);
+            executeCache.PreloadListItems(new[] { Tuple.Create(DummyGuid.ToString(), DummyGuid.ToString(), DummyInt.ToString()) });
+
+            // Act    
             privateObject.Invoke(ProcessItemRowMethodName,
                 row,
                 dtItems,
                 connection,
                 spSite,
-                new SaveJob.ExecuteCache(spSite),
+                executeCache,
                 timesheetSettings,
                 DummyString,
                 DummyString,
@@ -1964,6 +1982,12 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 return 1;
             };
             ShimSaveJob.AllInstances.ProcessItemRowXmlNodeDataTableRefSqlConnectionSPSiteSaveJobExecuteCacheTimesheetSettingsStringStringBooleanBoolean = ProcessItemRow;
+            var preloadListItemsWasCalled = false;
+            ShimSaveJob.ShimExecuteCache.AllInstances.PreloadListItemsIEnumerableOfTupleOfStringStringString = (cache, tuples) =>
+            {
+                preloadListItemsWasCalled = true;
+                return Tuple.Create(false, string.Empty);
+            };
 
             // Act
             saveJob.execute(spSite, DummyString);
@@ -1972,6 +1996,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             saveJob.ShouldSatisfyAllConditions(
                 () => saveJob.sErrors.ShouldBeEmpty(),
                 () => saveJob.bErrors.ShouldBeFalse(),
+                () => preloadListItemsWasCalled.ShouldBeTrue(),
                 () => processResourcesWasCalled.ShouldBeTrue(),
                 () => submitTimesheetWasCalled.ShouldBeTrue(),
                 () => expectedSqlCommands.All(p => sqlCommandList.Contains(p)));

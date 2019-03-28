@@ -313,13 +313,9 @@ namespace TimeSheets
                                     try
                                     {
                                         list = web.Lists[new Guid(listid)];
-
                                         try
                                         {
-                                            var fields = new[] {"ID", "Title", "Project"}
-                                                .Concat(GetProjectListFields(list))
-                                                .ToArray();
-                                            li = list.GetItemByIdSelectedFields(int.Parse(itemid), fields);
+                                            li = cache.GetListItem(webid, listid, itemid);
                                         }
                                         catch
                                         {
@@ -758,6 +754,14 @@ namespace TimeSheets
 
                                                 using (var cache = new ExecuteCache(site))
                                                 {
+                                                    var preloadResult = 
+                                                        cache.PreloadListItems(ndItems.Cast<XmlNode>().Select(i => Tuple.Create(iGetAttribute(i, "WebID"), iGetAttribute(i, "ListID"), iGetAttribute(i, "ItemID"))));
+                                                    if (preloadResult.Item1)
+                                                    {
+                                                        bErrors = true;
+                                                        sbErrors.Append(preloadResult.Item2);
+                                                    }
+
                                                     foreach (XmlNode ndItem in ndItems)
                                                     {
                                                         string worktype = "";
@@ -902,6 +906,7 @@ namespace TimeSheets
         {
             private readonly SPSite _site;
             private readonly Dictionary<string, SPWeb> _websCache = new Dictionary<string, SPWeb>();
+            private readonly Dictionary<Tuple<string, string>, SPListItemCollection> _itemsCache = new Dictionary<Tuple<string, string>, SPListItemCollection>();
 
             public ExecuteCache(SPSite site)
             {
@@ -918,6 +923,46 @@ namespace TimeSheets
                 }
 
                 return result;
+            }
+
+            public Tuple<bool, string> PreloadListItems(IEnumerable<Tuple<string, string, string>> items)
+            {
+                var groupByLists = items
+                    .Where(i => !string.IsNullOrEmpty(i.Item1) && !string.IsNullOrEmpty(i.Item2) && !string.IsNullOrEmpty(i.Item3))
+                    .GroupBy(i => Tuple.Create(i.Item1, i.Item2), i => i.Item3);
+                var anyError = false;
+                var errors = new StringBuilder();
+                foreach (var listInfo in groupByLists)
+                {
+                    var web = GetWeb(listInfo.Key.Item1);
+                    var list = web.Lists[new Guid(listInfo.Key.Item2)];
+
+                    try
+                    {
+                        var query = new SPQuery();
+                        query.RowLimit = (uint)listInfo.Count();
+                        var values = string.Join(string.Empty, listInfo.Select(itemId => $"<Value Type='Counter'>{itemId}</Value>"));
+                        query.Query = $"<Where><In><FieldRef Name='ID' /><Values>{values}</Values></In></Where>";
+                        var fields = new[] { "ID", "Title", "Project" }
+                            .Concat(GetProjectListFields(list))
+                            .ToArray();
+                        query.ViewFields = string.Join(string.Empty, fields.Select(name => $"<FieldRef Name='{name}'/>"));
+                        query.MeetingInstanceId = -2;
+                        _itemsCache.Add(listInfo.Key, list.GetItems(query));
+                    }
+                    catch (Exception ex)
+                    {
+                        anyError = true;
+                        errors.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex.ToString()}");
+                    }
+                }
+
+                return Tuple.Create(anyError, errors.ToString());
+            }
+
+            public SPListItem GetListItem(string webId, string listId, string itemId)
+            {
+                return _itemsCache[Tuple.Create(webId, listId)].GetItemById(int.Parse(itemId));
             }
 
             void IDisposable.Dispose()
