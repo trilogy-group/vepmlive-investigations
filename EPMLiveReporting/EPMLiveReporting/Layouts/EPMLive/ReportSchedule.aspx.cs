@@ -14,19 +14,18 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
     public partial class ReportSchedule : LayoutsPageBase
     {
         public static Hashtable desc;
-        private EPMData _DAO;
+        public string strTemplate;
+        public string strTitle;
         protected Button btnRunNow;
         protected CheckBox chkAdmin;
         protected CheckBox chkTask;
         protected string disabled;
         protected DropDownList DropDownListSnapshotTime;
         protected DropDownList FixTimes;
-
         protected HyperLink hlAdmin;
         protected Label lblLastResResult;
         protected Label lblLastResRun;
         protected Label lblLastRun;
-
         protected Label lblMessages;
         protected Label lblNotEnabled;
         protected Label lblPropertyEPMLiveFixLists;
@@ -42,13 +41,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected Panel pnlSaveResults;
         protected Panel pnlTL;
         protected string siteid;
-
         protected string siteUrl;
-        public string strTemplate;
-        public string strTitle;
         protected TextBox txtPropertyEPMLiveFixListsValue;
         protected TextBox txtResPlannerLists;
         protected TextBox txtScheduleTitle;
+        private EPMData _DAO;
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -220,6 +217,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             return GetFromList(ListBoxLists.Items);
         }
 
+        protected void Page_LoadComplete(object sender, EventArgs e)
+        {
+            _DAO.Dispose();
+        }
+
         private string GetFromList(ListItemCollection listItemCollection)
         {
             var stringBuilder = new StringBuilder();
@@ -236,11 +238,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 result = result.Remove(result.LastIndexOf(","));
             }
             return result;
-        }
-
-        protected void Page_LoadComplete(object sender, EventArgs e)
-        {
-            _DAO.Dispose();
         }
 
         private void DropDownListScheduleType_SelectedIndexChanged(object sender, EventArgs e)
