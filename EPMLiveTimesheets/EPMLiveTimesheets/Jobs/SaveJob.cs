@@ -182,13 +182,10 @@ namespace TimeSheets
                     }
                     if (recurse)
                     {
-
                         try
                         {
                             SPFieldLookup ProjectField = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
-
                             SPFieldLookupValue lv = new SPFieldLookupValue(li[ProjectField.Id].ToString());
-
 
                             SPList pList = list.ParentWeb.Lists[new Guid(ProjectField.LookupList)];
                             SPListItem pLi = pList.GetItemById(lv.LookupId);
@@ -281,7 +278,7 @@ namespace TimeSheets
 
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, string username, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, ExecuteCache cache, TimesheetSettings settings, string period, string username, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
 
@@ -309,293 +306,311 @@ namespace TimeSheets
                             {
                                 try
                                 {
-                                    using (SPWeb web = site.OpenWeb(new Guid(webid)))
-                                    {
-                                        SPListItem li = null;
+                                    var web = cache.GetWeb(webid);
+                                    SPListItem li = null;
+                                    SPList list = null;
 
-                                        SPList list = null;
+                                    try
+                                    {
+                                        list = web.Lists[new Guid(listid)];
 
                                         try
                                         {
-                                            list = web.Lists[new Guid(listid)];
+                                            var fields = new[] {"ID", "Title", "Project"}
+                                                .Concat(GetProjectListFields(list))
+                                                .ToArray();
+                                            li = list.GetItemByIdSelectedFields(int.Parse(itemid), fields);
+                                        }
+                                        catch
+                                        {
+                                        }
 
+                                        // Checking if any customer is using custom projectcenter
+                                        string projectListName = string.Empty;
+                                        projectListName = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveCustomProjectList");
+                                        if (!string.IsNullOrEmpty(projectListName))
+                                        {
+                                            ListProjectCenter = projectListName;
+                                        }
+
+                                        if (li != null)
+                                        {
+                                            int projectid = 0;
+                                            string project = "";
+                                            string projectlist = "";
                                             try
                                             {
-                                                var fields = new[] {"ID", "Title", "Project"}
-                                                    .Concat(GetProjectListFields(list))
-                                                    .ToArray();
-                                                li = list.GetItemByIdSelectedFields(int.Parse(itemid), fields);
-                                            }
-                                            catch { }
-                                            // Checking if any customer is using custom projectcenter
-                                            string projectListName = string.Empty;
-                                            projectListName = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveCustomProjectList");
-                                            if (!string.IsNullOrEmpty(projectListName))
-                                            {
-                                                ListProjectCenter = projectListName;
-                                            }
-
-                                            if (li != null)
-                                            {
-                                                int projectid = 0;
-                                                string project = "";
-                                                string projectlist = "";
-                                                try
+                                                // Added the check to fix for EPML-5618
+                                                if (list.Fields.ContainsField("Project"))
                                                 {
-                                                    // Added the check to fix for EPML-5618
-                                                    if (list.Fields.ContainsField("Project"))
-                                                    {
-                                                        SPFieldLookupValue lv = new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
-                                                        projectid = lv.LookupId;
-                                                        project = lv.LookupValue;
-                                                    }
-                                                    else
-                                                    {
-                                                        projectid = li.ID;
-                                                        project = li.Title;
-                                                    }
-                                                }
-                                                catch { }
-
-                                                if (drItem.Length > 0)
-                                                {
-                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
-                                                    using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid", cn))
-                                                    {
-                                                        cmd.Parameters.AddWithValue("@uid", id);
-                                                        cmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
-                                                        if (projectid == 0)
-                                                        {
-                                                            cmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                                            cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
-                                                            cmd.Parameters.AddWithValue("@rate", DBNull.Value);
-                                                        }
-                                                        else
-                                                        {
-                                                            cmd.Parameters.AddWithValue("@project", project);
-                                                            cmd.Parameters.AddWithValue("@projectid", projectid);
-                                                            cmd.Parameters.AddWithValue("@rate", rate);
-                                                        }
-                                                        cmd.ExecuteNonQuery();
-                                                    }
-
+                                                    SPFieldLookupValue lv =
+                                                        new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
+                                                    projectid = lv.LookupId;
+                                                    project = lv.LookupValue;
                                                 }
                                                 else
                                                 {
-                                                    try
-                                                    {
-                                                        SPFieldLookup fieldlookup = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
-                                                        projectlist = fieldlookup.LookupList;
+                                                    projectid = li.ID;
+                                                    project = li.Title;
+                                                }
+                                            }
+                                            catch
+                                            {
+                                            }
 
-                                                        LogEvent("ProcessItemRow", string.Format("Adding item id: {0} to TS: {1}, user id: {2}, assigned To: {3}", li.ID, TSUID, assignedtoid, userid),
-                                                            site.Url, EventLogEntryType.Information);
+                                            if (drItem.Length > 0)
+                                            {
+                                                string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username,
+                                                    $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
+                                                using (SqlCommand cmd = new SqlCommand(
+                                                    "UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid,rate=@rate where ts_item_uid=@uid",
+                                                    cn))
+                                                {
+                                                    cmd.Parameters.AddWithValue("@uid", id);
+                                                    cmd.Parameters.AddWithValue("@title",
+                                                        li["Title"] == null ? string.Empty : li["Title"].ToString());
+                                                    if (projectid == 0)
+                                                    {
+                                                        cmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                                        cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                        cmd.Parameters.AddWithValue("@rate", DBNull.Value);
                                                     }
-                                                    catch { }
-                                                    using (SqlCommand itemInsertCmd = new SqlCommand(@"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
+                                                    else
+                                                    {
+                                                        cmd.Parameters.AddWithValue("@project", project);
+                                                        cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                        cmd.Parameters.AddWithValue("@rate", rate);
+                                                    }
+
+                                                    cmd.ExecuteNonQuery();
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                try
+                                                {
+                                                    SPFieldLookup fieldlookup = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
+                                                    projectlist = fieldlookup.LookupList;
+
+                                                    LogEvent("ProcessItemRow",
+                                                        string.Format("Adding item id: {0} to TS: {1}, user id: {2}, assigned To: {3}", li.ID, TSUID,
+                                                            assignedtoid, userid),
+                                                        site.Url, EventLogEntryType.Information);
+                                                }
+                                                catch
+                                                {
+                                                }
+
+                                                using (SqlCommand itemInsertCmd = new SqlCommand(
+                                                    @"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
                                                             @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid,@rate 
                                                             FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
                                                             WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE = @worktype) 
-                                                            AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)", cn))
-                                                    {
-                                                        itemInsertCmd.Parameters.AddWithValue("@currenttsuid", TSUID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@currentperiodid", period);
-                                                        itemInsertCmd.Parameters.AddWithValue("@userid", userid);
-                                                        itemInsertCmd.Parameters.AddWithValue("@siteid", site.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@worktype", itemtypeid);
-                                                        itemInsertCmd.Parameters.AddWithValue("@uidcurrent", id);
-                                                        itemInsertCmd.Parameters.AddWithValue("@webid", web.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@listid", list.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                        itemInsertCmd.Parameters.AddWithValue("@title", li["Title"] == null ? string.Empty : li["Title"].ToString());
-                                                        itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
-                                                        itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
-                                                        itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
-                                                        string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username, $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
-                                                        itemInsertCmd.Parameters.AddWithValue("@rate", rate);
-                                                        if (projectlist == "")
-                                                            itemInsertCmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
-                                                        else
-                                                            itemInsertCmd.Parameters.AddWithValue("@projectlistid", projectlist);
-
-                                                        if (projectid == 0)
-                                                        {
-                                                            itemInsertCmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                                            itemInsertCmd.Parameters.AddWithValue("@projectid", DBNull.Value);
-                                                        }
-                                                        else
-                                                        {
-                                                            itemInsertCmd.Parameters.AddWithValue("@project", project);
-                                                            itemInsertCmd.Parameters.AddWithValue("@projectid", projectid);
-                                                        }
-
-                                                        itemInsertCmd.ExecuteNonQuery();
-                                                    }
-                                                }
-
-                                                ProcessTimesheetHours(id, ndRow, cn, settings, web, period);
-
-                                                if (!bSkipSP)
+                                                            AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)",
+                                                    cn))
                                                 {
-                                                    if (WorkList != null)
-                                                        ProcessTimesheetFields(id, ndRow, cn, settings);
+                                                    itemInsertCmd.Parameters.AddWithValue("@currenttsuid", TSUID);
+                                                    itemInsertCmd.Parameters.AddWithValue("@currentperiodid", period);
+                                                    itemInsertCmd.Parameters.AddWithValue("@userid", userid);
+                                                    itemInsertCmd.Parameters.AddWithValue("@siteid", site.ID);
+                                                    itemInsertCmd.Parameters.AddWithValue("@worktype", itemtypeid);
+                                                    itemInsertCmd.Parameters.AddWithValue("@uidcurrent", id);
+                                                    itemInsertCmd.Parameters.AddWithValue("@webid", web.ID);
+                                                    itemInsertCmd.Parameters.AddWithValue("@listid", list.ID);
+                                                    itemInsertCmd.Parameters.AddWithValue("@itemid", li.ID);
+                                                    itemInsertCmd.Parameters.AddWithValue("@title",
+                                                        li["Title"] == null ? string.Empty : li["Title"].ToString());
+                                                    itemInsertCmd.Parameters.AddWithValue("@list", list.Title);
+                                                    itemInsertCmd.Parameters.AddWithValue("@itemtype", itemtypeid);
+                                                    itemInsertCmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
+                                                    string rate = SharedFunctions.GetStandardRates(cn, base.TSUID.ToString(), site.RootWeb, username,
+                                                        $"{webid}.{web.Lists[ListProjectCenter].ID}.{projectid}");
+                                                    itemInsertCmd.Parameters.AddWithValue("@rate", rate);
+                                                    if (projectlist == "")
+                                                        itemInsertCmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
+                                                    else
+                                                        itemInsertCmd.Parameters.AddWithValue("@projectlistid", projectlist);
 
-                                                    /*if (Editable)
+                                                    if (projectid == 0)
                                                     {
-                                                        //PROCESS LI
-                                                        GridGanttSettings gSettings = new GridGanttSettings(list);
-                                                        Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-                                                        if (ndRow.Attributes != null)
-                                                        {
-                                                            foreach (XmlAttribute attr in ndRow.Attributes)
-                                                            {
-                                                                if (!NonUpdatingColumns.Contains(attr.Name))
-                                                                {
-                                                                    SPField spField = li.Fields.TryGetFieldByStaticName(attr.Name);
-                                                                    if (spField != null)
-                                                                    {
-                                                                        if (EditableFieldDisplay.isEditable(li, spField, fieldProperties))
-                                                                        {
-                                                                            string newValue = iGetAttribute(ndRow, spField.InternalName);
+                                                        itemInsertCmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                                        itemInsertCmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                    }
+                                                    else
+                                                    {
+                                                        itemInsertCmd.Parameters.AddWithValue("@project", project);
+                                                        itemInsertCmd.Parameters.AddWithValue("@projectid", projectid);
+                                                    }
 
-                                                                            switch (spField.Type)
-                                                                            {
-                                                                                case SPFieldType.Choice:
-                                                                                case SPFieldType.Text:
-                                                                                    if (Convert.ToString(li[spField.InternalName]) != newValue)
-                                                                                    {
-                                                                                        li[spField.InternalName] = newValue;
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.Boolean:
-                                                                                    if (!String.IsNullOrEmpty(newValue))
-                                                                                    {
-                                                                                        Boolean newBooleanValue = Convert.ToBoolean(newValue);
-                                                                                        if (Convert.ToBoolean(li[spField.InternalName]) != newBooleanValue)
-                                                                                        {
-                                                                                            li[spField.InternalName] = newBooleanValue;
-                                                                                        }
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.Currency:
-                                                                                    if (!String.IsNullOrEmpty(newValue))
-                                                                                    {
-                                                                                        Double newCurrencyValue = Convert.ToDouble(newValue);
-                                                                                        if (Convert.ToDouble(li[spField.InternalName]) != newCurrencyValue)
-                                                                                        {
-                                                                                            li[spField.InternalName] = newCurrencyValue;
-                                                                                        }
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.Number:
-                                                                                    if (!String.IsNullOrEmpty(newValue))
-                                                                                    {
-                                                                                        Double newDoubleValue = Convert.ToDouble(newValue);
-                                                                                        if (Convert.ToDouble(li[spField.InternalName]) != newDoubleValue)
-                                                                                        {
-                                                                                            if (((SPFieldNumber)spField).ShowAsPercentage)
-                                                                                            {
-                                                                                                newDoubleValue = newDoubleValue / 100;
-                                                                                            }
-                                                                                            li[spField.InternalName] = newDoubleValue;
-                                                                                        }
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.DateTime:
-                                                                                    if (!String.IsNullOrEmpty(newValue))
-                                                                                    {
-                                                                                        DateTime newDateTimeValue = Convert.ToDateTime(newValue);
-                                                                                        if (Convert.ToDateTime(li[spField.InternalName]) != newDateTimeValue)
-                                                                                        {
-                                                                                            li[spField.InternalName] = newDateTimeValue;
-                                                                                        }
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.Integer:
-                                                                                    if (!String.IsNullOrEmpty(newValue))
-                                                                                    {
-                                                                                        Int64 newInt64Value = Convert.ToInt64(newValue);
-                                                                                        if (Convert.ToInt64(li[spField.InternalName]) != newInt64Value)
-                                                                                        {
-                                                                                            li[spField.InternalName] = newInt64Value;
-                                                                                        }
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.User:
-                                                                                case SPFieldType.Lookup:
-                                                                                    var spFieldLookup = (SPFieldLookup)spField;
-                                                                                    if (spFieldLookup != null && !string.IsNullOrEmpty(spFieldLookup.LookupList))
-                                                                                    {
-                                                                                        SPList spLookuplist = web.Lists[new Guid(spFieldLookup.LookupList)];
-                                                                                        if (spLookuplist != null)
-                                                                                        {
-                                                                                            SPFieldLookupValueCollection spFLVCIds = new SPFieldLookupValueCollection();
-
-                                                                                            foreach (string itemId in newValue.Split(';'))
-                                                                                            {
-                                                                                                Int32 newInt32IdValue;
-                                                                                                if (Int32.TryParse(itemId, out newInt32IdValue))
-                                                                                                {
-                                                                                                    spFLVCIds.Add(new SPFieldLookupValue(newInt32IdValue.ToString()));
-                                                                                                }
-                                                                                            }
-
-                                                                                            li[spField.InternalName] = spFLVCIds;
-                                                                                        }
-                                                                                    }
-                                                                                    break;
-                                                                                case SPFieldType.MultiChoice:
-                                                                                    SPFieldMultiChoiceValue spFMCVIds = new SPFieldMultiChoiceValue();
-                                                                                    foreach (string itemId in newValue.Split(';'))
-                                                                                    {
-                                                                                        spFMCVIds.Add(itemId);
-                                                                                    }
-                                                                                    li[spField.InternalName] = spFMCVIds;
-                                                                                    break;
-                                                                                default:
-                                                                                    break;
-                                                                            }
-                                                                        }
-
-                                                                    }
-                                                                }
-
-                                                            }
-
-
-                                                            li.SystemUpdate();
-                                                        }
-
-
-                                                    }*/
-
-                                                    ProcessListFields(id, ndRow, cn, settings, li, true, list);
-
-                                                    //if (liveHours)
-                                                    //    processLiveHours(li, list.ID);
-
-                                                    //if (Editable)
-                                                    //    li.Update();
-                                                    //else
-                                                    //    li.SystemUpdate();
-
+                                                    itemInsertCmd.ExecuteNonQuery();
                                                 }
                                             }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            bErrors = true;
-                                            sbErrors.Append("Item (" + id + ") Error: " + ex.ToString());
-                                        }
-                                        finally
-                                        {
-                                            li = null;
-                                            list = null;
-                                        }
 
+                                            ProcessTimesheetHours(id, ndRow, cn, settings, web, period);
+
+                                            if (!bSkipSP)
+                                            {
+                                                if (WorkList != null)
+                                                    ProcessTimesheetFields(id, ndRow, cn, settings);
+
+                                                /*if (Editable)
+                                                {
+                                                    //PROCESS LI
+                                                    GridGanttSettings gSettings = new GridGanttSettings(list);
+                                                    Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+                                                    if (ndRow.Attributes != null)
+                                                    {
+                                                        foreach (XmlAttribute attr in ndRow.Attributes)
+                                                        {
+                                                            if (!NonUpdatingColumns.Contains(attr.Name))
+                                                            {
+                                                                SPField spField = li.Fields.TryGetFieldByStaticName(attr.Name);
+                                                                if (spField != null)
+                                                                {
+                                                                    if (EditableFieldDisplay.isEditable(li, spField, fieldProperties))
+                                                                    {
+                                                                        string newValue = iGetAttribute(ndRow, spField.InternalName);
+
+                                                                        switch (spField.Type)
+                                                                        {
+                                                                            case SPFieldType.Choice:
+                                                                            case SPFieldType.Text:
+                                                                                if (Convert.ToString(li[spField.InternalName]) != newValue)
+                                                                                {
+                                                                                    li[spField.InternalName] = newValue;
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.Boolean:
+                                                                                if (!String.IsNullOrEmpty(newValue))
+                                                                                {
+                                                                                    Boolean newBooleanValue = Convert.ToBoolean(newValue);
+                                                                                    if (Convert.ToBoolean(li[spField.InternalName]) != newBooleanValue)
+                                                                                    {
+                                                                                        li[spField.InternalName] = newBooleanValue;
+                                                                                    }
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.Currency:
+                                                                                if (!String.IsNullOrEmpty(newValue))
+                                                                                {
+                                                                                    Double newCurrencyValue = Convert.ToDouble(newValue);
+                                                                                    if (Convert.ToDouble(li[spField.InternalName]) != newCurrencyValue)
+                                                                                    {
+                                                                                        li[spField.InternalName] = newCurrencyValue;
+                                                                                    }
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.Number:
+                                                                                if (!String.IsNullOrEmpty(newValue))
+                                                                                {
+                                                                                    Double newDoubleValue = Convert.ToDouble(newValue);
+                                                                                    if (Convert.ToDouble(li[spField.InternalName]) != newDoubleValue)
+                                                                                    {
+                                                                                        if (((SPFieldNumber)spField).ShowAsPercentage)
+                                                                                        {
+                                                                                            newDoubleValue = newDoubleValue / 100;
+                                                                                        }
+                                                                                        li[spField.InternalName] = newDoubleValue;
+                                                                                    }
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.DateTime:
+                                                                                if (!String.IsNullOrEmpty(newValue))
+                                                                                {
+                                                                                    DateTime newDateTimeValue = Convert.ToDateTime(newValue);
+                                                                                    if (Convert.ToDateTime(li[spField.InternalName]) != newDateTimeValue)
+                                                                                    {
+                                                                                        li[spField.InternalName] = newDateTimeValue;
+                                                                                    }
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.Integer:
+                                                                                if (!String.IsNullOrEmpty(newValue))
+                                                                                {
+                                                                                    Int64 newInt64Value = Convert.ToInt64(newValue);
+                                                                                    if (Convert.ToInt64(li[spField.InternalName]) != newInt64Value)
+                                                                                    {
+                                                                                        li[spField.InternalName] = newInt64Value;
+                                                                                    }
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.User:
+                                                                            case SPFieldType.Lookup:
+                                                                                var spFieldLookup = (SPFieldLookup)spField;
+                                                                                if (spFieldLookup != null && !string.IsNullOrEmpty(spFieldLookup.LookupList))
+                                                                                {
+                                                                                    SPList spLookuplist = web.Lists[new Guid(spFieldLookup.LookupList)];
+                                                                                    if (spLookuplist != null)
+                                                                                    {
+                                                                                        SPFieldLookupValueCollection spFLVCIds = new SPFieldLookupValueCollection();
+
+                                                                                        foreach (string itemId in newValue.Split(';'))
+                                                                                        {
+                                                                                            Int32 newInt32IdValue;
+                                                                                            if (Int32.TryParse(itemId, out newInt32IdValue))
+                                                                                            {
+                                                                                                spFLVCIds.Add(new SPFieldLookupValue(newInt32IdValue.ToString()));
+                                                                                            }
+                                                                                        }
+
+                                                                                        li[spField.InternalName] = spFLVCIds;
+                                                                                    }
+                                                                                }
+                                                                                break;
+                                                                            case SPFieldType.MultiChoice:
+                                                                                SPFieldMultiChoiceValue spFMCVIds = new SPFieldMultiChoiceValue();
+                                                                                foreach (string itemId in newValue.Split(';'))
+                                                                                {
+                                                                                    spFMCVIds.Add(itemId);
+                                                                                }
+                                                                                li[spField.InternalName] = spFMCVIds;
+                                                                                break;
+                                                                            default:
+                                                                                break;
+                                                                        }
+                                                                    }
+
+                                                                }
+                                                            }
+
+                                                        }
+
+
+                                                        li.SystemUpdate();
+                                                    }
+
+
+                                                }*/
+
+                                                ProcessListFields(id, ndRow, cn, settings, li, true, list);
+
+                                                //if (liveHours)
+                                                //    processLiveHours(li, list.ID);
+
+                                                //if (Editable)
+                                                //    li.Update();
+                                                //else
+                                                //    li.SystemUpdate();
+
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        bErrors = true;
+                                        sbErrors.Append("Item (" + id + ") Error: " + ex.ToString());
+                                    }
+                                    finally
+                                    {
+                                        li = null;
+                                        list = null;
                                     }
 
                                 }
-                                catch { }
+                                catch
+                                {
+                                }
                             }
                             else
                             {
@@ -740,32 +755,39 @@ namespace TimeSheets
 
                                                 LoadJobItems(ndItems);
                                                 LoadDbItems(cn);
-                                                
-                                                foreach (XmlNode ndItem in ndItems)
+
+                                                using (var cache = new ExecuteCache(site))
                                                 {
-                                                    string worktype = "";
-
-                                                    try
+                                                    foreach (XmlNode ndItem in ndItems)
                                                     {
-                                                        worktype = ndItem.Attributes["WorkTypeField"].Value;
-                                                    }
-                                                    catch { }
+                                                        string worktype = "";
 
-                                                    ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, username, liveHours, worktype == settings.NonWorkList);
-
-                                                    count++;
-                                                    float pct = count / total * 98;
-
-                                                    if (pct >= percent + 10)
-                                                    {
-                                                        using (SqlCommand cmd4 = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                                        try
                                                         {
-                                                            cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
-                                                            cmd4.Parameters.AddWithValue("@pct", pct);
-                                                            cmd4.ExecuteNonQuery();
+                                                            worktype = ndItem.Attributes["WorkTypeField"].Value;
+                                                        }
+                                                        catch
+                                                        {
                                                         }
 
-                                                        percent = pct;
+                                                        ProcessItemRow(ndItem, ref dtItems, cn, site, cache, settings, period, username, liveHours,
+                                                            worktype == settings.NonWorkList);
+
+                                                        count++;
+                                                        float pct = count / total * 98;
+
+                                                        if (pct >= percent + 10)
+                                                        {
+                                                            using (SqlCommand cmd4 = new SqlCommand(
+                                                                "update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                                            {
+                                                                cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
+                                                                cmd4.Parameters.AddWithValue("@pct", pct);
+                                                                cmd4.ExecuteNonQuery();
+                                                            }
+
+                                                            percent = pct;
+                                                        }
                                                     }
                                                 }
 
@@ -874,6 +896,37 @@ namespace TimeSheets
             public string Id { get; }
             public DateTime Date { get; }
             public string Notes { get; }
+        }
+
+        public sealed class ExecuteCache : IDisposable
+        {
+            private readonly SPSite _site;
+            private readonly Dictionary<string, SPWeb> _websCache = new Dictionary<string, SPWeb>();
+
+            public ExecuteCache(SPSite site)
+            {
+                _site = site;
+            }
+
+            public SPWeb GetWeb(string id)
+            {
+                SPWeb result;
+                if (!_websCache.TryGetValue(id, out result))
+                {
+                    result = _site.OpenWeb(new Guid(id));
+                    _websCache.Add(id, result);
+                }
+
+                return result;
+            }
+
+            void IDisposable.Dispose()
+            {
+                foreach (var web in _websCache.Values)
+                {
+                    web.Dispose();
+                }
+            }
         }
 
         private static string[] GetProjectListFields(SPList list)
