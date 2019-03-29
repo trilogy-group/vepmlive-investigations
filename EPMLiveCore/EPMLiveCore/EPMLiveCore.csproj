@@ -258,6 +258,10 @@
     <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\WebServicesHelper.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.Delete.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.Get.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.IIntegrator.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.Update.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\706.1.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\706.2.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\703Steps.cs" />
