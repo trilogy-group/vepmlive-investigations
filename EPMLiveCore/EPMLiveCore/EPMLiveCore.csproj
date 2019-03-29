@@ -248,6 +248,12 @@
     <Compile Include="CascadingLookup\CascadingLookup.FieldSettings.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.Children.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.DropDownList.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.ErrorHandling.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.EventHandling.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.Overrides.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.Query.cs" />
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="Helpers\Guard.cs" />
     <Compile Include="Helpers\ItemHelper.cs" />
