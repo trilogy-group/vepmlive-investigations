@@ -134,12 +134,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                     if (numberOfJobs > 1)
                     {
-                        var deleteCmd =
-                       new SqlCommand(
-                           "delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                           cn);
-                        deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                        deleteCmd.ExecuteNonQuery();
+                        using (var deleteCmd = new SqlCommand("delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn))
+                        {
+                            deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            deleteCmd.ExecuteNonQuery();
+                        }
                     }
 
                     SqlCommand cmd;
