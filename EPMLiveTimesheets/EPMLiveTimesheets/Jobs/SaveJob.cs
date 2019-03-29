@@ -947,7 +947,7 @@ namespace TimeSheets
                             .Concat(GetProjectListFields(list))
                             .ToArray();
                         query.ViewFields = string.Join(string.Empty, fields.Select(name => $"<FieldRef Name='{name}'/>"));
-                        query.MeetingInstanceId = -2;
+                        query.MeetingInstanceId = -2; // It is part of SPList.GetItemById() implementation and so kept here
                         _itemsCache.Add(listInfo.Key, list.GetItems(query));
                     }
                     catch (Exception ex)
