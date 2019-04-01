@@ -13,18 +13,19 @@ namespace EPMLiveWebParts.RollupSummary
     {
         private void ProcesNodes(XmlDocument doc, ref bool duplicateFound)
         {
-            foreach (XmlNode sections in doc.SelectSingleNode("Sections").SelectNodes("Section"))
+            if (doc == null)
             {
-                foreach (XmlNode item in sections.SelectSingleNode("Items").SelectNodes("Item"))
+                throw new ArgumentNullException(nameof(doc));
+            }
+
+            foreach (XmlNode section in doc.SelectSingleNode("Sections").SelectNodes("Section"))
+            {
+                foreach (XmlNode item in section.SelectSingleNode("Items").SelectNodes("Item"))
                 {
                     var id = string.Empty;
-                    try
+                    if (item?.Attributes?["ID"] != null)
                     {
                         id = item.Attributes["ID"].Value;
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError("Exception Suppressed {0}", ex);
                     }
                     if (id != string.Empty)
                     {
@@ -65,25 +66,22 @@ namespace EPMLiveWebParts.RollupSummary
 
         private void processSection(XmlNode ndSection)
         {
-            var section = string.Empty;
             var url = string.Empty;
-            try
+
+            var section = string.Empty;
+            if (ndSection?.Attributes?["Title"] != null)
             {
                 section = ndSection.Attributes["Title"].Value;
             }
-            catch (Exception ex)
-            {
-                Trace.TraceError("Exception suppressed {0}", ex);
-            }
             try
             {
-                var rUrl = web.ServerRelativeUrl;
-                if (rUrl == "/")
+                var relativeUrl = web.ServerRelativeUrl;
+                if (relativeUrl == "/")
                 {
-                    rUrl = string.Empty;
+                    relativeUrl = string.Empty;
                 }
                 url = ndSection.Attributes["URL"].Value;
-                url = url.Replace("{WebUrl}", rUrl);
+                url = url.Replace("{WebUrl}", relativeUrl);
             }
             catch (Exception ex)
             {
@@ -92,7 +90,7 @@ namespace EPMLiveWebParts.RollupSummary
 
             sb.Append("<tr>");
             sb.Append(
-                url.Trim() != ""
+                url.Trim() != string.Empty
                     ? $"<td colspan=\"4\"><font class=\"ms-sectionheader\"><a class=\"ms-sectionheader\" href=\"{url}\">{section}</a></td>"
                     : $"<td colspan=\"4\"><font class=\"ms-sectionheader\"><font class=\"ms-sectionheader a\">{section}</font></td>");
             sb.Append("</tr>");
@@ -211,19 +209,18 @@ namespace EPMLiveWebParts.RollupSummary
             {
                 var lists = new StringBuilder();
 
-                var squery = siteUrl == string.Empty
+                var queryString = siteUrl == string.Empty
                     ? $"SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     webs.siteid='{web.Site.ID}' AND (dbo.AllLists.tp_Title like '{list.Replace("'", "''")}')"
                     : $"SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     (dbo.Webs.FullUrl LIKE '{siteUrl}/%' OR dbo.Webs.FullUrl = '{siteUrl}') AND (dbo.AllLists.tp_Title like '{list.Replace("'", "''")}')";
 
-                var sqlCommand = new SqlCommand(squery, cn);
-
-                var dataReader = sqlCommand.ExecuteReader();
-
-                while (dataReader.Read())
+                using (var sqlCommand = new SqlCommand(queryString, cn))
+                using (var dataReader = sqlCommand.ExecuteReader())
                 {
-                    lists.Append($"<List ID='{dataReader.GetGuid(0)}'/>");
+                    while (dataReader.Read())
+                    {
+                        lists.Append($"<List ID='{dataReader.GetGuid(0)}'/>");
+                    }
                 }
-                dataReader.Close();
 
                 siteDataQuery.Lists = $"<Lists>{lists}</Lists>";
                 siteDataQuery.Query = $"<Where>{query}</Where>";
