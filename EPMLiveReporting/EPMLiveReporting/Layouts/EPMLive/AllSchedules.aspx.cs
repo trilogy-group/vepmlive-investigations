@@ -117,32 +117,31 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 {
                     cn.Open();
 
-                    var cmd =
-                        new SqlCommand(
-                            "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                            cn);
-                    cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-
-                    int numberOfJobs = 0;
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    int numberOfJobs;
+                    using (var selectCommand = new SqlCommand(
+                        "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                        cn))
                     {
-                        using (DataTable dt = new DataTable())
+                        selectCommand.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+
+                        using (var dataReader = selectCommand.ExecuteReader())
+                        using (var dataTable = new DataTable())
                         {
-                            dt.Load(dr);
-                            numberOfJobs = dt.Rows.Count;
+                            dataTable.Load(dataReader);
+                            numberOfJobs = dataTable.Rows.Count;
                         }
                     }
 
                     if (numberOfJobs > 1)
                     {
-                        var deleteCmd =
-                       new SqlCommand(
-                           "delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                           cn);
-                        deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                        deleteCmd.ExecuteNonQuery();
+                        using (var deleteCmd = new SqlCommand("delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn))
+                        {
+                            deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            deleteCmd.ExecuteNonQuery();
+                        }
                     }
 
+                    SqlCommand cmd;
                     if (numberOfJobs == 1)
                     {
                         cmd =
