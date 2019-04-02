@@ -906,6 +906,10 @@ namespace TimeSheets
         {
             private readonly SPSite _site;
             private readonly Dictionary<string, SPWeb> _websCache = new Dictionary<string, SPWeb>();
+
+            /// <summary>
+            /// Maping of tuples of Web ID and List ID to SPListItemCollection
+            /// </summary>
             private readonly Dictionary<Tuple<string, string>, SPListItemCollection> _itemsCache = new Dictionary<Tuple<string, string>, SPListItemCollection>();
 
             public ExecuteCache(SPSite site)
@@ -925,6 +929,11 @@ namespace TimeSheets
                 return result;
             }
 
+            /// <summary>
+            /// Bulk loading of list items
+            /// </summary>
+            /// <param name="items">Triples of Web ID, List ID and Item ID</param>
+            /// <returns>Tuple of error presence flag and error message</returns>
             public Tuple<bool, string> PreloadListItems(IEnumerable<Tuple<string, string, string>> items)
             {
                 var groupByLists = items
