@@ -4,10 +4,14 @@
 
     internal class ProjectData
     {
-        internal ProjectData(StringBuilder sqlGetListHeaders, StringBuilder ListAssociatedItemsDivStringBuilder, string projectLinkedField, string sourceUrl)
+        internal ProjectData(
+            StringBuilder sqlGetListHeaders,
+            StringBuilder listAssociatedItemsDivStringBuilder,
+            string projectLinkedField,
+            string sourceUrl)
         {
             SqlGetListHeaders = sqlGetListHeaders;
-            this.ListAssociatedItemsDivStringBuilder = ListAssociatedItemsDivStringBuilder;
+            ListAssociatedItemsDivStringBuilder = listAssociatedItemsDivStringBuilder;
             ProjectLinkedField = projectLinkedField;
             SourceUrl = sourceUrl;
         }

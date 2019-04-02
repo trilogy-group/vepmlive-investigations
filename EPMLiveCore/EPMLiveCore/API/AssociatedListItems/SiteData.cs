@@ -1,12 +1,18 @@
-﻿namespace EPMLiveCore.API
-{
-    using System;
-    using System.Data;
+﻿using System;
+using System.Data;
 
+namespace EPMLiveCore.API
+{
     internal class SiteData
     {
-        internal SiteData(string siteUrl, string webId, Guid projectListId, DataTable listNameTable, string projectId, string siteId,
-                          string projectTitle)
+        internal SiteData(
+            string siteUrl,
+            string webId,
+            Guid projectListId,
+            DataTable listNameTable,
+            string projectId,
+            string siteId,
+            string projectTitle)
         {
             SiteUrl = siteUrl;
             WebId = webId;
