@@ -13,6 +13,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class AllSchedules : LayoutsPageBase
     {
+        private const int MaxLogSizeInKilobytes = 32768;
         protected MenuItemTemplate MenuItemTemplate1;
         protected MenuItemTemplate MenuItemTemplateDelete;
         private EPMData _DAO;
@@ -87,9 +88,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         if (!EventLog.SourceExists("EPMLive Reporting - Page_Load"))
                             EventLog.CreateEventSource("EPMLive Reporting - Page_Load", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Load");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                        using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Load"))
+                        {
+                            myLog.MaximumKilobytes = MaxLogSizeInKilobytes;
+                            myLog.WriteEntry(string.Format("{0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, 2040);
+                        }
                     });
                 }
             }
