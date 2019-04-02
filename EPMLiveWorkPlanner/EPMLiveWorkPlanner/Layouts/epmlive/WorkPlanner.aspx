@@ -1685,6 +1685,10 @@ Name:&nbsp;&nbsp;<%=sProjectName %></div>
     <script>
         initmb();
         <%if(Request["isdlg"] == "1"){%>
+        if(parent.window.location.toString().indexOf('workplanner.aspx') > -1)
+        {
+            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.Cancel);
+        }
         document.getElementsByTagName("html")[0].className = "ms-dialog";
         <%}%>
     </script>
