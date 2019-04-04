@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Xml;
+using System.Web;
 using System.Data.SqlClient;
 using Microsoft.SharePoint;
 using System.Collections;
 using EPMLiveCore;
 using EPMLiveCore.API;
+using System.Diagnostics;
 
 namespace TimeSheets
 {
@@ -20,6 +22,36 @@ namespace TimeSheets
         private string NonUpdatingColumns = "Project,AssignedTo";
         private string ListProjectCenter = "Project Center";
         StringBuilder sbErrors = null;
+
+        private const string TsItemHoursDeleteSql = "DELETE FROM TSITEMHOURS WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
+        private const string TsItemHoursInsertSql = "INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES ";
+        private const string TsItemHoursUpdateSql = "UPDATE TSITEMHOURS SET TS_ITEM_HOURS=@hours, TS_ITEM_TYPE_ID=@type WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
+        private const string TsItemNotesDeleteSql = "DELETE FROM TSNOTES WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE IN ({0})";
+        private const string TsItemNotesInsertSql = "INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES ";
+        private const string TsItemNotesUpdateSql = "UPDATE TSNOTES SET TS_ITEM_NOTES=@notes WHERE TS_ITEM_UID=@id AND TS_ITEM_DATE=@dt";
+        private const string TsItemHoursSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID FROM TSITEMHOURS WHERE TS_ITEM_UID IN ({0})";
+        private const string TsItemNotesSelectSql = "SELECT TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES FROM TSNOTES WHERE TS_ITEM_UID IN ({0})";
+
+        private const string TsItemUidColumnName = "TS_ITEM_UID";
+        private const string TsItemDateColumnName = "TS_ITEM_DATE";
+        private const string TsItemHoursColumnName = "TS_ITEM_HOURS";
+        private const string TsItemTypeIdColumnName = "TS_ITEM_TYPE_ID";
+        private const string TsItemNotesColumnName = "TS_ITEM_NOTES";
+        private const string UidAttribute = "UID";
+        private const string HoursDateXPath = "Hours/Date";
+        private const string ValueAttribute = "Value";
+        private const string TimeXPath = "Time";
+        private const string HoursAttribute = "Hours";
+        private const string TypeAttribute = "Type";
+        private const string TypeDefaultValue = "0";
+        private const string NotesXPath = "Notes";
+
+        private readonly Dictionary<string, List<TsItemHour>> _jobItemHours = new Dictionary<string, List<TsItemHour>>();
+        private readonly Dictionary<string, List<TsItemHour>> _dbItemHours = new Dictionary<string, List<TsItemHour>>();
+        private readonly Dictionary<string, List<TsItemNote>> _jobItemNotes = new Dictionary<string, List<TsItemNote>>();
+        private readonly Dictionary<string, List<TsItemNote>> _dbItemNotes = new Dictionary<string, List<TsItemNote>>();
+        private readonly Dictionary<string, List<DateTime>> _jobItemDates = new Dictionary<string, List<DateTime>>();
+
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
             try
@@ -51,6 +83,13 @@ namespace TimeSheets
             return "";
         }
 
+        private static string ReaderGetValue(SqlDataReader reader, string columnName)
+        {
+            return reader[columnName] == DBNull.Value
+                   ? string.Empty
+                   : reader[columnName].ToString();
+        }
+
         private void ProcessTimesheetHours(string id, XmlNode ndRow, SqlConnection cn, TimesheetSettings settings, SPWeb web, string period)
         {
 
@@ -58,68 +97,14 @@ namespace TimeSheets
             try
             {
                 arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, period);
-                foreach (XmlNode ndDate in ndRow.SelectNodes("Hours/Date"))
-                {
-                    DateTime dt = DateTime.Parse(ndDate.Attributes["Value"].Value);
 
-                    if (arrPeriods.Contains(dt))
-                    {
-                        using (SqlCommand cmd = new SqlCommand("DELETE FROM TSITEMHOURS where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn))
-                        {
-                            cmd.Parameters.AddWithValue("@id", id);
-                            cmd.Parameters.AddWithValue("@dt", dt);
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        using (SqlCommand cmd1 = new SqlCommand("DELETE FROM TSNOTES where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn))
-                        {
-                            cmd1.Parameters.AddWithValue("@id", id);
-                            cmd1.Parameters.AddWithValue("@dt", dt);
-                            cmd1.ExecuteNonQuery();
-                        }
-
-                        foreach (XmlNode ndTime in ndDate.SelectNodes("Time"))
-                        {
-                            string hours = iGetAttribute(ndTime, "Hours");
-                            string type = "0";
-                            try
-                            {
-                                type = ndTime.Attributes["Type"].Value;
-                            }
-                            catch { }
-
-                            using (SqlCommand cmd2 = new SqlCommand("INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)", cn))
-                            {
-                                cmd2.Parameters.AddWithValue("@id", id);
-                                cmd2.Parameters.AddWithValue("@dt", dt);
-                                cmd2.Parameters.AddWithValue("@hours", hours);
-                                cmd2.Parameters.AddWithValue("@type", type);
-                                cmd2.ExecuteNonQuery();
-                            }
-
-                        }
-
-                        XmlNode ndNotes = ndDate.SelectSingleNode("Notes");
-                        if (ndNotes != null)
-                        {
-                            using (SqlCommand cmd3 = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)", cn))
-                            {
-                                cmd3.Parameters.AddWithValue("@id", id);
-                                cmd3.Parameters.AddWithValue("@dt", dt);
-                                cmd3.Parameters.AddWithValue("@notes", System.Web.HttpUtility.UrlDecode(ndNotes.InnerText));
-                                cmd3.ExecuteNonQuery();
-                            }
-                        }
-
-                    }
-                }
+                ProcessItemHours(id, cn, arrPeriods);
+                ProcessItemNotes(id, cn, arrPeriods);
             }
             finally
             {
                 arrPeriods = null;
             }
-
-
         }
 
         private void ProcessListFields(string id, XmlNode ndRow, SqlConnection cn, TimesheetSettings settings, SPListItem li, bool recurse, SPList list)
@@ -400,6 +385,9 @@ namespace TimeSheets
                                                     {
                                                         SPFieldLookup fieldlookup = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
                                                         projectlist = fieldlookup.LookupList;
+
+                                                        LogEvent("ProcessItemRow", string.Format("Adding item id: {0} to TS: {1}, user id: {2}, assigned To: {3}", li.ID, TSUID, assignedtoid, userid),
+                                                            site.Url, EventLogEntryType.Information);
                                                     }
                                                     catch { }
                                                     using (SqlCommand itemInsertCmd = new SqlCommand(@"INSERT INTO TSITEM SELECT DISTINCT TS_UID, case when TS_UID=@currenttsuid then @uidcurrent else NEWID() end,
@@ -749,6 +737,9 @@ namespace TimeSheets
                                                 float count = 0;
                                                 float total = ndItems.Count;
 
+                                                LoadJobItems(ndItems);
+                                                LoadDbItems(cn);
+                                                
                                                 foreach (XmlNode ndItem in ndItems)
                                                 {
                                                     string worktype = "";
@@ -853,5 +844,435 @@ namespace TimeSheets
                 data = null;
             }
         }
+
+        public class TsItemHour
+        {
+            public TsItemHour(string id, DateTime date, string hours, string type)
+            {
+                Id = id;
+                Date = date;
+                Hours = hours;
+                Type = type;
+            }
+
+            public string Id { get; }
+            public DateTime Date { get; }
+            public string Hours { get; }
+            public string Type { get; }
+        }
+
+        public class TsItemNote
+        {
+            public TsItemNote(string id, DateTime date, string notes)
+            {
+                Id = id;
+                Date = date;
+                Notes = notes;
+            }
+
+            public string Id { get; }
+            public DateTime Date { get; }
+            public string Notes { get; }
+        }
+
+        private void DeleteItemHours(string id, SqlConnection connection, List<TsItemHour> items)
+        {
+            var dates = items.Select(item => item.Date)
+                             .Distinct()
+                             .ToArray();
+
+            var parameters = string.Join(",", Enumerable.Range(0, dates.Length).Select(i => $"@dt{i}"));
+
+            using (var cmd = new SqlCommand(string.Format(TsItemHoursDeleteSql, parameters), connection))
+            {
+                cmd.Parameters.AddWithValue("@id", id);
+
+                for (var i = 0; i < dates.Length; i++)
+                {
+                    cmd.Parameters.AddWithValue($"@dt{i}", dates[i]);
+                }
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void UpdateItemHours(string id, SqlConnection connection, List<TsItemHour> items)
+        {
+            foreach (var tsItemHour in items)
+            {
+                using (var cmd = new SqlCommand(TsItemHoursUpdateSql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@dt", tsItemHour.Date);
+                    cmd.Parameters.AddWithValue("@hours", tsItemHour.Hours);
+                    cmd.Parameters.AddWithValue("@type", tsItemHour.Type);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private void InsertItemHours(string id, SqlConnection connection, List<TsItemHour> items)
+        {
+			if (!items.Any())
+				return;
+			StringBuilder insertStatement = new StringBuilder(TsItemHoursInsertSql);
+
+			using (var cmd = new SqlCommand())
+			{
+				cmd.Connection = connection;
+				cmd.CommandTimeout = 0;
+				int itemIndex = 0;
+				foreach (var tsItemHour in items)
+				{
+					insertStatement.Append(string.Format("(@id{0}, @dt{0}, @hours{0}, @type{0}),", itemIndex));
+	
+					cmd.Parameters.AddWithValue("@id" + itemIndex, id);
+					cmd.Parameters.AddWithValue("@dt" + itemIndex, tsItemHour.Date);
+					cmd.Parameters.AddWithValue("@hours" + itemIndex, tsItemHour.Hours);
+					cmd.Parameters.AddWithValue("@type" + itemIndex, tsItemHour.Type);
+					itemIndex++;
+				}
+				cmd.CommandText = insertStatement.ToString().TrimEnd(',');
+				cmd.ExecuteNonQuery();
+			}
+        }
+
+        private void DeleteItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
+        {
+            var dates = items.Select(item => item.Date)
+                             .Distinct()
+                             .ToArray();
+
+            var parameters = string.Join(",", Enumerable.Range(0, dates.Length).Select(i => $"@dt{i}"));
+
+            using (var cmd = new SqlCommand(string.Format(TsItemNotesDeleteSql, parameters), connection))
+            {
+                cmd.Parameters.AddWithValue("@id", id);
+
+                for (var i = 0; i < dates.Length; i++)
+                {
+                    cmd.Parameters.AddWithValue($"@dt{i}", items[i].Date);
+                }
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void UpdateItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
+        {
+            foreach (var tsItemNote in items)
+            {
+                using (var cmd = new SqlCommand(TsItemNotesUpdateSql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@dt", tsItemNote.Date);
+                    cmd.Parameters.AddWithValue("@notes", tsItemNote.Notes);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private void InsertItemNotes(string id, SqlConnection connection, List<TsItemNote> items)
+        {
+			if (!items.Any())
+				return;
+			StringBuilder insertStatement = new StringBuilder(TsItemNotesInsertSql);
+
+			using (var cmd = new SqlCommand())
+			{
+				cmd.Connection = connection;
+				cmd.CommandTimeout = 0;
+				int itemIndex = 0;
+				foreach (var tsItemNote in items)
+				{
+					insertStatement.Append(string.Format("(@id{0}, @dt{0}, @notes{0}),", itemIndex));
+
+					cmd.Parameters.AddWithValue("@id" + itemIndex, id);
+					cmd.Parameters.AddWithValue("@dt" + itemIndex, tsItemNote.Date);
+					cmd.Parameters.AddWithValue("@notes" + itemIndex, tsItemNote.Notes);
+					itemIndex++;
+				}
+				cmd.CommandText = insertStatement.ToString().TrimEnd(',');
+				cmd.ExecuteNonQuery();
+			}
+        }
+
+        private void ProcessItemHours(string id, SqlConnection connection, ArrayList arrPeriods)
+        {
+            var jobItems = _jobItemHours.ContainsKey(id) 
+                ? _jobItemHours[id] 
+                : new List<TsItemHour>();
+            var dbItems = _dbItemHours.ContainsKey(id) 
+                ? _dbItemHours[id] 
+                : new List<TsItemHour>();
+            var dates = _jobItemDates.ContainsKey(id) 
+                ? _jobItemDates[id] 
+                : new List<DateTime>();
+            
+            dbItems.RemoveAll(item => !arrPeriods.Contains(item.Date));
+
+            var itemsToInsert = new List<TsItemHour>();
+            var itemsToUpdate = new List<TsItemHour>();
+            foreach (var date in dates.Distinct())
+            {
+                if (!arrPeriods.Contains(date))
+                {
+                    continue;
+                }
+
+                var jobItemsDate = jobItems.Where(item => item.Date == date)
+                                           .ToArray();
+
+                if (!jobItemsDate.Any())
+                {
+                    continue;
+                }
+
+                if (jobItemsDate.Length > 1)
+                {
+                    itemsToInsert.AddRange(jobItemsDate);
+                    continue;
+                }
+
+                var dbItemsDate = dbItems.Where(item => item.Date == date)
+                                         .ToArray();
+
+                if (dbItemsDate.Length == 1)
+                {
+                    var dbItem = dbItemsDate.First();
+                    var jobItem = jobItemsDate.First();
+                    if (dbItem.Hours != jobItem.Hours 
+                        || dbItem.Type != jobItem.Type)
+                    {
+                        itemsToUpdate.Add(jobItem);
+                    }
+                    dbItems.Remove(dbItem);
+                }
+                else
+                {
+                    itemsToInsert.AddRange(jobItemsDate);
+                }
+            }
+            
+            if (dbItems.Any())
+            {
+                DeleteItemHours(id, connection, dbItems);
+            }
+
+            if (itemsToUpdate.Any())
+            {
+                UpdateItemHours(id, connection, itemsToUpdate);
+            }
+
+            if (itemsToInsert.Any())
+            {
+                InsertItemHours(id, connection, itemsToInsert);
+            }
+        }
+
+        private void ProcessItemNotes(string id, SqlConnection connection, ArrayList arrPeriods)
+        {
+            var jobNotes = _jobItemNotes.ContainsKey(id) 
+                ? _jobItemNotes[id] 
+                : new List<TsItemNote>();
+            var dbNotes = _dbItemNotes.ContainsKey(id) 
+                ? _dbItemNotes[id] 
+                : new List<TsItemNote>();
+            var dates = _jobItemDates.ContainsKey(id) 
+                ? _jobItemDates[id] 
+                : new List<DateTime>();
+
+            dbNotes.RemoveAll(item => !arrPeriods.Contains(item.Date));
+
+            var itemsToInsert = new List<TsItemNote>();
+            var itemsToUpdate = new List<TsItemNote>();
+            foreach (var date in dates.Distinct())
+            {
+                if (!arrPeriods.Contains(date))
+                {
+                    continue;
+                }
+                
+                var jobNotesDate = jobNotes.Where(item => item.Date == date)
+                                           .ToArray();
+
+                if (!jobNotesDate.Any())
+                {
+                    continue;
+                }
+
+                var jobNote = jobNotesDate.First();
+
+                var dbNotesDate = dbNotes.Where(item => item.Date == date)
+                                         .ToArray();
+
+                if (dbNotesDate.Length == 1)
+                {
+                    var dbNote = dbNotesDate.First();
+                    if (dbNote.Notes != jobNote.Notes)
+                    {
+                        itemsToUpdate.Add(jobNote);
+                    }
+                    dbNotes.Remove(dbNote);
+                }
+                else
+                {
+                    itemsToInsert.Add(jobNote);
+                }
+            }
+            
+            if (dbNotes.Any())
+            {
+                DeleteItemNotes(id, connection, dbNotes);
+            }
+
+            if (itemsToUpdate.Any())
+            {
+                UpdateItemNotes(id, connection, itemsToUpdate);
+            }
+
+            if (itemsToInsert.Any())
+            {
+                InsertItemNotes(id, connection, itemsToInsert);
+            }
+        }
+
+        private void LoadJobItems(XmlNodeList ndItems)
+        {
+            foreach (XmlNode ndItem in ndItems)
+            {
+                var id = iGetAttribute(ndItem, UidAttribute);
+
+                if (!_jobItemHours.ContainsKey(id))
+                {
+                    _jobItemHours.Add(id, new List<TsItemHour>());
+                }
+
+                if (!_jobItemNotes.ContainsKey(id))
+                {
+                    _jobItemNotes.Add(id, new List<TsItemNote>());
+                }
+
+                if (!_jobItemDates.ContainsKey((id)))
+                {
+                    _jobItemDates.Add(id, new List<DateTime>());
+                }
+
+                var itemHours = _jobItemHours[id];
+                var itemNotes = _jobItemNotes[id];
+                var itemDates = _jobItemDates[id];
+                
+                foreach (XmlNode ndDate in ndItem.SelectNodes(HoursDateXPath))
+                {
+                    DateTime date;
+                    if (!DateTime.TryParse(iGetAttribute(ndDate, ValueAttribute), out date))
+                    {
+                        continue;
+                    }
+                    
+                    itemDates.Add(date);
+
+                    foreach (XmlNode ndTime in ndDate.SelectNodes(TimeXPath))
+                    {
+                        var hours = iGetAttribute(ndTime, HoursAttribute);
+                        var type = iGetAttribute(ndTime, TypeAttribute);
+
+                        if (string.IsNullOrWhiteSpace(type))
+                        {
+                            type = TypeDefaultValue;
+                        }
+
+                        itemHours.Add(new TsItemHour(id, date, hours, type));
+                    }
+
+                    var ndNotes = ndDate.SelectSingleNode(NotesXPath);
+                    if (ndNotes != null)
+                    {
+                        var notes = HttpUtility.UrlDecode(ndNotes.InnerText);
+                        itemNotes.Add(new TsItemNote(id, date, notes));
+                    }
+                }
+            }
+        }
+
+        private void LoadDbItems(SqlConnection connection)
+        {
+            if (!_jobItemDates.Any())
+            {
+                return;
+            }
+
+            var ids = string.Join(",", _jobItemDates.Keys.Select(key => $"'{key}'"));
+
+            using (var cmd = new SqlCommand(string.Format(TsItemHoursSelectSql, ids), connection))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var id = ReaderGetValue(reader, TsItemUidColumnName);
+                        DateTime date;
+                        if (!DateTime.TryParse(ReaderGetValue(reader, TsItemDateColumnName), out date))
+                        {
+                            continue;
+                        }
+
+                        if (_jobItemDates[id].Contains(date))
+                        {
+                            var hours = ReaderGetValue(reader, TsItemHoursColumnName);
+                            var type = ReaderGetValue(reader, TsItemTypeIdColumnName);
+
+                            if (!_dbItemHours.ContainsKey(id))
+                            {
+                                _dbItemHours.Add(id, new List<TsItemHour>());
+                            }
+
+                            _dbItemHours[id].Add(new TsItemHour(id, date, hours, type));
+                        }
+                    }
+                }
+            }
+
+            using (var cmd = new SqlCommand(string.Format(TsItemNotesSelectSql, ids), connection))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var id = ReaderGetValue(reader, TsItemUidColumnName);
+                        DateTime date;
+                        if (!DateTime.TryParse(ReaderGetValue(reader, TsItemDateColumnName), out date))
+                        {
+                            continue;
+                        }
+
+                        if (_jobItemDates[id].Contains(date))
+                        {
+                            var notes = ReaderGetValue(reader, TsItemNotesColumnName);
+
+                            if (!_dbItemNotes.ContainsKey(id))
+                            {
+                                _dbItemNotes.Add(id, new List<TsItemNote>());
+                            }
+
+                            _dbItemNotes[id].Add(new TsItemNote(id, date, notes));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LogEvent(string eventSource, string message, string siteName, EventLogEntryType type = EventLogEntryType.Information)
+        {
+            if (!EventLog.SourceExists(eventSource))
+                EventLog.CreateEventSource(eventSource, "EPM Live");
+
+            var eventLog = new EventLog("EPM Live", ".", eventSource) { MaximumKilobytes = 32768 };
+
+            eventLog.WriteEntry(
+                string.Format($"Name: {siteName}, Source: {eventSource}: {message}"), type);
+        }
     }
 }
+
+

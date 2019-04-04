@@ -821,7 +821,8 @@ eXcell_tree.prototype = new eXcell;
 *   @type: private
 */
 eXcell_tree.prototype.setValueA = function (content) {
-    this.cell.parentNode.valTag.innerHTML = content;
+    if (this.cell.parentNode.valTag)
+        this.cell.parentNode.valTag.innerHTML = content;
     this.grid.callEvent("onCellChanged", [this.cell.parentNode.idd, this.cell._cellIndex, content])
 }
 eXcell_tree.prototype.setValue = function (valAr) {

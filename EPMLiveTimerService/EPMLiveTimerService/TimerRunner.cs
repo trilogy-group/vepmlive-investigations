@@ -10,6 +10,7 @@ using System.Data;
 using Microsoft.SharePoint;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Configuration;
 
 namespace TimerService
 {
@@ -82,12 +83,14 @@ namespace TimerService
         
         protected virtual Task GetTask(int taskNumber)
         {
-            switch (taskNumber)
+			bool queueJobs = ConfigurationManager.AppSettings["SecondaryTimer"] == null || ConfigurationManager.AppSettings["SecondaryTimer"].ToLower() != "true";
+
+			switch (taskNumber)
             {
                 case 0:
-                    return Task.Run(() => DoWork(new TimerClass(false), progress[0], events[0]), token);
+                    return Task.Run(() => DoWork(new TimerClass(false, false), progress[0], events[0]), token);
                 case 1:
-                    return Task.Run(() => DoWork(new TimerClass(true), progress[1], events[1]), token);
+                    return Task.Run(() => DoWork(new TimerClass(true, queueJobs), progress[1], events[1]), token);
                 case 2:
                     return Task.Run(() => DoWork(new TimesheetTimerClass(), progress[2], events[2]), token);
                 case 3:

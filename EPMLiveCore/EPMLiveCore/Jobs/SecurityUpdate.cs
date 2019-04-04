@@ -9,6 +9,7 @@ using EPMLiveCore.ReportHelper;
 using System.Threading;
 using EPMLiveCore.API;
 using System.Collections;
+using System.Diagnostics;
 
 namespace EPMLiveCore.Jobs
 {
@@ -398,12 +399,26 @@ namespace EPMLiveCore.Jobs
                 string finalName = string.Empty;
                 try
                 {
+                    if (eI.HasUniqueRoleAssignments)
+                    {
+                        var raColl = eI.RoleAssignments;
+                        var groupAlreadyCreated = (from SPRoleAssignment roleAssignment in raColl
+                                                   where roleAssignment.Member.Name.Contains(grp)
+                                                   select roleAssignment.Member.ID).Any();
+                        if (groupAlreadyCreated)
+                        {
+                            continue;
+                        }
+                    }
                     finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
                     spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
                     ew.Update();
                     Thread.Sleep(1000);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning("Unexpected Permission error on AddBasicSecurityGroup: " + ex);
+                }
 
                 SPGroup finalGrp = ew.SiteGroups[finalName];
                 SPRoleType rType;
