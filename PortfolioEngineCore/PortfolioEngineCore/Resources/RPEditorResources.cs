@@ -304,135 +304,156 @@ namespace PortfolioEngineCore
 
         private static XElement BuildResourceXML(CStruct xResource, IEnumerable<CStruct> listFields)
         {
-            var xI = new XElement("I");
+            var element = AddBasicAttributes(xResource);
+            ProcessFields(xResource, listFields, element);
+            ProcessPeriods(xResource, element);
 
-            xI.Add(new XAttribute("CanEdit", 0));
-            xI.Add(new XAttribute("id", xResource.GetStringAttr("WResID")));
-            xI.Add(new XAttribute("Res_UID", xResource.GetStringAttr("WResID")));
-            xI.Add(new XAttribute("Res_EMail", xResource.GetStringAttr("EMail")));
-            var bUserIsRM = xResource.GetBooleanAttr("UserIsRM");
-            if (bUserIsRM)
-                xI.Add(new XAttribute("UserIsRM", 1));
+            return element;
+        }
 
-            var bInTeam = xResource.GetBoolean("InTeam");
-            if (bInTeam)
-                xI.Add(new XAttribute("InTeam", 1));
-            var bIsGeneric = xResource.GetBoolean("IsGeneric");
-            xI.Add(new XAttribute("IsGeneric", bIsGeneric ? 1 : 0));
-            if (bIsGeneric)
-                xI.Add(new XAttribute("Status", "/_layouts/ppm/images/generic.gif"));
-            var lDeptUID = xResource.GetInt("DeptUID");
-            xI.Add(new XAttribute("Dept_UID", lDeptUID));
-            var lCCRoleUID = xResource.GetInt("CCRoleUID");
-            xI.Add(new XAttribute("CCRole_UID", lCCRoleUID));
-            var lCCRoleParentUID = xResource.GetInt("CCRoleParentUID");
-            if (lCCRoleParentUID > 0)
-                xI.Add(new XAttribute("CCRoleParent_UID", lCCRoleParentUID));
-            var lRoleUID = xResource.GetInt("RoleUID");
-            xI.Add(new XAttribute("Role_UID", lRoleUID));
+        private static XElement AddBasicAttributes(CStruct resource)
+        {
+            var element = new XElement("I");
 
-            xI.Add(new XAttribute("Role_Name", xResource.GetString("RoleName")));
-            xI.Add(new XAttribute("CCRole_Name", xResource.GetString("CCRoleName")));
-            xI.Add(new XAttribute("CCRoleParent_Name", xResource.GetString("CCRoleParentName")));
-            xI.Add(new XAttribute("Dept_Name", xResource.GetString("DeptName")));
-
-            var sItemName = xResource.GetStringAttr("Name");
-            xI.Add(new XAttribute("ItemName", sItemName));
-            foreach (var xField in listFields)
+            element.Add(new XAttribute("CanEdit", 0));
+            element.Add(new XAttribute("id", resource.GetStringAttr("WResID")));
+            element.Add(new XAttribute("Res_UID", resource.GetStringAttr("WResID")));
+            element.Add(new XAttribute("Res_EMail", resource.GetStringAttr("EMail")));
+            var userIsRm = resource.GetBooleanAttr("UserIsRM");
+            if (userIsRm)
             {
-                var sValue = "";
-                var sColIDName = "";
-                var eFieldID = (SpecialFieldIDsEnum)xField.GetIntAttr("FieldID");
-                switch (eFieldID)
-                {
-                    case SpecialFieldIDsEnum.sfResourceName:
-                        sColIDName = "Res_Name";
-                        sValue = xResource.GetStringAttr("Name");
-                        break;
-                    case SpecialFieldIDsEnum.sfRoleName:
-                        //sColIDName = "Role_Name";
-                        //sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                        break;
-                    case SpecialFieldIDsEnum.sfResourceRate:
-                        sColIDName = "ResourceRate";
-                        sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                        break;
-                    case SpecialFieldIDsEnum.sfResourceGroups:
-                        sColIDName = "ResourceGroups";
-                        sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                        break;
-                    case SpecialFieldIDsEnum.sfResourceCostCategory:
-                        //sColIDName = "CCRole_Name";
-                        //sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                        break;
-                    case SpecialFieldIDsEnum.sfRPDeptName:
-                        //sColIDName = "Dept_Name";
-                        //SortedList<string, CStruct> listItems;
-                        //if (listLookups.TryGetValue(((int)eFieldID).ToString(), out listItems))
-                        //{
-                        //    CStruct xItem;
-                        //    if (listItems.TryGetValue(lDeptUID.ToString(), out xItem))
-                        //    {
-                        //        sValue = xItem.GetStringAttr("Name");
-                        //    }
-                        //}
-                        break;
-                    case SpecialFieldIDsEnum.sfResourceNotes:
-                        sColIDName = "ResourceNotes";
-                        sValue = xResource.GetString("Field" + ((int)(eFieldID)));
-                        break;
-                    default:
-                        var fieldInt = ((int)eFieldID);
-                        sColIDName = "C" + fieldInt;
-                        sValue = xResource.GetString("Field" + fieldInt);
-                        break;
-                }
-                if (sColIDName != "")
-                {
-                    xI.Add(new XAttribute(sColIDName, sValue));
-                    //xI.CreateStringAttr("Type", "Text");
-                    //xI.CreateIntAttr("CanEdit", 0);
-                    //xI.CreateIntAttr("CanMove", 0);
-                }
+                element.Add(new XAttribute("UserIsRM", 1));
             }
 
-            var ch = new[] { ',' };
+            var inTeam = resource.GetBoolean("InTeam");
+            if (inTeam)
+            {
+                element.Add(new XAttribute("InTeam", 1));
+            }
+            var isGeneric = resource.GetBoolean("IsGeneric");
+            element.Add(
+                new XAttribute(
+                    "IsGeneric",
+                    isGeneric
+                        ? 1
+                        : 0));
+            if (isGeneric)
+            {
+                element.Add(new XAttribute("Status", "/_layouts/ppm/images/generic.gif"));
+            }
+            var departmentUId = resource.GetInt("DeptUID");
+            element.Add(new XAttribute("Dept_UID", departmentUId));
+            var ccRoleUId = resource.GetInt("CCRoleUID");
+            element.Add(new XAttribute("CCRole_UID", ccRoleUId));
+            var ccRoleParentUId = resource.GetInt("CCRoleParentUID");
+            if (ccRoleParentUId > 0)
+            {
+                element.Add(new XAttribute("CCRoleParent_UID", ccRoleParentUId));
+            }
+            var roleUId = resource.GetInt("RoleUID");
+            element.Add(new XAttribute("Role_UID", roleUId));
 
-            var availablePeriods = xResource.GetString("AvailablePeriods").Split(ch);
-            var committedPeriods = xResource.GetString("CommittedPeriods").Split(ch);
-            var nonWorkPeriods = xResource.GetString("NonWorkPeriods").Split(ch);
+            element.Add(new XAttribute("Role_Name", resource.GetString("RoleName")));
+            element.Add(new XAttribute("CCRole_Name", resource.GetString("CCRoleName")));
+            element.Add(new XAttribute("CCRoleParent_Name", resource.GetString("CCRoleParentName")));
+            element.Add(new XAttribute("Dept_Name", resource.GetString("DeptName")));
 
-            var availableHours = xResource.GetString("AvailableHours").Split(ch);
-            var committedHours = xResource.GetString("CommittedHours").Split(ch);
-            var offHours = xResource.GetString("OffHours").Split(ch);
-            var nonWorkHours = xResource.GetString("NonWorkHours").Split(ch);
+            var itemName = resource.GetStringAttr("Name");
+            element.Add(new XAttribute("ItemName", itemName));
+            return element;
+        }
 
-            for (var i = 0; i < availablePeriods.Count(); i++)
+        private static void ProcessPeriods(CStruct resource, XElement element)
+        {
+            var separator = new[]
+            {
+                ','
+            };
+
+            var availablePeriods = resource.GetString("AvailablePeriods").Split(separator);
+            var committedPeriods = resource.GetString("CommittedPeriods").Split(separator);
+            var nonWorkPeriods = resource.GetString("NonWorkPeriods").Split(separator);
+
+            var availableHours = resource.GetString("AvailableHours").Split(separator);
+            var committedHours = resource.GetString("CommittedHours").Split(separator);
+            var offHours = resource.GetString("OffHours").Split(separator);
+            var nonWorkHours = resource.GetString("NonWorkHours").Split(separator);
+
+            for (var i = 0; i < availablePeriods.Length; i++)
             {
                 var period = availablePeriods[i];
-                if (string.IsNullOrEmpty(period)) break;
+                if (string.IsNullOrWhiteSpace(period))
+                {
+                    break;
+                }
 
-                xI.Add(new XAttribute("A" + period, availableHours[i]));
-                xI.Add(new XAttribute("O" + period, offHours[i]));
+                element.Add(new XAttribute(string.Format("A{0}", period), availableHours[i]));
+                element.Add(new XAttribute(string.Format("O{0}", period), offHours[i]));
             }
 
             for (var i = 0; i < committedPeriods.Count(); i++)
             {
                 var period = committedPeriods[i];
-                if (string.IsNullOrEmpty(period)) break;
+                if (string.IsNullOrWhiteSpace(period))
+                {
+                    break;
+                }
 
-                xI.Add(new XAttribute("C" + period, committedHours[i]));
+                element.Add(new XAttribute(string.Format("C{0}", period), committedHours[i]));
             }
 
             for (var i = 0; i < nonWorkPeriods.Count(); i++)
             {
                 var period = nonWorkPeriods[i];
-                if (string.IsNullOrEmpty(period)) break;
+                if (string.IsNullOrWhiteSpace(period))
+                {
+                    break;
+                }
 
-                xI.Add(new XAttribute("N" + period, nonWorkHours[i]));
+                element.Add(new XAttribute(string.Format("N{0}", period), nonWorkHours[i]));
             }
+        }
 
-            return xI;
+        private static void ProcessFields(CStruct resource, IEnumerable<CStruct> listFields, XElement element)
+        {
+            foreach (var field in listFields)
+            {
+                var fieldValue = string.Empty;
+                var colIdName = string.Empty;
+                var fieldId = (SpecialFieldIDsEnum)field.GetIntAttr("FieldID");
+                switch (fieldId)
+                {
+                    case SpecialFieldIDsEnum.sfResourceName:
+                        colIdName = "Res_Name";
+                        fieldValue = resource.GetStringAttr("Name");
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceRate:
+                        colIdName = "ResourceRate";
+                        fieldValue = resource.GetString("Field" + (int)fieldId);
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceGroups:
+                        colIdName = "ResourceGroups";
+                        fieldValue = resource.GetString("Field" + (int)fieldId);
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceNotes:
+                        colIdName = "ResourceNotes";
+                        fieldValue = resource.GetString("Field" + (int)fieldId);
+                        break;
+                    case SpecialFieldIDsEnum.sfRoleName:
+                    case SpecialFieldIDsEnum.sfResourceCostCategory:
+                    case SpecialFieldIDsEnum.sfRPDeptName:
+                        break;
+                    default:
+                        var fieldInt = (int)fieldId;
+                        colIdName = string.Format("C{0}", fieldInt);
+                        fieldValue = resource.GetString("Field" + fieldInt);
+                        break;
+                }
+                if (colIdName != string.Empty)
+                {
+                    element.Add(new XAttribute(colIdName, fieldValue));
+                }
+            }
         }
     }
 }

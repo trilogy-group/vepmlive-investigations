@@ -127,6 +127,7 @@ BEGIN
                     ,i.APPROVAL_STATUS
                     ,i.PROJECT_LIST_UID
                     ,NULL as AssignedToID
+                    ,NULL as Rate
                 from TSITEM i
                 join TSTIMESHEET t
                     on t.TS_UID = i.TS_UID

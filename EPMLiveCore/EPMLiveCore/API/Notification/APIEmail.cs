@@ -9,6 +9,7 @@ using System.Collections;
 using System.Data.SqlClient;
 using System.Data;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace EPMLiveCore.API
 {
@@ -755,8 +756,8 @@ namespace EPMLiveCore.API
 
                     foreach (string s in additionalParams.Keys)
                     {
-                        body = body.Replace("{" + s + "}", additionalParams[s].ToString());
-                        subject = subject.Replace("{" + s + "}", additionalParams[s].ToString());
+                        body = Regex.Replace(body, "{" + s + "}", additionalParams[s].ToString(), RegexOptions.IgnoreCase);
+                        subject = Regex.Replace(subject, "{" + s + "}", additionalParams[s].ToString(), RegexOptions.IgnoreCase);
                     }
 
                     SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;

@@ -9,34 +9,36 @@ pipeline {
         skipDefaultCheckout true
     }
 	triggers {
-		cron(env.BRANCH_NAME == 'Releases/7.1.0' ? '@midnight' : '')
+		cron('@midnight')
 	}
     parameters {
-        string(name: 'Version', defaultValue: '7.1.0.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'Version', defaultValue: '7.1.1.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+		
 		string(name: 'StagingTargetHost', defaultValue: '10.25.1.149,10.25.1.146,10.25.1.135', description: 'Staging Target hosts to deploy to')
 		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'StagingPassword', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 		string(name: 'StagingAppUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Staging SharePoint application url for deployment')
-        string(name: 'Staging2TargetHost', defaultValue: '10.25.2.85,10.25.2.57,10.25.2.54', description: 'Staging Target hosts to deploy to')
+        
+		string(name: 'Staging2TargetHost', defaultValue: '10.25.2.85,10.25.2.57,10.25.2.54', description: 'Staging Target hosts to deploy to')
 		string(name: 'Staging2UserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'Staging2Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
-		string(name: 'ReleaseBranch', defaultValue: '', description: 'Release branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-        string(name: 'ReleaseBranchBuild', defaultValue: '', description: 'Release build number to get artifacts from instead of triggering new build (leave empty to trigger new build)')
-        string(name: 'DeployBranch', defaultValue: '', description: 'Deploy branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
+
         string(name: 'ProtractorBranch', defaultValue: 'TestAutomation', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-    	string(name: 'ProtractorTargetHost', defaultValue: '10.25.1.146', description: 'Target host for protractor')
+    	string(name: 'ProtractorTargetHost', defaultValue: '10.25.2.54', description: 'Target host for protractor')
 		string(name: 'ProtractorHostsName', defaultValue: 'apps22.epmlive.com', description: 'Target full host name for protractor')
 		string(name: 'ProtractorBaseUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Target baseUrl for protractor')
-		string(name: 'ProtractorSiteCollection', defaultValue: '/sites/NYISO', description: 'Protractor siteCollection')
+		string(name: 'ProtractorSiteCollection', defaultValue: '/sites/AUT', description: 'Protractor siteCollection')
 		string(name: 'ProtractorUsername', defaultValue: 'servicedesk', description: 'Protractor username')
 		string(name: 'ProtractorPassword', defaultValue: 'A123456*', description: 'Protractor password')
+		
 		string(name: 'RunTSClient', defaultValue: 'true', description: 'Execute legacy TS-Client tests')
+		
 		string(name: 'ForceStage', defaultValue: 'false', description: 'Force staging deployment')
     }
     stages {
 		stage ("Weekly Deploy") {
 			when {
-				expression { (new Date()[Calendar.DAY_OF_WEEK] == Calendar.SUNDAY) ||  params.ForceStage == 'true'}
+				expression { params.ForceStage == 'true'}
 			}
 			stages {
 				stage('Preparing Release') {
@@ -44,24 +46,15 @@ pipeline {
 						timestamps {
 							script {
 								env.RELEASE_BRANCH = currentBuild.getProjectName()
-								if (params.ReleaseBranch?.trim()) {
-									env.RELEASE_BRANCH = params.ReleaseBranch
-								}
-								
-								if (params.ReleaseBranchBuild?.trim()) {
-									echo 'Using existing Release build...'
-									env.RELEASE_BRANCH_BUILD = params.ReleaseBranchBuild
-								} else {
-									echo 'Triggering Release build job...'
-									def releaseBuild = build(
-										job: "../EPML-RC/${env.RELEASE_BRANCH}",
-										wait: true,
-										parameters: [
-											[$class: 'StringParameterValue', name: 'Version', value: params.Version.replace('x', env.BUILD_NUMBER)]
-										]
-									)
-									env.RELEASE_BRANCH_BUILD = releaseBuild.getNumber()
-								}
+								echo 'Triggering Release build job...'
+								def releaseBuild = build(
+									job: "../EPML-RC/${env.RELEASE_BRANCH}",
+									wait: true,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'Version', value: params.Version.replace('x', env.BUILD_NUMBER)]
+									]
+								)
+								env.RELEASE_BRANCH_BUILD = releaseBuild.getNumber()
 								echo "Release Branch Build #${env.RELEASE_BRANCH_BUILD}"
 							}
 						}
@@ -75,9 +68,6 @@ pipeline {
 									script {
 										echo 'Triggering Deploy job...'
 										env.DEPLOY_BRANCH = currentBuild.getProjectName()
-										if (params.DeployBranch?.trim()) {
-											env.DEPLOY_BRANCH = params.DeployBranch
-										}
 										build(
 											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
 											wait: true,
@@ -85,8 +75,6 @@ pipeline {
 												[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
 												[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
 												[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
-												[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-												[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
 												[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
 											]
 										)
@@ -100,18 +88,14 @@ pipeline {
 									script {
 										echo 'Triggering Deploy job...'
 										env.DEPLOY_BRANCH = currentBuild.getProjectName()
-										if (params.DeployBranch?.trim()) {
-											env.DEPLOY_BRANCH = params.DeployBranch
-										}
 										build(
 											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
 											wait: true,
+											propagate: false,
 											parameters: [
 												[$class: 'StringParameterValue', name: 'TargetHost', value: params.Staging2TargetHost],
 												[$class: 'StringParameterValue', name: 'UserName', value: params.Staging2UserName],
 												[$class: 'StringParameterValue', name: 'Password', value: params.Staging2Password],
-												[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-												[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD],
 												[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
 											]
 										)
@@ -197,13 +181,10 @@ pipeline {
 						timestamps {
 							script {
 								echo 'Triggering TS-Client tests job...'
+								env.TS_BRANCH = currentBuild.getProjectName()
 								build(
-									job: "../EPML-TS/EPML-TS", 
-									wait: true,
-									parameters: [
-										[$class: 'StringParameterValue', name: 'FullRcBranch', value: env.RELEASE_BRANCH],
-										[$class: 'StringParameterValue', name: 'FullRcBranchBuild', value: env.RELEASE_BRANCH_BUILD]
-									]
+									job: "../EPML-TS/${env.TS_BRANCH}", 
+									wait: true
 								)
 							}
 						}		
