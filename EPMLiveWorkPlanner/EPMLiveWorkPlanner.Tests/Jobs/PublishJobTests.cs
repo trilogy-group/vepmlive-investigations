@@ -119,8 +119,6 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
-            ShimSPList.AllInstances.GetItemsSPQuery = (sender, spQuery) => new ShimSPListItemCollection();
-            ShimSPListItemCollection.AllInstances.GetEnumerator = sender => new List<SPListItem>().GetEnumerator();
         }
 
         private void SetupVariables()
@@ -459,7 +457,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 sProjectField = string.Empty,
                 sFieldMappings = fieldMappings
             };
-           
+
             ShimWorkPlannerAPI.getSettingsSPWebString = (_, __) =>
             {
                 validations += 1;
