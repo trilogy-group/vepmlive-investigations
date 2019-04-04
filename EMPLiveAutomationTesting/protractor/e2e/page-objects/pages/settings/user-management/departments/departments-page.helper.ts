@@ -9,6 +9,7 @@ import {DepartmentsPage} from './departments.po';
 import {TextboxHelper} from '../../../../../components/html/textbox-helper';
 import {ElementHelper} from '../../../../../components/html/element-helper';
 import {HtmlHelper} from '../../../../../components/misc-utils/html-helper';
+import { WaitHelper } from '../../../../../components/html/wait-helper';
 
 export class DepartmentsPageHelper {
 
@@ -45,14 +46,14 @@ export class DepartmentsPageHelper {
         const uniqueId = PageHelper.getUniqueId();
         const departmentTitle = `${DepartmentsPageConstants.newTitleLabel}${uniqueId}`;
         StepLogger.step(`Provide title as "${departmentTitle}"`);
-        await TextboxHelper.sendKeys(DepartmentsPage.addNewItemOptions.title, departmentTitle);
+        await TextboxHelper.sendKeys(DepartmentsPage.addNewItemOptions.title, departmentTitle, true);
         return departmentTitle;
     }
 
     static async verifyTitleEntered(title: string) {
         await browser.sleep(PageHelper.timeout.s);
         await ExpectationHelper.verifyAttributeValue(
-            DepartmentsPage.addNewItemOptions.titlePlaceholder,
+            DepartmentsPage.addNewItemOptions.title,
             HtmlHelper.attributes.value,
             title,
         );
@@ -93,10 +94,12 @@ export class DepartmentsPageHelper {
     static async clickSave() {
         StepLogger.step('Click Save');
         await PageHelper.click(DepartmentsPage.addNewItemOptions.save);
+        await PageHelper.sleepForXSec(PageHelper.timeout.xs);
+        await WaitHelper.waitForPageToStable();
     }
 
     static async verifyDepartmentCreated(departmentName: string) {
-        await ExpectationHelper.verifyDisplayedStatus(
+        await ExpectationHelper.verifyPresentStatus(
             DepartmentsPage.getCreatedDepartment(departmentName),
             departmentName,
         );

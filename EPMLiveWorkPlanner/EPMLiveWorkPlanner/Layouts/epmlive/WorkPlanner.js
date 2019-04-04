@@ -1946,9 +1946,8 @@ function GetAgileViewParam(key) {
 }
 
 function ClearSort() {
-    Grids.WorkPlannerGrid.ChangeSort("taskorder");
-    //Grids.WorkPlannerGrid.Sort = "";
-    //Grids.WorkPlannerGrid.SortRows();
+    var grid = Grids["WorkPlannerGrid"];
+    grid.ChangeSort("Title");
 }
 
 function isShowFilters() {

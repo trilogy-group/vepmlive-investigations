@@ -200,19 +200,22 @@ namespace TimeSheets
 
                 using (cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    cn.Open();
-                    using (SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn))
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        cmd.Parameters.AddWithValue("@siteid", site.ID);
-                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn))
                         {
-                            while (dr.Read())
+                            cmd.Parameters.AddWithValue("@siteid", site.ID);
+                            using (SqlDataReader dataReader  = cmd.ExecuteReader())
                             {
-                                timeeditor = true;
-                                worktypes += "|" + dr.GetInt32(0).ToString();
+                                while (dataReader .Read())
+                                {
+                                    timeeditor = true;
+                                    worktypes += "|" + dataReader .GetInt32(0).ToString();
+                                }
                             }
                         }
-                    }
+                    });
 
                     if (worktypes != "")
                         worktypes = worktypes.Substring(1);
@@ -364,28 +367,33 @@ namespace TimeSheets
                     curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(".") - firstDot - 1);
                     using (cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                     {
-                        cn.Open();
-
-                        using (SqlCommand cmd = new SqlCommand("spTSgetTSHours", cn))
-                        {
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@username", curUser);
-                            cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                            cmd.Parameters.AddWithValue("@period_id", period);
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            da.Fill(dsTSHours);
-                        }
                         DataSet dsTotalHours = new DataSet();
-
-                        using (SqlCommand cmd =  new SqlCommand("spTSGetTotalHoursForItem", cn))
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
-                            cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                            cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            da.Fill(dsTotalHours);
-                        }
+                            cn.Open();
+
+                            using (SqlCommand cmd = new SqlCommand("spTSgetTSHoursPM", cn))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@username", curUser);
+                                cmd.Parameters.AddWithValue("@siteguid", site.ID);
+                                cmd.Parameters.AddWithValue("@period_id", period);
+                                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                                da.Fill(dsTSHours);
+                            }
+
+
+                            using (SqlCommand cmd = new SqlCommand("spTSGetTotalHoursForItem", cn))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.AddWithValue("@listuid", ndListId.InnerText);
+                                cmd.Parameters.AddWithValue("@siteguid", site.ID);
+                                cmd.Parameters.AddWithValue("@itemid", ndItemId.InnerText);
+                                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                                da.Fill(dsTotalHours);
+                            }
+                        });
+
                         XmlNode newCol = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                         newCol.InnerText = view.ViewFields.Count.ToString();
                         XmlAttribute attrName = docXml.CreateAttribute("name");

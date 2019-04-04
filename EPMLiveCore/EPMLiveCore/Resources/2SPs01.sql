@@ -443,7 +443,6 @@ BEGIN
       -- SET NOCOUNT ON added to prevent extra result sets from
       -- interfering with SELECT statements.
       SET NOCOUNT ON;
-
     -- Insert statements for procedure here
     
     DECLARE @MaxInt INT
@@ -483,31 +482,30 @@ BEGIN
                   CLOSE NotificationCursor
                   DEALLOCATE NotificationCursor
             
-                  DECLARE @sqlStatement NVARCHAR(MAX);
-
-				 SET @sqlStatement = ''SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID,PersonalizationSiteID, UserName FROM (''
-				 SET @sqlStatement =    @sqlStatement  + '' SELECT TOP (COALESCE(@Limit, @MaxInt)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName''
-				 SET @sqlStatement =    @sqlStatement  + '' FROM (SELECT           ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM dbo.vwNotifications WHERE''
-				 SET @sqlStatement =    @sqlStatement  + '' (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' (SiteID = ''''00000000-0000-0000-0000-000000000000'''' OR SiteID IS NULL OR SiteID = @SiteId) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR ''
-				 SET @sqlStatement =    @sqlStatement  + '' (Type = 1) AND ((UserName = @UserName) OR (UserName = @UserId)) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' (SiteID = ''''00000000-0000-0000-0000-000000000000'''' OR SiteID IS NULL OR SiteID = @SiteId) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR ''
-				 SET @sqlStatement =    @sqlStatement  + '' (Type > 1) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' ((UserName = @UserName) OR (UserName = @UserId)) AND ''
-				 SET @sqlStatement =    @sqlStatement  + '' (PersonalizationSiteID = ''''00000000-0000-0000-0000-000000000000'''' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications ''
-				IF (@GetRead = 0) 
-				 SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 0 OR NotificationRead IS NULL) ''
-				IF (@GetRead = 1) 
-				 SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 1) ''
-				IF (@GetRead IS NULL) 
-				 SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead IN (0, 1) OR NotificationRead IS NULL) ''
-				SET @sqlStatement =    @sqlStatement  + '' ) AS Notifications WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)''
-
-				EXEC sp_executesql @sqlStatement, N''@Limit int, @MaxInt int, @FirstPage int,  @LastPage int, @UserName nvarchar, @UserId int, @SiteId uniqueidentifier, @SiteCreationDate datetime '', @Limit, @MaxInt, @FirstPage,  @LastPage, @UserName, @UserId,  @SiteId, @SiteCreationDate
-
+                  SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
+                           PersonalizationSiteID, UserName 
+                  FROM
+                  (
+                        SELECT            TOP (COALESCE(@Limit, @MaxInt)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
+                                          PersonalizationSiteID, UserName
+                        FROM        (SELECT           ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, 
+                                                            NotificationRead, PersonalizationID, PersonalizationSiteID, UserName
+                                          FROM       dbo.vwNotifications
+                                          WHERE            (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND 
+                                                                  (SiteID = ''00000000-0000-0000-0000-000000000000'' OR SiteID IS NULL OR SiteID = @SiteId) AND 
+                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR
+                                                            (Type = 1) AND ((UserName = @UserName) OR (UserName = @UserId)) AND 
+                                                                  (SiteID = ''00000000-0000-0000-0000-000000000000'' OR SiteID IS NULL OR SiteID = @SiteId) AND 
+                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR
+                                                            (Type > 1) AND 
+                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND 
+                                                                  ((UserName = @UserName) OR (UserName = @UserId)) AND 
+                                                                  (PersonalizationSiteID = ''00000000-0000-0000-0000-000000000000'' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications
+                        WHERE       (@GetRead = 0) AND (NotificationRead = 0 OR NotificationRead IS NULL) OR
+                                          (@GetRead = 1) AND (NotificationRead = 1) OR 
+                                          (@GetRead IS NULL) AND (NotificationRead IN (0, 1) OR NotificationRead IS NULL)
+                  ) AS Notifications
+                  WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)
             END
       ELSE
             BEGIN
@@ -531,29 +529,27 @@ BEGIN
                   CLOSE NotificationCursor
                   DEALLOCATE NotificationCursor
                   
-
-					SET @sqlStatement = ''SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM ( ''
-					SET @sqlStatement =    @sqlStatement  + '' SELECT TOP (COALESCE(@Limit, 2147483647)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM ( ''
-					SET @sqlStatement =    @sqlStatement  + '' SELECT ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, PersonalizationSiteID, UserName FROM       dbo.vwNotifications WHERE ''
-					SET @sqlStatement =    @sqlStatement  + '' (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND ''
-					SET @sqlStatement =    @sqlStatement  + '' (SiteID = ''''00000000-0000-0000-0000-000000000000'''' OR SiteID IS NULL OR SiteID = @SiteId) AND ''
-					SET @sqlStatement =    @sqlStatement  + '' (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR ''
-					SET @sqlStatement =    @sqlStatement  + '' (Type > 1) AND (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND ''
-					SET @sqlStatement =    @sqlStatement  + '' ((UserName = @UserName) OR (UserName = @UserId)) AND ''
-					SET @sqlStatement =    @sqlStatement  + '' (PersonalizationSiteID = ''''00000000-0000-0000-0000-000000000000'''' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications ''
-					IF (@GetRead = 0) 
-					SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 0 OR NotificationRead IS NULL) ''
-					IF (@GetRead = 1) 
-					SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead = 1) ''
-					IF (@GetRead IS NULL) 
-					SET @sqlStatement =    @sqlStatement  + '' WHERE (NotificationRead IN (0, 1) OR NotificationRead IS NULL) ''
-					SET @sqlStatement =    @sqlStatement  + '' ) AS Notifications WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)''
-					PRINT @sqlStatement
-
-					EXEC sp_executesql @sqlStatement, N''@Limit int, @MaxInt int, @FirstPage int,  @LastPage int, @UserName nvarchar, @UserId int, @SiteId uniqueidentifier, @SiteCreationDate datetime '', @Limit, @MaxInt, @FirstPage,  @LastPage, @UserName, @UserId,  @SiteId, @SiteCreationDate
-
-
-
+                  SELECT ID, Title, Message, CAST(Type AS INT) AS Type, CAST(CreatedBy AS INT) AS CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
+                           PersonalizationSiteID, UserName 
+                  FROM
+                  (
+                        SELECT            TOP (COALESCE(@Limit, 2147483647)) ROW_NUMBER() OVER(ORDER BY CreatedAt) AS Row, ID, Title, Message, Type, CreatedBy, SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, NotificationRead, PersonalizationID, 
+                                          PersonalizationSiteID, UserName
+                        FROM        (SELECT           ID, Title, Message, Type, CreatedBy, SiteCreationDateTime AS SiteCreationDate, CreatedAt, SiteID, WebID, ListID, ItemID, Emailed, Flags, UserEmailed, 
+                                                            NotificationRead, PersonalizationID, PersonalizationSiteID, UserName
+                                          FROM       dbo.vwNotifications
+                                          WHERE            (Type = 0) AND ((UserName = @UserName) OR (UserName = @UserId)) AND 
+                                                                  (SiteID = ''00000000-0000-0000-0000-000000000000'' OR SiteID IS NULL OR SiteID = @SiteId) AND 
+                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) OR
+                                                            (Type > 1) AND 
+                                                                  (SiteCreationDate IS NULL OR @SiteCreationDate <= SiteCreationDate) AND 
+                                                                  ((UserName = @UserName) OR (UserName = @UserId)) AND 
+                                                                  (PersonalizationSiteID = ''00000000-0000-0000-0000-000000000000'' OR PersonalizationSiteID IS NULL OR PersonalizationSiteID = @SiteId)) AS Notifications
+                        WHERE       (@GetRead = 0) AND (NotificationRead = 0 OR NotificationRead IS NULL) OR
+                                          (@GetRead = 1) AND (NotificationRead = 1) OR 
+                                          (@GetRead IS NULL) AND (NotificationRead IN (0, 1) OR NotificationRead IS NULL)
+                        ) AS Notifications
+                  WHERE Row BETWEEN COALESCE(@FirstPage, 0) AND COALESCE(@LastPage, @MaxInt)
             END
 END
 ')
@@ -1049,6 +1045,116 @@ end
 exec(@sql)
 ')
 
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSAllDataBatch')
+begin
+    Print 'Creating Stored Procedure spTSAllDataBatch'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSAllDataBatch'
+    SET @createoralter = 'ALTER'
+end
+exec (@createoralter + ' PROC [dbo].[spTSAllDataBatch]
+               @siteuid uniqueidentifier,
+	  @pageNo int,
+	  @pageSize int
+AS
+declare @colname varchar(255)
+declare @customertablename varchar(50)
+--GlobalTemptable will be unique for all customers becasue if they share same table there could be security breach.
+set  @customertablename=(Select ''##RRTemp_''+ REPLACE(@siteuid, ''-'', ''''))
+declare @cols varchar(MAX)
+declare @count bigint
+print @customertablename
+set @cols = ''''
+declare @dropsql varchar(100)
+IF @pageNo=0
+BEGIN
+-- Checking and Droping table in the begining to make sure there is no table with same name already exists
+IF OBJECT_ID(''tempdb..''+@customertablename) IS NOT NULL
+BEGIN
+set @dropsql =''DROP TABLE ''+@customertablename
+ exec(@dropsql) 
+END
+ DECLARE colsCursors CURSOR FOR 
+SELECT distinct IV.columnname
+FROM (
+SELECT		COALESCE (dbo.TSMETA.ListName + ''_'' + dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		COALESCE (dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND dbo.TSITEM.LIST = dbo.TSMETA.ListName
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		''Resource_'' + dbo.TSRESMETA.ColumnName AS columnname
+FROM		dbo.TSTIMESHEET AS TSTIMESHEET_1
+INNER JOIN	dbo.TSRESMETA ON TSTIMESHEET_1.TS_UID = dbo.TSRESMETA.TS_UID
+INNER JOIN	dbo.TSITEM AS TSITEM_1 ON TSTIMESHEET_1.TS_UID = TSITEM_1.TS_UID
+INNER JOIN	dbo.TSITEMHOURS AS TSITEMHOURS_1 ON TSITEM_1.TS_ITEM_UID = TSITEMHOURS_1.TS_ITEM_UID
+WHERE TSTIMESHEET_1.SITE_UID = @siteuid
+UNION
+SELECT		''TempColumn'') as IV
+order by IV.columnname
+ OPEN colsCursors
+ FETCH NEXT FROM colsCursors 
+INTO @colname
+ WHILE @@FETCH_STATUS = 0
+BEGIN
+ set @cols = @cols + '',['' + @colname + '']''
+ FETCH NEXT FROM colsCursors 
+INTO @colname
+ END
+CLOSE colsCursors
+DEALLOCATE colsCursors
+
+if @cols <> ''''
+begin
+	declare @sql varchar(MAX)
+	set @sql = ''SELECT  Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES] as [Item Notes], APPROVAL_DATE as [Approval Date] ''
+	set @sql = @sql + @cols
+	set @sql = @sql + '', [Item UID], [Timesheet UID] into ''+@customertablename+'' FROM ''
+		set @sql = @sql + ''(SELECT Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [LastSubmittedByName], [TS_ITEM_NOTES], [APPROVAL_DATE], columnname, columnvalue,site_id	FROM vwmeta Where hours > 0) ps
+	PIVOT
+	(
+	min (columnvalue)
+	FOR columnname IN
+	(''
+	set @sql = @sql + substring(@cols,2,len(@cols)-1)
+	set @sql = @sql + '')''
+	set @sql = @sql + '') AS pvt where site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+end
+else
+begin
+	set @sql = ''SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] into ''+@customertablename+'' from vwmeta where hours > 0  and site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+end
+--Executing SQL
+exec(@sql)
+END
+DECLARE @offset INT
+DECLARE @newsize INT
+declare @maxrow INT
+IF @pageNo=0
+BEGIN
+    SET @offset = @pageNo
+    SET @newsize = @pageSize-1
+   END
+ELSE 
+  BEGIN
+    SET @offset = @pageNo*@pageSize
+    SET @newsize = @pageSize-1
+END
+ Set @maxrow  = @offset + @newsize
+ exec(''SELECT * from(SELECT  ROW_NUMBER() OVER (ORDER BY Username) AS SNO,*,newid() as rpttsduid FROM ''+@customertablename+'') as RRData WHERE [SNO]  BETWEEN  ''+@offset+'' AND  ''+@maxrow+'' order by SNO;Select count(*) as RecCount from ''+@customertablename+'''');
+')
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetMyApprovals')
 begin
     Print 'Creating Stored Procedure spTSGetMyApprovals'
@@ -1105,29 +1211,38 @@ exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
 AS
 BEGIN
+declare 
+@Running_Type_1 int
+, @Running_Type_2 int
+, @MaxThreads_type_1 int
+, @MaxThreads_type_2 int
+, @divisor int
 
-declare @sql varchar(MAX)
+set @divisor  = 2
 
-set @sql = '';WITH CTE AS 
-( 
-SELECT TOP '' + @maxthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+set @MaxThreads_type_2 = @maxthreads / @divisor 
+set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
+
+set @Running_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
+set @Running_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 32))
+
+
+UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+(
+SELECT top (CASE WHEN @MaxThreads_type_1 > @Running_Type_1 THEN (@MaxThreads_type_1 - @Running_Type_1) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
-WHERE QUEUE is null and status=0 and JOBTYPE_ID = 32
+WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
-) 
-UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0;
+)
 
-WITH CTE2 AS 
-( 
-SELECT TOP 200 TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+(
+SELECT TOP (CASE WHEN @MaxThreads_type_2 > @Running_Type_2 THEN (@MaxThreads_type_2 - @Running_Type_2) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
-WHERE QUEUE is null and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31)
+WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
-) 
-UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0
-''
+)
 
-exec(@sql)
 
 SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.LOCKED, dbo.TSTIMESHEET.SITE_UID, 
                       dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, dbo.TSTIMESHEET.TSUSER_UID, dbo.TSTIMESHEET.APPROVAL_DATE, 
@@ -1157,7 +1272,8 @@ end
 exec(@createoralter + ' PROCEDURE [dbo].[spTSGetApprovedTimesheets]
 
 @siteguid uniqueidentifier,
-@dtapproved datetime
+@dtapproved datetime,
+@nextdtapproved datetime = null
 
 AS
 BEGIN
@@ -1174,7 +1290,7 @@ FROM         dbo.TSTIMESHEET INNER JOIN
                       dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID INNER JOIN
                       dbo.TSPERIOD ON dbo.TSTIMESHEET.PERIOD_ID = dbo.TSPERIOD.PERIOD_ID AND dbo.TSTIMESHEET.SITE_UID = dbo.TSPERIOD.SITE_ID LEFT OUTER JOIN
                       dbo.TSTYPE ON dbo.TSTIMESHEET.SITE_UID = dbo.TSTYPE.SITE_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID
-        where TSTIMESHEET.SITE_UID = @siteguid and APPROVAL_DATE >= @dtapproved              
+        where TSTIMESHEET.SITE_UID = @siteguid and APPROVAL_DATE >= @dtapproved  and (@nextdtapproved IS NULL OR APPROVAL_DATE < @nextdtapproved)              
                       ) AS A
 GROUP BY PROJECT_ID, TS_ITEM_DATE, USERNAME, WEB_UID, PERIOD_START, 
                       PERIOD_END, PROJECT_LIST_UID, TYPEID, TSTYPE_NAME, PROJECT_LIST_UID, PROJECT_ID, LIST, LIST_UID
@@ -2143,3 +2259,235 @@ SELECT * FROM vwNReadyEmails WHERE QUEUESERVER = @servername
 
 END
 ')
+
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSgetTSHoursPM')
+begin
+    Print 'Creating Stored Procedure spTSgetTSHoursPM'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSgetTSHoursPM'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spTSgetTSHoursPM]
+
+@username varchar(255),
+@siteguid uniqueidentifier,
+@period_id int
+
+AS
+BEGIN
+
+SELECT     dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEMHOURS.TS_ITEM_DATE, dbo.TSITEMHOURS.TS_ITEM_HOURS, dbo.TSITEM.TS_ITEM_UID, 
+                      COALESCE (dbo.TSTYPE.TSTYPE_ID, 0) AS TSTYPE_ID
+FROM         dbo.TSITEMHOURS FULL OUTER JOIN
+                      dbo.TSTYPE RIGHT OUTER JOIN
+                      dbo.TSITEM INNER JOIN
+                      dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID ON dbo.TSTYPE.SITE_UID = dbo.TSTIMESHEET.SITE_UID ON 
+                      dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID
+WHERE period_id=@period_id and tstimesheet.site_uid = @siteguid and username like @username AND TS_ITEM_TYPE_ID<>0
+UNION
+SELECT     dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEMHOURS.TS_ITEM_DATE, dbo.TSITEMHOURS.TS_ITEM_HOURS, 
+                      dbo.TSITEM.TS_ITEM_UID, TSTYPE_ID=0
+FROM         dbo.TSITEMHOURS FULL OUTER JOIN
+                      dbo.TSITEM INNER JOIN
+                      dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID
+WHERE period_id=@period_id and tstimesheet.site_uid = @siteguid and username like @username AND TS_ITEM_TYPE_ID=0
+
+
+SELECT     dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID, dbo.TSNOTES.TS_ITEM_DATE, dbo.TSNOTES.TS_ITEM_NOTES
+FROM         dbo.TSNOTES INNER JOIN
+                      dbo.TSITEM INNER JOIN
+                      dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID ON dbo.TSNOTES.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID
+WHERE period_id=@period_id and tstimesheet.site_uid = @siteguid and username like @username
+
+END
+')
+
+
+
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSAllData_V2')
+begin
+    Print 'Creating Stored Procedure spTSAllData_V2'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSAllData_V2'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROC [dbo].[spTSAllData_V2]
+	@siteuid uniqueidentifier
+AS
+BEGIN
+-- {versionMarker}
+declare @colname varchar(255)
+declare @cols varchar(MAX)
+
+set @cols = ''''
+
+IF (EXISTS (SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES 
+                 WHERE  TABLE_NAME = ''TempTSTable''))
+BEGIN
+  drop table TempTSTable
+END
+
+/*
+DECLARE colsCursors CURSOR FOR 
+SELECT distinct columnname
+from vwmeta
+where site_id = @siteuid
+*/
+/* Trial replacement of query (MAW, 2016-10-30) */
+DECLARE colsCursors CURSOR FOR 
+SELECT distinct IV.columnname
+FROM (
+SELECT		COALESCE (dbo.TSMETA.ListName + ''_'' + dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		COALESCE (dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND dbo.TSITEM.LIST = dbo.TSMETA.ListName
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		''Resource_'' + dbo.TSRESMETA.ColumnName AS columnname
+FROM		dbo.TSTIMESHEET AS TSTIMESHEET_1
+INNER JOIN	dbo.TSRESMETA ON TSTIMESHEET_1.TS_UID = dbo.TSRESMETA.TS_UID
+INNER JOIN	dbo.TSITEM AS TSITEM_1 ON TSTIMESHEET_1.TS_UID = TSITEM_1.TS_UID
+INNER JOIN	dbo.TSITEMHOURS AS TSITEMHOURS_1 ON TSITEM_1.TS_ITEM_UID = TSITEMHOURS_1.TS_ITEM_UID
+WHERE TSTIMESHEET_1.SITE_UID = @siteuid
+UNION
+SELECT		''TempColumn'') as IV
+order by IV.columnname
+
+OPEN colsCursors
+
+FETCH NEXT FROM colsCursors 
+INTO @colname
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+set @cols = @cols + '',['' + @colname + '']''
+
+FETCH NEXT FROM colsCursors 
+INTO @colname
+
+END
+
+CLOSE colsCursors
+DEALLOCATE colsCursors
+
+declare @sql varchar(MAX)
+
+if @cols <> ''''
+begin
+	set @sql = ''
+		WITH C1 AS (
+			SELECT 			dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSUSER.USER_ID AS SharePointAccountID, dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
+									 dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, dbo.TSITEM.ITEM_TYPE AS [Item Type], dbo.TSITEM.TS_UID AS [Timesheet UID], dbo.TSPERIOD.PERIOD_ID AS [Period Id], 
+									 dbo.TSPERIOD.SITE_ID, dbo.TSITEM.LIST AS List, dbo.TSITEMHOURS.TS_ITEM_DATE AS Date, dbo.TSITEMHOURS.TS_ITEM_HOURS AS Hours, dbo.TSITEMHOURS.TS_ITEM_TYPE_ID AS [Type Id], 
+									 dbo.TSTYPE.TSTYPE_NAME AS [Type Name], dbo.TSPERIOD.PERIOD_START AS [Period Start], dbo.TSPERIOD.PERIOD_END AS [Period End], 
+									 CASE dbo.TSTIMESHEET.SUBMITTED WHEN 0 THEN ''''No'''' WHEN 1 THEN ''''Yes'''' END AS Submitted, 
+									 CASE dbo.TSTIMESHEET.APPROVAL_STATUS WHEN 0 THEN ''''Pending'''' WHEN 1 THEN ''''Approved'''' WHEN 2 THEN ''''Rejected'''' END AS [Approval Status], 
+									 CASE dbo.TSITEM.APPROVAL_STATUS WHEN 0 THEN ''''Pending'''' WHEN 1 THEN ''''Approved'''' WHEN 2 THEN ''''Rejected'''' END AS [PM Approval Status], 
+									 CONVERT(varchar(8000), COALESCE (dbo.TSTIMESHEET.APPROVAL_NOTES, '''''''')) AS [Approval Notes], dbo.TSTIMESHEET.LASTMODIFIEDBYN, 
+									 CONVERT(varchar(MAX), dbo.TSNOTES.TS_ITEM_NOTES) AS TS_ITEM_NOTES, 
+									 dbo.TSTIMESHEET.APPROVAL_DATE, COALESCE (dbo.TSTIMESHEET.LastSubmittedByName, dbo.TSTIMESHEET.LASTMODIFIEDBYN) AS LastSubmittedByName, 
+									 COALESCE (dbo.TSTIMESHEET.LastSubmittedByUser, dbo.TSTIMESHEET.LASTMODIFIEDBYU) AS LastSubmittedByUser, dbo.TSITEM.TS_ITEM_UID, dbo.TSITEM.RATE Rate
+			FROM            dbo.TSITEM INNER JOIN
+									 dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
+									 dbo.TSPERIOD ON dbo.TSTIMESHEET.PERIOD_ID = dbo.TSPERIOD.PERIOD_ID AND dbo.TSTIMESHEET.SITE_UID = dbo.TSPERIOD.SITE_ID INNER JOIN
+									 dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID LEFT OUTER JOIN
+									 dbo.TSNOTES ON dbo.TSITEM.TS_ITEM_UID = dbo.TSNOTES.TS_ITEM_UID AND dbo.TSITEMHOURS.TS_ITEM_DATE = dbo.TSNOTES.TS_ITEM_DATE LEFT OUTER JOIN                        
+									 dbo.TSTYPE ON dbo.TSTIMESHEET.SITE_UID = dbo.TSTYPE.SITE_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID LEFT OUTER JOIN
+									 dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID
+		)
+		SELECT IDENTITY(bigint,1,1) ID, 
+				Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], 
+				[ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], 
+				[Period Start], [Period End],		 
+				[Submitted], [Approval Status],[PM Approval Status],[Approval Notes],
+				[lastmodifiedbyn], [TS_ITEM_NOTES], 
+				site_id, TS_ITEM_UID, Rate
+		INTO #META
+		FROM C1
+		WHERE HOURS > 0
+		AND site_id = '''''' + convert(varchar(50),@siteuid) + ''''''
+		OPTION (HASH JOIN)
+	'' 
+	+
+	''
+		;WITH
+		P0 AS (
+			SELECT M.ID, COALESCE (dbo.TSMETA.ListName + ''''_'''' + dbo.TSMETA.ColumnName, ''''TempColumn'''') AS ColumnName, dbo.TSMETA.ColumnValue
+			FROM #META M LEFT OUTER JOIN dbo.TSMETA ON M.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID	
+			UNION ALL
+			SELECT M.ID, COALESCE (dbo.TSMETA.ColumnName, ''''TempColumn'''') AS ColumnName, dbo.TSMETA.ColumnValue
+			FROM #META M LEFT OUTER JOIN dbo.TSMETA ON M.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND M.LIST = dbo.TSMETA.ListName	
+			UNION ALL
+			SELECT M.ID, ''''Resource_'''' + dbo.TSRESMETA.ColumnName AS ColumnName, 
+			CASE dbo.TSRESMETA.ColumnName WHEN ''''StandardRate'''' THEN (CASE WHEN (M.Rate is null or M.Rate = '''''''') THEN dbo.TSRESMETA.ColumnValue ELSE M.Rate END) ELSE dbo.TSRESMETA.columnvalue  END AS ColumnValue
+			FROM #META M INNER JOIN dbo.TSRESMETA ON M.[Timesheet UID] = dbo.TSRESMETA.TS_UID	
+		)
+		SELECT * INTO #P0 FROM P0 
+	''
+	+
+	''
+		SELECT ID ''+ @cols +''			
+		INTO #P1
+		FROM (
+			SELECT ID, columnname, columnvalue 
+			FROM #P0 		
+			) ps PIVOT ( 
+			min (columnvalue) FOR columnname IN (
+				'' + substring(@cols,2,len(@cols)-1) + ''
+			)
+		) AS pvt
+	''
+	+
+	''
+		SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], 
+			[ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], 
+			convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name],	
+			[Submitted], [Approval Status],[PM Approval Status],[Approval Notes], 
+			[lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] as [Item Notes]
+			''+@cols+'',
+			[Item UID], [Timesheet UID] 
+		INTO TempTSTable
+		FROM #META M JOIN #P1 P1 ON M.ID = P1.ID
+		OPTION (HASH JOIN)
+	''
+	+
+	''
+		DROP TABLE #P0
+		DROP TABLE #P1
+		DROP TABLE #META
+	''
+end
+else
+begin
+
+	set @sql = ''SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' 
+- '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] into  TempTSTable from vwmeta_V2 where hours > 0 and site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+
+end
+set @sql=@sql+'' alter table TempTSTable add rpttsduid uniqueidentifier''
+set @sql=@sql+'' update TempTSTable set rpttsduid=newid()''
+
+ --print @sql
+--print @cols
+
+exec(@sql)
+END
+')
+

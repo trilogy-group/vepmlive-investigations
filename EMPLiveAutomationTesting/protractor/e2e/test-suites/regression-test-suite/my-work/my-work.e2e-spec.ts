@@ -38,7 +38,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    it('Verify that View should be saved - [744288]', async () => {
+    it('Verify that View should be saved - [744288][BUG:SKYVERA-2366]', async () => {
         StepLogger.caseId = 744288;
         // Step 1 and Step 2 are inside below function
         StepLogger.stepId(1);
@@ -72,7 +72,7 @@ describe(SuiteNames.regressionTestSuite, () => {
         await LoginPageHelper.logout();
     });
 
-    it('Verify that View should be renamed - [744291]', async () => {
+    it('Verify that View should be renamed - [744291][BUG:SKYVERA-2366]', async () => {
         StepLogger.caseId = 744291;
         // Step 1 are inside below function
         StepLogger.stepId(1);
@@ -89,7 +89,7 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(3);
         StepLogger.step('Click on rename View button.');
-        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        await PageHelper.getText(MyWorkPage.getCurrentView);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
 
         StepLogger.stepId(4);
@@ -98,7 +98,6 @@ describe(SuiteNames.regressionTestSuite, () => {
 
         StepLogger.stepId(5);
         StepLogger.step('Click on Ok in the pop-up.');
-        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(
@@ -110,7 +109,7 @@ describe(SuiteNames.regressionTestSuite, () => {
             MyWorkPageConstants.currentView, viewNewName);
     });
 
-    it('Message while renaming the default view - [744293]', async () => {
+    it('Message while renaming the default view - [744293][BUG:SKYVERA-2366]', async () => {
         StepLogger.caseId = 744293;
         // preConditions are inside below function
         StepLogger.step('preCondition - click on My Workplace>> Click on My Work >> Views tab');
@@ -127,11 +126,10 @@ describe(SuiteNames.regressionTestSuite, () => {
         await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.getCurrentView, MyWorkPageConstants.currentView);
         StepLogger.stepId(2);
         StepLogger.step('Click on rename View button.> provide new name >click on ok');
-        const currentViewName = await PageHelper.getText(MyWorkPage.getCurrentView);
+        await PageHelper.getText(MyWorkPage.getCurrentView);
         await PageHelper.click(MyWorkPage.getViewRibbonOptions.renameView);
         // Step 2 and 3 are inside the below function
         const viewNewName = await MyWorkPageHelper.fillAndSubmitRenameView();
-        await MyWorkPageHelper.verifyAndAcceptRenameConfirmationPopup(currentViewName);
         // Takes time update current view
         await browser.sleep(PageHelper.timeout.xs);
         await CommonPageHelper.navigateToItemPageUnderMyWorkplace(

@@ -2,10 +2,10 @@ const browserList = require('./browser-list.js');
 const testrail = require("testrail-api");
 const setupUtilities = require('./setup-utilities');
 const browserStackBrowser = browserList[setupUtilities.getParam("chrome", "--params.browserstack.browser", false)];
-const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(10, "--params.maxInstances", false);
+const maxBrowserInstances = process.env.MAX_INSTANCES || setupUtilities.getParam(5, "--params.maxInstances", false);
 const useHeadlessBrowser = process.env.HEADLESS_BROWSER || setupUtilities.toBoolean(setupUtilities.getParam(false, "--params.headlessBrowser", false));
 const chromeHeadlessArgs = ['--headless', '--disable-gpu', '--window-size=1280x800', '--disable-dev-shm-usage', '--no-sandbox', '--disable-blink-features=BlockCredentialedSubresources',
-    '--disable-web-security'];
+    '--disable-web-security', '--ignore-certificate-errors'];
 /*  ABOUT --disable-dev-shm-usage:
     By default, Docker runs a container with a /dev/shm shared memory space 64MB.
     This is typically too small for Chrome and will cause Chrome to crash when rendering large pages.
@@ -69,15 +69,19 @@ const configSetup = {
         maxInstances: maxBrowserInstances
     }],
     params: {
+        siteCollection: setupUtilities.getParam('/epm', "--params.siteCollection", false),
         maxInstances: maxBrowserInstances,
         maxSessions: maxBrowserInstances,
         testrail: {
             projectId: process.env.TESTRAIL_PROJECT_ID || setupUtilities.getParam(345, "--params.testrail.projectId", false),
             milestoneName: process.env.TESTRAIL_MILESTONE_NAME || setupUtilities.getParam("Automation milestone week", "--params.testrail.milestoneName", false),
-            versionName: process.env.VERSION || setupUtilities.getParam("Default version name", "--params.testrail.versionName", false),
+            versionName:  setupUtilities.getParam(process.env.BUILD_VERSION, "--params.testrail.versionName", false),
             host: process.env.TESTRAIL_HOST || setupUtilities.getParam("https://testrail.devfactory.com/", '--params.testrail.host', false),
             user: process.env.TESTRAIL_USER || setupUtilities.getParam('testrail.automation@aurea.com', "--params.testrail.user", false),
-            password: process.env.TESTRAIL_PASSWORD || setupUtilities.getParam('Dav8B6Mgcoa7Fcb1DqJK-qvEoZ0400eKfqw82Bh.F', '--params.testrail.password', false)
+            password: process.env.TESTRAIL_PASSWORD || setupUtilities.getParam('Dav8B6Mgcoa7Fcb1DqJK-qvEoZ0400eKfqw82Bh.F', '--params.testrail.password', false),
+            milestoneNamePrefix: process.env.TESTRAIL_MILESTONE_NAME_PREFIX || setupUtilities.getParam('Automation milestone week', '--params.testrail.milestoneNamePrefix', false),
+            planNamePrefix: process.env.TESTRAIL_PLAN_NAME_PREFIX || setupUtilities.getParam('Automation Test Plan', '--params.testrail.planNamePrefix', false),
+            planId: process.env.TESTRAIL_PLAN_ID || setupUtilities.getParam(0, '--params.testrail.planId', false),
         },
         version: process.env.VERSION || setupUtilities.getParam('7.5.0', "--params.testrail.versionName", false),
         selenium: {
@@ -125,7 +129,7 @@ const configSetup = {
             }
         }
     },
-    baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com/epm', "--baseUrl", false),
+    baseUrl: setupUtilities.getParam('http://tenant02.epmldev.com', "--baseUrl", false),
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,

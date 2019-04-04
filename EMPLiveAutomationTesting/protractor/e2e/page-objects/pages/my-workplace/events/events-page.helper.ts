@@ -190,4 +190,27 @@ export class EventsPageHelper {
             i++;
         }
     }
+
+    static async deleteEvent(eventTitle: string) {
+        StepLogger.subStep('Navigate to Events Page');
+        await CommonPageHelper.navigateToItemPageUnderMyWorkplace(MyWorkplacePage.navigation.events,
+            CommonPage.pageHeaders.myWorkplace.events,
+            CommonPageConstants.pageHeaders.myWorkplace.events,
+        );
+        StepLogger.subStep('Expand all events');
+        await this.expandAllItems();
+        StepLogger.subVerification('Verify if event is displayed');
+        await ExpectationHelper.verifyDisplayedStatus(EventsPage.eventBox(eventTitle), eventTitle);
+        StepLogger.subStep(`Click on event ${eventTitle}`);
+        await PageHelper.click(EventsPage.eventBox(eventTitle));
+        StepLogger.subVerification('Verify if delete button is displayed');
+        await ExpectationHelper.verifyDisplayedStatus(EventsPage.deleteEventButton, eventTitle);
+        StepLogger.subStep('Click on delete button');
+        await PageHelper.click(EventsPage.deleteEventButton);
+        StepLogger.subStep('Accept confirmation alert');
+        await PageHelper.acceptAlert();
+        StepLogger.subVerification('Verify if event is displayed');
+        await ExpectationHelper.verifyHiddenStatus(EventsPage.eventBox(eventTitle), eventTitle, true);
+    }
+
 }

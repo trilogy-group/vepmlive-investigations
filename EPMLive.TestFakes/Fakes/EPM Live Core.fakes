@@ -7,6 +7,7 @@
   <ShimGeneration>
     <Clear/>
     <Add FullName="EPMLiveCore.Security!"/>
+    <Add FullName="EPMLiveCore.Jobs.SecurityUpdate!"/>
     <Add FullName="EPMLiveCore.AssignmentPlanner.GridManager!"/>
     <Add FullName="EPMLiveCore.AppSettingsHelper!"/>
     <Add FullName="EPMLiveCore.EditableFieldDisplay!"/>
@@ -51,6 +52,7 @@
     <Add FullName="EPMLiveCore.GenericEntityPickerPropertyBag"/>
     <Add FullName="EPMLiveCore.API.CommentManager!"/>
     <Add FullName="EPMLiveCore.SocialEngine.Core.Logger!"/>
+    <Add FullName="EPMLiveCore.Infrastructure.Logging.Logger!"/>
     <Add FullName="EPMLiveCore.ExtensionMethods!"/>
     <Add FullName="EPMLiveCore.XMLDataManager!"/>
     <Add Namespace="EPMLiveCore.SocialEngine!"/>
@@ -114,6 +116,7 @@
     <Add FullName="EPMLiveCore.ApplicationStore.AppStore!"/>
     <Add FullName="EPMLiveCore.API.Reporting!"/>
     <Add FullName="EPMLiveCore.addusers!"/>
+    <Add FullName="EPMLiveCore.SocialEngine.Entities.Activity!"/>
     <Add Namespace="EPMLiveCore.Integrations.Salesforce!"/>
     <Add FullName="EPMLiveCore.CascadingLookupField!"/>
     <Add FullName="EPMLiveCore.CascadingLookupFieldSettings!"/>
@@ -123,5 +126,7 @@
     <Add FullName="EPMLiveCore.Jobs.TimerFix!"/>
     <Add FullName="EPMLiveCore.Helpers.WebServicesHelper!"/>
     <Add FullName="EPMLiveCore.adsyncadmin!"/>
+    <Add FullName="EPMLiveCore.ControlCollectionExtensions!"/>
+    <Add FullName="EPMLiveCore.BtnChangeApp!"/>
   </ShimGeneration>
 </Fakes>

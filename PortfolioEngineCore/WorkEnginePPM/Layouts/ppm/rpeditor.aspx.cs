@@ -31,6 +31,7 @@ using System;
 using System.Web.UI;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using EPMLiveCore;
 
 namespace WorkEnginePPM
 {
@@ -58,6 +59,7 @@ namespace WorkEnginePPM
             {
                 WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
                 ctl.WEPID = Request["itemid"];
+                ctl.DepartmentValidation = CoreFunctions.getConfigSetting(Web, "EPMRPDepartmentValidation", true, false);
                 ctl.TicketVal = Request["dataid"];
                 ctl.IsResource = Request["isresource"];
                 ctl.IsDlg = Request["IsDlg"];
@@ -114,9 +116,10 @@ namespace WorkEnginePPM
                 {
                     WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.RPEditorControl)LoadControl("/_layouts/ppm/RPEditor.ascx");
                     ctl.WEPID = Request["itemid"];
+                    ctl.DepartmentValidation = CoreFunctions.getConfigSetting(Web, "EPMRPDepartmentValidation", true, false);
                     ctl.TicketVal = Request["dataid"];
                     ctl.IsResource = Request["isresource"];
-                    ctl.IsDlg = Request["IsDlg"];
+                    ctl.IsDlg = string.IsNullOrEmpty(Request["IsDlg"]) ? "0" : Request["IsDlg"];
                     ctl.HideCloseBtn = Request["hideCloseBtn"];
                     ctl.MaxPeriodLimit = GetMaxPeriodLimit();
                     if (string.IsNullOrEmpty(Request["isresource"]) == true || Request["isresource"] == "0")

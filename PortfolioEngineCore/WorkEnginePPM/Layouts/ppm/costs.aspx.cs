@@ -41,7 +41,7 @@ namespace WorkEnginePPM
                 WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl ctl = (WorkEnginePPM.ControlTemplates.WorkEnginePPM.EditCostsControl)LoadControl("/_layouts/ppm/EditCosts.ascx");
                 ctl.ViewUID = 0;
                 ctl.WEPID = "";
-                ctl.IsDlg = Request["IsDlg"];
+                ctl.IsDlg = string.IsNullOrEmpty(Request["IsDlg"]) ? "0" : Request["IsDlg"];
                 // Sets based on site's current culture
                 ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
                 ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
@@ -85,7 +85,7 @@ namespace WorkEnginePPM
                         ctl.ViewUID = i;
                     }
                     ctl.WEPID = Request["itemid"];
-                    ctl.IsDlg = Request["IsDlg"];
+                    ctl.IsDlg = string.IsNullOrEmpty(Request["IsDlg"]) ? "0" : Request["IsDlg"];
                     // Sets based on site's current culture
                     ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
                     ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;

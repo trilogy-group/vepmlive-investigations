@@ -2162,34 +2162,15 @@ namespace PortfolioEngineCore
                             CStruct xPlanRow;
                             if (dicPlanRows.TryGetValue(lPrevUID.ToString("0"), out xPlanRow))
                             {
-                                if (bPrevPending == false)
-                                {
-                                    if (sPeriods != "")
-                                        xPlanRow.CreateString("Periods", sPeriods);
-                                    if (sHours != "")
-                                        xPlanRow.CreateString("PeriodHours", sHours);
-                                    if (sFTEs != "")
-                                        xPlanRow.CreateString("PeriodFTEs", sFTEs);
-                                    if (sModes != "")
-                                        xPlanRow.CreateString("PeriodModes", sModes);
-                                    if (sRevenues != "")
-                                        xPlanRow.CreateString("PeriodRevenues", sRevenues);
-                                }
-                                else
-                                {
-                                    if (sPeriods != "")
-                                        xPlanRow.CreateString("PendingPeriods", sPeriods);
-                                    if (sHours != "")
-                                        xPlanRow.CreateString("PendingHours", sHours);
-                                    if (sFTEs != "")
-                                        xPlanRow.CreateString("PendingFTEs", sFTEs);
-                                    if (sModes != "")
-                                        xPlanRow.CreateString("PendingModes", sModes);
-                                    if (sRevenues != "")
-                                        xPlanRow.CreateString("PendingRevenues", sRevenues);
-                                    if (sEnteredBys != "")
-                                        xPlanRow.CreateString("PendingEnteredBys", sEnteredBys);
-                                }
+                                CreatePlanColumns(
+                                    bPrevPending,
+                                    sPeriods,
+                                    xPlanRow,
+                                    sHours,
+                                    sFTEs,
+                                    sModes,
+                                    sRevenues,
+                                    sEnteredBys);
                                 sPeriods = "";
                                 sHours = "";
                                 sFTEs = "";
@@ -2214,34 +2195,15 @@ namespace PortfolioEngineCore
                         CStruct xPlanRow;
                         if (dicPlanRows.TryGetValue(lPrevUID.ToString("0"), out xPlanRow))
                         {
-                            if (bPrevPending == false)
-                            {
-                                if (sPeriods != "")
-                                    xPlanRow.CreateString("Periods", sPeriods);
-                                if (sHours != "")
-                                    xPlanRow.CreateString("PeriodHours", sHours);
-                                if (sFTEs != "")
-                                    xPlanRow.CreateString("PeriodFTEs", sFTEs);
-                                if (sModes != "")
-                                    xPlanRow.CreateString("PeriodModes", sModes);
-                                if (sRevenues != "")
-                                    xPlanRow.CreateString("PeriodRevenues", sRevenues);
-                            }
-                            else
-                            {
-                                if (sPeriods != "")
-                                    xPlanRow.CreateString("PendingPeriods", sPeriods);
-                                if (sHours != "")
-                                    xPlanRow.CreateString("PendingHours", sHours);
-                                if (sFTEs != "")
-                                    xPlanRow.CreateString("PendingFTEs", sFTEs);
-                                if (sModes != "")
-                                    xPlanRow.CreateString("PendingModes", sModes);
-                                if (sRevenues != "")
-                                    xPlanRow.CreateString("PendingRevenues", sRevenues);
-                                if (sEnteredBys != "")
-                                    xPlanRow.CreateString("PendingEnteredBys", sEnteredBys);
-                            }
+                            CreatePlanColumns(
+                                bPrevPending,
+                                sPeriods,
+                                xPlanRow,
+                                sHours,
+                                sFTEs,
+                                sModes,
+                                sRevenues,
+                                sEnteredBys);
                         }
                     }
                     reader.Close();
@@ -2256,6 +2218,68 @@ namespace PortfolioEngineCore
             }
         Exit_Function:
             return (_dba.Status == StatusEnum.rsSuccess);
+        }
+
+        private static void CreatePlanColumns(
+            bool prevPending,
+            string periods,
+            CStruct planRow,
+            string hours,
+            string FTEs,
+            string modes,
+            string revenues,
+            string enteredBys)
+        {
+            if (prevPending == false)
+            {
+                if (!string.IsNullOrWhiteSpace(periods))
+                {
+                    planRow.CreateString("Periods", periods);
+                }
+                if (!string.IsNullOrWhiteSpace(hours))
+                {
+                    planRow.CreateString("PeriodHours", hours);
+                }
+                if (!string.IsNullOrWhiteSpace(FTEs))
+                {
+                    planRow.CreateString("PeriodFTEs", FTEs);
+                }
+                if (!string.IsNullOrWhiteSpace(modes))
+                {
+                    planRow.CreateString("PeriodModes", modes);
+                }
+                if (!string.IsNullOrWhiteSpace(revenues))
+                {
+                    planRow.CreateString("PeriodRevenues", revenues);
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(periods))
+                {
+                    planRow.CreateString("PendingPeriods", periods);
+                }
+                if (!string.IsNullOrWhiteSpace(hours))
+                {
+                    planRow.CreateString("PendingHours", hours);
+                }
+                if (!string.IsNullOrWhiteSpace(FTEs))
+                {
+                    planRow.CreateString("PendingFTEs", FTEs);
+                }
+                if (!string.IsNullOrWhiteSpace(modes))
+                {
+                    planRow.CreateString("PendingModes", modes);
+                }
+                if (!string.IsNullOrWhiteSpace(revenues))
+                {
+                    planRow.CreateString("PendingRevenues", revenues);
+                }
+                if (!string.IsNullOrWhiteSpace(enteredBys))
+                {
+                    planRow.CreateString("PendingEnteredBys", enteredBys);
+                }
+            }
         }
 
         private bool ConvertDateToPeriod(List<CPeriod> clnPeriods, DateTime dt, out int lPeriod)

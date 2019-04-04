@@ -8,7 +8,7 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string InternalName = "InternalName";
         private const string DummyText = "Dummy";
@@ -36,12 +36,14 @@ namespace EPMLiveWebParts.Tests
             _workspaceUrl = true;
 
             _newItemNode = null;
+            _idsCount = 1;
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             _shimsObject?.Dispose();
+            _responseWriter?.Dispose();
         }
 
         [TestMethod]

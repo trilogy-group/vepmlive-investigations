@@ -19,6 +19,7 @@ import { ComponentHelpers } from '../../../../components/devfactory/component-he
 import { MyTimeOffPage } from '../../my-workplace/my-time-off/my-time-off.po';
 import { ResourcePlannerConstants } from '../../resource-planner-page/resource-planner-page.constants';
 import { EditCost } from './edit-cost-page/edit-cost.po';
+import { CommonSubPageHelper } from '../../common/common-page.subhelper';
 
 export class ProjectItemPageHelper {
     static get getlink() {
@@ -250,9 +251,8 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.navigateAndSearchPage(projectNameValue);
 
         StepLogger.subStep('Click on "Items" tab');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
         await ProjectItemPageHelper.clickOnSearchedRecord();
+        await CommonPageHelper.clickItemTab();
 
         StepLogger.subStep('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
@@ -294,10 +294,8 @@ export class ProjectItemPageHelper {
         await ProjectItemPageHelper.navigateAndSearchPage(projectNameValue);
 
         StepLogger.subStep('Click on "Items" tab');
-        await PageHelper.click(CommonPage.ribbonTitles.items);
-        await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);
-        await PageHelper.sleepForXSec(PageHelper.timeout.s);
         await ProjectItemPageHelper.clickOnSearchedRecord();
+        await CommonSubPageHelper.clickOnItemsTab();
 
         StepLogger.subStep('Select "Edit Team" from the options displayed');
         await WaitHelper.waitForElementToBeDisplayed(CommonPage.ribbonItems.editTeamButton);

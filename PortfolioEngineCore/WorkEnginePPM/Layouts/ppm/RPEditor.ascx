@@ -332,7 +332,9 @@
     function addResourcesDlg_DialogEvent(action) { rpeditor.addResourcesDlg_DialogEvent(action); }
     function dialogEvent(action) { rpeditor.externalEvent(action); }
     function NotesDialogEvent(action) { rpeditor.NotesDialogEvent(action); }
+    var DepartmentValidation = '<%=DepartmentValidation%>';
     amountCheck('idSpreadAmount');
+    var DepartmentValidation = '<%=DepartmentValidation%>';
     var params = {};
     try {
         params.ClientID = '<%=ClientID%>';

@@ -424,6 +424,8 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Arrange
             SetupForProcessItemMethod(true, false);
 
+            TimeSheets.Log.Fakes.ShimLogger.WriteLogLoggerCategoryStringString = (_, _2, _3) => { };
+
             // Act
             _privateObject.Invoke(ProcessItemMethod, DummyString, _web.Instance, new ShimSPList().Instance, new ShimSPList().Instance);
 
@@ -444,6 +446,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             // Arrange
             SetupForProcessItemMethod(false, false);
 
+            TimeSheets.Log.Fakes.ShimLogger.WriteLogLoggerCategoryStringString = (_, _2, _3) => { };
             // Act
             _privateObject.Invoke(ProcessItemMethod, DummyString, _web.Instance, new ShimSPList().Instance, new ShimSPList().Instance);
 
@@ -466,6 +469,7 @@ namespace EPMLiveTimesheets.Tests.WebPageCode
             };
             _privateObject.SetField(DayDefsField, dayDefs);
             _privateObject.SetField(TimeEditorField, timeEditor);
+
             ShimHttpRequest.AllInstances.ItemGetString = (_, item) =>
             {
                 if (item.Contains(ItemIdParameter) || item.Contains(FieldCountParameter) || item.Contains(DateCountParameter))

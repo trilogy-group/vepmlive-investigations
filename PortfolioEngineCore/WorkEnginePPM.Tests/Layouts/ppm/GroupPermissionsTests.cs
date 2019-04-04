@@ -56,6 +56,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
         {
             // Arrange
             var dataTable = new DataTable();
+            var privateType = new PrivateType(typeof(GroupPermissionsGridHelper));
 
             // Act
             var result = privateType.InvokeStatic(BuildGridLayoutMethodName, dataTable) as CStruct;
@@ -321,7 +322,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
                 }
             };
             ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsSuccess;
-            ShimGroupPermissions.BuildGridLayoutDataTable = dataTable => new CStruct();
+            ShimGroupPermissionsGridHelper.BuildGridLayoutDataTable = dataTable => new CStruct();
             ShimCStruct.AllInstances.XML = _ => DummyString;
 
             // Act
@@ -352,7 +353,7 @@ namespace WorkEnginePPM.Tests.Layouts.ppm
                 CountGet = () => 0
             };
             ShimSqlDb.AllInstances.StatusGet = _ => StatusEnum.rsRequestCannotBeCompleted;
-            ShimGroupPermissions.BuildGridLayoutDataTable = dataTable => new CStruct();
+            ShimGroupPermissionsGridHelper.BuildGridLayoutDataTable = dataTable => new CStruct();
 
             // Act
             var result = GroupPermissions.GroupPermissionsRequest(httpContext, RequestContext, structData);

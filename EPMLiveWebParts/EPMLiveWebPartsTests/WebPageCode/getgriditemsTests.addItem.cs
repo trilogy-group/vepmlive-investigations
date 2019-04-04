@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Fakes;
 using System.Collections.Generic;
 using System.Collections.Generic.Fakes;
+using System.Collections.Specialized;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.ActiveDirectory.Fakes;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,20 +21,20 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Fakes;
+using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.Workflow;
 using Microsoft.SharePoint.Workflow.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Shouldly;
 
 namespace EPMLiveWebParts.Tests
 {
-    public partial class getgriditemsTests
+    public partial class GetGridItemsTests
     {
         private const string ExampleUrl = "http://example.com";
         private const string TypeTextXml = "text/xml";
         private const string TypeTextPlain = "text/plain";
-        private const string TitleField = "Title";
+        private const string FieldTitle = "Title";
         private const string AddItemMethod = "addItem";
         private bool _inEditmode;
         private bool _timesheet;
@@ -80,7 +82,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -243,7 +245,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'view');return false;\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -263,7 +265,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -306,7 +308,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -349,7 +351,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -369,7 +371,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"\" onclick=\"javascript:viewItem(this,'edit');return false;\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -390,7 +392,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -408,7 +410,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\">"),
                 () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
@@ -428,7 +430,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/tasks.aspx?ID=1\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\">"));
         }
 
         [TestMethod]
@@ -446,7 +448,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/_layouts/epmlive/workplanner.aspx?ID=1&Source=DummyVal\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -464,7 +466,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\"></a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[<a href=\"http://example.com/http://example.com?FilterField1=Project&FilterValue1=\">{DummyFieldName}</a> <img src=\"/_layouts/1/images/new.gif\"> &nbsp;<a href=\"javascript:viewItem(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>&nbsp;<a href=\"DummyVal\"><img src=\"http://example.com/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>]]></cell>"));
         }
 
         [TestMethod]
@@ -588,11 +590,12 @@ namespace EPMLiveWebParts.Tests
         public void AddItem_CleanValuesDateTime_SetsNewItemRow()
         {
             // Arrange
+            var date = new DateTime(2018, 10, 10);
             _cleanValues = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime);
-            ShimSPListItem.AllInstances.ItemGetString = (_, __) => DateTime.Today;
+            ShimSPListItem.AllInstances.ItemGetString = (_, __) => date;
             Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-                (a, b, c, d) => DateTime.Today.ToString();
+                (a, b, c, d) => date.ToString();
 
             // Act
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
@@ -601,7 +604,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{date.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
         }
 
         [TestMethod]
@@ -865,7 +868,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell type=\"ed\"><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"ed\"><![CDATA[{DummyText}.{DummyVal}]]></cell>"));
         }
         
         [TestMethod]
@@ -913,11 +916,12 @@ namespace EPMLiveWebParts.Tests
         public void AddItem_InEditModeDateTime_SetsNewItemRow()
         {
             // Arrange
+            var date = new DateTime(2018, 10, 10);
             _cleanValues = false;
             _inEditmode = true;
             var indexer = PrepareForAddItem("ItemID", "ItemID", fieldType: SPFieldType.DateTime, editable: true);
             Shimgetgriditems.AllInstances.getFieldSPListItemStringBoolean =
-                (a, b, c, d) => DateTime.Today.ToString();
+                (a, b, c, d) => date.ToString();
 
             // Act
             _privateObj.Invoke(AddItemMethod, new object[] { new ShimSPListItem().Instance, indexer });
@@ -926,7 +930,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{DateTime.Today.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell type=\"dhxCalendarA\"><![CDATA[{date.ToString("MM/dd/yyyy")} 12:00:00 AM]]></cell>"));
         }
 
         [TestMethod]
@@ -945,7 +949,7 @@ namespace EPMLiveWebParts.Tests
             _newItemNode.ShouldNotBeNull();
             this.ShouldSatisfyAllConditions(
                 () => _newItemNode.InnerXml.ShouldNotBeEmpty(),
-                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace("<cell><![CDATA[]]></cell>"));
+                () => _newItemNode.InnerXml.ShouldContainWithoutWhitespace($"<cell><![CDATA[{DummyFieldName}]]></cell>"));
         }
 
         [TestMethod]
@@ -1102,7 +1106,7 @@ namespace EPMLiveWebParts.Tests
             arrItems.Add(indexer, new string[] { "Admin" });
 
             var hshLists = new Hashtable();
-            hshLists.Add(DummyVal, "test.png");
+            hshLists.Add("ICON", "test.png");
 
             _privateObj.SetField("hshWBS", hshWBS);
             _privateObj.SetField("hshFieldProperties", hshFieldProperties);
@@ -1114,6 +1118,8 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("showCheckboxes", _showCheckboxes);
             _privateObj.SetField("isTimesheet", _isTimesheet);
             _privateObj.SetField("titleFieldFound", _titleFieldFound);
+            _privateObj.SetField("bUseReporting", true);
+            _privateObj.SetField("DoesUserHavePermissionsApproveItems", true);
             _privateObj.SetField("usePopup", _usepopup);
             _privateObj.SetField("bCleanValues", _cleanValues);
             _privateObj.SetField("bWorkspaceUrl", _workspaceUrl);
@@ -1132,7 +1138,7 @@ namespace EPMLiveWebParts.Tests
             _privateObj.SetField("aViewFields", aViewFields);
 
             var hshItemNodes = new Hashtable();
-            hshItemNodes.Add(TitleField, DummyVal);
+            hshItemNodes.Add(FieldTitle, DummyVal);
             hshItemNodes.Add("SiteUrl", string.Empty);
             hshItemNodes.Add("List", string.Empty);
             hshItemNodes.Add("Site", string.Empty);
@@ -1175,7 +1181,36 @@ namespace EPMLiveWebParts.Tests
 
         private void ShimSharePoint(string internalname, SPFieldType fieldType, string listId, string webId)
         {
-            ShimSPListCollection.AllInstances.ItemGetString = (_, __) => new ShimSPList();
+            Shimgetgriditems.AllInstances.addMenusXmlNodeSPListString = (a, ndNewItem, b, c) => GetMenus(ndNewItem);
+
+            ShimSPView.AllInstances.UrlGet = _ => ExampleUrl;
+            ShimSPContentTypeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPContentType { NameGet = () => TypeTextPlain };
+            ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
+            ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
+
+            ShimSPContext.CurrentGet = () => new ShimSPContext();
+            ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
+
+            PrepareSpListRelatedShims(listId);
+            PrepareSpFieldRelatedShims(internalname, fieldType);
+            PrepareSpWebRelatedShims(webId);
+            PrepareSpFileRelatedShims();
+            PrepareSpUserRelatedShims();
+        }
+
+        private static void PrepareSpListRelatedShims(string listId = null)
+        {
+            ShimSPListCollection.AllInstances.ItemGetString = (_, key) =>
+            {
+                switch (key)
+                {
+                    case "Project Schedules":
+                        return new ShimSPDocumentLibrary().Instance;
+                    default:
+                        return new ShimSPList();
+                }
+            };
+            ShimSPListCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPList();
             ShimSPListItem.AllInstances.IDGet = _ => 1;
             ShimSPListItem.AllInstances.ParentListGet = _ => new ShimSPList();
             ShimSPListItem.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
@@ -1195,7 +1230,9 @@ namespace EPMLiveWebParts.Tests
                 }
             };
             ShimSPListItem.AllInstances.ItemGetGuid = (_, __) => DummyVal;
-            ShimSPList.AllInstances.IDGet = _ => new Guid(listId);
+
+            var listGuid = listId == null ? Guid.NewGuid() : new Guid(listId);
+            ShimSPList.AllInstances.IDGet = _ => listGuid;
             ShimSPList.AllInstances.TitleGet = _ => DummyVal;
             ShimSPList.AllInstances.ImageUrlGet = _ => $"image.png";
             ShimSPList.AllInstances.ParentWebGet = _ => new ShimSPWeb();
@@ -1205,25 +1242,48 @@ namespace EPMLiveWebParts.Tests
             ShimSPList.AllInstances.FieldsGet = _ => new ShimSPFieldCollection();
             ShimSPList.AllInstances.EnableVersioningGet = _ => true;
             ShimSPList.AllInstances.EnableModerationGet = _ => true;
+            ShimSPList.AllInstances.ViewsGet = _ => new ShimSPViewCollection { ItemGetGuid = __ => new ShimSPView() };
+            ShimSPList.AllInstances.ItemsGet = _ => new ShimSPListItemCollection();
+            ShimSPList.AllInstances.RootFolderGet = _ => new ShimSPFolder();
+            ShimSPFolder.AllInstances.NameGet = _ => "Project Center";
 
-            Shimgetgriditems.AllInstances.addMenusXmlNodeSPListString = (a, ndNewItem, b, c) => GetMenus(ndNewItem);
+            ShimSPListItemCollection.AllInstances.Add = _ => new ShimSPListItem();
+            var itemCollection = new ShimSPListItemCollection();
+            itemCollection.Bind(new List<SPListItem>
+            {
+                new ShimSPListItem()
+            });
+            ShimSPList.AllInstances.GetItemsSPQuery = (_, __) => itemCollection.Instance;
+            ShimSPList.AllInstances.GetItemsSPView = (_, __) => itemCollection.Instance;
+            ShimSPList.AllInstances.GetItemByIdInt32 = (_, __) => new ShimSPListItem();
+        }
 
-            ShimSPView.AllInstances.UrlGet = _ => ExampleUrl;
+        private void PrepareSpUserRelatedShims()
+        {
+            ShimSPUser.AllInstances.IDGet = _ => 1;
+            ShimSPUser.AllInstances.LoginNameGet = _ => DummyText;
+            ShimSPUser.AllInstances.NameGet = _ => DummyText;
+        }
 
-            ShimSPContentTypeCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPContentType { NameGet = () => TypeTextPlain };
-
-            ShimSPFormCollection.AllInstances.ItemGetPAGETYPE = (_, __) => new ShimSPForm();
-            ShimSPForm.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-
+        private void PrepareSpFieldRelatedShims(string internalname, SPFieldType fieldType)
+        {
             ShimSPFieldCollection.AllInstances.GetFieldByInternalNameString = (_, __) => new ShimSPField();
             ShimSPFieldCollection.AllInstances.ContainsFieldWithStaticNameString = (_, __) => true;
-            ShimSPField.AllInstances.IdGet = _ => Guid.NewGuid();
+            ShimSPFieldCollection.AllInstances.ItemGetGuid = (_, __) => new ShimSPField();
+
+            var fieldId = Guid.NewGuid();
+            ShimSPField.AllInstances.IdGet = _ => fieldId;
             ShimSPField.AllInstances.InternalNameGet = _ => internalname;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => internalname;
             ShimSPField.AllInstances.TypeGet = _ => fieldType;
             ShimSPField.AllInstances.ReadOnlyFieldGet = _ => false;
             ShimSPField.AllInstances.ShowInEditFormGet = _ => true;
             ShimSPField.AllInstances.SchemaXmlGet = _ => "<root>1</root>";
             ShimSPField.AllInstances.ParentListGet = _ => new ShimSPList();
+            ShimSPField.AllInstances.TitleGet = _ => DummyText;
+            ShimSPField.AllInstances.GetFieldValueString = (_, __) => DummyVal;
+            ShimSPField.AllInstances.GetFieldValueAsTextObject = (_, __) => DummyVal;
+            ShimSPField.AllInstances.GetFieldValueAsHtmlObject = (_, val) => val as string;
             ShimSPFieldLookupValue.ConstructorString = (_, __) => { };
             ShimSPFieldLookupValue.AllInstances.LookupIdGet = _ => 1;
             ShimSPFieldLookupValue.AllInstances.LookupValueGet = _ => DummyVal;
@@ -1246,8 +1306,21 @@ namespace EPMLiveWebParts.Tests
                 var enumerator = list.GetEnumerator();
                 ShimList<SPFieldUserValue>.AllInstances.GetEnumerator = x => enumerator;
             };
+        }
 
-            ShimSPWeb.AllInstances.IDGet = _ => new Guid(webId);
+        private void PrepareSpFileRelatedShims()
+        {
+            ShimSPFolderCollection.AllInstances.ItemGetString = (_, __) => new ShimSPFolder();
+            ShimSPFolder.AllInstances.SubFoldersGet = _ => new ShimSPFolderCollection();
+            ShimSPFolder.AllInstances.FilesGet = _ => new ShimSPFileCollection();
+            ShimSPFileCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPFile();
+            ShimSPFile.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
+        }
+
+        private void PrepareSpWebRelatedShims(string webId = null)
+        {
+            var webGuid = webId == null ? Guid.NewGuid() : new Guid(webId);
+            ShimSPWeb.AllInstances.IDGet = _ => webGuid;
             ShimSPWeb.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.UrlGet = _ => ExampleUrl;
             ShimSPWeb.AllInstances.ListsGet = _ => new ShimSPListCollection();
@@ -1256,23 +1329,26 @@ namespace EPMLiveWebParts.Tests
             ShimSPWeb.AllInstances.FoldersGet = _ => new ShimSPFolderCollection();
             ShimSPWeb.AllInstances.TitleGet = _ => "1";
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
+            ShimSPWeb.AllInstances.LocaleGet = _ => CultureInfo.InvariantCulture;
+            ShimSPWeb.AllInstances.AllUsersGet = _ => new ShimSPUserCollection();
+            ShimSPWeb.AllInstances.GetListString = (_, __) => new ShimSPList();
+
+            ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => new ShimSPUser
+            {
+                NameGet = () => DummyText
+            };
+
+            var properties = new StringDictionary { { "reportingV2", bool.TrueString } };
+            var propertyBag = new ShimSPPropertyBag();
+            propertyBag.Bind(properties);
+            ShimSPWeb.AllInstances.PropertiesGet = _ => propertyBag.Instance;
             ShimSPSite.AllInstances.UrlGet = _ => ExampleUrl;
-
-            ShimSPFolderCollection.AllInstances.ItemGetString = (_, __) => new ShimSPFolder();
-            ShimSPFolder.AllInstances.SubFoldersGet = _ => new ShimSPFolderCollection();
-            ShimSPFolder.AllInstances.FilesGet = _ => new ShimSPFileCollection();
-            ShimSPFileCollection.AllInstances.ItemGetInt32 = (_, __) => new ShimSPFile();
-            ShimSPFile.AllInstances.ServerRelativeUrlGet = _ => ExampleUrl;
-
-            ShimSPUser.AllInstances.IDGet = _ => 1;
-            ShimSPUser.AllInstances.LoginNameGet = _ => DummyText;
-            ShimSPUser.AllInstances.NameGet = _ => DummyText;
         }
 
         private XmlNode GetMenus(XmlNode ndNewItem)
         {
             var viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            string strViewMenus = string.Empty;
+            var strViewMenus = string.Empty;
             foreach (int v in viewMenus)
             {
                 strViewMenus += "," + v.ToString();

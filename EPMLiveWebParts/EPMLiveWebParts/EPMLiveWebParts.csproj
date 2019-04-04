@@ -358,6 +358,7 @@
     <Compile Include="ListReportView\ListReportViewToolPart.cs" />
     <Compile Include="ListReportView\ReportingServicesToolPart.cs" />
     <Compile Include="ListSummary\ListSummary.cs" />
+    <Compile Include="ListSummary\ListSummaryProcessHelper.cs" />
     <Compile Include="ListSummary\ListSummaryToolpart.cs" />
     <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
       <DependentUpon>MyWorkSummary.ascx</DependentUpon>
@@ -411,6 +412,7 @@
     <Compile Include="ResourcePlanning\ResourcePlanning.renderGantt.cs" />
     <Compile Include="ResourcePlanning\ResourcePlanning.RenderWebPart.cs" />
     <Compile Include="RollupSummary\RollupSummary.cs" />
+    <Compile Include="RollupSummary\RollupSummary.HelperMethods.cs" />
     <Compile Include="RollupSummary\SummaryRollupToolpart.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizard.cs" />
     <Compile Include="SocialStream\SocialStream.cs" />
@@ -488,6 +490,7 @@
     <Compile Include="WebPageCode\gridlistribbon.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\GroupHelper.cs" />
     <Compile Include="WebPageCode\listedititem.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
