@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -652,7 +653,7 @@ namespace WorkEnginePPM.DataServiceModules
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    Guid listguid = new Guid(this._listId);
+                    var listguid = new Guid(this._listId);
                     var projectList = _spWeb.Lists[listguid];
                     if (_dvProjects.Count > 0)
                     {
@@ -669,7 +670,7 @@ namespace WorkEnginePPM.DataServiceModules
             }
             catch (Exception ex)
             {
-                LogDSMMessage(ex.Message, 2);
+                Trace.TraceError("Exception occurred: {0}", ex);
                 return false;
             }
             return true;
