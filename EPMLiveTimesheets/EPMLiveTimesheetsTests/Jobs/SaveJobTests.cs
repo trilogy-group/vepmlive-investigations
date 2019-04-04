@@ -584,7 +584,6 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 new SaveJob.TsItemHour(DummyString, dummyDate, "10", "1"),
                 new SaveJob.TsItemHour(DummyString, dummyDate, "20", "2"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(1), "2", "2"),
-                new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(2), "0", "2"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(4), "20", "2"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(5), "2", "2"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(6), "20", "2"),
@@ -598,7 +597,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
             {
                 new SaveJob.TsItemHour(DummyString, dummyDate, "0", "0"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(1), "2", "0"),
-                new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(2), "3", "0"),
+                new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(2), "0", "0"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(3), "0", "0"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(5), "20", "2"),
                 new SaveJob.TsItemHour(DummyString, dummyDate.AddDays(6), "0", "0")

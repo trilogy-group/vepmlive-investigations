@@ -1138,8 +1138,7 @@ namespace TimeSheets
                     continue;
                 }
 
-                // NOTE: We should skip empty records (with 0 hours)
-                var jobItemsDate = jobItems.Where(item => item.Date == date && item.Hours != "0")
+                var jobItemsDate = jobItems.Where(item => item.Date == date)
                                            .ToArray();
 
                 if (!jobItemsDate.Any())
