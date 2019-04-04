@@ -372,7 +372,7 @@ namespace TimeSheets
                         {
                             cn.Open();
 
-                            using (SqlCommand cmd = new SqlCommand("spTSgetTSHours", cn))
+                            using (SqlCommand cmd = new SqlCommand("spTSgetTSHoursPM", cn))
                             {
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.AddWithValue("@username", curUser);

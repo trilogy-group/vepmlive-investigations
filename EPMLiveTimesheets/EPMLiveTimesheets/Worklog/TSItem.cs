@@ -312,7 +312,7 @@ namespace TimeSheets
                     else
                     {
                         SPUser user = SPContext.Current.Web.EnsureUser(_userLoginName);
-                        if (user.Groups.Cast<SPGroup>().Any(g => String.Equals(g.Name, _userLoginName, StringComparison.CurrentCultureIgnoreCase)))
+                        if (user.Groups.Cast<SPGroup>().Any(g => String.Equals(g.Name, userValue.LookupValue, StringComparison.CurrentCultureIgnoreCase)))
                         {
                             _authorized = true;
                         }
