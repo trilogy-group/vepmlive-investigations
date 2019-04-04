@@ -144,23 +144,20 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         }
                     }
 
-                    SqlCommand cmd;
                     if (numberOfJobs == 1)
                     {
-                        cmd =
-                            new SqlCommand(
-                                "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                                cn);
-                        cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                        cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
-                        cmd.ExecuteNonQuery();
+                        using (var updateCommand = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn))
+                        {
+                            updateCommand.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            updateCommand.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
+                            updateCommand.ExecuteNonQuery();
+                        }
                     }
                     else
                     {
-                        cmd =
-                            new SqlCommand(
-                                "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)",
-                                cn);
+                        var cmd = new SqlCommand(
+                            "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)",
+                            cn);
                         cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                         cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
                         cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
