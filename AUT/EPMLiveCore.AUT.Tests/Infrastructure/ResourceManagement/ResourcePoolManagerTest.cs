@@ -69,6 +69,7 @@ namespace EPMLiveCore.Infrastructure
         [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
         [TestCase(MethodGetAll, 0)]
+        [TestCase(MethodBuildXmlElements, 0)]
         [TestCase(MethodGetAllFromReportingDB, 0)]
         [TestCase(MethodProcessHtmlValues, 0)]
         public void AUT_ResourcePoolManager_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
@@ -85,24 +86,6 @@ namespace EPMLiveCore.Infrastructure
             currentMethodInfo.ShouldNotBeNull();
         }
 
-        [Test]
-        [Timeout(TestsTimeOut)]
-        [Category("AUT Initializer")]
-        [TestCase(MethodBuildXmlElements, 0)]
-        public void AUT_ReportXmlBuilder_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
-        {
-            // Arrange
-            var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstanceFixture, string.Empty);
-            var currentMethodInfo = typeof(ReportXmlBuilder).GetMethod(methodName);
-
-            // Act
-            ShouldlyExtension.ExploreMethodWithOrWithoutInstance(reportXmlBuilder,
-                                                                 Fixture,
-                                                                 currentMethodInfo);
-
-            // Assert
-            currentMethodInfo.ShouldNotBeNull();
-        }
         #endregion
 
         #endregion
@@ -398,56 +381,28 @@ namespace EPMLiveCore.Infrastructure
             var includeHidden = CreateType<bool>();
             var includeReadOnly = CreateType<bool>();
             var rowCollection = CreateType<IEnumerable<DataRow>>();
-            var spFieldCollection = CreateType<IList<SPField>>();
+            var spFieldCollection = CreateType<List<SPField>>();
             var dataColumnCollection = CreateType<DataColumnCollection>();
             var resources = CreateType<DataTable>();
             var valueDictionary = CreateType<Dictionary<string, object[]>>();
-            var methodBuildXmlElementsPrametersTypes = new Type[]
-            {
-                typeof(bool),
-                typeof(bool),
-                typeof(IEnumerable<DataRow>),
-                typeof(IList<SPField>),
-                typeof(DataColumnCollection),
-                typeof(DataTable),
-                typeof(Dictionary<string, object[]>)
-            };
-
-            object[] parametersOfBuildXmlElements =
-            {
-                includeHidden,
-                includeReadOnly,
-                rowCollection,
-                spFieldCollection,
-                dataColumnCollection,
-                resources,
-                valueDictionary
-            };
-
-            Exception exception;
-            var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstance, string.Empty);
-            var methodInfo = typeof(ReportXmlBuilder).GetMethod(MethodBuildXmlElements);
+            var methodBuildXmlElementsPrametersTypes = new Type[] { typeof(bool), typeof(bool), typeof(IEnumerable<DataRow>), typeof(List<SPField>), typeof(DataColumnCollection), typeof(DataTable), typeof(Dictionary<string, object[]>) };
+            object[] parametersOfBuildXmlElements = { includeHidden, includeReadOnly, rowCollection, spFieldCollection, dataColumnCollection, resources, valueDictionary };
+            Exception exception, exception1;
+            var methodInfo = GetMethodInfo(MethodBuildXmlElements, methodBuildXmlElementsPrametersTypes, out exception);
 
             // Act
-            var result1 = methodInfo.GetResultMethodInfo<ReportXmlBuilder, IList<XElement>>(
-                reportXmlBuilder, 
-                out exception, 
-                parametersOfBuildXmlElements);
-
-            var result2 = ReflectionAnalyzer.GetResultOfMethod<ReportXmlBuilder, IList<XElement>>(
-                reportXmlBuilder,
-                MethodBuildXmlElements,
-                parametersOfBuildXmlElements,
-                methodBuildXmlElementsPrametersTypes);
+            var result1 = methodInfo.GetResultMethodInfo<ResourcePoolManager, List<XElement>>(_resourcePoolManagerInstanceFixture, out exception1, parametersOfBuildXmlElements);
+            var result2 = ReflectionAnalyzer.GetResultOfMethod<ResourcePoolManager, List<XElement>>(_resourcePoolManagerInstance, MethodBuildXmlElements, parametersOfBuildXmlElements, methodBuildXmlElementsPrametersTypes);
 
             // Assert
             methodInfo.ShouldNotBeNull();
+            exception.ShouldBeNull();
             result1.ShouldBeNull();
             result2.ShouldBeNull();
             parametersOfBuildXmlElements.ShouldNotBeNull();
             parametersOfBuildXmlElements.Length.ShouldBe(7);
             methodBuildXmlElementsPrametersTypes.Length.ShouldBe(7);
-            Should.Throw<Exception>(() => methodInfo.Invoke(reportXmlBuilder, parametersOfBuildXmlElements));
+            Should.Throw<Exception>(() => methodInfo.Invoke(_resourcePoolManagerInstanceFixture, parametersOfBuildXmlElements));
         }
 
         #endregion
@@ -529,11 +484,10 @@ namespace EPMLiveCore.Infrastructure
         {
             // Arrange
             Exception exception;
-            var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstanceFixture, string.Empty);
-            var methodInfo = typeof(ReportXmlBuilder).GetMethod(MethodBuildXmlElements);
+            var methodInfo = GetMethodInfo(MethodBuildXmlElements, 0);
 
             // Act
-            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(reportXmlBuilder, Fixture, out exception);
+            var result = methodInfo.InvokeStaticMethodWithDynamicParamters(_resourcePoolManagerInstanceFixture, Fixture, out exception);
 
             // Assert
             methodInfo.ShouldNotBeNull();
@@ -550,8 +504,7 @@ namespace EPMLiveCore.Infrastructure
         public void AUT_ResourcePoolManager_BuildXmlElements_Method_Call_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var reportXmlBuilder = new ReportXmlBuilder(_resourcePoolManagerInstanceFixture, string.Empty);
-            var methodInfo = typeof(ReportXmlBuilder).GetMethod(MethodBuildXmlElements);
+            var methodInfo = GetMethodInfo(MethodBuildXmlElements, 0);
             const int parametersCount = 7;
 
             // Act

@@ -33,7 +33,7 @@ namespace EPMLiveCore.Tests.ResourcePoolEvent
         private const string DummyString = "DummyString";
         private const int DummyInt = 1;
         private const int LookUpId = -1;
-        private const string AddUserCheck = "0;#";
+        private const string AddUserCheck = "0;#Test";
         
         private const string ItemAdding = "ItemAdding";
         private const string GetProperty = "GetProperty";
@@ -566,7 +566,7 @@ namespace EPMLiveCore.Tests.ResourcePoolEvent
                 }
                 else
                 {
-                    return new ShimSPUser();
+                    return new ShimSPUser() { NameGet = () => { return "Test"; } };
                 }
             };
         }

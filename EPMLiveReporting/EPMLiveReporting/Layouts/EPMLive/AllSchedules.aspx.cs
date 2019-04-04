@@ -13,6 +13,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class AllSchedules : LayoutsPageBase
     {
+        private const int MaxLogSizeInKilobytes = 32768;
         protected MenuItemTemplate MenuItemTemplate1;
         protected MenuItemTemplate MenuItemTemplateDelete;
         private EPMData _DAO;
@@ -87,9 +88,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         if (!EventLog.SourceExists("EPMLive Reporting - Page_Load"))
                             EventLog.CreateEventSource("EPMLive Reporting - Page_Load", "EPM Live");
 
-                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Load");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                        using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Load"))
+                        {
+                            myLog.MaximumKilobytes = MaxLogSizeInKilobytes;
+                            myLog.WriteEntry(string.Format("{0}{1}", ex.Message, ex.StackTrace), EventLogEntryType.Error, 2040);
+                        }
                     });
                 }
             }
@@ -117,48 +120,44 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 {
                     cn.Open();
 
-                    var cmd =
-                        new SqlCommand(
-                            "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                            cn);
-                    cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-
-                    int numberOfJobs = 0;
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    int numberOfJobs;
+                    using (var selectCommand = new SqlCommand(
+                        "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                        cn))
                     {
-                        using (DataTable dt = new DataTable())
+                        selectCommand.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+
+                        using (var dataReader = selectCommand.ExecuteReader())
+                        using (var dataTable = new DataTable())
                         {
-                            dt.Load(dr);
-                            numberOfJobs = dt.Rows.Count;
+                            dataTable.Load(dataReader);
+                            numberOfJobs = dataTable.Rows.Count;
                         }
                     }
 
                     if (numberOfJobs > 1)
                     {
-                        var deleteCmd =
-                       new SqlCommand(
-                           "delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                           cn);
-                        deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                        deleteCmd.ExecuteNonQuery();
+                        using (var deleteCmd = new SqlCommand("delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn))
+                        {
+                            deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            deleteCmd.ExecuteNonQuery();
+                        }
                     }
 
                     if (numberOfJobs == 1)
                     {
-                        cmd =
-                            new SqlCommand(
-                                "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                                cn);
-                        cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
-                        cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
-                        cmd.ExecuteNonQuery();
+                        using (var updateCommand = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn))
+                        {
+                            updateCommand.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            updateCommand.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
+                            updateCommand.ExecuteNonQuery();
+                        }
                     }
                     else
                     {
-                        cmd =
-                            new SqlCommand(
-                                "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)",
-                                cn);
+                        var cmd = new SqlCommand(
+                            "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)",
+                            cn);
                         cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                         cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
                         cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);

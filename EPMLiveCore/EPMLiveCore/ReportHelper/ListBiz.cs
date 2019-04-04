@@ -210,13 +210,96 @@ namespace EPMLiveCore.ReportHelper
 
         public static ListBiz CreateNewMapping(Guid siteId, Guid listId, ListItemCollection fields, bool isAuto)
         {
-            string webIdWithoutHyphen = string.Empty;
-            bool isReportingV2Enabled = false;
+            var spList = PopulateListIfPermitted(siteId, listId);
+            var automatic = AutomaticFields;
+            var required = new Collection<string>();
+            foreach (var requiredSourceField in RequiredResourceFields)
+            {
+                required.Add(requiredSourceField);
+            }
+
+            var listBiz = new ListBiz
+            {
+                _siteId = siteId,
+                _listId = listId,
+                _listName = spList.Title
+            };
+
+            var columns = ColumnDef.GetDefaultColumns();
+            var columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
+            var matches = 0;
+
+            AddRequiredFields(spList, automatic, required, columns, columnsSnapshot);
+            AddFieldsToProcess(fields, spList);
+            ProcessFields(fields, spList, columns, columnsSnapshot, required);
+
+            listBiz._resourceList = required.Count == 0 && RequiredResourceFields.Count > 0;
+
+            var tableName = PerformFix(spList);
+
+            listBiz.Create(columns, columnsSnapshot, tableName);
+            listBiz.RegisterEvent();
+            return listBiz;
+        }
+
+        private static void AddFieldsToProcess(ListItemCollection fields, SPList spList)
+        {
+            SPField fldExtId = null;
+            try
+            {
+                fldExtId = spList.Fields.TryGetFieldByStaticName("EXTID");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            if (fldExtId != null && !FieldExistsInCollection(fields, "extid"))
+            {
+                var listField = new ListItem
+                {
+                    Text = fldExtId.Title,
+                    Value = fldExtId.Id.ToString()
+                };
+                fields.Add(listField);
+            }
+        }
+
+        private static void ProcessFields(
+            ListItemCollection fields,
+            SPList spList,
+            ColumnDefCollection columns,
+            ColumnDefCollection columnsSnapshot,
+            Collection<string> required)
+        {
+            foreach (ListItem field in fields)
+            {
+                var spField = spList.Fields[new Guid(field.Value)];
+                columns.AddColumn(spField);
+                columnsSnapshot.AddColumn(spField);
+                //if (RequiredResourceFields.Contains(spField.InternalName))
+                //    matches++;
+
+                try
+                {
+                    required.Remove(spField.InternalName);
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+        }
+
+        private static SPList PopulateListIfPermitted(Guid siteId, Guid listId)
+        {
+            var webIdWithoutHyphen = string.Empty;
+            var isReportingV2Enabled = false;
             SPList spList = null;
-            SPUser user = null;
+            SPUser user;
             using (var site = new SPSite(siteId))
             {
-                using (SPWeb web = site.OpenWeb())
+                using (var web = site.OpenWeb())
                 {
                     user = web.CurrentUser;
                 }
@@ -224,68 +307,65 @@ namespace EPMLiveCore.ReportHelper
 
             if (user != null)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate
-                {
-                    using (var es = new SPSite(siteId))
+                SPSecurity.RunWithElevatedPrivileges(
+                    delegate
                     {
-                        foreach (SPWeb ew in es.AllWebs)
+                        using (var spSite = new SPSite(siteId))
                         {
-                            if (ew.DoesUserHavePermissions(user.LoginName, SPBasePermissions.ViewPages))
+                            foreach (SPWeb spWeb in spSite.AllWebs)
                             {
-                                try
-                                {
-                                    webIdWithoutHyphen = ew.ID.ToString().Replace("-", "");
-                                    spList = ew.Lists[listId];
-                                }
-                                catch { }
-                                finally
-                                {
-                                    if (ew != null)
-                                    {
-                                        ew.Dispose();
-                                    }
-                                }
-
-                                if (spList != null)
+                                if (spWeb.DoesUserHavePermissions(user.LoginName, SPBasePermissions.ViewPages))
                                 {
                                     try
                                     {
-                                        isReportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(es.OpenWeb(), "reportingV2"));
+                                        webIdWithoutHyphen = spWeb.ID.ToString().Replace("-", string.Empty);
+                                        spList = spWeb.Lists[listId];
                                     }
-                                    catch (Exception)
+                                    catch (Exception ex)
                                     {
-                                        isReportingV2Enabled = false;
+                                        Trace.TraceError("Exception Suppressed {0}", ex);
                                     }
-                                    break;
+                                    finally
+                                    {
+                                        if (spWeb != null)
+                                        {
+                                            spWeb.Dispose();
+                                        }
+                                    }
+
+                                    if (spList != null)
+                                    {
+                                        try
+                                        {
+                                            isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(spSite.OpenWeb(), "reportingV2"));
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Trace.TraceError("Exception Suppressed {0}", ex);
+                                            isReportingV2Enabled = false;
+                                        }
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
             }
-            Collection<string> automatic = AutomaticFields;
-            Collection<string> required = new Collection<string>();
-            foreach (string s in RequiredResourceFields)
-            {
-                required.Add(s);
-            }
+            return spList;
+        }
 
-            var lb = new ListBiz();
-            lb._siteId = siteId;
-            lb._listId = listId;
-            lb._listName = spList.Title;
-
-            ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
-            ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
-            int matches = 0;
-
+        private static void AddRequiredFields(
+            SPList spList,
+            Collection<string> automatic,
+            Collection<string> required,
+            ColumnDefCollection columns,
+            ColumnDefCollection columnsSnapshot)
+        {
             foreach (SPField field in spList.Fields)
             {
-                if (!field.Hidden &&
-                    field.Type != SPFieldType.Computed &&
-                    !automatic.Contains(field.InternalName) ||
-                    required.Contains(field.InternalName) ||
-                    field.InternalName == "Title")
+                if (!field.Hidden && field.Type != SPFieldType.Computed && !automatic.Contains(field.InternalName)
+                    || required.Contains(field.InternalName)
+                    || field.InternalName == "Title")
                 {
                     columns.AddColumn(field);
                     columnsSnapshot.AddColumn(field);
@@ -297,56 +377,22 @@ namespace EPMLiveCore.ReportHelper
                     {
                         required.Remove(field.InternalName);
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
                 }
             }
+        }
 
-            //Adding contenttype field specifically.
-            SPField fldExtId = null;
-            try
-            {
-                fldExtId = spList.Fields.TryGetFieldByStaticName("EXTID");
-            }
-            catch { }
-
-            if (fldExtId != null && !FieldExistsInCollection(fields, "extid"))
-            {
-                var listField = new ListItem();
-                listField.Text = fldExtId.Title;
-                listField.Value = fldExtId.Id.ToString();
-                fields.Add(listField);
-            }
-
-            foreach (ListItem field in fields)
-            {
-                SPField spField = spList.Fields[new Guid(field.Value)];
-                columns.AddColumn(spField);
-                columnsSnapshot.AddColumn(spField);
-                //if (RequiredResourceFields.Contains(spField.InternalName))
-                //    matches++;
-                try
-                {
-                    required.Remove(spField.InternalName);
-                }
-                catch { }
-            }
-            lb._resourceList = (required.Count == 0 && RequiredResourceFields.Count > 0);
-
+        private static string PerformFix(SPList spList)
+        {
             //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
-            string tableName;
-            if (!spList.Title.ToLower().EndsWith("resources"))
-            {
-                tableName = Resources.ReportingListPrefix + Utility.GetCleanAlphaNumeric(spList.Title);
-            }
-            else
-            {
-                tableName = Resources.ReportingListPrefix + "Resourcepool";
-            }
+            var tableName = !spList.Title.EndsWith("resources", StringComparison.OrdinalIgnoreCase)
+                ? string.Format("{0}{1}", Resources.ReportingListPrefix, Utility.GetCleanAlphaNumeric(spList.Title))
+                : string.Format("{0}Resourcepool", Resources.ReportingListPrefix);
             // -- END
-
-            lb.Create(columns, columnsSnapshot, tableName);
-            lb.RegisterEvent();
-            return lb;
+            return tableName;
         }
 
         public static ListBiz CreateNewMapping(Guid siteId, Guid listId, Guid webId, ListItemCollection fields)

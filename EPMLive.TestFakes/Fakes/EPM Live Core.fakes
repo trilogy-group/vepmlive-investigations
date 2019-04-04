@@ -84,7 +84,6 @@
     <Add FullName="EPMLiveCore.ReportAuth!"/>
     <Add FullName="EPMLiveCore.CascadingLookupRenderControl!"/>
     <Add FullName="EPMLiveCore.Infrastructure.ResourcePoolManager!"/>
-    <Add FullName="EPMLiveCore.Infrastructure.ReportXmlBuilder!"/>
     <Add FullName="EPMLiveCore.Infrastructure.SPListItemManager!"/>
     <Add FullName="EPMLiveCore.Infrastructure.GridViewManagerFactory!"/>
     <Add FullName="EPMLiveCore.Infrastructure.GridViewUtils!"/>
@@ -127,5 +126,7 @@
     <Add FullName="EPMLiveCore.Jobs.TimerFix!"/>
     <Add FullName="EPMLiveCore.Helpers.WebServicesHelper!"/>
     <Add FullName="EPMLiveCore.adsyncadmin!"/>
+    <Add FullName="EPMLiveCore.ControlCollectionExtensions!"/>
+    <Add FullName="EPMLiveCore.BtnChangeApp!"/>
   </ShimGeneration>
 </Fakes>

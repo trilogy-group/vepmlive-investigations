@@ -2,13 +2,17 @@ pipeline {
 	agent {
 		label 'skyvera-jenkins-protractor'
 	}
-	  parameters {
-		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
-		string(name: 'FullHostName', defaultValue: 'tenant02.epmldev.com', description: 'Target full host name')
-		string(name: 'BaseUrl', defaultValue: 'http://tenant02.epmldev.com', description: 'Protractor baseUrl')
-		string(name: 'SiteCollection', defaultValue: '/epm', description: 'Protractor siteCollection')
-		string(name: 'Username', defaultValue: 'farmadmin', description: 'Protractor username')
-		string(name: 'Password', defaultValue: 'Pass@word1', description: 'Protractor password')
+	options {
+		timestamps()
+		timeout(time: 2, unit: 'HOURS')
+    }
+	parameters {
+		string(name: 'TargetHost', defaultValue: '10.25.2.54', description: 'Target host to deploy to')
+		string(name: 'FullHostName', defaultValue: 'apps22.epmlive.com', description: 'Target full host name')
+		string(name: 'BaseUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Protractor baseUrl')
+		string(name: 'SiteCollection', defaultValue: '/sites/AUT', description: 'Protractor siteCollection')
+		string(name: 'Username', defaultValue: 'servicedesk', description: 'Protractor username')
+		string(name: 'Password', defaultValue: 'A123456*', description: 'Protractor password')
 	}
 	stages {
 		stage('Preparing for UI tests execution') {
