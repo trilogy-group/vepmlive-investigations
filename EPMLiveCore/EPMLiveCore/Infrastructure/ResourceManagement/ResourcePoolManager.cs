@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using EPMLiveCore.API;
-using EPMLiveCore.ReportHelper;
 using EPMLiveCore.ReportingProxy;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Infrastructure
 {
     public sealed class ResourcePoolManager : SPListItemManager
     {
+        #region Constructors (2) 
+
         public ResourcePoolManager(SPWeb web)
             : base("Resources", web.ID, web.Site.ID, "Resources", "Resource") { }
 
@@ -22,6 +23,12 @@ namespace EPMLiveCore.Infrastructure
         /// </summary>
         public ResourcePoolManager()
             : base("Resources", SPContext.Current.Web.ID, SPContext.Current.Site.ID, "Resources", "Resource") { }
+
+        #endregion Constructors 
+
+        #region Methods (4) 
+
+        // Public Methods (1) 
 
         /// <summary>
         ///     Gets all.
@@ -35,21 +42,25 @@ namespace EPMLiveCore.Infrastructure
         /// <returns></returns>
         public override XDocument GetAll(bool includeHidden, bool includeReadOnly)
         {
-            var useReportingDb = false;
-            var spWeb = ParentList.ParentWeb;
+            bool useReportingDb = false;
+
+            SPWeb spWeb = ParentList.ParentWeb;
+
             var reportData = new ReportData(spWeb.Site.ID);
 
             if (reportData.GetSite() != null)
             {
                 if (reportData.GetListMapping(ParentList.ID) != null)
                 {
-                    var exists = true;
-                    var dataTables = from obj in new[] { "[dbo].[spGetReportListData]" }
-                                     let queryExecutor = new QueryExecutor(spWeb)
-                                     select queryExecutor.ExecuteReportingDBQuery(
-                                         @"SELECT COUNT(*) AS Found FROM dbo.sysobjects WHERE id = object_id(@Object)",
-                                         new Dictionary<string, object> { { "@Object", obj } });
-                    foreach (var dataTable in dataTables)
+                    bool exists = true;
+
+                    foreach (
+                        DataTable dataTable in
+                            from obj in new[] {"[dbo].[spGetReportListData]"}
+                            let queryExecutor = new QueryExecutor(spWeb)
+                            select queryExecutor.ExecuteReportingDBQuery(
+                                @"SELECT COUNT(*) AS Found FROM dbo.sysobjects WHERE id = object_id(@Object)",
+                                new Dictionary<string, object> {{"@Object", obj}}))
                     {
                         if (dataTable.Rows.Count > 0)
                         {
@@ -76,6 +87,214 @@ namespace EPMLiveCore.Infrastructure
                 : base.GetAll(includeHidden, includeReadOnly);
         }
 
+        // Private Methods (3) 
+
+        private List<XElement> BuildXmlElements(bool includeHidden, bool includeReadOnly,
+            IEnumerable<DataRow> rowCollection, List<SPField> spFieldCollection,
+            DataColumnCollection dataColumnCollection, DataTable resources,
+            out Dictionary<string, object[]> valueDictionary)
+        {
+            var elements = new List<XElement>();
+            valueDictionary = new Dictionary<string, object[]>();
+
+            var lookupColumns = new List<string>();
+            var lookupValues = new Dictionary<object, string[]>();
+            var userValues = new Dictionary<object, string[]>();
+            var formatDictionary = new Dictionary<string, string>();
+
+            foreach (DataRow row in rowCollection)
+            {
+                var itemElement = new XElement(ElementName);
+                itemElement.Add(new XAttribute("ID", row["ID"]));
+
+                foreach (SPField spField in spFieldCollection)
+                {
+                    string internalName = spField.InternalName;
+
+                    bool processHtmlValue = false;
+
+                    bool isHidden = spField.Hidden;
+                    bool isReadOnly = spField.ReadOnlyField;
+
+                    if (!internalName.Equals("EXTID"))
+                    {
+                        if (isHidden && !includeHidden)
+                        {
+                            continue;
+                        }
+
+                        if (isReadOnly && !includeReadOnly)
+                        {
+                            continue;
+                        }
+                    }
+
+                    object value = null;
+
+                    if (dataColumnCollection.Contains(internalName))
+                    {
+                        value = row[internalName];
+                        if (value == null || value == DBNull.Value) value = string.Empty;
+                    }
+                    else
+                    {
+                        if (!lookupColumns.Contains(internalName))
+                        {
+                            if (resources.Columns.Contains(internalName + "ID"))
+                            {
+                                lookupColumns.Add(internalName);
+                            }
+                        }
+
+                        if (lookupColumns.Contains(internalName))
+                        {
+                            object idValue = row[internalName + "ID"];
+                            object textValue = row[internalName + "Text"];
+
+                            if (spField.Type == SPFieldType.MultiChoice)
+                            {
+                                try
+                                {
+                                    var choiceValue = new SPFieldMultiChoiceValue(value.ToString());
+
+                                    var list = new List<string>();
+                                    for (int i = 0; i < choiceValue.Count; i++)
+                                    {
+                                        list.Add(choiceValue[i]);
+                                    }
+
+                                    value = string.Join(", ", list.ToArray());
+                                }
+                                catch { }
+                            }
+                            else
+                            {
+                                if (idValue == null || idValue == DBNull.Value || textValue == null ||
+                                    textValue == DBNull.Value)
+                                {
+                                    value = string.Empty;
+                                }
+                                else
+                                {
+                                    string[] ids = idValue.ToString().Split(',');
+                                    string[] values = textValue.ToString().Split(',');
+
+                                    var list = new List<string>();
+
+                                    for (int i = 0; i < ids.Length; i++)
+                                    {
+                                        try
+                                        {
+                                            list.Add(ids[i]);
+                                            list.Add(values[i]);
+                                        }
+                                        catch { }
+                                    }
+
+                                    value = string.Join(";#", list.ToArray());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            value = string.Empty;
+                        }
+                    }
+
+                    value = value ?? string.Empty;
+
+                    string stringValue = value.ToString().Trim();
+
+                    string fieldEditValue;
+                    string fieldTextValue;
+                    string fieldHtmlValue;
+
+                    switch (spField.Type)
+                    {
+                        case SPFieldType.Lookup:
+                            var spFieldLookup = ((SPFieldLookup) spField);
+                            string key = spFieldLookup.LookupList + spFieldLookup.LookupField + stringValue;
+
+                            if (!lookupValues.ContainsKey(key))
+                            {
+                                GetFieldSpecialValues(spField, stringValue, value, out fieldEditValue,
+                                    out fieldTextValue,
+                                    out fieldHtmlValue);
+
+                                fieldHtmlValue = key;
+
+                                lookupValues.Add(key, new[] {fieldTextValue, fieldEditValue, fieldHtmlValue});
+
+                                valueDictionary.Add(key, new[] {spField, value});
+                            }
+                            else
+                            {
+                                string[] lookupValue = lookupValues[key];
+
+                                fieldTextValue = lookupValue[0];
+                                fieldEditValue = lookupValue[1];
+                                fieldHtmlValue = lookupValue[2];
+                            }
+
+                            processHtmlValue = true;
+                            break;
+                        case SPFieldType.User:
+                            if (!userValues.ContainsKey(value))
+                            {
+                                GetFieldSpecialValues(spField, stringValue, value, out fieldEditValue,
+                                    out fieldTextValue,
+                                    out fieldHtmlValue);
+
+                                userValues.Add(value, new[] {fieldTextValue, fieldEditValue, fieldHtmlValue});
+                            }
+                            else
+                            {
+                                string[] userValue = userValues[value];
+
+                                fieldTextValue = userValue[0];
+                                fieldEditValue = userValue[1];
+                                fieldHtmlValue = userValue[2];
+                            }
+                            break;
+                        case SPFieldType.DateTime:
+                            string specialValue = string.IsNullOrEmpty(stringValue)
+                                ? string.Empty
+                                : ((DateTime) value).ToString("yyyy-MM-dd HH:mm:ss");
+
+                            fieldTextValue = specialValue;
+                            fieldHtmlValue = specialValue;
+                            fieldEditValue = specialValue;
+                            break;
+                        default:
+                            fieldTextValue = stringValue;
+                            fieldEditValue = stringValue;
+                            fieldHtmlValue = stringValue;
+                            break;
+                    }
+
+                    if (!formatDictionary.ContainsKey(internalName))
+                    {
+                        formatDictionary.Add(internalName, Utils.GetFormat(spField));
+                    }
+
+                    itemElement.Add(new XElement("Data", new XAttribute("Field", internalName),
+                        new XAttribute("Type", spField.Type),
+                        new XAttribute("Format", formatDictionary[internalName]),
+                        new XAttribute("Hidden", isHidden),
+                        new XAttribute("ReadOnly", isReadOnly),
+                        new XAttribute("TextValue", fieldTextValue),
+                        new XAttribute("HtmlValue", fieldHtmlValue),
+                        new XAttribute("EditValue", fieldEditValue),
+                        new XAttribute("ProcessHtmlValue", processHtmlValue),
+                        new XCData(stringValue)));
+                }
+
+                elements.Add(itemElement);
+            }
+
+            return elements;
+        }
+
         /// <summary>
         ///     Gets all from reporting DB.
         /// </summary>
@@ -91,7 +310,8 @@ namespace EPMLiveCore.Infrastructure
             try
             {
                 var rootElement = new XElement(RootElementName);
-                var spWeb = ParentList.ParentWeb;
+
+                SPWeb spWeb = ParentList.ParentWeb;
 
                 var parameters = new Dictionary<string, object>
                 {
@@ -105,7 +325,7 @@ namespace EPMLiveCore.Infrastructure
                 };
 
                 var queryExecutor = new QueryExecutor(spWeb);
-                var resources = queryExecutor.ExecuteReportingDBStoredProc("spGetReportListData", parameters);
+                DataTable resources = queryExecutor.ExecuteReportingDBStoredProc("spGetReportListData", parameters);
 
                 if (resources == null)
                 {
@@ -115,15 +335,16 @@ namespace EPMLiveCore.Infrastructure
                     return xml;
                 }
 
-                var spFieldCollection = ParentList.Fields.Cast<SPField>().ToList();
-                var dataColumnCollection = resources.Columns;
-                var rowCollection = resources.AsEnumerable();
-                var tasks = new List<Task<object[]>>();
-                var totalRows = rowCollection.Count();
-                var pageSize = 200;
-                var threadCount = totalRows / pageSize;
+                List<SPField> spFieldCollection = ParentList.Fields.Cast<SPField>().ToList();
 
-                var reportXmlBuilder = new ReportXmlBuilder(this, ElementName);
+                DataColumnCollection dataColumnCollection = resources.Columns;
+                EnumerableRowCollection<DataRow> rowCollection = resources.AsEnumerable();
+
+                var tasks = new List<Task<object[]>>();
+
+                int totalRows = rowCollection.Count();
+                int pageSize = 200;
+                int threadCount = totalRows/pageSize;
 
                 if (totalRows <= pageSize)
                 {
@@ -131,12 +352,12 @@ namespace EPMLiveCore.Infrastructure
                     threadCount = 1;
                 }
 
-                var pagesProcessed = 0;
+                int pagesProcessed = 0;
 
                 while (pagesProcessed < threadCount)
                 {
-                    var page = pageSize;
-                    var offset = pagesProcessed * pageSize;
+                    int page = pageSize;
+                    int offset = pagesProcessed*pageSize;
 
                     pagesProcessed++;
 
@@ -145,25 +366,20 @@ namespace EPMLiveCore.Infrastructure
                         page = totalRows - offset;
                     }
 
-                    var task = Task<object[]>.Factory.StartNew(() =>
+                    Task<object[]> task = Task<object[]>.Factory.StartNew(() =>
                     {
-                        var dataRows = rowCollection
-                            .Skip(offset)
-                            .Take(page);
+                        IEnumerable<DataRow> dataRows = (from r in rowCollection select r).Skip(offset).Take(page);
 
                         Dictionary<string, object[]> valueDictionary;
-                        var elements = reportXmlBuilder.BuildXmlElements(includeHidden,
+
+                        List<XElement> elements = BuildXmlElements(includeHidden,
                             includeReadOnly, dataRows,
                             spFieldCollection,
                             dataColumnCollection,
                             resources,
                             out valueDictionary);
 
-                        return new object[]
-                        {
-                            elements,
-                            valueDictionary
-                        };
+                        return new object[] {elements, valueDictionary};
                     });
 
                     tasks.Add(task);
@@ -171,10 +387,10 @@ namespace EPMLiveCore.Infrastructure
 
                 foreach (var task in tasks)
                 {
-                    var result = task.Result;
+                    object[] result = task.Result;
 
-                    var elements = (List<XElement>)result[0];
-                    ProcessHtmlValues(elements, (Dictionary<string, object[]>)result[1]);
+                    var elements = (List<XElement>) result[0];
+                    ProcessHtmlValues(elements, (Dictionary<string, object[]>) result[1]);
 
                     rootElement.Add(elements);
                 }
@@ -186,53 +402,34 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                Trace.WriteLine(exception);
-                throw new APIException((int)Errors.SPLIMGetAllFromDB, exception.GetBaseException().Message);
+                throw new APIException((int) Errors.SPLIMGetAllFromDB, exception.GetBaseException().Message);
             }
         }
 
         private void ProcessHtmlValues(IEnumerable<XElement> elements, Dictionary<string, object[]> valueDictionary)
         {
-            foreach (var xElement in elements)
+            foreach (XElement xElement in elements)
             {
-                foreach (var element in xElement.Elements("Data"))
+                foreach (XElement element in xElement.Elements("Data"))
                 {
-                    var processHtmlAttr = element.Attribute("ProcessHtmlValue");
-                    var process = processHtmlAttr != null && processHtmlAttr.Value.ToLower().Equals("true");
+                    XAttribute processHtmlAttr = element.Attribute("ProcessHtmlValue");
+                    bool process = processHtmlAttr != null && processHtmlAttr.Value.ToLower().Equals("true");
 
-                    if (processHtmlAttr != null)
-                    {
-                        processHtmlAttr.Remove();
-                    }
+                    if (processHtmlAttr != null) processHtmlAttr.Remove();
 
-                    if (!process)
-                    {
-                        continue;
-                    }
+                    if (!process) continue;
 
-                    var key = element.Attribute("HtmlValue").Value;
+                    string key = element.Attribute("HtmlValue").Value;
 
-                    if (!valueDictionary.ContainsKey(key))
-                    {
-                        continue;
-                    }
+                    if (!valueDictionary.ContainsKey(key)) continue;
 
-                    var data = valueDictionary[key];
+                    object[] data = valueDictionary[key];
 
                     element.Attribute("HtmlValue").SetValue(((SPFieldLookup) data[0]).GetFieldValueAsHtml(data[1]));
                 }
             }
         }
 
-        internal void GetFieldSpecialValues(
-            SPField spField, 
-            string stringValue, 
-            object value,
-            out string fieldEditValue,
-            out string fieldTextValue, 
-            out string fieldHtmlValue)
-        {
-            base.GetFieldSpecialValues(spField, stringValue, value, out fieldEditValue, out fieldTextValue, out fieldHtmlValue);
-        }
+        #endregion Methods 
     }
 }

@@ -14,12 +14,12 @@ namespace EPMLiveReportsAdmin
     public static partial class DataScrubber
     {
         private const int OwnerId = 1073741823;
-
-        public static void CleanTables(SPSite site, EPMData epmData)
+        private static Guid timerJobId;
+        public static bool CleanTables(SPSite site, EPMData epmData, Guid jobId, ref string error)
         {
             Guard.ArgumentIsNotNull(site, nameof(site));
             Guard.ArgumentIsNotNull(epmData, nameof(epmData));
-
+            timerJobId = jobId;
             WipeData(DeleteReportListIds, WipeDataId, epmData);
             WipeData(DeleteRptWeb, WipeDataId, epmData);
             WipeData(DeleteRptWebGroups, WipeDataId, epmData);
@@ -33,7 +33,7 @@ namespace EPMLiveReportsAdmin
             var listIdsTest = new DataTable();
             var rptWebTest = new DataTable();
             var errMsg = new StringBuilder();
-            bool hasError;
+            bool hasError = false;
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
@@ -61,14 +61,14 @@ namespace EPMLiveReportsAdmin
                         BulkInsertRptWeb(epmData, rptWeb, ref hasError, errMsg);
                     }
 
-                    if (!CleanLstTables(epmData, listIdsTest, listNames, hasError, errMsg))
+                    if (CleanLstTables(epmData, listIdsTest, listNames, hasError, errMsg))
                     {
-                        return;
+                        var finalRecent = GetValidFrfRecentItems(epmData, errMsg, listIdsTest, rptWebTest);
+                        BulkInsertFrfRecentItems(epmData, finalRecent, rptWeb, errMsg);
                     }
-
-                    var finalRecent = GetValidFrfRecentItems(epmData, errMsg, listIdsTest, rptWebTest);
-                    BulkInsertFrfRecentItems(epmData, finalRecent, rptWeb, errMsg);
                 });
+            error = errMsg.ToString();
+            return hasError;
         }
 
         private static DataTable GetRptWebDataTable()
@@ -144,7 +144,6 @@ namespace EPMLiveReportsAdmin
                 LogStatusLevel2Type3(PopulateRptWebGroupsId, $"Error while Bulk insert dbo.RPTWEBGROUPS Error : {exception.Message}", epmData);
                 Trace.WriteLine(exception);
             }
-
             return hasError;
         }
 
@@ -218,7 +217,7 @@ namespace EPMLiveReportsAdmin
 
             if (!string.IsNullOrWhiteSpace(parentItem))
             {
-                var parentItemTokens = parentItem.Split(new[] {"^^"}, StringSplitOptions.RemoveEmptyEntries);
+                var parentItemTokens = parentItem.Split(new[] { "^^" }, StringSplitOptions.RemoveEmptyEntries);
                 var itemWebId = parentItemTokens[0];
                 var itemListId = parentItemTokens[1];
                 var itemId = parentItemTokens[2];
@@ -290,13 +289,13 @@ namespace EPMLiveReportsAdmin
             }
 
             var lsListIds = (from id in listIdsTest.AsEnumerable()
-                select id[Id].ToString()).ToList();
+                             select id[Id].ToString()).ToList();
             var lsWebIds = (from webid in rptWebTest.AsEnumerable()
-                select webid[WebId].ToString()).ToList();
+                            select webid[WebId].ToString()).ToList();
 
             var results = (from dataRow in recent.AsEnumerable()
-                where lsListIds.Contains(dataRow[ListId].ToString()) && lsWebIds.Contains(dataRow[WebId1].ToString())
-                select dataRow).ToList();
+                           where lsListIds.Contains(dataRow[ListId].ToString()) && lsWebIds.Contains(dataRow[WebId1].ToString())
+                           select dataRow).ToList();
 
             var finalRecent = new DataTable();
 

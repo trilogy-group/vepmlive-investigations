@@ -412,6 +412,7 @@
     <Compile Include="ResourcePlanning\ResourcePlanning.renderGantt.cs" />
     <Compile Include="ResourcePlanning\ResourcePlanning.RenderWebPart.cs" />
     <Compile Include="RollupSummary\RollupSummary.cs" />
+    <Compile Include="RollupSummary\RollupSummary.HelperMethods.cs" />
     <Compile Include="RollupSummary\SummaryRollupToolpart.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizard.cs" />
     <Compile Include="SocialStream\SocialStream.cs" />

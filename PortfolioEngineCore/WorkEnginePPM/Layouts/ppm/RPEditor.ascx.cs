@@ -76,6 +76,13 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             set { m_maxPeriodLimit = value; }
         }
 
+        private string m_sDepartmentValidation = "";
+        public string DepartmentValidation
+        {
+            get { return m_sDepartmentValidation; }
+            set { m_sDepartmentValidation = value; }
+        }
+
         public string Webservice
         {
             get
@@ -86,7 +93,7 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             }
             set { m_sWebservice = value?.Trim(); }
         }
-
+       
         protected void Page_Load(object sender, EventArgs e)
         {
             sm1.Services.Add(new ServiceReference(Webservice));

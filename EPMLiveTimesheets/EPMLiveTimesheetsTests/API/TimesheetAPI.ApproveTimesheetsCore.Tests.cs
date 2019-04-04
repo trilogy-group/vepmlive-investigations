@@ -35,8 +35,8 @@ namespace TimeSheets.Tests
                 "<Result Status=\"0\"><Approve><TS id='253' Status=\"0\"/></Approve></Result>",
                 message);
             Assert.AreEqual(3, _adoShims.ConnectionsDisposed.Count());
-            Assert.AreEqual(8, _adoShims.CommandsDisposed.Count);
-            Assert.AreEqual(5, _adoShims.DataReadersDisposed.Count);
+            Assert.AreEqual(9, _adoShims.CommandsDisposed.Count);
+            Assert.AreEqual(6, _adoShims.DataReadersDisposed.Count);
         }
 
         private void SetupShims()

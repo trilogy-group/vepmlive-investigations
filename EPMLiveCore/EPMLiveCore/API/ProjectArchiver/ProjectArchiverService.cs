@@ -116,6 +116,12 @@ namespace EPMLiveCore.API.ProjectArchiver
                 LogMessage(web, $"Updating project '{projectListItem.ID}' - Action: '{action}'", LogKind.Info);
 
                 projectListItem[ArchivedColumn] = status;
+
+                if (projectListItem.Fields.ContainsFieldWithInternalName(TimesheetColumn))
+                {
+                    projectListItem[TimesheetColumn] = !status;
+                }
+
                 projectListItem.Update();
 
                 // when associated lists configured - move to archive all of them

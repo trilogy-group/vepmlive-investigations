@@ -1,3 +1,8 @@
+using EPMLiveCore;
+using EPMLiveCore.API;
+using EPMLiveCore.API.ProjectArchiver;
+using EPMLiveCore.ReportingProxy;
+using Microsoft.SharePoint;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,11 +11,6 @@ using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Xml;
-using EPMLiveCore;
-using EPMLiveCore.API;
-using EPMLiveCore.API.ProjectArchiver;
-using EPMLiveCore.ReportingProxy;
-using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts
 {
@@ -23,7 +23,7 @@ namespace EPMLiveWebParts
         private const string RestoreProjectAction = "restoreproject";
 
         protected string data;
-        
+
 
         private string getMenuItem(string grid, string title, string image, string command, string type)
         {
@@ -327,7 +327,7 @@ namespace EPMLiveWebParts
         protected void linkeditemspost(SPWeb web)
         {
             SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 //using (SPSite s = SPContext.Current.Site)
                 {
@@ -546,7 +546,7 @@ namespace EPMLiveWebParts
                                 w.Close();
 
                                 string epkurl1 = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKURL");
-                                url += "/_layouts/ppm/" + Request["subaction"] + ".aspx?listid=" + Request["listid"] + "&itemid=" + Request["webid"] + "." + Request["listid"] + "." + Request["id"] + "&epkurl=" + HttpUtility.UrlEncode(epkurl1) + "&view=" + view + "&IsDlg=" + Request["IsDlg"];
+                                url += "/_layouts/ppm/" + Request["subaction"] + ".aspx?listid=" + Request["listid"] + "&itemid=" + Request["webid"] + "." + Request["listid"] + "." + Request["id"] + "&epkurl=" + HttpUtility.UrlEncode(epkurl1) + "&view=" + view;
                             }
                             break;
                         case "gotoplanner":
@@ -883,14 +883,12 @@ namespace EPMLiveWebParts
             {
                 throw new ArgumentNullException(nameof(site));
             }
-
             using (var web = GetWeb(site))
             {
-                SPGroup group = web.Groups.GetByName("Administrators");
-
-                if (!web.IsCurrentUserMemberOfGroup(group.ID) && !web.CurrentUser.IsSiteAdmin)
+                if (!IsCurrentUserAdmin(web) && !web.CurrentUser.IsSiteAdmin)
+                {
                     throw new UnauthorizedAccessException();
-
+                }
                 var list = web.Lists[new Guid(Request[ArhiveRestoreListIdRequestParameter])];
                 var listItem = list.GetItemById(int.Parse(Request[ArchiveRestoreItemIdRequestParameter]));
                 var service = new ProjectArchiverService();
@@ -904,6 +902,36 @@ namespace EPMLiveWebParts
                     service.RestoreProject(listItem);
                 }
                 return SuccessMessage;
+            }
+        }
+
+        private static bool IsCurrentUserAdmin(SPWeb web)
+        {
+            try
+            {
+                foreach (SPRoleAssignment roleAssignment in web.RoleAssignments)
+                {
+                    if (roleAssignment.Member is SPGroup)
+                    {
+                        foreach (SPRoleDefinition roleDefinition in roleAssignment.RoleDefinitionBindings)
+                        {
+                            if (roleDefinition.Type == SPRoleType.Administrator)
+                            {
+                                SPGroup group = web.Groups.GetByName(roleAssignment.Member.Name);
+                                if (web.IsCurrentUserMemberOfGroup(group.ID))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Exception Suppressed: {0}", ex);
+                return false;
             }
         }
     }
