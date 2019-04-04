@@ -648,14 +648,28 @@ namespace WorkEnginePPM.DataServiceModules
 
         private bool UpdateProject(int projectId)
         {
-            var projectList = _spWeb.Lists["Project Center"];
             try
             {
-                var item = projectList.GetItemById(projectId);
-                item.Update();
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    Guid listguid = new Guid(this._listId);
+                    var projectList = _spWeb.Lists[listguid];
+                    if (_dvProjects.Count > 0)
+                    {
+                        string project_ext_uid = Convert.ToString(_dvProjects[0]["project_ext_uid"]);
+                        int rptProjectId = 0;
+                        int.TryParse(project_ext_uid.Replace($"{_spWeb.ID}.{this._listId}.", string.Empty), out rptProjectId);
+                        if (rptProjectId != 0)
+                        {
+                            var item = projectList.GetItemById(rptProjectId);
+                            item.Update();
+                        }
+                    }
+                });
             }
-            catch
+            catch (Exception ex)
             {
+                LogDSMMessage(ex.Message, 2);
                 return false;
             }
             return true;
