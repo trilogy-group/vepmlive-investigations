@@ -1058,7 +1058,9 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if (oField != null)
                     {
-                        if (!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup" && oField.TypeAsString != "FilteredLookup")
+                        if (!oField.ReadOnlyField && oField.TypeAsString != "TotalRollup" && oField.TypeAsString != "FilteredLookup"
+                            //Updating TS hours from the project plan can cause discrepancy, if the plan did not process all pending updates
+                            && name != "TimesheetHours")
                         {
                             switch (oField.Type)
                             {

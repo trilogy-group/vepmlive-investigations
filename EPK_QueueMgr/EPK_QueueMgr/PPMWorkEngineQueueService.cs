@@ -174,15 +174,26 @@ namespace WE_QueueMgr
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
 				string timeoutString = System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"];
-				if (!string.IsNullOrEmpty(timeoutString))
-				{
-					int parsedTimeout;
-					int.TryParse(timeoutString, out parsedTimeout);
-					if (parsedTimeout > 15)
-					{
-						jobMaxTimeout = parsedTimeout;
-					}
-				}
+                if (!string.IsNullOrEmpty(timeoutString))
+                {
+                    int timeoutMins;
+                    if (!int.TryParse(timeoutString, out timeoutMins))
+                    {
+                        TimeSpan timeoutSpan;
+                        if (!TimeSpan.TryParse(timeoutString, out timeoutSpan))
+                        {
+                            jobMaxTimeout = new TimeSpan(0, 2, 0);
+                        }
+                        else
+                        {
+                            jobMaxTimeout = timeoutSpan;
+                        }
+                    }
+                    else
+                    {
+                        jobMaxTimeout = new TimeSpan(0, 0, timeoutMins);
+                    }
+                }
 
 				string basepaths = BuildSitesList();
                 _cts = new CancellationTokenSource();
@@ -360,7 +371,9 @@ namespace WE_QueueMgr
         }
         //Loop once every:
         TimeSpan longRunPeriod = new TimeSpan(0, 1, 0);
-        int jobMaxTimeout = 60;
+        TimeSpan jobMaxTimeout = new TimeSpan(0, 1, 0);
+        TimeSpan cancellationWait = new TimeSpan(0, 0, 5);
+        TimeSpan pollPeriod = new TimeSpan(0, 0, 30);
         void DoLongRun()
         {
             while (!token.IsCancellationRequested)
@@ -375,27 +388,34 @@ namespace WE_QueueMgr
                         site = longRunQueue[0];
                         jobId = longRunJobIds[0];
                     }
-					
-
-				
-
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
-                    CancellationToken tasktoken = tokenSource.Token;
                     Task task = Task.Factory.StartNew(() =>
                      {
-                         InvokeWSSAdminRSVPRequest(site, jobId);
-                     }, tasktoken);
+                         try
+                         {
+                             using (tokenSource.Token.Register(Thread.CurrentThread.Abort))
+                             {
+                                 InvokeWSSAdminRSVPRequest(site, jobId);
+                                 return true;
+                             }
+                         }
+                         catch (ThreadAbortException)
+                         {
+                             return false;
+                         }
+                     }, tokenSource.Token);
 
                     DateTime jobStarted = DateTime.Now;
-                    while (((DateTime.Now - jobStarted).Minutes < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
+                    while (((DateTime.Now - jobStarted) < jobMaxTimeout || longRunJobIds.Count <= 1) && !token.IsCancellationRequested)
                     {
                         if (task.IsCompleted)
                             break;
-						task.Wait(TimeSpan.FromSeconds(30));
+                        task.Wait(pollPeriod);
                     }
                     if (token.IsCancellationRequested || !task.IsCompleted)
                     {
                         tokenSource.Cancel();
+                       
                         string sXML = BuildProductInfoString(site);
                         using (var qm = new QueueManager(sXML))
                         {

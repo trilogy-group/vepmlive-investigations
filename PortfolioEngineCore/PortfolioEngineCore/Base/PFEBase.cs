@@ -104,7 +104,10 @@ namespace PortfolioEngineCore
             debug.AddMessage("PFE Base Loaded");
         }
 
-
+        public void AddDebugMessage(string message)
+        {
+            debug?.AddMessage(message);
+        }
         #endregion Constructors
 
         #region Methods (2)

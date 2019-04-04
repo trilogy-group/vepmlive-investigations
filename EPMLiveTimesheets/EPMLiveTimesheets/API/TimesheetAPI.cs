@@ -31,6 +31,10 @@ namespace TimeSheets
         private const string GridIoResultTemplate = "<Grid><IO Result=\"{0}\" Message=\"{1}\"/></Grid>";
         private const string StopWatchResultTemplate = "<StopWatch Status=\"{0}\">{1}</StopWatch>";
         private const string GetOtherHoursResultTemplate = "<GetOtherHours Status=\"{0}\">{1}</GetOtherHours>";
+        private const string TimesheetUserName = "TimesheetUser_Name";
+        private const string ElementEntries = "Element_Entries";
+        private const string ManagerName = "Manager_Name";
+        private const string ManagerNotes = "Manager_Notes";
 
         static TimesheetAPI()
         {
@@ -1160,6 +1164,8 @@ namespace TimeSheets
 
                 string tsuid = docTimesheet.FirstChild.Attributes["TSUID"].Value;
 
+                Logger.WriteLog(Logger.Category.Medium, "Saving TS: ", tsuid);
+
                 SqlConnection connection = null;
                 try
                 {
@@ -1815,6 +1821,8 @@ namespace TimeSheets
                                         var emailTo = string.Empty;
                                         var emailcontent = string.Empty;
                                         var ResourceName = string.Empty;
+                                        var managerNotes = string.Empty;
+
                                         using (var command =
                                             new SqlCommand(
                                                 "Select RESOURCENAME,TSUSER_UID from  TSTIMESHEET where ts_uid=@ts_uid",
@@ -1873,7 +1881,7 @@ namespace TimeSheets
                                             }
                                         });
 
-                                        //Getting List pf rejected entries
+                                        // Getting List of rejected entries
                                         using (var command =
                                             new SqlCommand("Select Title,Project from TSITEM where ts_uid=@ts_uid", connection))
                                         {
@@ -1883,6 +1891,20 @@ namespace TimeSheets
                                                 while (reader.Read())
                                                 {
                                                     emailcontent += "<li>" + reader["Title"] + "</li>";
+                                                }
+                                            }
+                                        }
+
+                                        // Getting notes of rejected entries
+                                        using (var command =
+                                            new SqlCommand("select approval_notes from vwTSApprovalNotes where ts_uid=@ts_uid", connection))
+                                        {
+                                            command.Parameters.AddWithValue("@ts_uid", timesheetNode.Attributes["id"].Value);
+                                            using (var reader = command.ExecuteReader())
+                                            {
+                                                while (reader.Read())
+                                                {
+                                                    managerNotes = Convert.ToString(reader["approval_notes"]);
                                                 }
                                             }
                                         }
@@ -1897,8 +1919,10 @@ namespace TimeSheets
                                                     TIMESHEET_REJECTION_NOTIFICATION,
                                                     new Hashtable()
                                                     {
-                                                        { "TimesheetUser_Name", ResourceName },
-                                                        { "Element_Entries", emailcontent }
+                                                        { TimesheetUserName, ResourceName },
+                                                        { ElementEntries, emailcontent },
+                                                        { ManagerName, oWeb.CurrentUser.Name},
+                                                        { ManagerNotes,string.IsNullOrEmpty(managerNotes)?"No Notes":managerNotes },
                                                     },
                                                     emaillist,
                                                     string.Empty,
@@ -2391,7 +2415,7 @@ namespace TimeSheets
             XmlNode nodeHeader)
         {
             var nodeTotalsCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
-        
+
             CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Name", "TSTotals");
             CreateAndAppendAttribute(docLayout, nodeTotalsCol, "Visible", "1");
             CreateAndAppendAttribute(docLayout, nodeTotalsCol, "CanHide", "0");
@@ -4181,6 +4205,9 @@ namespace TimeSheets
                                     }
 
                                     command.ExecuteNonQuery();
+
+                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ", 
+                                        string.Format("Adding item id: {0} to TS: {1}, user id: {2}", itemRow["ITEM_ID"].ToString(), timesheetGuid, user.ID));
                                 }
                             }
                         }
@@ -4801,6 +4828,8 @@ namespace TimeSheets
                                             cmd.Parameters.AddWithValue("@projectid", projectid);
                                         }
                                         cmd.ExecuteNonQuery();
+
+                                        Logger.WriteLog(Logger.Category.Medium, "AddWorkItem: ", string.Format("Adding item id: {0} to TS: {1}, user id: {2}", li.ID, id, assignedtoid));
                                     }
                                 }
                                 catch { }

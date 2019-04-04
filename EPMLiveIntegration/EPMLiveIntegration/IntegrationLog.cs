@@ -38,12 +38,14 @@ namespace EPMLiveIntegration
                 if (_cn.State == System.Data.ConnectionState.Closed)
                     _cn.Open();
 
-                SqlCommand cmdError = new SqlCommand("INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @level, @text)", _cn);
-                cmdError.Parameters.AddWithValue("@intlistid", _intlogid);
-                cmdError.Parameters.AddWithValue("@listid", _listid);
-                cmdError.Parameters.AddWithValue("@level", (int)level);
-                cmdError.Parameters.AddWithValue("@text", _title + ": " + log);
-                cmdError.ExecuteNonQuery();
+                using (var cmdError = new SqlCommand("INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @level, @text)", _cn))
+                {
+                    cmdError.Parameters.AddWithValue("@intlistid", _intlogid);
+                    cmdError.Parameters.AddWithValue("@listid", _listid);
+                    cmdError.Parameters.AddWithValue("@level", (int)level);
+                    cmdError.Parameters.AddWithValue("@text", $"{_title}: {log}");
+                    cmdError.ExecuteNonQuery();
+                }
 
                 _cn.Close();
             }

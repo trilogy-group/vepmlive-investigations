@@ -293,51 +293,55 @@ namespace EPMLiveSynch.Layouts.epmlive
                     //    sServerRelativeUrl = currWeb.ServerRelativeUrl;
                     //}
 
-
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.CommandText = "Select timerjobuid,runtime,percentComplete,status,dtfinished,result From vwQueueTimerLog Where listguid=@listguid and jobtype=4";
-                    cmd.Parameters.AddWithValue("@listguid", sListGuid);
-                    cmd.Connection = cn;
-                    SqlDataReader rdr;
-                    rdr = cmd.ExecuteReader();
-
-                    string sImg = "";
-                    string sLogTime = "";
-                    string sLogResult = "";
-                    string percent = "0";
-
-                    if (rdr.Read())
+                    string sImg;
+                    string sLogTime;
+                    string sLogResult;
+                    string percent;
+                    using (var sqlCommand = new SqlCommand())
                     {
-                        if (!rdr.IsDBNull(3))
+                        sqlCommand.CommandText = "Select timerjobuid,runtime,percentComplete,status,dtfinished,result From vwQueueTimerLog Where listguid=@listguid and jobtype=4";
+                        sqlCommand.Parameters.AddWithValue("@listguid", sListGuid);
+                        sqlCommand.Connection = cn;
+                        using (var dataReader = sqlCommand.ExecuteReader())
                         {
-                            if (rdr.GetInt32(3) == 0)
+                            sImg = string.Empty;
+                            sLogTime = string.Empty;
+                            sLogResult = string.Empty;
+                            percent = "0";
+
+                            if (dataReader.Read())
                             {
-                                sLogResult = "Queued";
-                            }
-                            else if (rdr.GetInt32(3) == 1)
-                            {
-                                sLogResult = "Processing";
-                                percent = rdr.GetInt32(2).ToString("##0");
-                            }
-                            else if (!rdr.IsDBNull(5))
-                            {
-                                sLogResult = rdr.GetString(5);
-                                if (sLogResult == "No Errors")
-                                    sImg = "<img src=\"/_layouts/images/green.gif\" alt=\"\" >";
-                                else
-                                    sImg = "<img src=\"/_layouts/images/yellow.gif\" alt=\"\" >";
-                            }
-                            else
-                            {
-                                sLogResult = "No Results";
+                                if (!dataReader.IsDBNull(3))
+                                {
+                                    if (dataReader.GetInt32(3) == 0)
+                                    {
+                                        sLogResult = "Queued";
+                                    }
+                                    else if (dataReader.GetInt32(3) == 1)
+                                    {
+                                        sLogResult = "Processing";
+                                        percent = dataReader.GetInt32(2).ToString("##0");
+                                    }
+                                    else if (!dataReader.IsDBNull(5))
+                                    {
+                                        sLogResult = dataReader.GetString(5);
+                                        sImg = sLogResult == "No Errors"
+                                            ? "<img src=\"/_layouts/images/green.gif\" alt=\"\" >"
+                                            : "<img src=\"/_layouts/images/yellow.gif\" alt=\"\" >";
+                                    }
+                                    else
+                                    {
+                                        sLogResult = "No Results";
+                                    }
+                                }
+
+                                if (!dataReader.IsDBNull(4))
+                                {
+                                    sLogTime = dataReader.GetDateTime(4).ToString();
+                                }
                             }
                         }
-
-                        if (!rdr.IsDBNull(4))
-                            sLogTime = rdr.GetDateTime(4).ToString();
                     }
-
-                    rdr.Close();
 
                     dt.Rows.Add(new string[] { sListName, sListEditPageURL, "", "", "", sLogTime, sImg, sLogResult, sListGuid, percent });
                     cntFields++;

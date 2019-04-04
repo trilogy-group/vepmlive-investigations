@@ -26,6 +26,7 @@ namespace EPMLiveReporting.Tests
         private const string DummyString = "DummyString";
         private const string DummyUrl = "https://www.dummy.org/url";
         private const string ParentItemKey = "ParentItem";
+        private string ErrMsg = "ErrMsg";
         private readonly Guid DummyGuid = Guid.NewGuid();
         private IDisposable shimContext;
         private static SPSite spSite;
@@ -170,7 +171,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid,ref ErrMsg);
 
             // Assert
             Assert.IsTrue(commandsExecuted.Contains(WipeReportListIds));
@@ -198,7 +199,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -231,7 +232,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -259,7 +260,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -292,7 +293,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -320,7 +321,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -353,7 +354,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -381,7 +382,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(bulkInserted);
@@ -415,7 +416,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(spSite, epmData);
+            DataScrubber.CleanTables(spSite, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             Assert.IsTrue(logMessages.Any(log => log.Contains(ExpectedLogMessage)));
@@ -452,7 +453,7 @@ namespace EPMLiveReporting.Tests
             };
 
             // Act
-            DataScrubber.CleanTables(site, epmData);
+            DataScrubber.CleanTables(site, epmData, DummyGuid, ref ErrMsg);
 
             // Assert
             this.ShouldSatisfyAllConditions(
