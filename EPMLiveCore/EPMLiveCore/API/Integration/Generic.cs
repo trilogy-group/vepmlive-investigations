@@ -224,8 +224,7 @@ namespace EPMLiveCore.API.Integration
                             WarningLevel = 4,
                         };
 
-                        var results = new CompilerResults(new TempFileCollection());
-                        results = prov.CompileAssemblyFromDom(param, codeCompileUnit);
+                        var results = prov.CompileAssemblyFromDom(param, codeCompileUnit);
                         var assembly = results.CompiledAssembly;
                         service = assembly.GetType(sdName);
 
