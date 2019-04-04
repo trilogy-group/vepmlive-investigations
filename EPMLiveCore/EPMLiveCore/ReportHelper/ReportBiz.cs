@@ -260,7 +260,7 @@ namespace EPMLiveCore.ReportHelper
                         "Finished inserting data to RPTTSData for web: " + WebTitle,
                         "Finished inserting data to RPTTSData for web: " + WebTitle,
                         0, 1, jobUid.ToString());
-                    //message = "Successfully refreshed timesheet data.";
+                   
                     rd.LogStatus("",
                         "TimeSheet",
                         "Finished refreshing time sheet data for web: " + WebTitle,
@@ -291,8 +291,7 @@ namespace EPMLiveCore.ReportHelper
                         0, 1, jobUid.ToString());
 
                     rd.RefreshTimeSheet(_siteId, WebTitle, jobUid);
-
-                    //message = "Successfully refreshed timesheet data.";
+                    
                     rd.LogStatus("",
                         "TimeSheet",
                         "Finished refreshing time sheet data for web: " + WebTitle,
@@ -307,6 +306,163 @@ namespace EPMLiveCore.ReportHelper
                 }
                 return hasErrors;
             }
+        }
+        public bool RefreshTimesheetBatch(out string message, Guid jobUid,int pageSize=0)
+        {
+            using (var rd = new ReportData(_siteId))
+            {
+                int pageNo = 0;
+                pageSize = pageSize == 0 ? 100000 : pageSize;
+                int recCount = 0;
+                message = string.Empty;
+                bool hasErrors = false;
+                try
+                {
+                    rd.LogStatus("",
+                        "TimeSheet",
+                        "Begin refreshing time sheet data for web: " + WebTitle,
+                        "Begin refreshing time sheet data for web: " + WebTitle,
+                        0, 1, jobUid.ToString());
+
+                    DataSet dsTSData = rd.GetTSAllDataBatchWithSchema(pageNo, pageSize);
+
+                    if (dsTSData != null && dsTSData.Tables.Count > 0)
+                    {
+                        DataTable tblTSData = dsTSData.Tables[0];
+                        recCount = Convert.ToInt32(dsTSData.Tables[1].Rows[0][0]);
+                        //Delete Timesheetdata start 
+                        rd.LogStatus("",
+                            "TimeSheet",
+                            "Begin deleting existing time sheet data for web: " + WebTitle,
+                            "Begin deleting existing time sheet data for web: " + WebTitle,
+                            0, 1, jobUid.ToString());
+
+                        rd.DeleteExistingTSData();
+                        rd.LogStatus("",
+                            "TimeSheet",
+                            "Finished deleting existing time sheet data for web: " + WebTitle,
+                            "Finished deleting existing time sheet data for web: " + WebTitle,
+                            0, 1, jobUid.ToString());
+
+                        if (tblTSData.Columns.Contains("SNO"))
+                        {
+                            tblTSData.Columns.Remove("SNO");
+                        }
+
+                        var columns = new ColumnDefCollection(tblTSData.Columns);
+                        string sTableName = rd.GetSafeTableName("RPTTSData");
+
+                        rd.LogStatus("",
+                           "TimeSheet",
+                           "Recreating RPTTSData for web: " + WebTitle,
+                           "Recreating RPTTSData for web: " + WebTitle,
+                           0, 1, jobUid.ToString());
+                        if (!rd.CreateTable(sTableName, columns, true, out message))
+                        {
+                            hasErrors = true;
+                            rd.LogStatus("",
+                                "TimeSheet",
+                                "Error occured while recreating RPTTSData for web: " + WebTitle + ".",
+                                message,
+                                0, 1, jobUid.ToString());
+                        }
+                        rd.LogStatus("",
+                            "TimeSheet",
+                            "Finished recreating RPTTSData for web: " + WebTitle,
+                            "Finished recreating RPTTSData for web: " + WebTitle,
+                            0, 1, jobUid.ToString());
+                        DataTable dtTabletoInsert = tblTSData.Copy();
+                        ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtTabletoInsert);
+
+                        if (recCount > pageSize)
+                        {
+                            int pageCount = 0;
+                            if (recCount % pageSize > 0)
+                            {
+                                pageCount = (recCount / pageSize) + 1;
+                            }
+                            else
+                            {
+                                pageCount = recCount / pageSize;
+                            }
+                            for (int i = 1; i < pageCount; i++)
+                            {
+                                rd.LogStatus("",
+                                "TimeSheet",
+                                $"Processing data for batch no {2} for {WebTitle}",
+                                $"Processing data for batch no {2} for {WebTitle}",
+                                0, 1, jobUid.ToString());
+
+                                dsTSData = rd.GetTSAllDataBatchWithSchema(i, pageSize);
+                                if (dsTSData != null && dsTSData.Tables.Count > 0)
+                                {
+                                    tblTSData = dsTSData.Tables[0];
+                                    if (tblTSData.Columns.Contains("SNO"))
+                                    {
+                                        tblTSData.Columns.Remove("SNO");
+                                    }
+                                    dtTabletoInsert = tblTSData.Copy();
+                                    ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtTabletoInsert);
+                                }
+
+                                rd.LogStatus("",
+                               "TimeSheet",
+                               $"Finished Processing data for batch no {2} for {WebTitle}",
+                               $"Finished  Processing data for batch no {2} for {WebTitle}",
+                               0, 1, jobUid.ToString());
+                            }
+                        }
+                        //message = "Successfully refreshed timesheet data.";
+                        rd.LogStatus("",
+                            "TimeSheet",
+                            "Finished refreshing time sheet data for web: " + WebTitle,
+                            "Finished refreshing time sheet data for web: " + WebTitle,
+                            0, 1, jobUid.ToString());
+                    }
+                    else
+                    {
+                        message = "No timesheet data exists.";
+                        hasErrors = true;
+                        return hasErrors;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    message = string.Format("Refresh not completed due errors. {0} ", ex.ToString());
+                    rd.LogStatus("",
+                           "TimeSheet",
+                           $"Reporting Refresh Failed {WebTitle}",
+                           ex.ToString(),
+                           0, 3, jobUid.ToString());
+                    hasErrors = true;
+                }
+                return hasErrors;
+            }
+        }
+
+        private void ProcessRRInBatch(ref string message, ref Guid jobUid, ReportData rd, ref bool hasErrors, DataTable dtToInsert)
+        {
+            rd.LogStatus("", "TimeSheet",
+                "Inserting data to RPTTSData for web: " + WebTitle,
+                "Inserting data to RPTTSData for web: " + WebTitle,
+                0, 1, jobUid.ToString());
+            if (dtToInsert.Rows.Count > 0)
+            {
+                if (!rd.InsertTSAllData(dtToInsert, out message))
+                {
+                    hasErrors = true;
+                    rd.LogStatus("",
+                        "TimeSheet",
+                        "Error occurred while inserting data into RPTTSData for web: " + WebTitle,
+                        message, 0, 3, jobUid.ToString());
+                }
+            }
+
+            rd.LogStatus("", "TimeSheet",
+                  "Finished inserting data to RPTTSData for web: " + WebTitle,
+                  "Finished inserting data to RPTTSData for web: " + WebTitle,
+                  0, 1, jobUid.ToString());
         }
         //Modules created by xjh -- START
         public DataTable GetAllForeignKeys(EPMData DAO)

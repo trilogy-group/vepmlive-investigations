@@ -87,6 +87,7 @@
     <Compile Include="API\TimesheetAPI.cs" />
     <Compile Include="ApprovalsBase.cs" />
     <Compile Include="ApprovalsBase.RenderWebPart.cs" />
+    <Compile Include="Jobs\AllocationNotificationJob.cs" />
     <Compile Include="Jobs\ApprovalJob.cs" />
     <Compile Include="Jobs\BaseJob.cs" />
     <Compile Include="Jobs\SaveDataJob.cs" />
@@ -132,6 +133,9 @@
     </Compile>
     <Compile Include="Layouts\epmlive\WorkLog.aspx.designer.cs">
       <DependentUpon>WorkLog.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\WorkLog.Scripts.cs">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Models\TimeSheetItem.cs" />
     <Compile Include="Logger\Logger.cs" />

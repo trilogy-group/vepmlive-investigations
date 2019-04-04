@@ -42,7 +42,9 @@ describe(SuiteNames.smokeTestSuite, () => {
 
     it('Add an Event- [786942]', async () => {
         StepLogger.caseId = 786942;
-        await EventsPageHelper.createNewEvent();
+        const eventTitle = await EventsPageHelper.createNewEvent();
+        StepLogger.postCondition('Delete created event');
+        await EventsPageHelper.deleteEvent(eventTitle);
     });
 
     it('Create View- [855383]', async () => {

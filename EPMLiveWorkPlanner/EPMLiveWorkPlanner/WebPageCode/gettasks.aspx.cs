@@ -4,6 +4,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using Microsoft.SharePoint;
+using static System.Diagnostics.Trace;
 
 namespace EPMLiveWorkPlanner
 {
@@ -142,47 +143,8 @@ namespace EPMLiveWorkPlanner
                     string parentWbs = wbs.Substring(0, dotLoc);
                     string xpathExpr = "//row[wbs='" + parentWbs + "']";
                     XmlNode parent = nd.SelectSingleNode(xpathExpr);
-                    attr = doc.CreateAttribute("id");
-                    attr.Value = li.ID.ToString();
-                    newNode = doc.CreateNode(XmlNodeType.Element, "row", doc.NamespaceURI);
-                    newNode.Attributes.Append(attr);
-
-                    string innerXml = "<wbs>" + wbs + "</wbs><userdata name=\"wbs\">" + wbs + "</userdata><userdata name=\"taskorder\">" + taskorder + "</userdata><userdata name=\"SharePointId\">" + li.ID + "</userdata>";
-
-                    try
-                    {
-                        if (lstTaskCenter.Fields.GetFieldByInternalName("Predecessors") != null)
-                        {
-                            innerXml += "<userdata name=\"Predecessors\">" + li["Predecessors"] + "</userdata>";
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        innerXml += "<userdata name=\"" + percentageCalc + "\">" + li[percentageCalc] + "</userdata>";
-                    }
-                    catch { }
-
-                    newNode.InnerXml = innerXml;
-
-                    if (newNode.SelectSingleNode("userdata[@name='Duration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"Duration\">" + li["Duration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
-                    if (newNode.SelectSingleNode("userdata[@name='ActualDuration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"ActualDuration\">" + li["ActualDuration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
-
+                    string innerXml;
+                    CreateNode(doc, li, wbs, taskorder, percentageCalc, out newNode, out innerXml);
 
                     newNode.InnerXml = innerXml;
 
@@ -216,46 +178,8 @@ namespace EPMLiveWorkPlanner
                 }
                 else
                 {
-                    attr = doc.CreateAttribute("id");
-                    attr.Value = li.ID.ToString();
-
-                    newNode = doc.CreateNode(XmlNodeType.Element, "row", doc.NamespaceURI);
-                    newNode.Attributes.Append(attr);
-
-                    string innerXml = "<wbs>" + wbs + "</wbs><userdata name=\"wbs\">" + wbs + "</userdata><userdata name=\"taskorder\">" + taskorder + "</userdata><userdata name=\"SharePointId\">" + li.ID + "</userdata>";
-
-                    try
-                    {
-                        if (lstTaskCenter.Fields.GetFieldByInternalName("Predecessors") != null)
-                        {
-                            innerXml += "<userdata name=\"Predecessors\">" + li["Predecessors"] + "</userdata>";
-                        }
-                    }
-                    catch { }
-                    try
-                    {
-                        innerXml += "<userdata name=\"" + percentageCalc + "\">" + li[percentageCalc] + "</userdata>";
-                    }
-                    catch { }
-
-                    newNode.InnerXml = innerXml;
-
-                    if (newNode.SelectSingleNode("userdata[@name='Duration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"Duration\">" + li["Duration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
-                    if (newNode.SelectSingleNode("userdata[@name='ActualDuration']") == null)
-                    {
-                        try
-                        {
-                            innerXml += "<userdata name=\"ActualDuration\">" + li["ActualDuration"] + "</userdata>";
-                        }
-                        catch { }
-                    }
+                    string innerXml;
+                    CreateNode(doc, li, wbs, taskorder, percentageCalc, out newNode, out innerXml);
 
                     newNode.InnerXml += getCellData(li);
 
@@ -278,6 +202,80 @@ namespace EPMLiveWorkPlanner
             }
 
             data = doc.OuterXml;
+        }
+
+        private void CreateNode(
+            XmlDocument xmlDocument,
+            SPListItem listItem,
+            string wbs,
+            string taskOrder,
+            string percentageCalc,
+            out XmlNode newNode,
+            out string innerXml)
+        {
+            XmlAttribute attribute;
+            attribute = xmlDocument.CreateAttribute("id");
+            attribute.Value = listItem.ID.ToString();
+            newNode = xmlDocument.CreateNode(XmlNodeType.Element, "row", xmlDocument.NamespaceURI);
+            newNode.Attributes.Append(attribute);
+
+            innerXml = string.Format(
+                "<wbs>{0}</wbs><userdata name=\"wbs\">{0}</userdata><userdata name=\"taskorder\">{1}</userdata><userdata name=\"SharePointId\">{2}</userdata>",
+                wbs,
+                taskOrder,
+                listItem.ID);
+
+            var stringBuilder = new StringBuilder(innerXml);
+
+            try
+            {
+                if (lstTaskCenter.Fields.GetFieldByInternalName("Predecessors") != null)
+                {
+                    stringBuilder.Append(string.Format("<userdata name=\"Predecessors\">{0}</userdata>", listItem["Predecessors"]));
+                    innerXml = stringBuilder.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            try
+            {
+                stringBuilder.Append(string.Format("<userdata name=\"{0}\">{1}</userdata>", percentageCalc, listItem[percentageCalc]));
+                innerXml = stringBuilder.ToString();
+            }
+            catch (Exception ex)
+            {
+                TraceError("Exception Suppressed {0}", ex);
+            }
+
+            newNode.InnerXml = stringBuilder.ToString();
+
+            if (newNode.SelectSingleNode("userdata[@name='Duration']") == null)
+            {
+                try
+                {
+                    stringBuilder.Append(string.Format("<userdata name=\"Duration\">{0}</userdata>", listItem["Duration"]));
+                    innerXml = stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+            if (newNode.SelectSingleNode("userdata[@name='ActualDuration']") == null)
+            {
+                try
+                {
+                    stringBuilder.Append(string.Format("<userdata name=\"ActualDuration\">{0}</userdata>", listItem["ActualDuration"]));
+                    innerXml = stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    TraceError("Exception Suppressed {0}", ex);
+                }
+            }
         }
 
         private string getPercentCalc(SPWeb web)
@@ -1108,202 +1106,7 @@ namespace EPMLiveWorkPlanner
                     }
                     else if (field.InternalName != "LinkTitle" && field.InternalName != "Title")
                     {
-                        string displayValue = "";
-                        switch (field.Type)
-                        {
-                            case SPFieldType.User:
-
-                                if (useResourcePool)
-                                {
-                                    SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(data);
-                                    data = "";
-                                    foreach (SPFieldLookupValue lv in lvc)
-                                    {
-                                        data += "," + lv.LookupValue;
-                                    }
-                                    if (data.Length > 1)
-                                        data = data.Substring(1);
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                else
-                                {
-                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.Web, data);
-
-                                    foreach (SPFieldUserValue uv in uvc)
-                                    {
-                                        displayValue += "\n" + uv.User.LoginName + "\n" + uv.User.Name;
-                                    }
-                                    if (displayValue.Length > 1)
-                                        displayValue = displayValue.Substring(1);
-
-                                    //displayValue += "\t";
-
-                                    //if (hshComboCells.Contains(field.InternalName + "-" + li.Web.ID.ToString()))
-                                    //{
-                                    //    displayValue += hshComboCells[field.InternalName + "-" + li.Web.ID.ToString()].ToString();
-                                    //}
-                                    //else
-                                    //{
-                                    //    string mode = "";
-                                    //    try
-                                    //    {
-                                    //        mode = fieldXml.FirstChild.Attributes["UserSelectionMode"].Value;
-                                    //    }
-                                    //    catch { }
-
-                                    //    string userList = getMultiUser(mode, li.Web);
-                                    //    hshComboCells[field.InternalName + "-" + li.Web.ID.ToString()] = userList;
-                                    //    displayValue += userList;
-                                    //}
-                                    sb.Append("<cell><![CDATA[" + displayValue + "]]></cell>");
-                                }
-                                break;
-                            case SPFieldType.DateTime:
-                                try
-                                {
-                                    data = DateTime.Parse(data).ToShortDateString();
-                                }
-                                catch { }
-                                sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                break;
-                            case SPFieldType.Number:
-
-                                if (field.SchemaXml.Contains("Percentage=\"TRUE\""))
-                                {
-                                    try
-                                    {
-                                        float val = float.Parse(data) * 100;
-                                        data = val.ToString(nf);
-
-                                    }
-                                    catch { }
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        float val = float.Parse(data);
-                                        data = val.ToString(nf);
-
-                                    }
-                                    catch { }
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                break;
-                            case SPFieldType.Calculated:
-                                data = li.Fields.GetFieldByInternalName(f).GetFieldValueAsText(data);
-                                try
-                                {
-                                    data = data.Replace(";#", "\n").Split('\n')[1];
-                                }
-                                catch { }
-                                if (field.Description == "Indicator")
-                                {
-                                    sb.Append("<cell><![CDATA[<img src=\"" + web.Url + "/_layouts/images/" + data + "\">]]></cell>");
-                                }
-                                else
-                                {
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-
-                                break;
-                            case SPFieldType.MultiChoice:
-                                //try
-                                //{
-                                //    data = data.Replace(";#", ",");
-                                //    data = data.Substring(1, data.Length - 2);
-                                //}
-                                //catch { }
-                                //sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                //string cval;
-                                if (data != "")
-                                {
-                                    SPFieldMultiChoiceValue mcv = new SPFieldMultiChoiceValue(data);
-
-                                    //string choices = data;
-                                    //choices = choices.Replace(";#", "\n");
-                                    for (int i = 0; i < mcv.Count; i++)
-                                    {
-                                        string choice = mcv[i];
-                                        displayValue += "\n" + choice + ";#" + choice;
-                                    }
-                                    if (displayValue.Length > 1)
-                                        displayValue = displayValue.Substring(1);
-                                }
-                                //displayValue += "\t";
-                                //if (hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
-                                //{
-                                //    displayValue += hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
-                                //}
-                                //else
-                                //{
-                                //    XmlDocument doc = new XmlDocument();
-                                //    doc.LoadXml(li.Fields.GetFieldByInternalName(field.InternalName).SchemaXml);
-
-                                //    string inputs = "";
-                                //    foreach (XmlNode nd in doc.SelectNodes("//CHOICE"))
-                                //    {
-                                //        inputs += "\n" + nd.InnerText + ";#" + nd.InnerText;
-                                //    }
-                                //    if (inputs.Length > 1)
-                                //        inputs = inputs.Substring(1);
-                                //    displayValue += inputs;
-                                //    hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = inputs;
-                                //}
-                                sb.Append("<cell><![CDATA[" + displayValue + "]]></cell>");
-                                break;
-                            case SPFieldType.Lookup:
-                                if (field.TypeAsString == "LookupMulti")
-                                {
-                                    //try
-                                    //{
-                                    //    string[] datalist = data.Replace(";#", "\n").Split('\n');
-                                    //    data = "";
-                                    //    for (int i = 0; i < datalist.Length; i = i + 2)
-                                    //    {
-                                    //        data += "," + datalist[i] + " - " + datalist[i + 1];
-                                    //    }
-                                    //    data = data.Substring(1);
-                                    //}
-                                    //catch { }
-                                    //displayValue = data;
-                                    //if (!hshComboCells.Contains(field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()))
-                                    //{
-                                    //    string lookuplist = fieldXml.ChildNodes[0].Attributes["List"].Value;
-                                    //    string lookupfield = fieldXml.ChildNodes[0].Attributes["ShowField"].Value;
-
-                                    //    hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()] = getLookupList(li.Web, lookuplist, lookupfield);
-                                    //}
-                                    //displayValue += "\t" + hshComboCells[field.InternalName + "-" + li.ParentList.ID.ToString() + "-" + li.Web.ID.ToString()].ToString();
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-                                else
-                                {
-                                    data = data.Replace(";#", "\n").Split('\n')[0];
-                                    sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                }
-
-                                break;
-                            case SPFieldType.Boolean:
-                                if (data == "True")
-                                    sb.Append("<cell>1</cell>");
-                                else
-                                    sb.Append("<cell>0</cell>");
-                                break;
-                            case SPFieldType.Currency:
-                                try
-                                {
-                                    float fl = float.Parse(data);
-                                    data = fl.ToString(nf);
-                                }
-                                catch { }
-                                sb.Append("<cell><![CDATA[" + data + "]]></cell>");
-                                break;
-                            default:
-                                sb.Append("<cell><![CDATA[" + HttpUtility.HtmlEncode(data) + "]]></cell>");
-                                break;
-                        }
+                        updatetask.ProcessFieldType(useResourcePool, li, field, data, sb, nf, f, web.Url);
                     }
                     else
                     {

@@ -93,7 +93,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(SocialStreamPageConstants.settingItems.page));
     });
 
-    it('Post Status - [907973] [BUG:SKYVERA-1406]', async () => {
+    it('Post Status - [907973]', async () => {
         StepLogger.caseId = 907973;
         StepLogger.stepId(1);
         const uniqueId = PageHelper.getUniqueId();
@@ -148,7 +148,7 @@ describe(SuiteNames.smokeTestSuite, () => {
             ValidationsHelper.getDisplayedValidation(comment));
     });
 
-    it('Add Shared Document - [907964] [BUG: SKYVERA-1584]', async () => {
+    it('Add Shared Document - [907964]', async () => {
         StepLogger.caseId = 907964;
         const newFile = CommonPageHelper.uniqueDocumentFilePath;
 

@@ -110,50 +110,11 @@ namespace EPMLiveWebParts
                 {
                     var menu = (ActionsMenu)childControl;
 
-                    try
-                    {
-                        menu.GetMenuItem("EditInGridButton").Visible = false;
-                    }
-                    catch (Exception exception)
-                    {
-                        Trace.WriteLine(exception);
-                    }
-
-                    try
-                    {
-                        menu.GetMenuItem("ExportToDatabase").Visible = false;
-                    }
-                    catch (Exception exception)
-                    {
-                        Trace.WriteLine(exception);
-                    }
-
-                    try
-                    {
-                        menu.GetMenuItem("ExportToSpreadsheet").Visible = false;
-                    }
-                    catch (Exception exception)
-                    {
-                        Trace.WriteLine(exception);
-                    }
-
-                    try
-                    {
-                        menu.GetMenuItem("ViewRSS").Visible = false;
-                    }
-                    catch (Exception exception)
-                    {
-                        Trace.WriteLine(exception);
-                    }
-
-                    try
-                    {
-                        menu.GetMenuItem("SubscribeButton").Visible = false;
-                    }
-                    catch (Exception exception)
-                    {
-                        Trace.WriteLine(exception);
-                    }
+                    SetMenuVisibility(menu, "EditInGridButton", false);
+                    SetMenuVisibility(menu, "ExportToDatabase", false);
+                    SetMenuVisibility(menu, "ExportToSpreadsheet", false);
+                    SetMenuVisibility(menu, "ViewRSS", false);
+                    SetMenuVisibility(menu, "SubscribeButton", false);
 
                     menu.AddMenuItem(
                         "ChangeResources",
@@ -188,6 +149,18 @@ namespace EPMLiveWebParts
                 }
 
                 processControls(childControl, zoneIndex, viewUrl, curWeb);
+            }
+        }
+
+        public static void SetMenuVisibility(ActionsMenu menu, string menuItemId, bool visible)
+        {
+            try
+            {
+                menu.GetMenuItem(menuItemId).Visible = visible;
+            }
+            catch (Exception exception)
+            {
+                Trace.WriteLine(exception);
             }
         }
 

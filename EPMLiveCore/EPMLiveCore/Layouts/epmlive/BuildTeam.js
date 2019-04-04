@@ -237,7 +237,7 @@ function ShowPool() {
 }
 
 function ShowUserPopup(spaccount) {
-	return $.ajax({
+	$.ajax({
 		url: _spPageContextInfo.siteServerRelativeUrl + "/_api/web/lists('" + sUserInfoList + "')/DefaultDisplayFormUrl",
 		type: "GET",
 		headers: {

@@ -3,16 +3,18 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "postinstall": "webdriver-manager update",
+    "postinstall": "webdriver-manager update && npm run clean",
     "lint": "tslint \"e2e/**/*.ts\" --fix",
-    "clean": "rm -rf allure-reporter *.log",
+    "clean": "rm -rf auto-generated/allure-results *.log",
     "test": "protractor protractor.conf.js",
     "e2e": "protractor protractor.conf.js",
     "e2e:bs": "protractor protractor.browserstack.conf.js",
     "e2e:bsf": "protractor protractor.browserstack-serial.conf.js",
     "e2e-selenium": "protractor protractor.selenium-hub.conf.js",
     "e2e:report": "allure generate auto-generated/allure-results -o e2e-report --clean",
-    "e2e-tc": "protractor protractor.local.conf.js"
+    "e2e-tc": "protractor protractor.local.conf.js",
+    "build": "tsc -p ./",
+    "publish:testrail": "aurea-tr-publish"
   },
   "husky": {
     "hooks": {
@@ -29,7 +31,7 @@
   "dependencies": {
     "@angular/compiler": "^6.1.8",
     "@angular/core": "^6.1.8",
-    "@aurea/aurea-jasmine-testrail-reporter": "^1.0.3",
+    "@aurea/aurea-jasmine-testrail-reporter": "^2.0.0",
     "@aurea/protractor-automation-helper": "0.0.1",
     "allure-commandline": "^2.5.0",
     "browserstack-local": "^1.3.0",

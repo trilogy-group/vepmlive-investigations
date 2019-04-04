@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Fakes;
+using System.Reflection;
 using System.Web;
 using System.Web.Fakes;
 using System.Web.SessionState.Fakes;
@@ -14,6 +15,7 @@ using PortfolioEngineCore.Base.DBAccess.Fakes;
 using PortfolioEngineCore.Fakes;
 using Shouldly;
 using WorkEnginePPM.Fakes;
+using static WorkEnginePPM.EditCosts;
 using ShimSystemWebService = System.Web.Services.Fakes.ShimWebService;
 
 namespace WorkEnginePPM.Tests.WebServices
@@ -23,6 +25,15 @@ namespace WorkEnginePPM.Tests.WebServices
     {
         private IDisposable _shimContext;
         private EditCosts _testEntity;
+        private PrivateObject _privateObject;
+        private PrivateType _privateType;
+
+        private const string MergeCostCategoriesMethodName = "MergeCostCategories";
+        private const string MergeCostCategoryValuesMethodName = "MergeCostCategoryValues";
+        private const string BuildJsonLookupMethodName = "BuildJSONLookup";
+        private const string SendXmlToWorkEngineMethodName = "SendXMLToWorkEngine";
+        private const string BuildCalculatedDataMethodName = "BuildCalculatedData";
+        private const string GetCostTypeMethodName = "GetCostType";
 
         private const string CostTypeIdFieldName = "CT_ID";
         private const string CostTypeNameFieldName = "CT_NAME";
@@ -49,6 +60,8 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string NamedRateUidFieldName = "RT_UID";
         private const string NamedRateNameFieldName = "RT_NAME";
         private const string NamedRateLevelFieldName = "RT_LEVEL";
+        private const string NamedRateEffectiveDateFieldName = "RT_EFFECTIVE_DATE";
+        private const string NamedRateRateFieldName = "RT_RATE";
         private const string LookupUidFieldName = "LV_UID";
         private const string LookupFullValueFieldName = "LV_FULLVALUE";
         private const string LookupValuedFieldName = "LV_VALUE";
@@ -74,6 +87,8 @@ namespace WorkEnginePPM.Tests.WebServices
         private const string PeriodCostCostFieldName = "BD_COST";
         private const string SeqFieldName = "Seq";
         private const string UsedFieldName = "Used";
+        private const string ViewUidFieldName = "VIEW_UID";
+        private const string ViewNameFieldName = "VIEW_NAME";
 
         private const string DummyString = "DummyString";
         private const string DummyBaseInfo = "DummyBaseInfo";
@@ -161,24 +176,48 @@ namespace WorkEnginePPM.Tests.WebServices
         private const int CustomFieldId11815 = 11815;
         private const int DummyInt = 1;
         private const string DummyError = "DummyError";
-        private const string wepId = "33";
+        private const string WepId = "33";
         private const int DefaultProjectId = 0;
         private const int DefaultCostTypeId = 0;
         private const int DefaultFteMode = 0;
+        private const string DummyViewName = "DummyViewName";
+        private const string DummyViewUid = "444";
+        private const int DummyProjectId = 100;
+        private const int DummyLookupItemUid1 = 110;
+        private const int DummyLookupItemUid2 = 120;
+        private const int DummyLookupItemUid3 = 130;
+        private const int DummyLookupItemUid4 = 140;
+        private const string DummyLookupItemName1 = "DummyLookupItemName1";
+        private const string DummyLookupItemName2 = "DummyLookupItemName2";
+        private const string DummyLookupItemName3 = "DummyLookupItemName3";
+        private const string DummyLookupItemName4 = "DummyLookupItemName4";
 
-        private readonly string xmlDataSaveEditCostsData = $@"<Root><Body><B><I Visible=""1"" id=""I{DummyCostCategoryUid1}""><I Visible=""0"" id=""I{DummyCostCategoryUid2}S1"" CanWrite=""0""/><I Visible=""1"" id=""I{DummyCostCategoryUid2}S2"" CanWrite=""1"" Changed=""0""/></I><I Visible=""1"" id=""I{DummyCostCategoryUid3}"" Changed=""1"" Y{CustomFieldId11801}=""1""  Y{CustomFieldId11802}=""1""  Y{CustomFieldId11803}=""1""  Y{CustomFieldId11804}=""1""  Y{CustomFieldId11805}=""1"" Y{CustomFieldId11811}=""1""  Y{CustomFieldId11812}=""1""  Y{CustomFieldId11813}=""1""  Y{CustomFieldId11814}=""1""  Y{CustomFieldId11815}=""1"" C{DummyPeriodId1}=""1""></I></B></Body></Root>";
-        private readonly string xmlDataSaveEditCostsSimpleData = $"<Root><Body><B><I Visible=\"1\" id=\"I{DummyCostCategoryUid1}\"/></B></Body></Root>";
+        private readonly string _xmlDataSaveEditCostsData = $@"<Root><Body><B><I Visible=""1"" id=""I{DummyCostCategoryUid1}""><I Visible=""0"" id=""I{DummyCostCategoryUid2}S1"" CanWrite=""0""/><I Visible=""1"" id=""I{DummyCostCategoryUid2}S2"" CanWrite=""1"" Changed=""0""/></I><I Visible=""1"" id=""I{DummyCostCategoryUid3}"" Changed=""1"" Y{CustomFieldId11801}=""1""  Y{CustomFieldId11802}=""1""  Y{CustomFieldId11803}=""1""  Y{CustomFieldId11804}=""1""  Y{CustomFieldId11805}=""1"" Y{CustomFieldId11811}=""1""  Y{CustomFieldId11812}=""1""  Y{CustomFieldId11813}=""1""  Y{CustomFieldId11814}=""1""  Y{CustomFieldId11815}=""1"" C{DummyPeriodId1}=""1""></I></B></Body></Root>";
+        private readonly string _xmlDataSaveEditCostsSimpleData = $"<Root><Body><B><I Visible=\"1\" id=\"I{DummyCostCategoryUid1}\"/></B></Body></Root>";
 
         private StatusEnum _currentStatus = StatusEnum.rsSuccess;
         private string _currentStatusText;
+        private ShimDBAccess _dbAccess;
+        private ShimSqlDb _sqlDb;
+        private List<CostCategory> _costCategoryList1;
+        private List<CostCategory> _costCategoryList2;
+        private CostCategory _costCategory1;
+        private CostCategory _costCategory2;
+        private Type _costTypeOperationClass;
+        private ConstructorInfo _costTypeOperationCtor;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _shimContext = ShimsContext.Create();
             _testEntity = new EditCosts();
+            _privateObject = new PrivateObject(_testEntity);
+            _privateType = new PrivateType(typeof(EditCosts));
 
             _currentStatusText = string.Empty;
+
+            _costTypeOperationClass = typeof(CostType).Assembly.GetType("WorkEnginePPM.EditCosts+CostTypeOperation");
+            _costTypeOperationCtor = _costTypeOperationClass.GetConstructors()[0];
 
             ShimSystemWebService.AllInstances.ContextGet = sender => new ShimHttpContext()
             {
@@ -200,8 +239,8 @@ namespace WorkEnginePPM.Tests.WebServices
                 return true;
             };
 
-            var dbAccess = new ShimDBAccess();
-            var sqlDb = new ShimSqlDb(dbAccess)
+            _dbAccess = new ShimDBAccess();
+            _sqlDb = new ShimSqlDb(_dbAccess)
             {
                 Open = () => StatusEnum.rsSuccess,
                 StatusGet = () => _currentStatus,
@@ -212,7 +251,7 @@ namespace WorkEnginePPM.Tests.WebServices
             ShimWebAdmin.BuildBaseInfoHttpContext = context => DummyBaseInfo;
             ShimDataAccess.ConstructorStringSecurityLevels = (sender, baseInfo, secLevel) => new ShimDataAccess(sender)
             {
-                dbaGet = () => dbAccess
+                dbaGet = () => _dbAccess
             };
 
             ShimdbaGeneral.SelectAdminDBAccessDataTableOut = (DBAccess dba, out DataTable dataTable) =>
@@ -270,7 +309,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -307,7 +346,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -344,7 +383,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -381,7 +420,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -422,7 +461,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -448,7 +487,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout);
 
             // Assert
@@ -521,7 +560,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -556,7 +595,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -593,7 +632,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -623,7 +662,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 
@@ -678,7 +717,7 @@ namespace WorkEnginePPM.Tests.WebServices
                 DefaultCostTypeId,
                 viewUid,
                 DefaultFteMode,
-                wepId,
+                WepId,
                 tryCheckout,
                 loadAllCostCategories);
 

@@ -197,6 +197,13 @@ namespace EPMLiveCore.API
             nd.Attributes.Append(attr);
             ndMain.AppendChild(nd);
 
+            nd = docProperties.CreateNode(XmlNodeType.Element, "EPMLiveMSProjectDisabledFields", docProperties.NamespaceURI);
+            nd.InnerText = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLiveMSProjectDisabledFields");
+            attr = docProperties.CreateAttribute("Locked");
+            attr.Value = "1";
+            nd.Attributes.Append(attr);
+            ndMain.AppendChild(nd);
+
             return docProperties;
         }
 

@@ -84,7 +84,7 @@ namespace TimerService
                                             
                                             if (startProcess(rd))
                                             {
-                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id", cn))
+                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id and status = 1", cn))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
                                                     cmd1.ExecuteNonQuery();
@@ -158,8 +158,13 @@ namespace TimerService
                         thisClass.GetField("bErrors").SetValue(classObject, true);
                         thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
                     }
+					if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
+					{
+						string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
+						logMessage("ERR", "PROC", error);
+					}
 
-                    m = thisClass.GetMethod("finishJob");
+					m = thisClass.GetMethod("finishJob");
                     m.Invoke(classObject, new object[] { });
 
                 }

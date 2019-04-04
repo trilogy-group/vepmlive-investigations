@@ -48,6 +48,10 @@
     <Reference Include="EPM Live Core.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.Services.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.Services.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="WorkEnginePPM.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
@@ -134,23 +138,43 @@
     <Compile Include="ChartControl\EpmChartTests.cs" />
     <Compile Include="ChartControl\VfChartTests.cs" />
     <Compile Include="ControlTemplates\SocialStreamTests.cs" />
+    <Compile Include="FancyDisplayForm.Tests.cs" />
+    <Compile Include="FancyDisplayForm.Tests.FillMethods.cs" />
+    <Compile Include="FancyDisplayForm.Tests.LoadFancyFormData.cs" />
+    <Compile Include="GridListView\GridDataTests.cs" />
     <Compile Include="GridListView\GridListViewTests.AddContextualTab.cs" />
     <Compile Include="GridListView\GridListViewTests.RemainingMethods.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderActionMenu.cs" />
     <Compile Include="GridListView\GridListViewTests.RenderGantt.cs" />
+    <Compile Include="GridListView\GridListViewToolpartTests.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplayTest.cs" />
     <Compile Include="Layouts\epmlive\Admin\SSLogsTests.cs" />
     <Compile Include="Layouts\epmlive\TlwizardTests.cs" />
     <Compile Include="Layouts\epmlive\UpdateWebPartTests.cs" />
     <Compile Include="ListReportView\ListReportViewTest.cs" />
+    <Compile Include="ListSummaryTest.cs" />
+    <Compile Include="ListSummary\ListSummaryTests.cs" />
     <Compile Include="MyWorkWebPart\MyWorkToolpartTests.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ReportingChart\ReportingChartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.cs" />
     <Compile Include="ReportingChart\ReportingChartToolPartTests.Part2.cs" />
+    <Compile Include="ReportingFilter\ReportingFilterToolpartTests.cs" />
     <Compile Include="ResourcePlanningTest.cs" />
     <Compile Include="ReportingFilter\ReportingFilterTests.cs" />
+    <Compile Include="RollupSummaryTests.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePicturesTests.cs" />
     <Compile Include="WebPageCode\GetGanttItemsTests.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItem.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItemDataRow.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.HelperMethodsAndFields.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddItems.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.AddGroup.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.Aggregations.cs" />
     <Compile Include="WebPageCode\GetGanttTasksTests.cs" />
     <Compile Include="GridListView\GridListViewTests.cs" />
     <Compile Include="Helpers\SpListItemDefinition.cs" />
@@ -158,13 +182,22 @@
     <Compile Include="ReportsCenterTest.cs" />
     <Compile Include="ReportWebPartsTestBase.cs" />
     <Compile Include="ReportViewerTest.cs" />
-    <Compile Include="WebPageCode\getgriditemsTests.addItem.cs" />
-    <Compile Include="WebPageCode\getgriditemsTests.cs" />
-    <Compile Include="WebPageCode\getgriditemsTests.IsEditable.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.Fields.cs" />
+    <Compile Include="WebPageCode\GetGanttTasksTests.GetField.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.Fields.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.addItem.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.addItemDataRow.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.IsEditable.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.PageLoad.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.processList.cs" />
+    <Compile Include="WebPageCode\GetGridItemsTests.AddGroups.cs" />
     <Compile Include="WebPageCode\GetitemsTests.cs" />
+    <Compile Include="WebPageCode\GetListReportItemsTests.cs" />
     <Compile Include="WebPageCode\GridActionTests.cs" />
     <Compile Include="WebPageCode\SavegridTests.cs" />
     <Compile Include="CONTROLTEMPLATES\MyWork\MyWorkControlTests.cs" />
+    <Compile Include="WorkSpaceCenter\WorkSpaceCenterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -185,7 +218,12 @@
     <None Include="EPMLiveWebParts.Tests.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <!--<Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

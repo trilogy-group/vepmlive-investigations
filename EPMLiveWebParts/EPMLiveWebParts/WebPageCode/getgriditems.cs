@@ -1,25 +1,20 @@
 using System;
-using System.Linq;
-using System.Data;
-using System.Configuration;
 using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using System.Text;
-using System.Xml;
-using System.Data.SqlClient;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Xml;
 using EPMLiveCore;
-using EPMLiveCore.Infrastructure;
+using EPMLiveCore.Helpers;
+using Microsoft.SharePoint;
 using WorkEnginePPM;
 using Diagnostics = System.Diagnostics;
 using ListDisplayUtils = EPMLiveCore.ListDisplayUtils;
+using SDTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveWebParts
 {
@@ -521,175 +516,195 @@ namespace EPMLiveWebParts
 
         private XmlNode addMenus(XmlNode ndNewItem, SPList list, string showcreateworkspace)
         {
+            Guard.ArgumentIsNotNull(list, nameof(list));
 
-            int[] viewMenus = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            if (DoesUserHavePermissionsViewListItems)
-                viewMenus[0] = 1;
-
-            if (DoesUserHavePermissionsEditListItems)
-                viewMenus[1] = 1;
-
-            if (DoesUserHavePermissionsManagePermissions)
-                viewMenus[2] = 1;
-
-            if (DoesUserHavePermissionsDeleteListItems && !isTimesheet)
-                viewMenus[3] = 1;
-
-
-            if (list.EnableVersioning)
-                if (DoesUserHavePermissionsViewVersions)
-                    viewMenus[4] = 1;
-
-            //if (list.WorkflowAssociations.Count > 0)
-            //    if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
-            //        viewMenus[0] = 1;
-
-
+            var viewMenus = new int[14];
+            viewMenus[0] = DoesUserHavePermissionsViewListItems ? 1 : 0;
+            viewMenus[1] = DoesUserHavePermissionsEditListItems ? 1 : 0;
+            viewMenus[2] = DoesUserHavePermissionsManagePermissions ? 1 : 0;
+            viewMenus[3] = DoesUserHavePermissionsDeleteListItems && !isTimesheet ? 1 : 0;
+            viewMenus[4] = list.EnableVersioning && DoesUserHavePermissionsViewVersions ? 1 : 0;
             viewMenus[5] = 1;
+            viewMenus[6] = list.EnableModeration && DoesUserHavePermissionsApproveItems ? 1 : 0;
+            viewMenus[7] = list.WorkflowAssociations.Count > 0 ? 1 : 0;
 
-            if (list.EnableModeration)
-                if (DoesUserHavePermissionsApproveItems)
-                    viewMenus[6] = 1;
+            AddPlannerMenus(list);
+            ShowProjectButton(list, viewMenus);
 
-            if (list.WorkflowAssociations.Count > 0)
-                viewMenus[7] = 1;
+            // show create workspace
+            viewMenus[9] = requestsenabled
+                    && list.ParentWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs)
+                    && showcreateworkspace.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase)
+                ? 1
+                : 0;
 
+            ShowWorkPlanner(list, viewMenus);
+            ShowAgilePlanner(list, viewMenus);
 
+            viewMenus[12] = list.EnableAttachments && DoesUserHavePermissionsEditListItems ? 1 : 0;
+            ShowEditInProject(list, viewMenus);
 
+            var viewMenusBuider = new StringBuilder();
+            foreach (var viewMenu in viewMenus)
+            {
+                viewMenusBuider.AppendFormat(",{0}", viewMenu.ToString());
+            }
+            var nodeUserData = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+            nodeUserData.InnerText = viewMenusBuider.ToString().Substring(1);
+
+            var attrName = docXml.CreateAttribute("name");
+            attrName.Value = "viewMenus";
+            nodeUserData.Attributes.Append(attrName);
+
+            Guard.ArgumentIsNotNull(ndNewItem, nameof(ndNewItem));
+            ndNewItem.AppendChild(nodeUserData);
+            return ndNewItem;
+        }
+
+        private void ShowEditInProject(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[13] = hshMenus[list.ID].project ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void ShowAgilePlanner(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[11] = hshMenus[list.ID].agile ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void ShowWorkPlanner(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[10] = hshMenus[list.ID].workplan ? 1 : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void ShowProjectButton(SPList list, int[] viewMenus)
+        {
+            try
+            {
+                viewMenus[8] = hshMenus[list.ID].agile || hshMenus[list.ID].workplan || hshMenus[list.ID].project
+                    ? 1
+                    : 0;
+            }
+            catch (Exception ex)
+            {
+                SDTrace.WriteLine(ex);
+            }
+        }
+
+        private void AddPlannerMenus(SPList list)
+        {
             if (!hshMenus.ContainsKey(list.ID))
             {
-                string pubPC = "";
-
-                bool wp = false;
-                bool ap = false;
+                var pubPC = string.Empty;
+                var workPlanProject = false;
+                var agileProject = false;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    using (SPSite site = new SPSite(list.ParentWeb.Site.ID))
+                    using (var site = new SPSite(list.ParentWeb.Site.ID))
                     {
-                        using (SPWeb web = site.OpenWeb())
+                        using (var web = site.OpenWeb())
                         {
-
-                            Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
+                            var lockWeb = CoreFunctions.getLockedWeb(web);
                             if (lockWeb == Guid.Empty || lockWeb == list.ParentWeb.ID)
                             {
-                                if (EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveWPProjectCenter") == list.Title)
-                                {
-                                    try
-                                    {
-                                        wp = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveWPEnable"));
-                                    }
-                                    catch { }
-                                }
-                                if (EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveAgileProjectCenter") == list.Title)
-                                {
-                                    try
-                                    {
-                                        ap = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveAgileEnable"));
-                                    }
-                                    catch { }
-                                }
-                                pubPC = EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLivePublisherProjectCenter");
+                                GetPlannerMenusConfig(
+                                    list.ParentWeb,
+                                    list.Title,
+                                    out pubPC,
+                                    out workPlanProject,
+                                    out agileProject);
                             }
                             else
                             {
-                                using (SPWeb w = site.OpenWeb(lockWeb))
+                                using (var spWeb = site.OpenWeb(lockWeb))
                                 {
-                                    if (EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPProjectCenter") == list.Title)
-                                    {
-                                        try
-                                        {
-                                            wp = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPEnable"));
-                                        }
-                                        catch { }
-                                    }
-                                    if (EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveAgileProjectCenter") == list.Title)
-                                    {
-                                        try
-                                        {
-                                            ap = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveAgileEnable"));
-                                        }
-                                        catch { }
-                                    }
-                                    pubPC = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePublisherProjectCenter");
+                                    GetPlannerMenusConfig(
+                                        spWeb,
+                                        list.Title,
+                                        out pubPC,
+                                        out workPlanProject,
+                                        out agileProject);
                                 }
                             }
                         }
                     }
 
                 });
-                PlannerMenus pm = new PlannerMenus();
-                pm.agile = ap;
-                pm.workplan = wp;
+                var plannerMenus = new PlannerMenus
+                {
+                    agile = agileProject,
+                    workplan = workPlanProject
+                };
                 try
                 {
-                    SPDocumentLibrary pschedules = (SPDocumentLibrary)list.ParentWeb.Lists["Project Schedules"];
-                    if (pschedules != null && pubPC.ToLower() == list.Title.ToLower())
+                    var projectSchedules = (SPDocumentLibrary)list.ParentWeb.Lists["Project Schedules"];
+                    if (projectSchedules != null && pubPC.Equals(list.Title, StringComparison.OrdinalIgnoreCase))
                     {
-                        pm.project = true;
+                        plannerMenus.project = true;
                     }
                 }
-                catch { }
-                hshMenus.Add(list.ID, pm);
-            }
+                catch (Exception ex)
+                {
+                    SDTrace.WriteLine(ex);
+                }
 
-            //if (list.TemplateFeatureId == new Guid("8fdde10b-891e-4600-ad06-dd9e554faca0") || list.TemplateFeatureId == new Guid("8087cd06-a830-49b9-9697-f1457a276bcb") || list.Title == EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb, "EPMLiveProjectCenter"))
-            //show project button
-            try
+                hshMenus.Add(list.ID, plannerMenus);
+            }
+        }
+
+        private static void GetPlannerMenusConfig(
+            SPWeb spWeb,
+            string listTitle,
+            out string pubPC,
+            out bool wpProject,
+            out bool agileProject)
+        {
+            wpProject = GetProjectEnableSetting(spWeb, listTitle, "EPMLiveWPProjectCenter", "EPMLiveWPEnable");
+            agileProject = GetProjectEnableSetting(spWeb, listTitle, "EPMLiveAgileProjectCenter", "EPMLiveAgileEnable");
+            pubPC = CoreFunctions.getConfigSetting(spWeb, "EPMLivePublisherProjectCenter");
+        }
+
+        private static bool GetProjectEnableSetting(SPWeb spWeb, string title, string titleKey, string enableKey)
+        {
+            if (CoreFunctions.getConfigSetting(spWeb, titleKey) == title)
             {
-                if (hshMenus[list.ID].agile || hshMenus[list.ID].workplan || hshMenus[list.ID].project)
-                    viewMenus[8] = 1;
+                try
+                {
+                    var configSetting = CoreFunctions.getConfigSetting(spWeb, enableKey);
+                    bool isEnable;
+                    if (!bool.TryParse(configSetting, out isEnable))
+                    {
+                        throw new InvalidOperationException($"Valid bool value was expected in {configSetting}");
+                    }
+                    return isEnable;
+                }
+                catch (Exception ex)
+                {
+                    SDTrace.WriteLine(ex);
+                }
             }
-            catch { }
-            //show create workspace
-            if (requestsenabled && list.ParentWeb.DoesUserHavePermissions(SPBasePermissions.ManageSubwebs) && showcreateworkspace.ToLower() == "true")
-                viewMenus[9] = 1;
 
-            //show work planner
-            try
-            {
-                if (hshMenus[list.ID].workplan)
-                    viewMenus[10] = 1;
-            }
-            catch { }
-            //show agile planner
-            try
-            {
-                if (hshMenus[list.ID].agile)
-                    viewMenus[11] = 1;
-            }
-            catch { }
-            //if (list.ParentWeb.Features[new Guid("")] != null)
-            //    viewMenus[10] = 1;
-
-            if (list.EnableAttachments && DoesUserHavePermissionsEditListItems)
-                viewMenus[12] = 1;
-
-            //show edit in project (NON PS)
-            try
-            {
-                if (hshMenus[list.ID].project)
-                    viewMenus[13] = 1;
-            }
-            catch { }
-
-            string strViewMenus = "";
-
-            foreach (int v in viewMenus)
-            {
-                strViewMenus += "," + v.ToString();
-            }
-            strViewMenus = strViewMenus.Substring(1);
-            XmlNode ndUserData = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-            ndUserData.InnerText = strViewMenus;
-
-            XmlAttribute attrName = docXml.CreateAttribute("name");
-            attrName.Value = "viewMenus";
-            ndUserData.Attributes.Append(attrName);
-
-            ndNewItem.AppendChild(ndUserData);
-
-            return ndNewItem;
+            return false;
         }
 
         private void addFilterItems(string field, string value)
@@ -869,70 +884,16 @@ namespace EPMLiveWebParts
             {
                 try
                 {
-                    string HasComments = "";
+                    const string oneString = "1";
+                    const string twoString = "2";
 
-                    string scomments = dr["CommentCount"].ToString();
-                    double comments = 0;
-                    double.TryParse(scomments, out comments);
-                    if (comments > 0)
-                    {
-                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
-                        {
-                            ArrayList commenters = new ArrayList();
-                            int authorid = 0;
-                            try
-                            {
-                                commenters = new ArrayList(dr["Commenters"].ToString().Split(','));
-                            }
-                            catch { }
-                            try
-                            {
-                                SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, dr["Author"].ToString());
-                                authorid = uv.LookupId;
-                            }
-                            catch { }
-                            bool isAssigned = false;
-                            try
-                            {
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, dr["AssignedTo"].ToString());
-                                foreach (SPFieldUserValue uv in uvc)
-                                {
-                                    if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
-                                    {
-                                        isAssigned = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            catch { }
-                            if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
-                            {
-                                ArrayList commentersread = new ArrayList();
-                                try
-                                {
-                                    commentersread = new ArrayList(dr["CommentersRead"].ToString().Split(','));
-                                }
-                                catch { }
-                                if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
-                                {
-                                    HasComments += "1";
-                                }
-                                else
-                                {
-                                    HasComments += "2";
-                                }
-                            }
-                            else
-                                HasComments += "1";
-                        }
-                    }
-
+                    var hasComments = GetCommentsString(dr, oneString, twoString, oneString, string.Empty);
 
                     XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
                     XmlAttribute attrName = docXml.CreateAttribute("name");
                     attrName.Value = "HasComments";
                     ndSiteUrl.Attributes.Append(attrName);
-                    ndSiteUrl.InnerText = HasComments;
+                    ndSiteUrl.InnerText = hasComments;
                     ndNewItem.AppendChild(ndSiteUrl);
                 }
                 catch { }
@@ -1328,63 +1289,14 @@ namespace EPMLiveWebParts
                                         }
                                         try
                                         {
-                                            string scomments = dr["CommentCount"].ToString();
-                                            double comments = 0;
-                                            double.TryParse(scomments, out comments);
-                                            if (comments > 0)
-                                            {
-                                                if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
-                                                {
-                                                    ArrayList commenters = new ArrayList();
-                                                    int authorid = 0;
-                                                    try
-                                                    {
-                                                        commenters = new ArrayList(dr["Commenters"].ToString().Split(','));
-                                                    }
-                                                    catch { }
-                                                    try
-                                                    {
-                                                        SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, dr["Author"].ToString());
-                                                        authorid = uv.LookupId;
-                                                    }
-                                                    catch { }
-                                                    bool isAssigned = false;
-                                                    try
-                                                    {
-                                                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, dr["AssignedTo"].ToString());
-                                                        foreach (SPFieldUserValue uv in uvc)
-                                                        {
-                                                            if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
-                                                            {
-                                                                isAssigned = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    catch { }
-                                                    if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
-                                                    {
-                                                        ArrayList commentersread = new ArrayList();
-                                                        try
-                                                        {
-                                                            commentersread = new ArrayList(dr["CommentersRead"].ToString().Split(','));
-                                                        }
-                                                        catch { }
-                                                        if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
-                                                        {
-                                                            val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                                        }
-                                                        else
-                                                        {
-                                                            val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
-                                                        }
-                                                    }
-                                                    else
-                                                        val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                                }
-                                                else
-                                                    val += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                            }
+                                            val = string.Concat(
+                                                val,
+                                                GetCommentsString(
+                                                    dr,
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>",
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>",
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>",
+                                                    $" &nbsp;<a href=\"javascript:viewItem{gridname}(this,\'comments\');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>"));
                                         }
                                         catch { }
 
@@ -1432,7 +1344,24 @@ namespace EPMLiveWebParts
                                         {
                                             SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
                                             displayValue = "";
-                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                            string loginName = uv.LookupValue;
+
+                                            try
+                                            {
+                                                //SKYVERA-2119: Check if we have a group with this ID
+                                                if (string.IsNullOrEmpty(loginName))
+                                                {
+                                                    var group = field.ParentList.ParentWeb.SiteGroups.GetByID(int.Parse(val));
+
+                                                    if (group != null)
+                                                    {
+                                                        loginName = group.LoginName;
+                                                    }
+                                                }
+                                            }
+                                            catch { }
+
+                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + loginName + "</a>";
                                         }
                                         else
                                         {
@@ -2002,6 +1931,86 @@ namespace EPMLiveWebParts
                 }
                 counter++;
             }
+        }
+
+        private string GetCommentsString(DataRow dataRow, string firstAppend, string secondAppend, string thirdAppend, string fourthAppend)
+        {
+            var returnValue = new StringBuilder();
+
+            var comments = dataRow["CommentCount"].ToString();
+            var commentsCount = 0.0;
+            double.TryParse(comments, out commentsCount);
+            if (commentsCount > 0)
+            {
+                if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                {
+                    var commenters = new ArrayList();
+                    var authorid = 0;
+                    try
+                    {
+                        commenters = new ArrayList(dataRow["Commenters"].ToString().Split(','));
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    try
+                    {
+                        var userValue = new SPFieldUserValue(list.ParentWeb, dataRow["Author"].ToString());
+                        authorid = userValue.LookupId;
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    var isAssigned = false;
+                    try
+                    {
+                        var userValueCollection = new SPFieldUserValueCollection(list.ParentWeb, dataRow["AssignedTo"].ToString());
+                        foreach (var userValue in userValueCollection)
+                        {
+                            if (userValue.LookupId == list.ParentWeb.CurrentUser.ID)
+                            {
+                                isAssigned = true;
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                    if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
+                    {
+                        var commentersread = new ArrayList();
+                        try
+                        {
+                            commentersread = new ArrayList(dataRow["CommentersRead"].ToString().Split(','));
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                        if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
+                        {
+                            returnValue.Append(firstAppend);
+                        }
+                        else
+                        {
+                            returnValue.Append(secondAppend);
+                        }
+                    }
+                    else
+                    {
+                        returnValue.Append(thirdAppend);
+                    }
+                }
+                else
+                {
+                    returnValue.Append(fourthAppend);
+                }
+            }
+            return returnValue.ToString();
         }
 
         private void HandleFilteredLookupCase(SPField field, XmlDocument fieldXml, string val, XmlNode ndNewCell, ref string displayValue)
@@ -3894,347 +3903,234 @@ namespace EPMLiveWebParts
             return view.Query;//.Replace("<FieldRef Name=\"SiteURLNoMenu\" />", "");
         }
 
-
-
-
-
-        public virtual void addGroups(SPWeb web, string spquery, SortedList arrGTemp)
+        public virtual void addGroups(SPWeb web, string spQuery, SortedList groupsList)
         {
             tb.AddTimer();
             if (bUseReporting)
             {
-                string orderby = "";
-                string query = EPMLiveCore.ReportingData.GetReportQuery(web, list, spquery, out orderby);
-
+                var orderBy = string.Empty;
+                var query = ReportingData.GetReportQuery(web, list, spQuery, out orderBy);
                 if (rolluplists == null)
                 {
-                    try
-                    {
-                        DataSet ds = EPMLiveCore.ReportingData.GetReportingData(web, list.Title, false, query, orderby, iPage, iPageSize);
-                        if (ds != null)
-                        {
-                            DataTable dt = ds.Tables[0];
-                            dt.Columns.Add("SiteURL");
-                            dt.Columns.Add("siteid");
-
-                            if (filterfield != "")
-                            {
-                                try
-                                {
-                                    processListDT(web, dt.Select(filterfield + " = '" + filtervalue + "'"), arrGTemp, list.Title);
-                                }
-                                catch { }
-                            }
-                            else
-                                processListDT(web, dt.Select(), arrGTemp, list.Title);
-
-                            if (iPageSize > 0 && ds.Tables.Count > 1)
-                            {
-                                XmlNode nd = docXml.FirstChild.SelectSingleNode("//afterInit");
-                                if (nd != null)
-                                {
-                                    XmlNode ndCall = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
-                                    XmlAttribute attrName = docXml.CreateAttribute("command");
-                                    attrName.Value = "setuppaging";
-                                    ndCall.Attributes.Append(attrName);
-
-                                    XmlNode ndParam = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
-                                    ndParam.InnerText = ds.Tables[1].Rows[0][0].ToString();
-
-                                    ndCall.AppendChild(ndParam);
-                                    nd.AppendChild(ndCall);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        globalError += ex.Message + "<br>";
-                    }
-
+                    TryGetReportingData(web, groupsList, orderBy, query);
                 }
                 else
                 {
-                    foreach (string rlist in rolluplists)
-                    {
-                        try
-                        {
-                            DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, rlist, true, query, orderby);
-                            if (dt != null && dt.Rows.Count > 0)
-                            {
-                                dt.Columns.Add("SiteURL");
-                                dt.Columns.Add("siteid");
-                                if (filterfield != "")
-                                {
-                                    try
-                                    {
-                                        processListDT(web, dt.Select(filterfield + " = '" + filtervalue + "'"), arrGTemp, rlist);
-                                    }
-                                    catch { }
-                                }
-                                else
-                                    processListDT(web, dt.Select(), arrGTemp, rlist);
-                            }
-                            else
-                            {
-                                //When Enable Team, Enable Team Security is Enabled and Enable Reporting Database is unchecked then we need to add this clause
-                                //In this case we need to fetch value using SPOM. As by design, we have not created a property for Enable Reporting Database flag in
-                                //GridGanttSettings. So, we need to call processList routine to fetch record using SPOM
-                                //Workaround:
-                                processList(web, spquery, list, arrGTemp);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            globalError += ex.Message + "<br>";
-                        }
-                    }
+                    ProcessRollupLists(web, spQuery, groupsList, orderBy, query);
                 }
             }
             else if (rolluplists == null)
             {
-                processList(web, spquery, list, arrGTemp);
+                processList(web, spQuery, list, groupsList);
             }
             else
             {
                 if (inEditMode || !usePerformance)
                 {
-                    foreach (string strList in rolluplists)
+                    ProcessRollupLists(web, spQuery, groupsList);
+                    TryAddGroups(web, spQuery, groupsList);
+                }
+                else
+                {
+                    foreach (var rollupList in rolluplists)
                     {
-                        try
-                        {
-                            SPList tList = web.Lists[strList];
-                            if (tList != null)
-                                processList(web, spquery, tList, arrGTemp);
-                        }
-                        catch { }
+                        TryGetSiteItems(web, spQuery, groupsList, rollupList);
                     }
+                }
+            }
+            tb.StopTimer();
+        }
+
+        private void TryGetSiteItems(SPWeb web, string spQuery, SortedList groupsList, string rollupList)
+        {
+            try
+            {
+                var dataTable = CoreFunctions.getSiteItems(
+                    web,
+                    view,
+                    spQuery,
+                    filterfield,
+                    usewbs,
+                    rollupList.Trim(),
+                    arrGroupFields);
+                if (dataTable != null)
+                {
+                    ProcessListDTWithSiteFields(web, groupsList, dataTable, rollupList);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToGlobalError(ex);
+            }
+        }
+
+        private void TryGetReportingData(SPWeb web, SortedList groupsList, string orderBy, string query)
+        {
+            try
+            {
+                var dataSet = ReportingData.GetReportingData(
+                    web,
+                    list.Title,
+                    false,
+                    query,
+                    orderBy,
+                    iPage,
+                    iPageSize);
+                if (dataSet != null)
+                {
+                    if (dataSet.Tables.Count == 0)
+                    {
+                        throw new InvalidOperationException("dataSet should have at least one table.");
+                    }
+                    ProcessListDTWithSiteFields(web, groupsList, dataSet.Tables[0], list.Title);
+                    AppendSetupPagingCommand(dataSet);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToGlobalError(ex);
+            }
+        }
+
+        private void AppendToGlobalError(Exception exception)
+        {
+            SDTrace.WriteLine(exception);
+            globalError = $"{globalError}{exception.Message}<br>";
+        }
+
+        private void ProcessRollupLists(SPWeb web, string spQuery, SortedList groupsList)
+        {
+            foreach (string rollupList in rolluplists)
+            {
+                try
+                {
+                    Guard.ArgumentIsNotNull(web, nameof(web));
+
+                    var spList = web.Lists[rollupList];
+                    if (spList != null)
+                    {
+                        processList(web, spQuery, spList, groupsList);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SDTrace.WriteLine(ex);
+                }
+            }
+        }
+
+        private void TryAddGroups(SPWeb web, string spQuery, SortedList groupsList)
+        {
+            try
+            {
+                Guard.ArgumentIsNotNull(web, nameof(web));
+
+                foreach (SPWeb spWeb in web.Webs)
+                {
                     try
                     {
-
-                        foreach (SPWeb w in web.Webs)
-                        {
-                            try
-                            {
-                                addGroups(w, spquery, arrGTemp);
-                            }
-                            catch { }
-                            w.Close();
-                        }
+                        addGroups(spWeb, spQuery, groupsList);
                     }
-                    catch (Exception exception)
+                    catch (Exception ex)
                     {
-                        string msg = exception.Message;
-                        if (msg.Contains("Access is denied"))
-                        {
-                            if (web.DoesUserHavePermissions(SPBasePermissions.ViewPages) && !web.DoesUserHavePermissions(SPBasePermissions.BrowseDirectories))
-                                globalError = "Although some data may have been returned, access was denied to some data due to incorrect security configuration. Visit <a href=\"http://kb.epmlive.com/KnowledgebaseArticle50056.aspx\">Our Knowledge Base</a> for more information.";
-                        }
-                        else
-                        {
-                            globalError = msg;
-                        }
+                        SDTrace.WriteLine(ex);
+                    }
+                    spWeb.Close();
+                }
+            }
+            catch (Exception exception)
+            {
+                SDTrace.WriteLine(exception);
+                var msg = exception.Message;
+                if (msg.Contains("Access is denied"))
+                {
+                    Guard.ArgumentIsNotNull(web, nameof(web));
+                    if (web.DoesUserHavePermissions(SPBasePermissions.ViewPages) && !web.DoesUserHavePermissions(SPBasePermissions.BrowseDirectories))
+                    {
+                        globalError = "Although some data may have been returned, access was denied to some data due to incorrect security configuration. Visit <a href=\"http://kb.epmlive.com/KnowledgebaseArticle50056.aspx\">Our Knowledge Base</a> for more information.";
                     }
                 }
                 else
                 {
-
-                    foreach (string rlist in rolluplists)
-                    {
-                        try
-                        {
-                            DataTable dt = EPMLiveCore.CoreFunctions.getSiteItems(web, view, spquery, filterfield, usewbs, rlist.Trim(), arrGroupFields);
-                            if (dt != null)
-                            {
-                                dt.Columns.Add("SiteURL");
-                                dt.Columns.Add("siteid");
-                                if (filterfield != "")
-                                {
-                                    try
-                                    {
-                                        processListDT(web, dt.Select(filterfield + " = '" + filtervalue + "'"), arrGTemp, rlist);
-                                    }
-                                    catch { }
-                                }
-                                else
-                                    processListDT(web, dt.Select(), arrGTemp, rlist);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            globalError += ex.Message + "<br>";
-                        }
-                    }
-
-                    //string lists = "";
-                    //SqlConnection cn = null;
-                    //SPSecurity.RunWithElevatedPrivileges(delegate()
-                    //{
-                    //    //using (SPSite s = SPContext.Current.Site)
-                    //    {
-                    //        string dbCon = web.Site.ContentDatabase.DatabaseConnectionString;
-                    //        cn = new SqlConnection(dbCon);
-                    //        cn.Open();
-                    //    }
-                    //});
-
-                    //if (cn.State == ConnectionState.Open)
-                    //{
-
-                    //    try
-                    //    {
-
-
-                    //        string siteurl = web.ServerRelativeUrl.Substring(1);
-
-                    //        ArrayList arr = new ArrayList();
-                    //        string dqFields = "";
-                    //        foreach (string field in view.ViewFields)
-                    //        {
-                    //            SPField f = getRealField(list.Fields.GetFieldByInternalName(field));
-                    //            arr.Add(f.InternalName.ToLower());
-                    //            dqFields += "<FieldRef Name='" + f.InternalName + "' Nullable='TRUE'/>";
-                    //        }
-                    //        foreach (string groupby in arrGroupFields)
-                    //        {
-                    //            if (!arr.Contains(groupby.ToLower()))
-                    //            {
-                    //                arr.Add(groupby.ToLower());
-                    //                dqFields += "<FieldRef Name='" + groupby + "' Nullable='TRUE'/>";
-                    //            }
-                    //        }
-
-                    //        XmlDocument doc = new XmlDocument();
-                    //        doc.LoadXml("<Where>" + spquery + "</Where>");
-                    //        XmlNode nl = doc.FirstChild.SelectSingleNode("//OrderBy");
-                    //        if(nl != null)
-                    //        {
-                    //            foreach (XmlNode nd in nl.ChildNodes)
-                    //            {
-                    //                string fname = nd.Attributes["Name"].Value;
-                    //                if (!arr.Contains(fname.ToLower()))
-                    //                {
-                    //                    arr.Add(fname.ToLower());
-                    //                    dqFields += "<FieldRef Name='" + fname + "' Nullable='TRUE'/>";
-                    //                }
-                    //            }
-                    //        }
-
-
-                    //        if (!arr.Contains("title") && list.Fields.ContainsField("Title"))
-                    //        {
-                    //            dqFields += "<FieldRef Name='Title' Nullable='TRUE'/>";
-                    //        }
-                    //        if (!arr.Contains("created"))
-                    //        {
-                    //            dqFields += "<FieldRef Name='Created'/>";
-                    //        }
-                    //        if (!arr.Contains("_moderationstatus"))
-                    //        {
-                    //            dqFields += "<FieldRef Name='_ModerationStatus' Nullable='TRUE'/>";
-                    //        }
-                    //        if (filterfield != "")
-                    //        {
-                    //            if (!arr.Contains(filterfield.ToLower()))
-                    //            {
-                    //                dqFields += "<FieldRef Name='" + filterfield + "' Nullable='TRUE'/>";
-                    //            }
-                    //        }
-                    //        if (usewbs != "")
-                    //        {
-                    //            if (!arr.Contains(usewbs.ToLower()))
-                    //            {
-                    //                dqFields += "<FieldRef Name='" + usewbs + "' Nullable='TRUE'/>";
-                    //            }
-                    //        }
-                    //        if (!arr.Contains("list"))
-                    //        {
-                    //            dqFields += "<FieldRef Name='List' Nullable='TRUE'/>";
-                    //        }
-
-                    //        foreach (string rlist in rolluplists)
-                    //        {
-                    //            try
-                    //            {
-                    //                lists = "";
-                    //                string query = "";
-                    //                if (siteurl == "")
-                    //                    query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     webs.siteid='" + web.Site.ID + "' AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
-                    //                else
-                    //                    query = "SELECT     dbo.AllLists.tp_ID FROM         dbo.Webs INNER JOIN dbo.AllLists ON dbo.Webs.Id = dbo.AllLists.tp_WebId WHERE     (dbo.Webs.FullUrl LIKE '" + siteurl + "/%' OR dbo.Webs.FullUrl = '" + siteurl + "') AND (dbo.AllLists.tp_Title like '" + rlist.Replace("'", "''") + "')";
-
-                    //                SqlCommand cmd = new SqlCommand(query, cn);
-                    //                //cmd.Parameters.AddWithValue("@rlist", rlist);
-                    //                SqlDataReader dr = cmd.ExecuteReader();
-
-                    //                while (dr.Read())
-                    //                {
-                    //                    lists += "<List ID='" + dr.GetGuid(0).ToString() + "'/>";
-                    //                }
-                    //                dr.Close();
-
-                    //                if (lists != "")
-                    //                {
-                    //                    SPSiteDataQuery dq = new SPSiteDataQuery();
-                    //                    dq.Lists = "<Lists MaxListLimit='0'>" + lists + "</Lists>";
-                    //                    dq.Query = spquery;
-                    //                    dq.Webs = "<Webs Scope='Recursive'/>";
-                    //                    dq.ViewFields = dqFields;
-                    //                    try
-                    //                    {
-                    //                        DataTable dt = web.GetSiteData(dq);
-                    //                        dt.Columns.Add("SiteURL");
-                    //                        dt.Columns.Add("siteid");
-                    //                        if (filterfield != "")
-                    //                        {
-                    //                            try
-                    //                            {
-                    //                                processListDT(web, dt.Select(filterfield + " = '" + filtervalue + "'"), arrGTemp, rlist);
-                    //                            }
-                    //                            catch { }
-                    //                        }
-                    //                        else
-                    //                            processListDT(web, dt.Select(), arrGTemp, rlist);
-                    //                    }
-                    //                    catch (Exception ex)
-                    //                    {
-                    //                        globalError += "Error getting site data: " + ex.Message + "<br>";
-                    //                    }
-                    //                }
-                    //            }
-                    //            catch (Exception ex)
-                    //            {
-                    //                globalError += "Error getting site data lists: " + ex.Message + "<br>";
-                    //            }
-
-                    //        }
-
-
-                    //        cn.Close();
-                    //    }
-                    //    catch { }
-                    //    cn.Close();
-                    //}
-                    //dq.Lists = "<Lists ServerTemplate='10701'/>";
-
+                    globalError = msg;
                 }
             }
+        }
 
+        private void ProcessRollupLists(SPWeb web, string spQuery, SortedList groupsList, string orderBy, string query)
+        {
+            foreach (string rollupList in rolluplists)
+            {
+                try
+                {
+                    var dataTable = ReportingData.GetReportingData(web, rollupList, true, query, orderBy);
+                    if (dataTable?.Rows.Count > 0)
+                    {
+                        ProcessListDTWithSiteFields(web, groupsList, dataTable, rollupList);
+                    }
+                    else
+                    {
+                        // When Enable Team, Enable Team Security is Enabled and Enable Reporting Database is unchecked then we need to add this clause
+                        // In this case we need to fetch value using SPOM. As by design, we have not created a property for Enable Reporting Database flag in
+                        // GridGanttSettings. So, we need to call processList routine to fetch record using SPOM
+                        // Workaround:
+                        processList(web, spQuery, list, groupsList);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppendToGlobalError(ex);
+                }
+            }
+        }
 
+        private void AppendSetupPagingCommand(DataSet dataSet)
+        {
+            if (iPageSize > 0 && dataSet.Tables.Count > 1)
+            {
+                var xmlNode = docXml.FirstChild.SelectSingleNode("//afterInit");
+                if (xmlNode != null)
+                {
+                    var nodeCall = docXml.CreateNode(XmlNodeType.Element, "call", docXml.NamespaceURI);
+                    var attrName = docXml.CreateAttribute("command");
+                    attrName.Value = "setuppaging";
+                    nodeCall.Attributes.Append(attrName);
 
-            //if (rolluplists != null)
-            //{
-            //    foreach (SPWeb w in web.Webs)
-            //    {
-            //        try
-            //        {
-            //            addGroups(w, spquery, arrGTemp);
-            //        }
-            //        catch { }
-            //        w.Close();
-            //    }
-            //}
-            tb.StopTimer();
+                    var nodeParam = docXml.CreateNode(XmlNodeType.Element, "param", docXml.NamespaceURI);
+                    if (dataSet.Tables[1].Rows.Count == 0 || dataSet.Tables[1].Columns.Count == 0)
+                    {
+                        throw new InvalidOperationException(
+                            "dataSet.Tables[1] should have at least one row and one column.");
+                    }
+                    nodeParam.InnerText = dataSet.Tables[1].Rows[0][0].ToString();
+
+                    nodeCall.AppendChild(nodeParam);
+                    xmlNode.AppendChild(nodeCall);
+                }
+            }
+        }
+
+        private void ProcessListDTWithSiteFields(SPWeb web, SortedList groupsList, DataTable dataTable, string listName)
+        {
+            Guard.ArgumentIsNotNull(dataTable, nameof(DataTable));
+            dataTable.Columns.Add("SiteURL");
+            dataTable.Columns.Add("siteid");
+
+            if (!string.IsNullOrWhiteSpace(filterfield))
+            {
+                try
+                {
+                    processListDT(web, dataTable.Select($"{filterfield} = '{filtervalue}'"), groupsList, listName);
+                }
+                catch (Exception ex)
+                {
+                    SDTrace.WriteLine(ex);
+                }
+            }
+            else
+            {
+                processListDT(web, dataTable.Select(), groupsList, listName);
+            }
         }
 
         private void setInitialAggs(string grouping)

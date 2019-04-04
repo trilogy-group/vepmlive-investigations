@@ -167,6 +167,8 @@
     <Compile Include="API\Applications\ErrorLevels.cs" />
     <Compile Include="API\AppsStoreHelper.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
+    <Compile Include="API\AssociatedListItems\ProjectData.cs" />
+    <Compile Include="API\AssociatedListItems\SiteData.cs" />
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
     <Compile Include="API\Comments\CommentManager.cs" />
@@ -225,6 +227,7 @@
     <Compile Include="API\Template\Template.cs" />
     <Compile Include="API\Timer.cs" />
     <Compile Include="API\ViewManager.cs" />
+    <Compile Include="API\WebInitHelper.cs" />
     <Compile Include="API\WorkspaceCenter\WorkspaceCenter.cs" />
     <Compile Include="AppNavFixUp.cs" />
     <Compile Include="AppSettingsHelper.cs" />
@@ -247,13 +250,34 @@
     <Compile Include="CascadingLookup\CascadingLookup.FieldSettings.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.Children.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.DropDownList.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.ErrorHandling.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.EventHandling.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.Overrides.cs" />
+    <Compile Include="CascadingLookup\CascadingLookupFieldControl.Query.cs" />
     <Compile Include="ChildParentSync.cs" />
     <Compile Include="Helpers\Guard.cs" />
+    <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\WebServicesHelper.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.Delete.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.Get.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.IIntegrator.cs" />
+    <Compile Include="Integrations\Salesforce\Integrator.Update.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\706.1.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\706.2.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\703Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\702Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\701Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\710Steps.cs" />
+    <Compile Include="JsonUtilHelper.cs" />
     <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
+    <Compile Include="Layouts\epmlive\sitepermissions.Helpers.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\XmlDataSimplifier.cs" />
+    <Compile Include="Layouts\epmlive\WebSettingsAdditionalInfo.cs" />
     <Compile Include="ListDisplaySettingIterator.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator.RenderControl.cs" />
     <Compile Include="ListDisplaySettingIterator.IsFieldExcluded.cs" />

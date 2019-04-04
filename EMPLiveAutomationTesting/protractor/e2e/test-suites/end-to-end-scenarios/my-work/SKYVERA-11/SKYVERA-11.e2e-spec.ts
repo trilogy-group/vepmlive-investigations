@@ -27,12 +27,6 @@ describe(SuiteNames.endToEndSuite, () => {
         await StepLogger.takeScreenShot();
     });
 
-    afterAll(async () => {
-        await new LoginPage().goToAndLogin();
-        await MyWorkPageSubHelper.deleteToDoItem(item);
-        await LoginPageHelper.logout();
-    });
-
     it('Check the ellipsis icon (…) on the grid.- [745063]', async () => {
         StepLogger.caseId = 745063;
 
@@ -43,6 +37,7 @@ describe(SuiteNames.endToEndSuite, () => {
 
         StepLogger.stepId(2);
         const workType = await MyWorkPageHelper.clickWorkTypeOption();
+        await MyWorkPageSubHelper.searchItem(item);
         await MyWorkPageHelper.verifySearchResults(workType);
     });
 
@@ -75,6 +70,7 @@ describe(SuiteNames.endToEndSuite, () => {
         StepLogger.caseId = 745074;
 
         StepLogger.stepId(1);
+        await MyWorkPageSubHelper.searchItem(item);
         const itemTitle = await MyWorkPageHelper.clickOnEllipsesForAnyItem();
         await MyWorkPageHelper.verifyEllipsesDropdownForItemDisplayed();
 

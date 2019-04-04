@@ -171,7 +171,7 @@ export class MyWorkPageHelper {
         const viewNewName = `${MyWorkPageConstants.renameView}${uniqueId}`;
         await TextboxHelper.sendKeys(MyWorkPage.viewsPopup.newName, viewNewName);
         await PageHelper.click(MyWorkPage.viewsPopup.ok);
-
+        await PageHelper.acceptAlert();
         return viewNewName;
     }
 
@@ -863,7 +863,7 @@ export class MyWorkPageHelper {
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
         const workType = await PageHelper.getText(ellipseMyWorkPageItems.workTypeSubmenuItem);
         await ElementHelper.actionHoverOver(ellipseMyWorkPageItems.workTypes);
-        await PageHelper.click(ellipseMyWorkPageItems.workTypeSubmenuItem);
+        await ElementHelper.clickUsingJs(ellipseMyWorkPageItems.workTypeSubmenuItem);
         return workType;
     }
 

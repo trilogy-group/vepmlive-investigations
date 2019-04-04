@@ -1377,144 +1377,156 @@ namespace CADataCache
 
 
         }
-        private void CopyOverTotFields(clsDetailRowData otot, clsDetailRowData odet, bool bFirstPass)
+
+        private void CopyOverTotFields(clsDetailRowData detailRowData,
+            clsDetailRowData detailRowDataPrime,
+            bool firstPass)
         {
-            int lVal;
-            string sVal;
-            int lFid = (int)FieldIDs.BC_FID;
-            bool bPid = false;
-
-            foreach (clsDataItem oi in m_TotalRoot)
+            foreach (var clsItem in m_TotalRoot)
             {
-                if (oi.bSelected == true)
+                if (!clsItem.bSelected)
                 {
-                    if (bFirstPass == true)
-                    {
-                        lFid = oi.UID;
-
-                        GetDetFieldValue(odet, lFid, out lVal, out sVal);
-                        SetTotalDetFieldValue(otot, lFid, lVal, sVal);
-
-                        if (lFid == (int)FieldIDs.BC_FID)
-                        {
-                            otot.Cat_Name = odet.Cat_Name;
-                            otot.FullCatName = odet.FullCatName;
-                        }
-
-                        else if (lFid == (int)FieldIDs.CAT_FID)
-                        {
-                            otot.CC_Name = odet.CC_Name;
-                            otot.FullCCName = odet.FullCCName;
-                        }
-
-                        else if (lFid >= 11801 && lFid <= 11805)
-                            otot.Text_OCVal[lFid - 11800] = odet.Text_OCVal[lFid - 11800];
-
-                        else if (lFid >= 11811 && lFid <= 11815)
-                            otot.TXVal[lFid - 11810] = odet.TXVal[lFid - 11810];
-
-                        else if (lFid == (int)FieldIDs.SCEN_FID)
-                        {
-                            otot.Scen_Name = odet.Scen_Name;
-                        }
-
-                        else if (lFid == (int)FieldIDs.CT_FID)
-                        {
-                            otot.CT_Name = odet.CT_Name;
-                        }
-
-                        else if (lFid == (int)FieldIDs.BC_ROLE)
-                        {
-                            otot.Role_Name = odet.Role_Name;
-                        }
-
-
-                        else if (lFid == (int)FieldIDs.PI_FID)
-                        {
-                            otot.PI_Name = odet.PI_Name;
-
-                            //     if (bPid)
-                            otot.Internal_ID = odet.Internal_ID;
-                        }
-                        else
-                        {
-                            lFid = oi.ID;
-
-                            if (lFid >= (int)FieldIDs.PI_USE_EXTRA && lFid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                            {
-                                otot.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA] = odet.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA];
-                            }
-                        }
-
-
-                    }
-                    else
-                    {
-                        int tlVal;
-                        string tsVal;
-
-                        lFid = oi.UID;
-
-                        GetDetFieldValue(otot, lFid, out tlVal, out tsVal);
-                        GetDetFieldValue(odet, lFid, out lVal, out sVal);
-
-                        Boolean bSame = ((lVal == tlVal) && (sVal == tsVal));
-
-                        if (bSame == false)
-                        {
-
-                            if (lFid == (int)FieldIDs.BC_FID)
-                            {
-                                otot.Cat_Name = "";
-                                otot.FullCatName = "";
-                            }
-
-                            else if (lFid == (int)FieldIDs.CAT_FID)
-                            {
-                                otot.CC_Name = "";
-                                otot.FullCCName = "";
-                            }
-
-                            else if (lFid >= 11801 && lFid <= 11805)
-                                otot.Text_OCVal[lFid - 11800] = "";
-
-                            else if (lFid >= 11811 && lFid <= 11815)
-                                otot.TXVal[lFid - 11810] = "";
-
-
-                            else if (lFid == (int)FieldIDs.CT_FID)
-                            {
-                                otot.CT_Name = "";
-                            }
-
-                            else if (lFid == (int)FieldIDs.BC_ROLE)
-                            {
-                                otot.Role_Name = "";
-                            }
-
-
-                            else if (lFid == (int)FieldIDs.PI_FID)
-                            {
-                                otot.PI_Name = "";
-
-                                //     if (bPid)
-                                otot.Internal_ID = 0;
-                            }
-
-                            else
-                            {
-                                lFid = oi.ID;
-
-                                if (lFid >= (int)FieldIDs.PI_USE_EXTRA && lFid <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
-                                {
-                                    otot.m_PI_Format_Extra_data[lFid - (int)FieldIDs.PI_USE_EXTRA] = "";
-                                }
-                            }
-
-                        }
-                    }
+                    continue;
                 }
 
+                if (firstPass)
+                {
+                    ProcessFirstPassData(clsItem, detailRowData, detailRowDataPrime);
+                }
+                else
+                {
+                    ProcessNonFirstPassData(clsItem, detailRowData, detailRowDataPrime);
+                }
+            }
+        }
+
+        private void ProcessNonFirstPassData(clsDataItem clsItem, clsDetailRowData detailRowData, clsDetailRowData detailRowDataPrime)
+        {
+            int tlVal;
+            string tsVal;
+            int intValue;
+            string stringValue;
+            var fieldType = clsItem.UID;
+
+            GetDetFieldValue(detailRowData, fieldType, out tlVal, out tsVal);
+            GetDetFieldValue(detailRowDataPrime, fieldType, out intValue, out stringValue);
+
+            var bSame = intValue == tlVal && stringValue == tsVal;
+
+            if (bSame)
+            {
+                return;
+            }
+
+            switch (fieldType)
+            {
+                case (int)FieldIDs.BC_FID:
+                    detailRowData.Cat_Name = string.Empty;
+                    detailRowData.FullCatName = string.Empty;
+                    break;
+                case (int)FieldIDs.CAT_FID:
+                    detailRowData.CC_Name = string.Empty;
+                    detailRowData.FullCCName = string.Empty;
+                    break;
+                default:
+                    if (fieldType >= 11801 && fieldType <= 11805)
+                        detailRowData.Text_OCVal[fieldType - 11800] = string.Empty;
+
+                    else if (fieldType >= 11811 && fieldType <= 11815)
+                    {
+                        detailRowData.TXVal[fieldType - 11810] = string.Empty;
+                    }
+                    else switch (fieldType)
+                        {
+                            case (int)FieldIDs.CT_FID:
+                                detailRowData.CT_Name = string.Empty;
+                                break;
+                            case (int)FieldIDs.BC_ROLE:
+                                detailRowData.Role_Name = string.Empty;
+                                break;
+                            case (int)FieldIDs.PI_FID:
+                                detailRowData.PI_Name = string.Empty;
+                                detailRowData.Internal_ID = 0;
+                                break;
+                            default:
+                                {
+                                    fieldType = clsItem.ID;
+
+                                    if (fieldType >= (int)FieldIDs.PI_USE_EXTRA
+                                        && fieldType <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                                    {
+                                        detailRowData.m_PI_Format_Extra_data[fieldType - (int)FieldIDs.PI_USE_EXTRA] = string.Empty;
+                                    }
+
+                                    break;
+                                }
+                        }
+
+                    break;
+            }
+        }
+
+        private void ProcessFirstPassData(IDataItem clsItem,
+            clsDetailRowData detailRowData,
+            clsDetailRowData detailRowDataPrime)
+        {
+            var fieldType = clsItem.UID;
+            int intValue;
+            string stringValue;
+            GetDetFieldValue(detailRowDataPrime, fieldType, out intValue, out stringValue);
+            SetTotalDetFieldValue(detailRowData, fieldType, intValue, stringValue);
+
+            switch (fieldType)
+            {
+                case (int)FieldIDs.BC_FID:
+                    detailRowData.Cat_Name = detailRowDataPrime.Cat_Name;
+                    detailRowData.FullCatName = detailRowDataPrime.FullCatName;
+                    break;
+                case (int)FieldIDs.CAT_FID:
+                    detailRowData.CC_Name = detailRowDataPrime.CC_Name;
+                    detailRowData.FullCCName = detailRowDataPrime.FullCCName;
+                    break;
+                default:
+                    {
+                        if (fieldType >= 11801 && fieldType <= 11805)
+                        {
+                            detailRowData.Text_OCVal[fieldType - 11800] = detailRowDataPrime.Text_OCVal[fieldType - 11800];
+                        }
+
+                        else if (fieldType >= 11811 && fieldType <= 11815)
+                        {
+                            detailRowData.TXVal[fieldType - 11810] = detailRowDataPrime.TXVal[fieldType - 11810];
+                        }
+                        else switch (fieldType)
+                            {
+                                case (int)FieldIDs.SCEN_FID:
+                                    detailRowData.Scen_Name = detailRowDataPrime.Scen_Name;
+                                    break;
+                                case (int)FieldIDs.CT_FID:
+                                    detailRowData.CT_Name = detailRowDataPrime.CT_Name;
+                                    break;
+                                case (int)FieldIDs.BC_ROLE:
+                                    detailRowData.Role_Name = detailRowDataPrime.Role_Name;
+                                    break;
+                                case (int)FieldIDs.PI_FID:
+                                    detailRowData.PI_Name = detailRowDataPrime.PI_Name;
+                                    detailRowData.Internal_ID = detailRowDataPrime.Internal_ID;
+                                    break;
+                                default:
+                                    fieldType = clsItem.ID;
+
+                                    if (fieldType >= (int)FieldIDs.PI_USE_EXTRA
+                                        && fieldType <= (int)FieldIDs.PI_USE_EXTRA + (int)FieldIDs.MAX_PI_EXTRA)
+                                    {
+                                        detailRowData.m_PI_Format_Extra_data[fieldType - (int)FieldIDs.PI_USE_EXTRA]
+                                            = detailRowDataPrime.m_PI_Format_Extra_data[fieldType - (int)FieldIDs.PI_USE_EXTRA];
+                                    }
+
+                                    break;
+                            }
+
+                        break;
+                    }
             }
         }
 

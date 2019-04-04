@@ -1,0 +1,83 @@
+pipeline {
+	agent {
+		node {
+			label 'skyvera-jenkins-win-build'
+			customWorkspace "c:\\jenkins\\build"
+		}
+	}
+	options {
+		skipDefaultCheckout true
+		timestamps()
+		timeout(time: 4, unit: 'HOURS') 
+	}
+	stages {
+		stage('Prepare to build') {
+			steps {
+				echo 'Cleanup previous build workspace...'
+				dir ("${env.WORKSPACE}") {
+					deleteDir()
+				}
+				powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
+
+			}
+		}
+		stage('Downloading artifacts') {
+			steps {
+				script {
+					def rootProjectName = '../'
+					echo 'Getting artifacts from Release branch with the same name as this branch'
+					env.FULLRC_BRANCH_NAME = currentBuild.getProjectName()
+					env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
+					readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
+					echo 'Extracting build version...'
+					env.BUILD_VERSION = readFile("${env.WORKSPACE}/build_version.txt").readLines()[0]
+					echo "Build version is ${env.BUILD_VERSION}"
+				}
+			}
+		}
+		stage('Running Tests') {
+			steps {
+				echo 'Executing deploy (upgrade) script...'
+				zip(zipFile: "epmlive_SI_${env.BUILD_VERSION}.zip", glob: "SilentInstaller.zip", archive: true)
+				bat '"C:/Program Files/nodejs/node.exe" C:/ts-client/bin/ts-cli start-job "epmlive_SI_%BUILD_VERSION%.zip" %BUILD_VERSION%'
+			}
+		}
+	}
+	post {
+	   
+		cleanup {
+		   
+			powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+			echo 'Cleanup workspace...'
+			dir ("${env.WORKSPACE}") {
+				deleteDir()
+			}
+			powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+		}
+	}
+}
+
+def readArtifactsFromBranch(jobName, buildNumber) {
+	if (buildNumber) {
+		echo "Reading artifacts from ${jobName} (build #${buildNumber})"
+		buildSelector = [$class: 'hudson.plugins.copyartifact.SpecificBuildSelector', buildNumber: "#${buildNumber}"]
+	} else {
+		echo "Reading artifacts from ${jobName} (latest successful build)"
+		buildSelector = [$class: 'hudson.plugins.copyartifact.StatusBuildSelector', stable: true] // Selects latest successful build
+	}
+	try {
+		step (
+			[$class: "CopyArtifact",
+			projectName: jobName,
+			filter: "build_version.txt, SilentInstaller*.zip",
+			target: "${env.WORKSPACE}",
+			selector: buildSelector])
+	} catch (ex) {
+		echo ex.toString()
+		throw ex
+	}
+}
+
+def makeJobName(rootProjectName, parentJobName, branchName) {
+	return rootProjectName + parentJobName + '/' + branchName
+}

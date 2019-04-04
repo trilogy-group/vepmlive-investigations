@@ -47,7 +47,7 @@ export class MyWorkPageSubHelper {
     }
 
     static async clickOnItem(item: string) {
-        StepLogger.subStep('Click on newly created item in the grid.');
+        StepLogger.subVerification('verify created item is present');
         await this.verifyItemPresent(item);
         StepLogger.subStep(`Click on item ${item}`);
         await PageHelper.click(MyWorkPage.itemCreated(item));
@@ -55,6 +55,7 @@ export class MyWorkPageSubHelper {
 
     static async verifyItemPresent(item: string) {
         StepLogger.subStep('Verify item created');
+        await WaitHelper.waitForPageToStable();
         await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.itemCreated(item));
         StepLogger.subVerification('Verify Created item is displayed');
         await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.itemCreated(item), item);
@@ -75,6 +76,7 @@ export class MyWorkPageSubHelper {
             CommonPage.pageHeaders.myWorkplace.myWork,
             CommonPageConstants.pageHeaders.myWorkplace.myWork,
         );
+        await MyWorkPageSubHelper.searchItem(item);
         await this.verifyItemPresent(item);
         StepLogger.subStep('Click on Ellipses For Item');
         await MyWorkPageSubHelper.clickOnEllipsesForItem(item);
@@ -88,5 +90,20 @@ export class MyWorkPageSubHelper {
     static async clickOnAnyEditItem() {
         StepLogger.subStep('Click on "Edit Item" button.');
         await PageHelper.click(MyWorkPage.manageTabRibbonItems.editItem);
+    }
+
+    static async searchItem(itemTitle: string) {
+        await WaitHelper.waitForPageToStable();
+        await PageHelper.sleepForXSec(PageHelper.timeout.s);
+        const searchBoxDisplayed = await PageHelper.isElementDisplayed(MyWorkPage.searchItem);
+        if (!searchBoxDisplayed) {
+            await PageHelper.refreshPage();
+            await WaitHelper.waitForPageToStable();
+            await WaitHelper.waitForElementToBeDisplayed(MyWorkPage.searchItem);
+        }
+        StepLogger.subStep('Enter search key');
+        await TextboxHelper.sendKeys(MyWorkPage.searchItem, itemTitle, true);
+        StepLogger.subVerification('Verify item is displayed');
+        await ExpectationHelper.verifyDisplayedStatus(MyWorkPage.getItemByName(itemTitle), itemTitle);
     }
 }

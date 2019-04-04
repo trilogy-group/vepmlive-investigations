@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -9,10 +10,8 @@ using System.Web.Fakes;
 using System.Web.UI.Fakes;
 using System.Xml;
 using System.Xml.Fakes;
-using EPMLive.TestFakes.Utility;
 using EPMLiveCore.Fakes;
 using EPMLiveWebParts.Fakes;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,36 +19,9 @@ using Shouldly;
 
 namespace EPMLiveWebParts.Tests.WebPageCode
 {
-    [TestClass]
-    public class GetGanttTasksTests
+    [TestClass, ExcludeFromCodeCoverage]
+    public partial class GetGanttTasksTests
     {
-        private IDisposable _shimContext;
-        private SharepointShims _sharepointShims;
-        private AdoShims _adoShims;
-        private getgantttasks _getGanttTasks;
-        private PrivateObject _getGanttTasksPrivate;
-        private const string DummyString = "DummyString";
-        private const string PageLoadMethodName = "Page_Load";
-        private const string IgnoreListId = "ignorelistid";
-
-        [TestInitialize]
-        public void Setup()
-        {
-            _shimContext = ShimsContext.Create();
-
-            _adoShims = AdoShims.ShimAdoNetCalls();
-            _sharepointShims = SharepointShims.ShimSharepointCalls();
-
-            _getGanttTasks = new getgantttasks();
-            _getGanttTasksPrivate = new PrivateObject(_getGanttTasks);
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            _shimContext?.Dispose();
-        }
-
         [TestMethod]
         public void ProcessList_FieldTypeUser_Exceuted()
         {

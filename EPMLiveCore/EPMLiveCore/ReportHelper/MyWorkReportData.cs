@@ -38,10 +38,12 @@ namespace EPMLiveCore.ReportHelper
         {
             var dataTable = new DataTable();
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetEPMLiveConnection);
-            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
+            using (var cmd = new SqlCommand(sql, _DAO.GetEPMLiveConnection))
             {
-                dataTable.Load(sqlDataReader);
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    dataTable.Load(sqlDataReader);
+                }
             }
 
             return dataTable;
@@ -56,10 +58,12 @@ namespace EPMLiveCore.ReportHelper
         {
             var dataTable = new DataTable();
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
             {
-                dataTable.Load(sqlDataReader);
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    dataTable.Load(sqlDataReader);
+                }
             }
 
             return dataTable;
@@ -78,10 +82,12 @@ namespace EPMLiveCore.ReportHelper
             string sql = BuildSelectSql(filterValues, reportingScope, spWeb);
             var dataTable = new DataTable();
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
             {
-                dataTable.Load(sqlDataReader);
+                using (var sqlDataReader = cmd.ExecuteReader())
+                {
+                    dataTable.Load(sqlDataReader);
+                }
             }
 
             return dataTable;
@@ -98,12 +104,14 @@ namespace EPMLiveCore.ReportHelper
             string sql = string.Format(@"SELECT DISTINCT InternalName FROM RPTColumn WHERE RPTListId = N'{0}'",
                 _DAO.GetListId("My Work"));
 
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-            using (var sqlDataReader = _cmdWithParams.ExecuteReader())
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
             {
-                while (sqlDataReader.Read())
+                using (var sqlDataReader = cmd.ExecuteReader())
                 {
-                    fields.Add(sqlDataReader.GetString(sqlDataReader.GetOrdinal("InternalName")));
+                    while (sqlDataReader.Read())
+                    {
+                        fields.Add(sqlDataReader.GetString(sqlDataReader.GetOrdinal("InternalName")));
+                    }
                 }
             }
 
@@ -519,29 +527,18 @@ namespace EPMLiveCore.ReportHelper
                 string.Join(" AND ", filters.ToArray()));
         }
 
-        /// <summary>
-        ///     Determines whether [is look up field] [the specified list name].
-        /// </summary>
-        /// <param name="listName">Name of the list.</param>
-        /// <param name="columnName">Name of the column.</param>
-        /// <returns>
-        ///     <c>true</c> if [is look up field] [the specified list name]; otherwise, <c>false</c>.
-        /// </returns>
-        protected override bool IsLookUpField(string listName, string columnName)
-        {
-            const string sql =
-                "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
-
-            _DAO.AddParam("@listName", "My Work");
-            _DAO.AddParam("@colName", columnName);
-
-            _DAO.Command = sql;
-
-            object objType = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-
-            return objType.ToString().ToLower().Equals("lookup") || objType.ToString().ToLower().Equals("user") ||
-                   objType.ToString().ToLower().Equals("flookup");
-        }
+		/// <summary>
+		///     Determines whether [is look up field] [the specified list name].
+		/// </summary>
+		/// <param name="listName">Name of the list.</param>
+		/// <param name="columnName">Name of the column.</param>
+		/// <returns>
+		///     <c>true</c> if [is look up field] [the specified list name]; otherwise, <c>false</c>.
+		/// </returns>
+		protected override bool IsLookUpField(string listName, string columnName)
+		{
+			return _DAO.IsLookUpField("My Work", columnName);
+		}
 
         /// <summary>
         ///     Populates the default column value.
@@ -716,8 +713,10 @@ namespace EPMLiveCore.ReportHelper
                     columnName);
 
             object columnType;
-            _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
-            columnType = _cmdWithParams.ExecuteScalar();
+            using (var cmd = new SqlCommand(sql, _DAO.GetClientReportingConnection))
+            {
+                columnType = cmd.ExecuteScalar();
+            }
 
             if (columnType == null || columnType == DBNull.Value)
                 throw new Exception(string.Format("Cannot find column: {0}", columnName));
