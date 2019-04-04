@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace EPMLiveCore.API
 {
@@ -28,13 +22,24 @@ namespace EPMLiveCore.API
                 case AnalyticsType.FavoriteWorkspace:
                     queryParams = GetFavWorkspaceQueryParams(data);
                     break;
-
             }
 
             return queryParams;
         }
 
-        #region PARAM CATEOGRY FACADES
+        private static Dictionary<string, object> GetCreateRecentItemQueryParams(AnalyticsData data)
+        {
+            return new Dictionary<string, object>
+            {
+                { "@siteid", data.SiteId },
+                { "@webid", data.WebId },
+                { "@listid", data.ListId },
+                { "@itemid", data.ItemId },
+                { "@userid", data.UserId },
+                { "@icon", data.Icon },
+                { "@title", data.Title }
+            };
+        }
 
         private static Dictionary<string, object> GetFavoriteQueryParams(AnalyticsData data)
         {
@@ -52,7 +57,6 @@ namespace EPMLiveCore.API
                 case AnalyticsAction.Delete:
                     queryParams = GetRemoveFavoriteQueryParams(data);
                     break;
-
             }
 
             return queryParams;
@@ -74,7 +78,6 @@ namespace EPMLiveCore.API
                 case AnalyticsAction.Delete:
                     queryParams = GetDeleteFrequentQueryParams(data);
                     break;
-
             }
 
             return queryParams;
@@ -88,7 +91,6 @@ namespace EPMLiveCore.API
                 case AnalyticsAction.Create:
                     queryParams = GetCreateRecentItemQueryParams(data);
                     break;
-
             }
 
             return queryParams;
@@ -110,268 +112,148 @@ namespace EPMLiveCore.API
             return queryParams;
         }
 
-        #endregion
-
-        #region FAVORITES
-
         private static Dictionary<string, object> GetFavoriteStatusQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                    new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                        
-                    }
-                    :
-                    new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@userid", data.UserId},
-                        {"@fstring", data.FString}
-                    };
+            return data.IsItem
+                ? GetCreateRecentItemQueryParams(data)
+                : new Dictionary<string, object>
+                {
+                    { "@siteid", data.SiteId },
+                    { "@webid", data.WebId },
+                    { "@userid", data.UserId },
+                    { "@fstring", data.FString }
+                };
         }
 
         private static Dictionary<string, object> GetRemoveFavoriteQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            :
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            ;
+            return data.IsItem
+                ? GetFsFromDataDictionary(data)
+                : GetNoItemIdDictionary(data);
         }
 
         private static Dictionary<string, object> GetCreateFavoriteQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            :
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", DBNull.Value},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            ;
+            return data.IsItem
+                ? GetFsFromDataDictionary(data)
+                : GetItemIdNullDictionary(data);
         }
-
-        #endregion
-
-        #region FREQUENT APPS
 
         private static Dictionary<string, object> GetCreateFrequentQueryParams(AnalyticsData data)
         {
             return new Dictionary<string, object>
-                        {
-                            {"@siteid", data.SiteId},
-                            {"@webid", data.WebId},
-                            {"@listid", data.ListId},
-                            {"@userid", data.UserId},
-                            {"@icon", data.Icon},
-                            {"@title", data.Title},
-                        };
+            {
+                { "@siteid", data.SiteId },
+                { "@webid", data.WebId },
+                { "@listid", data.ListId },
+                { "@userid", data.UserId },
+                { "@icon", data.Icon },
+                { "@title", data.Title }
+            };
         }
 
         private static Dictionary<string, object> GetReadFrequentQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            :
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            ;
+            return data.IsItem
+                ? GetFsFromDataDictionary(data)
+                : GetNoItemIdDictionary(data);
+        }
+
+        private static Dictionary<string, object> GetNoItemIdDictionary(AnalyticsData data)
+        {
+            return new Dictionary<string, object>
+            {
+                { "@siteid", data.SiteId },
+                { "@webid", data.WebId },
+                { "@listid", data.ListId },
+                { "@fstring", data.FString },
+                { "@userid", data.UserId },
+                { "@icon", data.Icon },
+                { "@title", data.Title }
+            };
         }
 
         private static Dictionary<string, object> GetUpdateFrequentQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            :
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", DBNull.Value},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            ;
+            return data.IsItem
+                ? GetFsFromDataDictionary(data)
+                : GetItemIdNullDictionary(data);
+        }
+
+        private static Dictionary<string, object> GetFsFromDataDictionary(AnalyticsData data)
+        {
+            return new Dictionary<string, object>
+            {
+                { "@siteid", data.SiteId },
+                { "@webid", data.WebId },
+                { "@listid", data.ListId },
+                { "@itemid", data.ItemId },
+                { "@fstring", data.FString },
+                { "@userid", data.UserId },
+                { "@icon", data.Icon },
+                { "@title", data.Title }
+            };
         }
 
         private static Dictionary<string, object> GetDeleteFrequentQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            :
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", DBNull.Value},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@icon", data.Icon},
-                        {"@title", data.Title},
-                    }
-            ;
+            return data.IsItem
+                ? GetFsFromDataDictionary(data)
+                : GetItemIdNullDictionary(data);
         }
 
-        #endregion
-
-        #region RECENT ITEMS
-
-        private static Dictionary<string, object> GetCreateRecentItemQueryParams(AnalyticsData data)
+        private static Dictionary<string, object> GetItemIdNullDictionary(AnalyticsData data)
         {
             return new Dictionary<string, object>
-                        {
-                            {"@siteid", data.SiteId},
-                            {"@webid", data.WebId},
-                            {"@listid", data.ListId},
-                            {"@itemid", data.ItemId},
-                            {"@userid", data.UserId},
-                            {"@icon", data.Icon},
-                            {"@title", data.Title},
-                        };
+            {
+                { "@siteid", data.SiteId },
+                { "@webid", data.WebId },
+                { "@listid", data.ListId },
+                { "@itemid", DBNull.Value },
+                { "@fstring", data.FString },
+                { "@userid", data.UserId },
+                { "@icon", data.Icon },
+                { "@title", data.Title }
+            };
         }
-
-        #endregion
-
-        #region Favorite Workspace
 
         private static Dictionary<string, object> GetCreateFavWorkspaceQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                        {
-                            {"@siteid", data.SiteId},
-                            {"@webid", data.WebId},
-                            {"@listid", data.ListId},
-                            {"@itemid", data.ItemId},
-                            {"@userid", data.UserId},
-                            {"@icon", data.Icon},
-                            {"@title", data.Title},
-                            {"@fstring", data.FString}
-                        }
-                :
-                new Dictionary<string, object>
-                        {
-                            {"@siteid", data.SiteId},
-                            {"@webid", data.WebId},
-                            {"@listid", data.ListId},
-                            {"@userid", data.UserId},
-                            {"@icon", data.Icon},
-                            {"@title", data.Title},
-                            {"@fstring", data.FString}
-                        };
+            return data.IsItem
+                ? GetFsFromDataDictionary(data)
+                : new Dictionary<string, object>
+                {
+                    { "@siteid", data.SiteId },
+                    { "@webid", data.WebId },
+                    { "@listid", data.ListId },
+                    { "@userid", data.UserId },
+                    { "@icon", data.Icon },
+                    { "@title", data.Title },
+                    { "@fstring", data.FString }
+                };
         }
 
         private static Dictionary<string, object> GetRemoveFavWorkspaceQueryParams(AnalyticsData data)
         {
-            return data.IsItem ?
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@listid", data.ListId},
-                        {"@itemid", data.ItemId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@title", data.Title},
-                    }
-            :
-                new Dictionary<string, object>
-                    {
-                        {"@siteid", data.SiteId},
-                        {"@webid", data.WebId},
-                        {"@fstring", data.FString},
-                        {"@userid", data.UserId},
-                        {"@title", data.Title},
-                    }
-            ;
+            return data.IsItem
+                ? new Dictionary<string, object>
+                {
+                    { "@siteid", data.SiteId },
+                    { "@webid", data.WebId },
+                    { "@listid", data.ListId },
+                    { "@itemid", data.ItemId },
+                    { "@fstring", data.FString },
+                    { "@userid", data.UserId },
+                    { "@title", data.Title }
+                }
+                : new Dictionary<string, object>
+                {
+                    { "@siteid", data.SiteId },
+                    { "@webid", data.WebId },
+                    { "@fstring", data.FString },
+                    { "@userid", data.UserId },
+                    { "@title", data.Title }
+                };
         }
-
-        #endregion
     }
 }

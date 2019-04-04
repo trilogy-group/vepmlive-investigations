@@ -301,6 +301,7 @@ namespace EPMLive.TestFakes.Utility
             ShimSPSite.AllInstances.OpenWeb = instance => WebShim;
             ShimSPSite.AllInstances.OpenWebGuid = (instance, webId) => WebShim;
             ShimSPSite.AllInstances.WebApplicationGet = (instance) => ApplicationShim;
+            ShimSPFarm.LocalGet = () => new ShimSPFarm();
 
             ShimSPFieldUserValue.ConstructorSPWebString = (instance, web, fieldValue) => new Func<ShimSPFieldUserValue>(() => FieldUserValueShim)();
             ShimSPFieldUserValue.AllInstances.UserGet = instance => UserShim;

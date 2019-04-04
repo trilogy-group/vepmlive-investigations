@@ -56,7 +56,7 @@ namespace EPMLiveCore
         #region General Initializer : Class (getworkspacexml) Initializer
 
         private const string MethodPage_Load = "Page_Load";
-        private const string MethodaddWebs = "addWebs";
+        private const string MethodAddWebs = "AddWebs";
         private const string Fielddoc = "doc";
         private const string Fielddata = "data";
         private Type _getworkspacexmlInstanceType;
@@ -93,7 +93,7 @@ namespace EPMLiveCore
         [Timeout(TestsTimeOut)]
         [Category("AUT Initializer")]
         [TestCase(MethodPage_Load, 0)]
-        [TestCase(MethodaddWebs, 0)]
+        [TestCase(MethodAddWebs, 0)]
         public void AUT_Getworkspacexml_All_Methods_Explore_Verify_Test(string methodName, int overloadingIndex = 0)
         {
             // Arrange
@@ -200,7 +200,7 @@ namespace EPMLiveCore
         [Timeout(TestsTimeOut)]
         [Category("AUT MethodCallTest")]
         [TestCase(MethodPage_Load)]
-        [TestCase(MethodaddWebs)]
+        [TestCase(MethodAddWebs)]
         public void AUT_Getworkspacexml_NonStatic_Methods_Explore_Verify_Test(string methodName)
         {
             // AAA: Arrange, Act, Assert
@@ -343,7 +343,10 @@ namespace EPMLiveCore
         private void AUT_Getworkspacexml_addWebs_Method_Call_Internally(Type[] types)
         {
             var methodaddWebsPrametersTypes = types;
-            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_getworkspacexmlInstance, MethodaddWebs, Fixture, methodaddWebsPrametersTypes);
+            ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_getworkspacexmlInstance,
+                MethodAddWebs,
+                Fixture,
+                methodaddWebsPrametersTypes);
         }
 
         #endregion
@@ -361,7 +364,7 @@ namespace EPMLiveCore
             var methodaddWebsPrametersTypes = new Type[] { typeof(SPWeb), typeof(XmlNode) };
             object[] parametersOfaddWebs = { web, parentNode };
             Exception exception = null;
-            var methodInfo = GetMethodInfo(MethodaddWebs, methodaddWebsPrametersTypes, out exception);
+            var methodInfo = GetMethodInfo(MethodAddWebs, methodaddWebsPrametersTypes, out exception);
 
             // Act
             Action currentAction = () => methodInfo.Invoke(_getworkspacexmlInstanceFixture, parametersOfaddWebs);
@@ -392,7 +395,10 @@ namespace EPMLiveCore
             object[] parametersOfaddWebs = { web, parentNode };
 
             // Act
-            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_getworkspacexmlInstance, MethodaddWebs, parametersOfaddWebs, methodaddWebsPrametersTypes);
+            Action currentAction = () => ReflectionAnalyzer.InvokeVoidMethod(_getworkspacexmlInstance,
+                MethodAddWebs,
+                parametersOfaddWebs,
+                methodaddWebsPrametersTypes);
 
             // Assert
             parametersOfaddWebs.ShouldNotBeNull();
@@ -412,7 +418,7 @@ namespace EPMLiveCore
         public void AUT_Getworkspacexml_addWebs_Method_Call_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var methodInfo = GetMethodInfo(MethodaddWebs, 0);
+            var methodInfo = GetMethodInfo(MethodAddWebs, 0);
             const int parametersCount = 2;
 
             // Act
@@ -435,7 +441,7 @@ namespace EPMLiveCore
             var methodaddWebsPrametersTypes = new Type[] { typeof(SPWeb), typeof(XmlNode) };
 
             // Act
-            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_getworkspacexmlInstance, MethodaddWebs, Fixture, methodaddWebsPrametersTypes);
+            Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_getworkspacexmlInstance, MethodAddWebs, Fixture, methodaddWebsPrametersTypes);
 
             // Assert
             methodaddWebsPrametersTypes.Length.ShouldBe(2);
@@ -453,7 +459,7 @@ namespace EPMLiveCore
         {
             // Arrange
             Exception exception;
-            var methodInfo = GetMethodInfo(MethodaddWebs, 0);
+            var methodInfo = GetMethodInfo(MethodAddWebs, 0);
 
             // Act
             Action currentAction = () => methodInfo.InvokeStaticMethodWithDynamicParamters(_getworkspacexmlInstanceFixture, Fixture, out exception);

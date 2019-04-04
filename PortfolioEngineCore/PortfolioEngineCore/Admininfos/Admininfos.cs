@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using PortfolioEngineCore.Infrastructure.Entities;
 
@@ -878,99 +879,144 @@ namespace PortfolioEngineCore
         /// <returns></returns>
         public bool DeleteListWork(string data, out string sResult)
         {
+            return DeleteListWorkCommon(
+                data,
+                out sResult,
+                "Delete From EPGP_PI_WORK2 Where PROJECT_ID=@ProjectId And PW_ITEM_ID=@Id",
+                true,
+                PFEError.DeleteListWork);
+        }
+
+        private bool DeleteListWorkCommon(
+            string data,
+            out string resultString,
+            string deleteCommand,
+            bool hasIdParameter,
+            PFEError pfeeError,
+            [CallerMemberName] string memberName = "")
+        {
             try
             {
-                _dba.WriteImmTrace("DataSynch", "DeleteListWork", "Input", data);
+                _dba.WriteImmTrace("DataSynch", memberName, "Input", data);
 
-                string stablename = "EPGP_PI_WORK2";
-                CStruct xItems = new CStruct();
-                xItems.LoadXML(data);
-                List<CStruct> listPIs = xItems.GetList("Project");
+                var items = new CStruct();
+                items.LoadXML(data);
+                var listPIs = items.GetList("Project");
 
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                SqlTransaction transaction = null;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+                if (_sqlConnection.State == ConnectionState.Open)
+                {
+                    _sqlConnection.Close();
+                }
                 _sqlConnection.Open();
 
-                bool bupdateOK = true;
-                String sErrorMessage = "empty";
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Data");
+                var updateOK = true;
+                var errorMessage = "empty";
+                var result = new CStruct();
+                result.Initialize("Data");
 
-                foreach (CStruct xProject in listPIs)
+                foreach (var project in listPIs)
                 {
-                    string PIExtId = xProject.GetStringAttr("ExtId");
-                    int nProjectID = 0;
-                    int nTotalRows = 0;
-                    // get the Project Id of this PI
-                    sCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        nProjectID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    }
-                    SqlReader.Close();
-                    if (nProjectID == 0)
-                    {
-                        sErrorMessage = "PI not found";
-                        bupdateOK = false;
-                    }
-                    else
-                    {
-                        bupdateOK = true;
-                    }
+                    string extIdAttribute;
+                    int totalRows;
+                    var projectId = GetProjectId(project, out extIdAttribute, out totalRows);
+                    updateOK = GetUpdateStatus(projectId, ref errorMessage);
 
-                    if (bupdateOK == true)
+                    if (updateOK)
                     {
-                        sCommand = "Delete From " + stablename + " Where PROJECT_ID=@ProjectId And PW_ITEM_ID=@Id";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                        SqlParameter pwid = SqlCommand.Parameters.Add("@Id", SqlDbType.NVarChar, 128);
-                        SqlCommand.Transaction = transaction;
-
-                        List<CStruct> listWIs = xProject.GetList("Item");
-                        foreach (CStruct xWI in listWIs)
-                        {
-                            string WIExtId = xWI.GetStringAttr("Id");
-                            pwid.Value = WIExtId;
-                            int nrows = SqlCommand.ExecuteNonQuery();
-                            nTotalRows += nrows;
-                        }
+                        RunDelete(deleteCommand, hasIdParameter, projectId, project, ref totalRows);
                     }
-                    CStruct xPIResult = xResult.CreateSubStruct("Project");
-                    if (bupdateOK == true)
-                    {
-                        if (transaction != null) transaction.Commit();
-                        xPIResult.CreateIntAttr("Status", 0);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection("Work rows deleted = " + nTotalRows.ToString());
-                    }
-                    else
-                    {
-                        if (transaction != null) transaction.Rollback();
-                        xPIResult.CreateIntAttr("Status", 1);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection(sErrorMessage);
-                    }
-                    transaction = null;
-                    nProjectID = 0;
-                    nTotalRows = 0;
+                    PopulateResultMessage(result, updateOK, extIdAttribute, totalRows, errorMessage);
                 }
 
                 _sqlConnection.Close();
-                sResult = xResult.XML();
-                return bupdateOK;
-
+                resultString = result.XML();
+                return updateOK;
             }
             catch (Exception exception)
             {
-                throw new PFEException((int)PFEError.DeleteListWork, exception.GetBaseMessage());
+                throw new PFEException((int)pfeeError, exception.GetBaseMessage());
+            }
+        }
+
+        private static bool GetUpdateStatus(int projectId, ref string errorMessage)
+        {
+            bool updateOK;
+            if (projectId == 0)
+            {
+                errorMessage = "PI not found";
+                updateOK = false;
+            }
+            else
+            {
+                updateOK = true;
+            }
+            return updateOK;
+        }
+
+        private static void PopulateResultMessage(CStruct result, bool updateOK, string extIdAttribute, int totalRows, string errorMessage)
+        {
+            var projectResult = result.CreateSubStruct("Project");
+            if (updateOK)
+            {
+                projectResult.CreateIntAttr("Status", 0);
+                projectResult.CreateStringAttr("ExtId", extIdAttribute);
+                projectResult.CreateCDataSection(string.Format("Work rows deleted = {0}", totalRows));
+            }
+            else
+            {
+                projectResult.CreateIntAttr("Status", 1);
+                projectResult.CreateStringAttr("ExtId", extIdAttribute);
+                projectResult.CreateCDataSection(errorMessage);
+            }
+        }
+
+        private int GetProjectId(CStruct project, out string extIdAttribute, out int totalRows)
+        {
+            extIdAttribute = project.GetStringAttr("ExtId");
+            var projectId = 0;
+            totalRows = 0;
+
+            // get the Project Id of this PI
+            var command = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
+            using (var sqlCommand = new SqlCommand(command, _sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ExtId", extIdAttribute);
+                using (var sqlReader = sqlCommand.ExecuteReader())
+                {
+                    if (sqlReader.Read())
+                    {
+                        projectId = SqlDb.ReadIntValue(sqlReader["PROJECT_ID"]);
+                    }
+                }
+            }
+            return projectId;
+        }
+
+        private void RunDelete(string deleteCommand, bool hasIdParameter, int projectId, CStruct project, ref int totalRows)
+        {
+            using (var sqlCommand = new SqlCommand(deleteCommand, _sqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ProjectID", projectId);
+
+                if (hasIdParameter)
+                {
+                    const int IdParameterSize = 128;
+                    var id = sqlCommand.Parameters.Add("@Id", SqlDbType.NVarChar, IdParameterSize);
+
+                    var workItems = project.GetList("Item");
+                    foreach (var workItem in workItems)
+                    {
+                        var workItemId = workItem.GetStringAttr("Id");
+                        id.Value = workItemId;
+                        var rows = sqlCommand.ExecuteNonQuery();
+                        totalRows += rows;
+                    }
+                }
+                else
+                {
+                    var rows = sqlCommand.ExecuteNonQuery();
+                    totalRows += rows;
+                }
             }
         }
 
@@ -1111,87 +1157,12 @@ namespace PortfolioEngineCore
         /// <returns></returns>
         public bool DeletePIListWork(string data, out string sResult)
         {
-            try
-            {
-                _dba.WriteImmTrace("DataSynch", "DeletePIListWork", "Input", data);
-
-                string stablename = "EPGP_PI_WORK2";
-                CStruct xItems = new CStruct();
-                xItems.LoadXML(data);
-                List<CStruct> listPIs = xItems.GetList("Project");
-
-
-                SqlCommand SqlCommand;
-                SqlDataReader SqlReader;
-                string sCommand;
-
-                if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                _sqlConnection.Open();
-
-                bool bupdateOK = true;
-                String sErrorMessage = "empty";
-                CStruct xResult = new CStruct();
-                xResult.Initialize("Data");
-
-                foreach (CStruct xProject in listPIs)
-                {
-                    string PIExtId = xProject.GetStringAttr("ExtId");
-                    int nProjectID = 0;
-                    int nTotalRows = 0;
-                    // get the Project Id of this PI
-                    sCommand = "SELECT PROJECT_ID From EPGP_PROJECTS Where PROJECT_EXT_UID=@ExtId";
-                    SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                    SqlCommand.Parameters.AddWithValue("@ExtId", PIExtId);
-                    SqlReader = SqlCommand.ExecuteReader();
-                    if (SqlReader.Read())
-                    {
-                        nProjectID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    }
-                    SqlReader.Close();
-                    if (nProjectID == 0)
-                    {
-                        sErrorMessage = "PI not found";
-                        bupdateOK = false;
-                    }
-                    else
-                    {
-                        bupdateOK = true;
-                    }
-
-                    if (bupdateOK == true)
-                    {
-                        sCommand = "Delete From " + stablename + " Where PROJECT_ID=@ProjectId";
-                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
-                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
-                        int nrows = SqlCommand.ExecuteNonQuery();
-                        nTotalRows += nrows;
-                    }
-                    CStruct xPIResult = xResult.CreateSubStruct("Project");
-                    if (bupdateOK == true)
-                    {
-                        xPIResult.CreateIntAttr("Status", 0);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection("Work rows deleted = " + nTotalRows.ToString());
-                    }
-                    else
-                    {
-                        xPIResult.CreateIntAttr("Status", 1);
-                        xPIResult.CreateStringAttr("ExtId", PIExtId);
-                        xPIResult.CreateCDataSection(sErrorMessage);
-                    }
-                    nProjectID = 0;
-                    nTotalRows = 0;
-                }
-
-                _sqlConnection.Close();
-                sResult = xResult.XML();
-                return bupdateOK;
-
-            }
-            catch (Exception exception)
-            {
-                throw new PFEException((int)PFEError.DeletePIListWork, exception.GetBaseMessage());
-            }
+            return DeleteListWorkCommon(
+                data,
+                out sResult,
+                "Delete From EPGP_PI_WORK2 Where PROJECT_ID=@ProjectId",
+                false,
+                PFEError.DeletePIListWork);
         }
 
         private string CheckIfResourceExists(string extId, ref int wresId)

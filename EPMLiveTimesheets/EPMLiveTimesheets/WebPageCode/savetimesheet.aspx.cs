@@ -7,6 +7,7 @@ using System.Web.UI;
 using EPMLiveWebParts;
 using Microsoft.SharePoint;
 using static System.Diagnostics.Trace;
+using TimeSheets.Log;
 
 namespace TimeSheets
 {
@@ -698,6 +699,8 @@ namespace TimeSheets
                             else
                                 cmd.Parameters.AddWithValue("@projectlistuid", DBNull.Value);
                             cmd.ExecuteNonQuery();
+
+                            Logger.WriteLog(Logger.Category.Medium, "SaveTimesheet.aspx: ", string.Format("Adding item id: {0} to TS: {1}, user id: {2}", itemid, tsuid, username?? ""));
 
                             if (pField != null)
                                 SharedFunctions.processMeta(iWeb, iList, li, newTS, project, cn, pList);
