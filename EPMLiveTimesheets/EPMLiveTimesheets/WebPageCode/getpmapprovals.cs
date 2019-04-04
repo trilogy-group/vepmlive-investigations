@@ -200,19 +200,22 @@ namespace TimeSheets
 
                 using (cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    cn.Open();
-                    using (SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn))
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        cmd.Parameters.AddWithValue("@siteid", site.ID);
-                        using (SqlDataReader dr = cmd.ExecuteReader())
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("select TSTYPE_ID from TSTYPE where site_uid=@siteid", cn))
                         {
-                            while (dr.Read())
+                            cmd.Parameters.AddWithValue("@siteid", site.ID);
+                            using (SqlDataReader dataReader  = cmd.ExecuteReader())
                             {
-                                timeeditor = true;
-                                worktypes += "|" + dr.GetInt32(0).ToString();
+                                while (dataReader .Read())
+                                {
+                                    timeeditor = true;
+                                    worktypes += "|" + dataReader .GetInt32(0).ToString();
+                                }
                             }
                         }
-                    }
+                    });
 
                     if (worktypes != "")
                         worktypes = worktypes.Substring(1);
@@ -369,7 +372,7 @@ namespace TimeSheets
                         {
                             cn.Open();
 
-                            using (SqlCommand cmd = new SqlCommand("spTSgetTSHours", cn))
+                            using (SqlCommand cmd = new SqlCommand("spTSgetTSHoursPM", cn))
                             {
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.AddWithValue("@username", curUser);

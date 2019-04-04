@@ -1769,6 +1769,23 @@ namespace WorkEnginePPM
                         {
                             timerjobuid = dr.GetGuid(0);
                         }
+                        else
+                        {
+                            timerjobuid = Guid.NewGuid();
+                            using (SPWeb web = SPContext.Current.Web)
+                            {
+                                cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, @jobtype, @name, @runtime, @scheduletype, @webguid)", cn);
+                                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                                cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                                cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
+                                cmd.Parameters.AddWithValue("@runtime", -1);
+                                cmd.Parameters.AddWithValue("@scheduletype", 9);
+                                cmd.Parameters.AddWithValue("@jobtype", 10);
+                                cmd.Parameters.AddWithValue("@name", "EPK Synch");
+
+                                cmd.ExecuteNonQuery();
+                            }
+                        }                       
                         dr.Close();
                         cn.Close();
 

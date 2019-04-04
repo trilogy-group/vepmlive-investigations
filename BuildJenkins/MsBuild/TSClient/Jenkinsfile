@@ -8,11 +8,7 @@ pipeline {
 	options {
 		skipDefaultCheckout true
 		timestamps()
-	}
-	parameters {
-		string(name: 'FullRcBranch', defaultValue: '', description: 'Full RC branch to get artifacts from (leave empty to use the same branch name as this build, replace "/" with "%2F")')
-		string(name: 'FullRcBranchBuild', defaultValue: '', description: 'Full RC build number to get artifacts from (leave empty to get latest successful build)')
-	
+		timeout(time: 4, unit: 'HOURS') 
 	}
 	stages {
 		stage('Prepare to build') {
@@ -29,18 +25,10 @@ pipeline {
 			steps {
 				script {
 					def rootProjectName = '../'
-
-					if (params.FullRcBranch?.trim()) {
-						echo 'Getting artifacts from manually specified Release branch'
-						env.FULLRC_BRANCH_NAME = params.FullRcBranch
-						env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
-						readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
-					} else {
-						echo 'Getting artifacts from Release branch with the same name as this branch'
-						env.FULLRC_BRANCH_NAME = currentBuild.getProjectName()
-						env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
-						readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
-					}
+					echo 'Getting artifacts from Release branch with the same name as this branch'
+					env.FULLRC_BRANCH_NAME = currentBuild.getProjectName()
+					env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
+					readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
 					echo 'Extracting build version...'
 					env.BUILD_VERSION = readFile("${env.WORKSPACE}/build_version.txt").readLines()[0]
 					echo "Build version is ${env.BUILD_VERSION}"

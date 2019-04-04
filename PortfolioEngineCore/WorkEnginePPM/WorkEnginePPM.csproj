@@ -261,6 +261,9 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Layouts\ppm\Costtypes.aspx.designer.cs">
       <DependentUpon>Costtypes.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\ppm\CostTypes.Get.cs" />
+    <Compile Include="Layouts\ppm\CostTypes.Populate.cs" />
+    <Compile Include="Layouts\ppm\CostTypes.Update.cs" />
     <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.cs">
       <DependentUpon>CostTypes_NAX.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

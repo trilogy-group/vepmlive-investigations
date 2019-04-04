@@ -74,8 +74,12 @@ namespace EPMLiveCore
 
            try
            {
-               if(properties.List.Fields.ContainsFieldWithInternalName("DisplayName") && properties.List.Fields.ContainsFieldWithInternalName("RBS"))
-               {
+                bool isEmptyDisplayName = properties.AfterProperties["DisplayName"] == null
+                     || string.IsNullOrWhiteSpace(properties.AfterProperties["DisplayName"].ToString());
+
+                if (properties.List.Fields.ContainsFieldWithInternalName("DisplayName")
+                    && properties.List.Fields.ContainsFieldWithInternalName("RBS") && isEmptyDisplayName)
+                {
                    string title = GetProperty(properties, "Title");
                    string parent = GetProperty(properties, "RBS");
 

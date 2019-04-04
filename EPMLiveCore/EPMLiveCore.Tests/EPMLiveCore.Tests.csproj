@@ -182,6 +182,7 @@
     <Compile Include="API\Analytics\FRFQueryParamFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="API\APITeamTests.cs" />
+    <Compile Include="API\APITeamTests2.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTestsPartOne.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.CheckPermissions.cs" />
     <Compile Include="API\Applications\ApplicationInstallerTests.iInstallAndConfigureApp.cs" />
@@ -222,12 +223,15 @@
     <Compile Include="API\ResourceGrid\ResourceGridTests.cs" />
     <Compile Include="API\SolGalTemplatesManagerTests.cs" />
     <Compile Include="API\ResourceGrid\ResourceImporterTests.cs" />
+    <Compile Include="API\SolGalTemplatesManagerTests2.cs" />
     <Compile Include="API\SPAdmin\EventReceiverManagerTests.cs" />
     <Compile Include="API\TimerTests.cs" />
     <Compile Include="API\WorkspaceCenter\WorkspaceCenterTests.cs" />
     <Compile Include="AppSettingsHelperTests.cs" />
     <Compile Include="AssignmentPlanner\GridManagerTests.cs" />
+    <Compile Include="BtnChangeAppTests.cs" />
     <Compile Include="CascadingLookupRenderControls\CascadingLookupRenderControlTests.cs" />
+    <Compile Include="CascadingLookup\CascadingLookup.FieldControlTests.cs" />
     <Compile Include="CascadingLookup\CascadingLookup.FieldSettingsTests.cs" />
     <Compile Include="CheckOpenCloseConnections.cs" />
     <Compile Include="ControlDataBuilderTest.cs" />
@@ -287,6 +291,7 @@
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.IsFieldExcluded.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.OnInit.cs" />
     <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.RenderControl.cs" />
+    <Compile Include="ListDisplaySettingIterator\ListDisplaySettingIteratorTests.SmallFunctions.cs" />
     <Compile Include="NewAppTest.cs" />
     <Compile Include="PlatformIntegrationEventTest.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />

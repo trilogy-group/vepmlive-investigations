@@ -340,7 +340,7 @@ namespace PortfolioEngineCore.WEIntegration
             if (autoposts[0, 0] > 0)
             {
                 // there is at least one autopost instruction so set up a job
-                bRet = PostCostValuesForTimesheetData();
+                //bRet = PostCostValuesForTimesheetData();
             }
 
 
@@ -373,7 +373,7 @@ namespace PortfolioEngineCore.WEIntegration
             return true;
         }
 
-        private bool PostCostValuesForTimesheetData()
+        public bool PostCostValuesForTimesheetData()
         {
             try
             {

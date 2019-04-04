@@ -146,7 +146,7 @@
                                     <img src="/_layouts/images/GEARS_AN.GIF" style="vertical-align: middle;"/> Loading Items...
                                     </div>
                                     <script>
-                                        var sSiteURL = "<%=strSiteUrl %>";
+                                        var sSiteURL = "<%=SiteUrl %>";
                                         mygrid = new dhtmlXGridObject('grid');
                                         mygrid.setImagePath('/_layouts/epmlive/DHTML/xgrid/imgs/');
                                         mygrid.setSkin('modern');
@@ -160,7 +160,7 @@
                                         function clearLoader(id) {
                                             document.getElementById("grid").style.display = "";
                                             document.getElementById("loadinggrid").style.display = "none";
-                                            mygrid.selectRowById('<%=strCurrentTemplate%>');
+                                            mygrid.selectRowById('<%=CurrentTemplate%>');
                                         }
                                         function setSelectedRowId(id) {
                                             if (id.substring(0, 3) == '---') {

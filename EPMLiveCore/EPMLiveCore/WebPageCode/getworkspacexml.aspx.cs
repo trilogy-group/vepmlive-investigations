@@ -14,6 +14,7 @@ using System.Data.SqlClient;
 using System.Collections;
 using System.Text.RegularExpressions;
 using EPMLiveCore.Infrastructure.Logging;
+using DebugTrace = System.Diagnostics.Trace;
 using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore
@@ -60,132 +61,158 @@ namespace EPMLiveCore
             newNode.InnerText = "Site URL";
             headNode.AppendChild(newNode);
 
-            addWebs(web, mainNode);
+            AddWebs(web, mainNode);
 
             data = doc.OuterXml;
         }
 
-        private void addWebs(SPWeb web, XmlNode parentNode)
+        private void AddWebs(SPWeb web, XmlNode parentNode)
         {
-            XmlNode newNode = doc.CreateNode(XmlNodeType.Element, "row", doc.NamespaceURI);
-            bool canpub = false;
+            var newNode = doc.CreateNode(XmlNodeType.Element, "row", doc.NamespaceURI);
+            var canPublish = false;
             try
             {
                 if (web.DoesUserHavePermissions(SPBasePermissions.ViewPages))
                 {
+                    var attributeLocked = doc.CreateAttribute("locked");
+                    attributeLocked.Value = "1";
+                    var attributeExpand = doc.CreateAttribute("open");
+                    attributeExpand.Value = "1";
+                    var attributeId = doc.CreateAttribute("id");
+                    attributeId.Value = web.ServerRelativeUrl;
 
-                    XmlAttribute attrLocked = doc.CreateAttribute("locked");
-                    attrLocked.Value = "1";
-                    XmlAttribute attrExpand = doc.CreateAttribute("open");
-                    attrExpand.Value = "1";
-                    XmlAttribute attrId = doc.CreateAttribute("id");
-                    attrId.Value = web.ServerRelativeUrl;
+                    newNode.Attributes.Append(attributeLocked);
+                    newNode.Attributes.Append(attributeExpand);
+                    newNode.Attributes.Append(attributeId);
                     
-                    newNode.Attributes.Append(attrLocked);
-                    newNode.Attributes.Append(attrExpand);
-                    newNode.Attributes.Append(attrId);
-                    
-
                     if (Request["List"] == null)
                     {
-                        XmlNode newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
-                        newNode.AppendChild(newCell);
-                        newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
-                        newCell.InnerText = web.Title;
-                        newNode.AppendChild(newCell);
-                        newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
-                        newCell.InnerText = web.ServerRelativeUrl;
-                        newNode.AppendChild(newCell);
-                        canpub = true;
+                        ProcessUserData(newNode, web);
+                        canPublish = true;
                     }
                     else
                     {
-                        SPList list = null;
-                        try
-                        {
-                            list = web.Lists[HttpUtility.UrlDecode(Request["List"])];
-                        }
-                        catch { }
-
-                        if(list!=null)
-                        {
-                            if (!list.Hidden)
-                            {
-                                GridGanttSettings gSettings = new GridGanttSettings(list);
-
-                                if(gSettings.HideNewButton)
-                                {
-                                    list = null;
-                                }
-                            }
-                            else
-                            {
-                                list = null;
-                            }
-                        }
-
-                        XmlNode newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
-                        if (list != null)
-                        {
-                            newCell.InnerText = list.Forms[PAGETYPE.PAGE_NEWFORM].ServerRelativeUrl;
-                            XmlAttribute attrName = doc.CreateAttribute("name");
-                            attrName.Value = "NewItemURL";
-                            newCell.Attributes.Append(attrName);
-                            newNode.AppendChild(newCell);
-
-                            newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
-                            newCell.InnerText = "No";
-                            attrName = doc.CreateAttribute("name");
-                            attrName.Value = "CanPublish";
-                            newCell.Attributes.Append(attrName);
-
-                            if (list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
-                            {
-                                newCell.InnerText = "Yes";
-                                canpub = true;
-                            }
-                        }
-
-                        newNode.AppendChild(newCell);
-                        newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
-                        newCell.InnerText = web.Title;
-                        newNode.AppendChild(newCell);
-                        newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
-                        newCell.InnerText = web.ServerRelativeUrl;
-                        newNode.AppendChild(newCell);
-
-                        {
-                            newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
-                            newCell.InnerText = web.ID.ToString();
-                            XmlAttribute attrName = doc.CreateAttribute("name");
-                            attrName.Value = "webid";
-                            newCell.Attributes.Append(attrName);
-                            newNode.AppendChild(newCell);
-                        }
+                        canPublish = ProcessDataList(web, newNode);
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                DebugTrace.TraceError("Exception swallowed: {0}", ex);
+            }
 
             try
             {
-                foreach (SPWeb w in web.Webs)
+                foreach (SPWeb additionalWeb in web.Webs)
                 {
                     try
                     {
-                        addWebs(w, newNode);
+                        AddWebs(additionalWeb, newNode);
                     }
-                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
-                    finally { if(w!=null) w.Dispose(); }
-                    
-                    
+                    catch (Exception ex)
+                    {
+                        WriteTrace(Area.EPMLiveCore, 
+                            Categories.EPMLiveCore.Event, 
+                            TraceSeverity.Medium, 
+                            ex.ToString());
+                    }
+                    finally
+                    {
+                        additionalWeb?.Dispose();
+                    }
                 }
-                
             }
-            catch { }
+            catch (Exception ex)
+            {
+                DebugTrace.TraceError("Exception swallowed: {0}", ex);
+            }
 
-            if (newNode.SelectSingleNode("row") != null || canpub)
+            if (newNode.SelectSingleNode("row") != null || canPublish)
+            {
                 parentNode.AppendChild(newNode);
+            }
+        }
+
+        private bool ProcessDataList(SPWeb web, XmlNode newNode)
+        {
+            var canPublish = false;
+            SPList list = null;
+            try
+            {
+                list = web.Lists[HttpUtility.UrlDecode(Request["List"])];
+            }
+            catch (Exception ex)
+            {
+                DebugTrace.TraceError("Exception swallowed: {0}", ex);
+            }
+
+            if (list != null)
+            {
+                if (!list.Hidden)
+                {
+                    var gSettings = new GridGanttSettings(list);
+
+                    if (gSettings.HideNewButton)
+                    {
+                        list = null;
+                    }
+                }
+                else
+                {
+                    list = null;
+                }
+            }
+
+            var newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
+            if (list != null)
+            {
+                newCell.InnerText = list.Forms[PAGETYPE.PAGE_NEWFORM].ServerRelativeUrl;
+                var attrName = doc.CreateAttribute("name");
+                attrName.Value = "NewItemURL";
+                newCell.Attributes.Append(attrName);
+                newNode.AppendChild(newCell);
+
+                newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
+                newCell.InnerText = "No";
+                attrName = doc.CreateAttribute("name");
+                attrName.Value = "CanPublish";
+                newCell.Attributes.Append(attrName);
+
+                if (list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                {
+                    newCell.InnerText = "Yes";
+                    canPublish = true;
+                }
+            }
+
+            newNode.AppendChild(newCell);
+            newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
+            newCell.InnerText = web.Title;
+            newNode.AppendChild(newCell);
+            newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
+            newCell.InnerText = web.ServerRelativeUrl;
+            newNode.AppendChild(newCell);
+            newCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
+            newCell.InnerText = web.ID.ToString();
+
+            var attributeName = doc.CreateAttribute("name");
+            attributeName.Value = "webid";
+            newCell.Attributes.Append(attributeName);
+            newNode.AppendChild(newCell);
+
+            return canPublish;
+        }
+
+        private void ProcessUserData(XmlNode newNode, SPWeb web)
+        {
+            var userDataCell = doc.CreateNode(XmlNodeType.Element, "userdata", doc.NamespaceURI);
+            newNode.AppendChild(userDataCell);
+            userDataCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
+            userDataCell.InnerText = web.Title;
+            newNode.AppendChild(userDataCell);
+            userDataCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
+            userDataCell.InnerText = web.ServerRelativeUrl;
+            newNode.AppendChild(userDataCell);
         }
     }
 }
