@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using EPMLiveCore.GlobalResources;
 using Microsoft.SharePoint.Navigation;
 using System.Collections;
+using System.Diagnostics;
 using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore
@@ -1522,127 +1523,159 @@ namespace EPMLiveCore
 
         public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                using (SPSite es = new SPSite(SPContext.Current.Site.ID))
+            SPSecurity.RunWithElevatedPrivileges(
+                delegate
                 {
-                    using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ID))
+                    using (var spSite = new SPSite(SPContext.Current.Site.ID))
+                    using (var spWeb = spSite.OpenWeb(SPContext.Current.Web.ID))
                     {
-                        int oldNodeId;
-                        int newNodeId;
-                        ew.AllowUnsafeUpdates = true;
-                        SPNavigationNode eCurrentNode = ew.Navigation.GetNodeById(nodeId);
-                        eCurrentNode.Url = url;
-                        eCurrentNode.Title = title;
-                        eCurrentNode.IsVisible = false;
-                        eCurrentNode.Update();
+                        PrepareWebForUpdates(spWeb);
 
-                        if ((parentNodeId != -1) &&
-                            (eCurrentNode.ParentId != parentNodeId))
+                        var currentNode = UpdateCurrentNode(nodeId, title, url, spWeb);
+
+                        if (parentNodeId != -1 && currentNode.ParentId != parentNodeId)
                         {
-                            SPNavigationNode oldParent = eCurrentNode.Parent;
-                            SPNavigationNode newParent = ew.Navigation.GetNodeById(parentNodeId);
-
-                            // create internal or external node dynamically
-                            SPNavigationNode newECurrentNode = (IsUrlInternal(url)) ?
-                                newParent.Children.AddAsLast(eCurrentNode) :
-                                newParent.Children.AddAsLast(new SPNavigationNode(eCurrentNode.Title, eCurrentNode.Url, true));
-                            newNodeId = newECurrentNode.Id;
-                            oldNodeId = eCurrentNode.Id;
-
-                            // delete original node
-                            oldParent.Children.Delete(eCurrentNode);
-
-                            SPList appList = ew.Lists.TryGetList(MultiAppNavigationResources.INSTALLED_APP_LIST_NAME);
-                            if (appList != null)
-                            {
-                                SPListItem appItem = appList.GetItemById(appId);
-                                if (appItem != null)
-                                {
-                                    object fv = null;
-                                    string sfv = string.Empty;
-                                    try
-                                    {
-                                        if (nodeType.ToLower() == "topnav")
-                                        {
-                                            fv = appItem["TopNav"];
-                                        }
-                                        else
-                                        {
-                                            fv = appItem["QuickLaunch"];
-                                        }
-                                    }
-                                    catch { }
-
-                                    if (fv != null)
-                                    {
-                                        sfv = fv.ToString();
-                                    }
-                                    string sClean = sfv;
-                                    Hashtable hshNavs = new Hashtable();
-                                    foreach (string s in sClean.Split(','))
-                                    {
-                                        string navId = string.Empty;
-                                        string aId = string.Empty;
-                                        if (s.Contains(':'))
-                                        {
-                                            string[] navAndAppIds = s.Split(':');
-                                            navId = navAndAppIds[0];
-                                            aId = navAndAppIds[1];
-                                        }
-                                        else
-                                        {
-                                            navId = s;
-                                        }
-
-                                        hshNavs.Add(navId, aId);
-                                    }
-
-                                    List<int> existingNavIds = Array.ConvertAll(sfv.Split(',').Select(s => s.Trim()).ToArray(), s => int.Parse(s.Split(':')[0])).ToList();
-                                    if (existingNavIds.Contains(oldNodeId))
-                                    {
-                                        existingNavIds.Remove(oldNodeId);
-                                    }
-
-                                    existingNavIds.Add(newNodeId);
-
-                                    StringBuilder sbNewIds = new StringBuilder();
-                                    foreach (int id in existingNavIds)
-                                    {
-                                        if (hshNavs.ContainsKey(id.ToString()))
-                                        {
-                                            sbNewIds.Append(id.ToString() + ":" + hshNavs[id.ToString()] + ",");
-                                        }
-                                        else
-                                        {
-                                            sbNewIds.Append(id.ToString() + ",");
-                                        }
-                                    }
-
-                                    //sfv = string.Join(",", Array.ConvertAll(existingNavIds.ToArray(), s => s.ToString()));
-                                    sfv = sbNewIds.ToString().Trim(',');
-                                    if (nodeType.ToLower() == "topnav")
-                                    {
-                                        appItem["TopNav"] = sfv;
-                                    }
-                                    else
-                                    {
-                                        appItem["QuickLaunch"] = sfv;
-                                    }
-
-                                    appItem.Update();
-                                }
-                            }
+                            UpdateParent(parentNodeId, url, currentNode, spWeb, out var newNodeId, out var oldNodeId);
+                            UpdateApp(appId, nodeType, spWeb, oldNodeId, newNodeId);
                         }
 
-                        // clear EPM cache
-                        new GenericLinkProvider(es.ID, ew.ID, origUser.LoginName).ClearCache();
-
-                        ew.Update();
-                        ew.AllowUnsafeUpdates = false;
+                        ClearEpmCache(origUser, spSite, spWeb);
+                        UpdateWeb(spWeb);
                     }
+                });
+        }
+
+        private static void UpdateApp(int appId, string nodeType, SPWeb spWeb, int oldNodeId, int newNodeId)
+        {
+            var appList = spWeb.Lists.TryGetList(MultiAppNavigationResources.INSTALLED_APP_LIST_NAME);
+            if (appList != null)
+            {
+                var appItem = appList.GetItemById(appId);
+                if (appItem != null)
+                {
+                    object field = null;
+                    var fieldValue = string.Empty;
+                    try
+                    {
+                        field = string.Equals(nodeType, "topnav", StringComparison.OrdinalIgnoreCase)
+                            ? appItem["TopNav"]
+                            : appItem["QuickLaunch"];
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception suppressed {0}", ex);
+                    }
+
+                    if (field != null)
+                    {
+                        fieldValue = field.ToString();
+                    }
+                    var clean = fieldValue;
+                    var hashtable = new Hashtable();
+                    foreach (var id in clean.Split(','))
+                    {
+                        PopulateAppHashTable(id, hashtable);
+                    }
+
+                    var existingNavIds = Array.ConvertAll(
+                            fieldValue.Split(',').Select(s => s.Trim()).ToArray(),
+                            s => int.Parse(s.Split(':')[0]))
+                        .ToList();
+                    if (existingNavIds.Contains(oldNodeId))
+                    {
+                        existingNavIds.Remove(oldNodeId);
+                    }
+
+                    existingNavIds.Add(newNodeId);
+
+                    var newIds = new StringBuilder();
+                    foreach (var id in existingNavIds)
+                    {
+                        newIds.Append(
+                            hashtable.ContainsKey(id.ToString())
+                                ? $"{id}:{hashtable[id.ToString()]},"
+                                : $"{id},");
+                    }
+
+                    fieldValue = newIds.ToString().Trim(',');
+                    if (string.Equals(nodeType, "topnav", StringComparison.OrdinalIgnoreCase))
+                    {
+                        appItem["TopNav"] = fieldValue;
+                    }
+                    else
+                    {
+                        appItem["QuickLaunch"] = fieldValue;
+                    }
+
+                    appItem.Update();
                 }
-            });
+            }
+        }
+
+        private static void PopulateAppHashTable(string id, Hashtable hashtable)
+        {
+            var navId = string.Empty;
+            var navAppId = string.Empty;
+            if (id.Contains(':'))
+            {
+                var navAndAppIds = id.Split(':');
+                navId = navAndAppIds[0];
+                navAppId = navAndAppIds[1];
+            }
+            else
+            {
+                navId = id;
+            }
+
+            hashtable.Add(navId, navAppId);
+        }
+
+        private void UpdateParent(
+            int parentNodeId,
+            string url,
+            SPNavigationNode currentNode,
+            SPWeb spWeb,
+            out int newNodeId,
+            out int oldNodeId)
+        {
+            var oldParent = currentNode.Parent;
+            var newParent = spWeb.Navigation.GetNodeById(parentNodeId);
+
+            // create internal or external node dynamically
+            var newECurrentNode = IsUrlInternal(url)
+                ? newParent.Children.AddAsLast(currentNode)
+                : newParent.Children.AddAsLast(new SPNavigationNode(currentNode.Title, currentNode.Url, true));
+            newNodeId = newECurrentNode.Id;
+            oldNodeId = currentNode.Id;
+
+            // delete original node
+            oldParent.Children.Delete(currentNode);
+        }
+
+        private static SPNavigationNode UpdateCurrentNode(int nodeId, string title, string url, SPWeb spWeb)
+        {
+            var currentNode = spWeb.Navigation.GetNodeById(nodeId);
+            currentNode.Url = url;
+            currentNode.Title = title;
+            currentNode.IsVisible = false;
+            currentNode.Update();
+            return currentNode;
+        }
+
+        private static void PrepareWebForUpdates(SPWeb spWeb)
+        {
+            spWeb.AllowUnsafeUpdates = true;
+        }
+
+        private static void UpdateWeb(SPWeb spWeb)
+        {
+            spWeb.Update();
+            spWeb.AllowUnsafeUpdates = false;
+        }
+
+        private static void ClearEpmCache(SPUser origUser, SPSite spSite, SPWeb spWeb)
+        {
+            new GenericLinkProvider(spSite.ID, spWeb.ID, origUser.LoginName).ClearCache();
         }
 
         public void DeleteNode(int appId, int nodeId, string nodeType, SPUser origUser)
