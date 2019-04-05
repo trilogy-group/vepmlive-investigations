@@ -44,6 +44,27 @@ namespace EPMLiveCore.API
     internal class Applications
     {
         private const string INSTALLED_APP_LIST_NAME = "Installed Applications";
+        private const string AddOperation = "ADD";
+        private const string LinkedCommunityFieldName = "LinkedCommunity";
+        private const string LinkedAppsFieldName = "LinkedApps";
+        private const string InstallXmlFieldName = "InstallXML";
+        private const string TopNavXmlFieldName = "TopNavXML";
+        private const string QuickLaunchXmlFieldName = "QuickLaunchXML";
+        private const string InstalledFilesFieldName = "InstalledFiles";
+        private const string ConfiguredFieldName = "Configured";
+        private const string InstallMessagesFieldName = "InstallMessages";
+        private const string InstallPercentFieldName = "InstallPercent";
+        private const string StatusFieldName = "Status";
+        private const string AppUrlFieldName = "AppUrl";
+        private const string AppVersionFieldName = "AppVersion";
+        private const string IconFieldName = "Icon";
+        private const string HomePageFieldName = "HomePage";
+        private const string DefaultFieldName = "Default";
+        private const string VisibleFieldName = "Visible";
+        private const string TopNavFieldName = "TopNav";
+        private const string QuickLaunchFieldName = "QuickLaunch";
+        private const string ExtIdFieldName = "EXTID";
+        private const string DescriptionFieldName = "Description";
 
         public static string getAttribute(XmlNode nd, string attribute)
         {
@@ -92,215 +113,293 @@ namespace EPMLiveCore.API
             return null;
         }
 
-        private static SPList CheckApplicationList(SPList oList)
+        private static SPList CheckApplicationList(SPList list)
         {
-            if (oList != null)
+            if (list != null)
             {
-                SPField oField = GetField(oList, "Description");
-                if (oField == null)
-                {
-                    oList.Fields.Add("Description", SPFieldType.Note, false);
-                }
-
-                oField = GetField(oList, "EXTID");
-                if (oField == null)
-                {
-                    oList.Fields.Add("EXTID", SPFieldType.Number, false);
-                    oField = GetField(oList, "EXTID");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "QuickLaunch");
-                if (oField == null)
-                {
-                    oList.Fields.Add("QuickLaunch", SPFieldType.Text, false);
-                    oField = GetField(oList, "QuickLaunch");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "TopNav");
-                if (oField == null)
-                {
-                    oList.Fields.Add("TopNav", SPFieldType.Text, false);
-                    oField = GetField(oList, "TopNav");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "Visible");
-                if (oField == null)
-                {
-                    oList.Fields.Add("Visible", SPFieldType.Boolean, false);
-                    SPFieldBoolean bField = (SPFieldBoolean)GetField(oList, "Visible");
-                    bField.DefaultValue = "0";
-                    bField.Update();
-                }
-
-                oField = GetField(oList, "Default");
-                if (oField == null)
-                {
-                    oList.Fields.Add("Default", SPFieldType.Boolean, false);
-                    SPFieldBoolean bField = (SPFieldBoolean)GetField(oList, "Default");
-                    bField.DefaultValue = "0";
-                    bField.ShowInEditForm = false;
-                    bField.ShowInNewForm = false;
-                    bField.Update();
-                }
-
-                oField = GetField(oList, "HomePage");
-                if (oField == null)
-                {
-                    oList.Fields.Add("HomePage", SPFieldType.URL, false);
-                }
-
-                oField = GetField(oList, "Icon");
-                if (oField == null)
-                {
-                    oList.Fields.Add("Icon", SPFieldType.URL, false);
-                }
-
-                oField = GetField(oList, "AppVersion");
-                if (oField == null)
-                {
-                    oList.Fields.Add("AppVersion", SPFieldType.Text, false);
-                    oField = GetField(oList, "AppVersion");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "AppUrl");
-                if (oField == null)
-                {
-                    oList.Fields.Add("AppUrl", SPFieldType.Text, false);
-                    oField = GetField(oList, "AppUrl");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "Status");
-                if (oField == null)
-                {
-                    oList.Fields.Add("Status", SPFieldType.Text, false);
-                    oField = GetField(oList, "Status");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "InstallPercent");
-                if (oField == null)
-                {
-                    oList.Fields.Add("InstallPercent", SPFieldType.Number, false);
-                    SPFieldNumber bField = (SPFieldNumber)GetField(oList, "InstallPercent");
-                    bField.ShowAsPercentage = true;
-                    bField.ShowInEditForm = false;
-                    bField.ShowInNewForm = false;
-                    bField.Update();
-                }
-
-                oField = GetField(oList, "InstallMessages");
-                if (oField == null)
-                {
-                    oList.Fields.Add("InstallMessages", SPFieldType.Note, false);
-                    SPFieldMultiLineText bField = (SPFieldMultiLineText)GetField(oList, "InstallMessages");
-                    bField.RichTextMode = SPRichTextMode.FullHtml;
-                    bField.RichText = true;
-                    bField.ShowInEditForm = false;
-                    bField.ShowInNewForm = false;
-                    bField.Update();
-                }
-
-                oField = GetField(oList, "Configured");
-                if (oField == null)
-                {
-                    oList.Fields.Add("Configured", SPFieldType.Boolean, false);
-                    oField = GetField(oList, "Configured");
-                    oField.ShowInEditForm = false;
-                    oField.ShowInNewForm = false;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "InstalledFiles");
-                if (oField == null)
-                {
-                    oList.Fields.Add("InstalledFiles", SPFieldType.Note, false);
-                    oField = GetField(oList, "InstalledFiles");
-                    oField.Hidden = true;
-                    oField.Update();
-                }
-
-
-                oField = GetField(oList, "QuickLaunchXML");
-                if (oField == null)
-                {
-                    oList.Fields.Add("QuickLaunchXML", SPFieldType.Note, false);
-                    oField = GetField(oList, "QuickLaunchXML");
-                    oField.Hidden = true;
-                    oField.Update();
-                }
-
-
-                oField = GetField(oList, "TopNavXML");
-                if (oField == null)
-                {
-                    oList.Fields.Add("TopNavXML", SPFieldType.Note, false);
-                    oField = GetField(oList, "TopNavXML");
-                    oField.Hidden = true;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "InstallXML");
-                if (oField == null)
-                {
-                    oList.Fields.Add("InstallXML", SPFieldType.Note, false);
-                    oField = GetField(oList, "InstallXML");
-                    oField.Hidden = true;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "LinkedApps");
-                if (oField == null)
-                {
-                    oList.Fields.Add("LinkedApps", SPFieldType.Note, false);
-                    oField = GetField(oList, "LinkedApps");
-                    oField.Hidden = true;
-                    oField.Update();
-                }
-
-                oField = GetField(oList, "LinkedCommunity");
-                if (oField == null)
-                {
-                    oList.Fields.Add("LinkedCommunity", SPFieldType.Number, false);
-                    oField = GetField(oList, "LinkedCommunity");
-                    oField.Hidden = true;
-                    oField.Update();
-                }
-
+                AddDescriptionField(list);
+                UpdateExtIdField(list);
+                UpdateQuickLaunchField(list);
+                UpdateTopNavField(list);
+                UpdateVisibleField(list);
+                UpdateDefaultField(list);
+                UpdateHomePageField(list);
+                UpdateAppVersionField(list);
+                UpdateAppUrlField(list);
+                UpdateStatusField(list);
+                UpdateInstallPercentField(list);
+                UpdateInstallMessagesField(list);
+                UpdateConfiguredField(list);
+                UpdateInstalledFilesField(list);
+                UpdateQuickLaunchXmlField(list);
+                UpdateTopNavXmlField(list);
+                UpdateInstallXmlField(list);
+                UpdateLinkedAppsField(list);
+                UpdateLinkedCommunityField(list);
 
                 var dataElement = new XElement("Data");
-
-                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
-
-                string className = "EPMLiveCore.AppsListEvents";
-
+                var assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                var className = "EPMLiveCore.AppsListEvents";
                 var spEventReceiverTypes = new[]
-                                               {
-                                                   SPEventReceiverType.ItemDeleting
-                                               };
+                {
+                    SPEventReceiverType.ItemDeleting
+                };
 
-                AddEventReceiverElement("ADD", className, assemblyName, spEventReceiverTypes, oList.ID, ref dataElement, oList.ParentWeb);
+                AddEventReceiverElement(
+                    AddOperation,
+                    className,
+                    assemblyName,
+                    spEventReceiverTypes,
+                    list.ID,
+                    ref dataElement,
+                    list.ParentWeb);
 
-                WorkEngineAPI.EventReceiverManager(new XElement("EventReceiverManager", dataElement).ToString(), oList.ParentWeb);
+                WorkEngineAPI.EventReceiverManager(new XElement("EventReceiverManager", dataElement).ToString(), list.ParentWeb);
             }
 
-            return oList;
+            return list;
+        }
+
+        private static void AddDescriptionField(SPList list)
+        {
+            var field = GetField(list, DescriptionFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(DescriptionFieldName, SPFieldType.Note, false);
+            }
+        }
+
+        private static void UpdateExtIdField(SPList list)
+        {
+            var field = GetField(list, ExtIdFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(ExtIdFieldName, SPFieldType.Number, false);
+                field = GetField(list, ExtIdFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateQuickLaunchField(SPList list)
+        {
+            var field = GetField(list, QuickLaunchFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(QuickLaunchFieldName, SPFieldType.Text, false);
+                field = GetField(list, QuickLaunchFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateTopNavField(SPList list)
+        {
+            var field = GetField(list, TopNavFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(TopNavFieldName, SPFieldType.Text, false);
+                field = GetField(list, TopNavFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateVisibleField(SPList list)
+        {
+            var field = GetField(list, VisibleFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(VisibleFieldName, SPFieldType.Boolean, false);
+                var boolField = (SPFieldBoolean)GetField(list, VisibleFieldName);
+                boolField.DefaultValue = "0";
+                boolField.Update();
+            }
+        }
+
+        private static void UpdateDefaultField(SPList list)
+        {
+            var field = GetField(list, DefaultFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(DefaultFieldName, SPFieldType.Boolean, false);
+                var boolField = (SPFieldBoolean)GetField(list, DefaultFieldName);
+                boolField.DefaultValue = "0";
+                boolField.ShowInEditForm = false;
+                boolField.ShowInNewForm = false;
+                boolField.Update();
+            }
+        }
+
+        private static void UpdateHomePageField(SPList list)
+        {
+            var field = GetField(list, HomePageFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(HomePageFieldName, SPFieldType.URL, false);
+            }
+
+            field = GetField(list, IconFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(IconFieldName, SPFieldType.URL, false);
+            }
+        }
+
+        private static void UpdateAppVersionField(SPList list)
+        {
+            var field = GetField(list, AppVersionFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(AppVersionFieldName, SPFieldType.Text, false);
+                field = GetField(list, AppVersionFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateAppUrlField(SPList list)
+        {
+            var field = GetField(list, AppUrlFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(AppUrlFieldName, SPFieldType.Text, false);
+                field = GetField(list, AppUrlFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateStatusField(SPList list)
+        {
+            var field = GetField(list, StatusFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(StatusFieldName, SPFieldType.Text, false);
+                field = GetField(list, StatusFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateInstallPercentField(SPList list)
+        {
+            var field = GetField(list, InstallPercentFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(InstallPercentFieldName, SPFieldType.Number, false);
+                var numericField = (SPFieldNumber)GetField(list, InstallPercentFieldName);
+                numericField.ShowAsPercentage = true;
+                numericField.ShowInEditForm = false;
+                numericField.ShowInNewForm = false;
+                numericField.Update();
+            }
+        }
+
+        private static void UpdateInstallMessagesField(SPList list)
+        {
+            var field = GetField(list, InstallMessagesFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(InstallMessagesFieldName, SPFieldType.Note, false);
+                var numericField = (SPFieldMultiLineText)GetField(list, InstallMessagesFieldName);
+                numericField.RichTextMode = SPRichTextMode.FullHtml;
+                numericField.RichText = true;
+                numericField.ShowInEditForm = false;
+                numericField.ShowInNewForm = false;
+                numericField.Update();
+            }
+        }
+
+        private static void UpdateConfiguredField(SPList list)
+        {
+            var field = GetField(list, ConfiguredFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(ConfiguredFieldName, SPFieldType.Boolean, false);
+                field = GetField(list, ConfiguredFieldName);
+                field.ShowInEditForm = false;
+                field.ShowInNewForm = false;
+                field.Update();
+            }
+        }
+
+        private static void UpdateInstalledFilesField(SPList list)
+        {
+            var field = GetField(list, InstalledFilesFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(InstalledFilesFieldName, SPFieldType.Note, false);
+                field = GetField(list, InstalledFilesFieldName);
+                field.Hidden = true;
+                field.Update();
+            }
+        }
+
+        private static void UpdateQuickLaunchXmlField(SPList list)
+        {
+            var field = GetField(list, QuickLaunchXmlFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(QuickLaunchXmlFieldName, SPFieldType.Note, false);
+                field = GetField(list, QuickLaunchXmlFieldName);
+                field.Hidden = true;
+                field.Update();
+            }
+        }
+
+        private static void UpdateTopNavXmlField(SPList list)
+        {
+            var field = GetField(list, TopNavXmlFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(TopNavXmlFieldName, SPFieldType.Note, false);
+                field = GetField(list, TopNavXmlFieldName);
+                field.Hidden = true;
+                field.Update();
+            }
+        }
+
+        private static void UpdateInstallXmlField(SPList list)
+        {
+            var field = GetField(list, InstallXmlFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(InstallXmlFieldName, SPFieldType.Note, false);
+                field = GetField(list, InstallXmlFieldName);
+                field.Hidden = true;
+                field.Update();
+            }
+        }
+
+        private static void UpdateLinkedAppsField(SPList list)
+        {
+            var field = GetField(list, LinkedAppsFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(LinkedAppsFieldName, SPFieldType.Note, false);
+                field = GetField(list, LinkedAppsFieldName);
+                field.Hidden = true;
+                field.Update();
+            }
+        }
+
+        private static void UpdateLinkedCommunityField(SPList list)
+        {
+            var field = GetField(list, LinkedCommunityFieldName);
+            if (field == null)
+            {
+                list.Fields.Add(LinkedCommunityFieldName, SPFieldType.Number, false);
+                field = GetField(list, LinkedCommunityFieldName);
+                field.Hidden = true;
+                field.Update();
+            }
         }
 
         private static void AddEventReceiverElement(string operation, string className, string assembly, IEnumerable<SPEventReceiverType> spEventReceiverTypes, Guid listId, ref XElement dataElement, SPWeb web)
@@ -391,7 +490,7 @@ namespace EPMLiveCore.API
             {
                 ApplicationDef appDef = GetApplicationInfoFromList(oLiCommunity.ParentList.ParentWeb, appextid.ToString());
 
-                SPField fQuickLaunch = oLiCommunity.ParentList.Fields.GetFieldByInternalName("QuickLaunch");
+                SPField fQuickLaunch = oLiCommunity.ParentList.Fields.GetFieldByInternalName(QuickLaunchFieldName);
 
                 XmlNode nd = appDef.ApplicationXml.FirstChild.SelectSingleNode("//Application/QuickLaunch");
                 if (nd != null)
@@ -422,7 +521,7 @@ namespace EPMLiveCore.API
 
             try
             {
-                SPField fQuickLaunch = oLiCommunity.ParentList.Fields.GetFieldByInternalName("QuickLaunch");
+                SPField fQuickLaunch = oLiCommunity.ParentList.Fields.GetFieldByInternalName(QuickLaunchFieldName);
                 RemoveAppNav(oLiCommunity, appextid, oLiCommunity.ParentList.ParentWeb, fQuickLaunch);
                 CreateQuickLaunchXML(oLiCommunity.ID, oLiCommunity.ParentList.ParentWeb);
 
@@ -599,7 +698,7 @@ namespace EPMLiveCore.API
 
         public static void CreateQuickLaunchXML(int AppId, SPWeb cWeb)
         {
-            CreateGenericXml(AppId, cWeb, "QuickLaunch", cWeb.Navigation.QuickLaunch);
+            CreateGenericXml(AppId, cWeb, QuickLaunchFieldName, cWeb.Navigation.QuickLaunch);
         }
 
         private static void CreateGenericXml(int AppId, SPWeb cWeb, string field, SPNavigationNodeCollection nodeCollection)
@@ -754,7 +853,7 @@ namespace EPMLiveCore.API
                                 }
                             }
 
-                            li["QuickLaunch"] = String.Join(",", ids.ToArray());
+                            li[QuickLaunchFieldName] = String.Join(",", ids.ToArray());
                             li.Update();
                         }
                     }
@@ -1233,7 +1332,7 @@ namespace EPMLiveCore.API
 
                         if (arrNav.Count > 0)
                         {
-                            li["QuickLaunch"] = String.Join(",", (string[])arrNav.ToArray(typeof(string)));
+                            li[QuickLaunchFieldName] = String.Join(",", (string[])arrNav.ToArray(typeof(string)));
                             li.Update();
 
                             CreateQuickLaunchXML(li.ID, web);
@@ -1272,7 +1371,7 @@ namespace EPMLiveCore.API
 
                             CreateCommunityNav(li, web.Navigation.QuickLaunch, ndQL, ref arrNav);
 
-                            li["QuickLaunch"] = String.Join(",", (string[])arrNav.ToArray(typeof(string)));
+                            li[QuickLaunchFieldName] = String.Join(",", (string[])arrNav.ToArray(typeof(string)));
                             li.Update();
 
                             CreateQuickLaunchXML(li.ID, web);
