@@ -29,9 +29,10 @@ namespace EPMLiveIntegration
         {
             if (LocalLog)
             {
-                StreamWriter sw = new StreamWriter("log.txt", true);
-                sw.WriteLine(DateTime.Now.ToString() + "\t" + level.ToString() + "\t" + log);
-                sw.Close();
+                using (var streamWriter = new StreamWriter("log.txt", true))
+                {
+                    streamWriter.WriteLine("{0}\t{1}\t{2}", DateTime.Now, level, log);
+                }
             }
             else
             {
