@@ -8,6 +8,8 @@ namespace OptmizerDataCache
 {
     internal partial class OptTopGrid
     {
+        private const string DateFormat = "MM/dd/yyyy";
+
         private static string GetCurrencyFormat(int currencyPosition, int currencyDigits, string currencySymbol)
         {
             string currencyFormat;
@@ -60,7 +62,7 @@ namespace OptmizerDataCache
 
         public bool InitializeGridLayout(List<clsOptFieldDelf> fielddef, int curr_pos, int curr_digits, string curr_sym)
         {
-            var inOutAutojsonMenu = "{Items:["
+            const string inOutAutojsonMenu = "{Items:["
                 + "{Name:'1',Text:'In',Value:'In'},{Name:'2',Text:'Out',Value:'Out'},{Name:'3',Text:'Auto',Value:'Auto'}"
                 + "]}";
 
@@ -177,13 +179,13 @@ namespace OptmizerDataCache
                 "PIStart",
                 oDet.StartDate == DateTime.MinValue
                     ? string.Empty
-                    : oDet.StartDate.ToString("MM/dd/yyyy"));
+                    : oDet.StartDate.ToString(DateFormat));
 
             iStruct.CreateStringAttr(
                 "PIFinish",
                 oDet.FinishDate == DateTime.MinValue
                     ? string.Empty
-                    : oDet.FinishDate.ToString("MM/dd/yyyy"));
+                    : oDet.FinishDate.ToString(DateFormat));
             var columnId = 0;
 
             foreach (var column in fielddef)
