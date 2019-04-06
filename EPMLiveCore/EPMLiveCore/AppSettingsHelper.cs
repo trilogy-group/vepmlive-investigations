@@ -1523,6 +1523,11 @@ namespace EPMLiveCore
 
         public void EditNodeById(int parentNodeId, int nodeId, string title, string url, int appId, string nodeType, SPUser origUser)
         {
+            if (origUser == null)
+            {
+                throw new ArgumentNullException(nameof(origUser));
+            }
+
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
@@ -1535,7 +1540,9 @@ namespace EPMLiveCore
 
                         if (parentNodeId != -1 && currentNode.ParentId != parentNodeId)
                         {
-                            UpdateParent(parentNodeId, url, currentNode, spWeb, out var newNodeId, out var oldNodeId);
+                            int newNodeId;
+                            int oldNodeId;
+                            UpdateParent(parentNodeId, url, currentNode, spWeb, out newNodeId, out oldNodeId);
                             UpdateApp(appId, nodeType, spWeb, oldNodeId, newNodeId);
                         }
 
