@@ -215,95 +215,95 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void loadData(SPWeb web)
         {
-            using (var cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate { cn.Open(); });
+                SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
-                var cmd =
-                    new SqlCommand(
-                        "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=5",
-                        cn);
-                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID);
-                SqlDataReader dr = null;
-
-                bool processing = false;
-
-                using (dr = cmd.ExecuteReader())
+                const string selectJobType5Command =
+                    "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=5";
+                using (var selectJobType5SqlCommand = new SqlCommand(selectJobType5Command, sqlConnection))
                 {
-                    if (dr.Read())
+                    selectJobType5SqlCommand.Parameters.AddWithValue("@siteguid", web.Site.ID);
+
+                    var processing = false;
+
+                    using (var dataReaderJobType5 = selectJobType5SqlCommand.ExecuteReader())
                     {
-                        if (!dr.IsDBNull(3))
+                        if (dataReaderJobType5.Read())
                         {
-                            if (dr.GetInt32(3) == 0)
+                            if (!dataReaderJobType5.IsDBNull(3))
                             {
-                                processing = true;
-                                //lblLastRun.Text = "Queued";
-                                lblMessages.Text = "Queued";
-                                btnRunNow.Enabled = false;
-                            }
-                            else if (dr.GetInt32(3) == 1)
-                            {
-                                processing = true;
-                                //lblLastRun.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
-                                lblMessages.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
-                                btnRunNow.Enabled = false;
-                            }
-                            else if (!dr.IsDBNull(5))
-                            {
-                                lblMessages.Text = dr.GetString(5);
-                            }
-                            else
-                            {
-                                lblMessages.Text = "No Results";
-                            }
-                        }
-
-                        if (!dr.IsDBNull(4))
-                            lblLastRun.Text = dr.GetDateTime(4).ToString();
-
-                        const string selectJobType1Command =
-                            "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1";
-                        using (var selectJobType1SqlCommand = new SqlCommand(selectJobType1Command, cn))
-                        {
-                            selectJobType1SqlCommand.Parameters.AddWithValue("@siteguid", web.Site.ID);
-
-                            dr.Close();
-                            using (dr = selectJobType1SqlCommand.ExecuteReader())
-                            {
-                                if (!processing && dr.Read())
+                                if (dataReaderJobType5.GetInt32(3) == 0)
                                 {
-                                    if (!dr.IsDBNull(3))
-                                    {
-                                        if (dr.GetInt32(3) == 0)
-                                        {
-                                            lblMessages.Text = "Queued";
-                                            btnRunNow.Enabled = false;
-                                        }
-                                        else if (dr.GetInt32(3) == 1)
-                                        {
-                                            lblMessages.Text = $"Processing ({dr.GetInt32(2):##0}%)";
-                                            btnRunNow.Enabled = false;
-                                        }
-                                        else if (!dr.IsDBNull(5))
-                                        {
-                                            lblMessages.Text = dr.GetString(5);
-                                        }
-                                        else
-                                        {
-                                            lblMessages.Text = "No Results";
-                                        }
-                                    }
+                                    processing = true;
 
-                                    if (!dr.IsDBNull(4))
+                                    lblMessages.Text = "Queued";
+                                    btnRunNow.Enabled = false;
+                                }
+                                else if (dataReaderJobType5.GetInt32(3) == 1)
+                                {
+                                    processing = true;
+                                    lblMessages.Text = $"Processing ({dataReaderJobType5.GetInt32(2):##0}%)";
+                                    btnRunNow.Enabled = false;
+                                }
+                                else if (!dataReaderJobType5.IsDBNull(5))
+                                {
+                                    lblMessages.Text = dataReaderJobType5.GetString(5);
+                                }
+                                else
+                                {
+                                    lblMessages.Text = "No Results";
+                                }
+                            }
+
+                            if (!dataReaderJobType5.IsDBNull(4))
+                            {
+                                lblLastRun.Text = dataReaderJobType5.GetDateTime(4).ToString();
+                            }
+
+                            const string selectJobType1Command =
+                                "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1";
+                            using (var selectJobType1SqlCommand = new SqlCommand(selectJobType1Command, sqlConnection))
+                            {
+                                selectJobType1SqlCommand.Parameters.AddWithValue("@siteguid", web.Site.ID);
+
+                                using (var dataReaderJobType1 = selectJobType1SqlCommand.ExecuteReader())
+                                {
+                                    if (!processing && dataReaderJobType1.Read())
                                     {
-                                        lblMessages.Text = dr.GetDateTime(4).ToString();
+                                        if (!dataReaderJobType1.IsDBNull(3))
+                                        {
+                                            if (dataReaderJobType1.GetInt32(3) == 0)
+                                            {
+                                                lblMessages.Text = "Queued";
+                                                btnRunNow.Enabled = false;
+                                            }
+                                            else if (dataReaderJobType1.GetInt32(3) == 1)
+                                            {
+                                                lblMessages.Text =
+                                                    $"Processing ({dataReaderJobType1.GetInt32(2):##0}%)";
+                                                btnRunNow.Enabled = false;
+                                            }
+                                            else if (!dataReaderJobType1.IsDBNull(5))
+                                            {
+                                                lblMessages.Text = dataReaderJobType1.GetString(5);
+                                            }
+                                            else
+                                            {
+                                                lblMessages.Text = "No Results";
+                                            }
+                                        }
+
+                                        if (!dataReaderJobType1.IsDBNull(4))
+                                        {
+                                            lblMessages.Text = dataReaderJobType1.GetDateTime(4).ToString();
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
 
