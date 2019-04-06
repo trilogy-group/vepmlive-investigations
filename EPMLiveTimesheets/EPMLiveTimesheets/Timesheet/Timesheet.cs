@@ -26,6 +26,7 @@ using System.Collections;
 using System.Diagnostics;
 using EPMLiveCore;
 using EPMLiveWebParts;
+using WebPart = System.Web.UI.WebControls.WebParts.WebPart;
 
 namespace TimeSheets
 {
@@ -34,6 +35,7 @@ namespace TimeSheets
     [XmlRoot(Namespace = "TimeSheet")]
     public class TimeSheet : Microsoft.SharePoint.WebPartPages.WebPart, IWebPartPageComponentProvider
     {
+        private const int ThirtyMinutes = 30;
         SPList list;
         SPView view;
         //ViewToolBar toolbar;
@@ -472,11 +474,10 @@ namespace TimeSheets
 
         protected override void RenderWebPart(HtmlTextWriter output)
         {
-
             output.Write(error);
             try
             {
-                SPWeb web =SPContext.Current.Web;
+                var web = SPContext.Current.Web;
 
                 if (activation != 0)
                 {
@@ -484,322 +485,355 @@ namespace TimeSheets
                     return;
                 }
 
-                if (arrPeriods.Count <= 0)
+                if (!CheckIfHasEnoughPeriods(output, web))
                 {
-                    
-                    output.Write("No Periods Defined.<br><br>");
-                    if(web.CurrentUser.IsSiteAdmin)
-                    {
-                        output.Write("<a href=\"");
-                        output.Write(web.ServerRelativeUrl == "/" ? "" : web.ServerRelativeUrl);
-                        output.Write("/_layouts/epmlive/timesheetadmin.aspx\">Go To Timesheet Admin</a>");
-                        output.WriteLine("");
-                        
-                    }
-
-                    output.WriteLine("<script language=\"javascript\">");
-                    output.WriteLine("var myDataProcessor = new Object();");
-                    output.WriteLine("var mygrid" + sFullGridId + " = new Object();");
-                    output.WriteLine("</script>");
-
-                    if(SPContext.Current.ViewContext.View != null)
-                    {
-                        foreach(System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
-                        {
-                            try
-                            {
-                                if(wp.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" || wp.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
-                                {
-                                    wp.Visible = false;
-                                }
-                            }
-                            catch { }
-                        }
-                    }
                     return;
                 }
-                
-                {
-                    web.Site.CatchAccessDeniedException = false;
-                    EnsureChildControls();
 
-                    if (list != null && view != null)
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                web.Site.CatchAccessDeniedException = false;
+                EnsureChildControls();
+
+                if (list != null && view != null)
+                {
+                    SPSecurity.RunWithElevatedPrivileges(
+                        delegate
                         {
                             try
                             {
-                                string webpartid = "";
-                                string doEdit = "";
-                                try
-                                {
-                                    // switchto = Page.Request["switchto"];
-                                    webpartid = Page.Request["webpartid"];
-                                    doEdit = Page.Request["edit"];
-                                }
-                                catch { }
-
-                                EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
-
-                                try
-                                {
-                                    allowEditToggle = gSettings.AllowEdit;
-                                }
-                                catch { }
-                                try
-                                {
-                                    inEditMode = gSettings.EditDefault;
-                                }
-                                catch { }
-                                if (webpartid == this.ID)
-                                {
-                                    try
-                                    {
-                                        if (doEdit == "1")
-                                            inEditMode = true;
-                                        else if (doEdit == "0")
-                                            inEditMode = false;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        error = "Error Saving Personalization: " + ex.Message;
-                                    }
-                                }
-
-
-                                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                                cn.Open();
-
-                                if (Page.Request["NewPeriod"] != null && Page.Request["NewPeriod"] != "")
-                                {
-                                    Page.Response.Cookies.Remove("EPMLiveTSPeriod");
-                                    Page.Request.Cookies.Remove("EPMLiveTSPeriod");
-
-                                    HttpCookie myCookie = new HttpCookie("EPMLiveTSPeriod");
-
-                                    myCookie["period"] = Page.Request["NewPeriod"];
-                                    myCookie.Expires = DateTime.Now.AddMinutes(30);
-                                    Page.Response.Cookies.Add(myCookie);
-
-                                }
-
-                                string sPeriod = "";
-
-                                if (Page.Request.Cookies["EPMLiveTSPeriod"] != null)
-                                    sPeriod = Page.Request.Cookies["EPMLiveTSPeriod"]["period"];
-
-                                //if (Page.Response.Cookies["EPMLiveTSPeriod"].Value != null)
-                                //    sPeriod = Page.Response.Cookies["EPMLiveTSPeriod"].Value;
-                                //else if (Page.Request.Cookies["EPMLiveTSPeriod"] != null)
-                                //    sPeriod = Page.Request.Cookies["EPMLiveTSPeriod"].Value;
-
-                                if (sPeriod == null || sPeriod == "")
-                                {
-                                    SqlCommand cmd1 = new SqlCommand("SELECT period_id from TSPERIOD where period_start<=@dtchecked and period_end>=@dtchecked and locked = 0 and site_id=@siteid", cn);
-                                    cmd1.CommandType = CommandType.Text;
-                                    cmd1.Parameters.AddWithValue("@dtchecked", DateTime.Now);
-                                    cmd1.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                    SqlDataReader dr1 = cmd1.ExecuteReader();
-                                    if (dr1.Read())
-                                    {
-                                        intPeriod = dr1.GetInt32(0);
-                                    }
-                                    else
-                                    {
-                                        intPeriod = int.Parse(arrPeriods.GetKey(0).ToString());
-                                    }
-
-                                    dr1.Close();
-                                }
-                                else
-                                {
-                                    intPeriod = int.Parse(sPeriod);
-                                }
-
-                                foreach (DictionaryEntry de in arrPeriods)
-                                {
-                                    strAllPeriods += "," + de.Value.ToString() + "|" + de.Key.ToString();
-                                    if (intPeriod == (int)de.Key)
-                                    {
-                                        strCurPeriodName = de.Value.ToString();
-                                        if (arrPeriods.IndexOfKey(de.Key) > 0)
-                                            strPreviousPeriod = arrPeriods.GetKey(arrPeriods.IndexOfKey(de.Key) - 1).ToString();
-                                        if (arrPeriods.IndexOfKey(de.Key) < (arrPeriods.Count - 1))
-                                            strNextPeriod = arrPeriods.GetKey(arrPeriods.IndexOfKey(de.Key) + 1).ToString();
-                                    }
-                                }
-                                if (strAllPeriods.Length > 0)
-                                    strAllPeriods = strAllPeriods.Substring(1);
-
-                                status = "New";
-
-                                SqlCommand cmd = new SqlCommand("SELECT TS_UID, Submitted, approval_status,approval_notes from TSTIMESHEET where PERIOD_ID=@periodid and username=@username and site_uid=@site_uid", cn);
-                                cmd.CommandType = CommandType.Text;
-                                cmd.Parameters.AddWithValue("@periodid", intPeriod);
-                                cmd.Parameters.AddWithValue("@username", username);
-                                cmd.Parameters.AddWithValue("@site_uid", web.Site.ID);
-                                SqlDataReader dr = cmd.ExecuteReader();
-                                if (dr.Read())
-                                {
-                                    tsuid = dr.GetGuid(0).ToString();
-                                    if (dr.GetBoolean(1))
-                                    {
-                                        lockedts = "true";
-                                        if (dr.GetInt32(2) == 1)
-                                        {
-                                            status = "Approved";
-                                            lockunsubmit = "true";
-                                            SPSecurity.RunWithElevatedPrivileges(delegate()
-                                            {
-                                                if (EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "EPMLiveTSDisableApprovals").ToLower() == "true")
-                                                {
-                                                    lockunsubmit = "false";
-                                                    //ts.GetMenuItem("UnsubmitTimesheet").Visible = true;
-                                                }
-                                                else if (canImpersonate)
-                                                {
-
-                                                }
-                                                //else
-                                                    //ts.Visible = false;
-                                            });
-                                            inEditMode = false;
-                                        }
-                                        else if (dr.GetInt32(2) == 2)
-                                        {
-                                            //status = "<font color='red'>Rejected</font> <a href='javascript:viewnote" + sFullGridId + "()'><img src='/_layouts/images/ICDISC.GIF' border='0'></a>";
-                                            status = "Rejected";
-                                            appNote = dr.GetString(3);
-                                            //ts.GetMenuItem("UnsubmitTimesheet").Visible = true;
-                                        }
-                                        else
-                                        {
-                                            status = "Submitted";
-                                            //ts.GetMenuItem("UnsubmitTimesheet").Visible = true;
-                                            inEditMode = false;
-                                        }
-
-                                        editEvents = "false";
-                                        //toolbar.Controls[0].Controls[1].Controls[0].Controls[6].Visible = false;
-                                        //ts.GetMenuItem("SaveTimeSheet").Visible = false;
-                                        //ts.GetMenuItem("DeleteItem").Visible = false;
-                                        //ts.GetMenuItem("SubmitTimesheet").Visible = false;
-
-                                        //ts.Controls[0].FindControl("AddWork").Visible = false;
-                                    }
-                                    else
-                                    {
-                                        if (dr.GetInt32(2) == 2)
-                                        {
-                                            //status = "<font color='red'>Rejected</font> <a href='javascript:viewnote" + sFullGridId + "()'><img src='/_layouts/images/ICDISC.GIF' border='0'></a>";
-                                            status = "Rejected";
-                                            appNote = dr.GetString(3);
-                                        }
-                                        else
-                                            status = "Saved";
-                                    }
-                                }
-                                dr.Close();
-
-                                cmd = new SqlCommand("SELECT locked from TSPERIOD where period_id=@periodid and site_id=@site_id", cn);
-                                cmd.CommandType = CommandType.Text;
-                                cmd.Parameters.AddWithValue("@periodid", intPeriod);
-                                cmd.Parameters.AddWithValue("@site_id", web.Site.ID);
-                                dr = cmd.ExecuteReader();
-
-                                //SPSecurity.RunWithElevatedPrivileges(delegate()
-                                //{
-                                //    if (EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "EPMLiveTSNonWork") == "")
-                                //        ts.Controls[0].FindControl("NonWork").Visible = false;
-                                //    else
-                                //        ts.Controls[0].FindControl("NonWork").Visible = true;
-                                //});
-
-                                if (dr.Read())
-                                {
-                                    if (dr.GetBoolean(0))
-                                    {
-                                        status = "Closed";
-                                        editEvents = "false";
-                                        //toolbar.Controls[0].Controls[1].Controls[0].Controls[6].Visible = false;
-                                        //Image img = new Image();
-                                        //img.ImageUrl = "/_layouts/images/lockts.gif";
-                                        //toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(6, img);
-                                    }
-                                }
-                                dr.Close();
-
-                                Label lbl = new Label();
-                                lbl.ID = "lblTimesheetStatus";
-                                lbl.Text = "&nbsp;&nbsp;Timesheet Status: <span id=\"divStatus\" class=\"ms-descriptiontext\">" + status + "</span>";
-                                //toolbar.Controls[0].Controls[1].Controls[0].Controls.Add(lbl);
-
-
-                                //SqlDataReader dr = cmd.ExecuteReader();
-                                //if (dr.Read())
-                                //{
-                                //    strPeriodStart = dr.GetDateTime(0).ToShortDateString();
-                                //    strPeriodEnd = dr.GetDateTime(1).ToShortDateString();
-                                //}
-                                //dr.Close();
-
-                                //ddl.SelectedValue = intPeriod.ToString();
-
-                                //if (ddl.SelectedIndex == 0)
-                                //    btnPrev.Visible = false;
-
-                                //if (ddl.SelectedIndex == ddl.Items.Count - 1)
-                                //    btnNext.Visible = false;
-
-                                //foreach (Control control in toolbar.Controls)
-                                //{
-                                //    processControls(control, sFullGridId, view.ServerRelativeUrl, web);
-                                //}
-
-                                //toolbar.RenderControl(output);
-                                if (impersonate)
-                                {
-                                    output.Write("<div style=\"height: 10px;background-color:#FFFF88;padding:2px;font-size:10px\"><b>Editing Timesheet For: " + impersonatedUser + "</b></div>");
-                                }
-                                renderGrid(output, web, cn);
-
-                                cn.Close();
-
-
-
-
+                                RenderEditOptions();
+                                RenderFromDatabase(output, web);
                             }
                             catch (Exception ex)
                             {
-                                output.Write("Error: " + ex.Message);
+                                Trace.TraceError("Exception Suppressed {0}", ex);
+                                output.Write("Error: {0}", ex.Message);
                             }
-
-
-
                         });
-                    }
+                }
 
+                SetPartVisibility();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                output.Write("Error (Render WebPart): {0}", ex.Message);
+            }
+        }
 
+        private void RenderFromDatabase(HtmlTextWriter output, SPWeb web)
+        {
+            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+            {
+                sqlConnection.Open();
 
-                    if (SPContext.Current.ViewContext.View != null)
+                var requestPeriod = Page.Request["NewPeriod"];
+                if (!string.IsNullOrWhiteSpace(requestPeriod))
+                {
+                    Page.Response.Cookies.Remove("EPMLiveTSPeriod");
+                    Page.Request.Cookies.Remove("EPMLiveTSPeriod");
+
+                    var myCookie = new HttpCookie("EPMLiveTSPeriod");
+
+                    myCookie["period"] = requestPeriod;
+                    myCookie.Expires = DateTime.Now.AddMinutes(ThirtyMinutes);
+                    Page.Response.Cookies.Add(myCookie);
+                }
+
+                ReadAndRenderPeriod(sqlConnection, web);
+                PopulatePeriods();
+
+                status = "New";
+
+                ReadAndRenderTimeSheetStatus(sqlConnection, web);
+                ReadAndRenderLockedEvents(sqlConnection, web);
+
+                var label = new Label();
+                label.ID = "lblTimesheetStatus";
+                label.Text = string.Format("&nbsp;&nbsp;Timesheet Status: <span id=\"divStatus\" class=\"ms-descriptiontext\">{0}</span>", status);
+
+                if (impersonate)
+                {
+                    output.Write(
+                        "<div style=\"height: 10px;background-color:#FFFF88;padding:2px;font-size:10px\"><b>Editing Timesheet For: {0}</b></div>",
+                        impersonatedUser);
+                }
+                renderGrid(output, web, sqlConnection);
+            }
+        }
+
+        private bool CheckIfHasEnoughPeriods(HtmlTextWriter output, SPWeb web)
+        {
+            if (arrPeriods.Count <= 0)
+            {
+                output.Write("No Periods Defined.<br><br>");
+                if (web.CurrentUser.IsSiteAdmin)
+                {
+                    output.Write("<a href=\"");
+                    output.Write(
+                        web.ServerRelativeUrl == "/"
+                            ? string.Empty
+                            : web.ServerRelativeUrl);
+                    output.Write("/_layouts/epmlive/timesheetadmin.aspx\">Go To Timesheet Admin</a>");
+                    output.WriteLine(string.Empty);
+                }
+
+                output.WriteLine("<script language=\"javascript\">");
+                output.WriteLine("var myDataProcessor = new Object();");
+                output.WriteLine("var mygrid{0} = new Object();", sFullGridId);
+                output.WriteLine("</script>");
+
+                if (SPContext.Current.ViewContext.View != null)
+                {
+                    foreach (WebPart webPart in WebPartManager.WebParts)
                     {
-                        foreach (System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
+                        try
                         {
-                            try
+                            if (webPart.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart"
+                                || webPart.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
                             {
-                                if (wp.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" || wp.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
-                                {
-                                    wp.Visible = false;
-                                }
+                                webPart.Visible = false;
                             }
-                            catch { }
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.TraceError("Exception Suppressed {0}", ex);
+                        }
+                    }
+                }
+                return false;
+            }
+            return true;
+        }
+
+        private void SetPartVisibility()
+        {
+            if (SPContext.Current.ViewContext.View != null)
+            {
+                foreach (WebPart webPart in WebPartManager.WebParts)
+                {
+                    try
+                    {
+                        if (webPart.ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart"
+                            || webPart.ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
+                        {
+                            webPart.Visible = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", ex);
+                    }
+                }
+            }
+        }
+
+        private void RenderEditOptions()
+        {
+            var webPartId = string.Empty;
+            var doEdit = string.Empty;
+
+            try
+            {
+                webPartId = Page.Request["webpartid"];
+                doEdit = Page.Request["edit"];
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            var gridGanttSettings = new GridGanttSettings(list);
+
+            try
+            {
+                allowEditToggle = gridGanttSettings.AllowEdit;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            try
+            {
+                inEditMode = gridGanttSettings.EditDefault;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+
+            if (webPartId == ID)
+            {
+                try
+                {
+                    if (doEdit == "1")
+                    {
+                        inEditMode = true;
+                    }
+                    else if (doEdit == "0")
+                    {
+                        inEditMode = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                    error = string.Format("Error Saving Personalization: {0}", ex.Message);
+                }
+            }
+        }
+
+        private void PopulatePeriods()
+        {
+            var stringBuilder = new StringBuilder(strAllPeriods);
+            foreach (DictionaryEntry de in arrPeriods)
+            {
+                stringBuilder.Append(string.Format(",{0}|{1}", de.Value, de.Key));
+                if (intPeriod == (int)de.Key)
+                {
+                    strCurPeriodName = de.Value.ToString();
+                    if (arrPeriods.IndexOfKey(de.Key) > 0)
+                    {
+                        strPreviousPeriod = arrPeriods.GetKey(arrPeriods.IndexOfKey(de.Key) - 1).ToString();
+                    }
+                    if (arrPeriods.IndexOfKey(de.Key) < arrPeriods.Count - 1)
+                    {
+                        strNextPeriod = arrPeriods.GetKey(arrPeriods.IndexOfKey(de.Key) + 1).ToString();
+                    }
+                }
+            }
+            strAllPeriods = stringBuilder.ToString();
+
+            if (strAllPeriods.Length > 0)
+            {
+                strAllPeriods = strAllPeriods.Substring(1);
+            }
+        }
+
+        private void ReadAndRenderPeriod(SqlConnection sqlConnection, SPWeb web)
+        {
+            var period = string.Empty;
+
+            if (Page.Request.Cookies["EPMLiveTSPeriod"] != null)
+            {
+                period = Page.Request.Cookies["EPMLiveTSPeriod"]["period"];
+            }
+
+            if (string.IsNullOrWhiteSpace(period))
+            {
+                using (var sqlCommand = new SqlCommand(
+                    "SELECT period_id from TSPERIOD where period_start<=@dtchecked and period_end>=@dtchecked and locked = 0 and site_id=@siteid",
+                    sqlConnection))
+                {
+                    sqlCommand.CommandType = CommandType.Text;
+                    sqlCommand.Parameters.AddWithValue("@dtchecked", DateTime.Now);
+                    sqlCommand.Parameters.AddWithValue("@siteid", web.Site.ID);
+                    using (var dataReader = sqlCommand.ExecuteReader())
+                    {
+                        intPeriod = dataReader.Read()
+                            ? dataReader.GetInt32(0)
+                            : int.Parse(arrPeriods.GetKey(0).ToString());
+                    }
+                }
+            }
+            else
+            {
+                intPeriod = int.Parse(period);
+            }
+        }
+
+        private void ReadAndRenderTimeSheetStatus(SqlConnection sqlConnection, SPWeb web)
+        {
+            const int Approved = 1;
+            const int Rejected = 2;
+
+            const int FieldIndex0 = 0;
+            const int FieldIndex1 = 1;
+            const int FieldIndex2 = 2;
+            const int FieldIndex3 = 3;
+
+            using (var sqlCommand = new SqlCommand(
+                "SELECT TS_UID, Submitted, approval_status,approval_notes from TSTIMESHEET where PERIOD_ID=@periodid and username=@username and site_uid=@site_uid",
+                sqlConnection))
+            {
+                sqlCommand.CommandType = CommandType.Text;
+                sqlCommand.Parameters.AddWithValue("@periodid", intPeriod);
+                sqlCommand.Parameters.AddWithValue("@username", username);
+                sqlCommand.Parameters.AddWithValue("@site_uid", web.Site.ID);
+
+                using (var dataReader = sqlCommand.ExecuteReader())
+                {
+                    if (dataReader.Read())
+                    {
+                        tsuid = dataReader.GetGuid(FieldIndex0).ToString();
+                        if (dataReader.GetBoolean(FieldIndex1))
+                        {
+                            lockedts = "true";
+
+                            if (dataReader.GetInt32(FieldIndex2) == Approved)
+                            {
+                                status = "Approved";
+                                lockunsubmit = "true";
+                                SPSecurity.RunWithElevatedPrivileges(
+                                    delegate
+                                    {
+                                        if (CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "EPMLiveTSDisableApprovals")
+                                            .Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            lockunsubmit = "false";
+                                        }
+                                        else if (canImpersonate)
+                                        {
+                                            // CC-77530 This line was already blank, leaving it as it can demonstrate the intent of handling the case
+                                        }
+                                    });
+                                inEditMode = false;
+                            }
+                            else if (dataReader.GetInt32(FieldIndex2) == Rejected)
+                            {
+                                status = "Rejected";
+                                appNote = dataReader.GetString(FieldIndex3);
+                            }
+                            else
+                            {
+                                status = "Submitted";
+                                inEditMode = false;
+                            }
+
+                            editEvents = "false";
+                        }
+                        else
+                        {
+                            if (dataReader.GetInt32(FieldIndex2) == Rejected)
+                            {
+                                status = "Rejected";
+                                appNote = dataReader.GetString(FieldIndex3);
+                            }
+                            else
+                            {
+                                status = "Saved";
+                            }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+        }
+
+        private void ReadAndRenderLockedEvents(SqlConnection sqlConnection, SPWeb web)
+        {
+            using (var sqlCommand = new SqlCommand("SELECT locked from TSPERIOD where period_id=@periodid and site_id=@site_id", sqlConnection))
             {
-                output.Write("Error (Render WebPart): " + ex.Message);
+                sqlCommand.CommandType = CommandType.Text;
+                sqlCommand.Parameters.AddWithValue("@periodid", intPeriod);
+                sqlCommand.Parameters.AddWithValue("@site_id", web.Site.ID);
+                using (var dataReader = sqlCommand.ExecuteReader())
+                {
+                    if (dataReader.Read() && dataReader.GetBoolean(0))
+                    {
+                        status = "Closed";
+                        editEvents = "false";
+                    }
+                }
             }
         }
 
