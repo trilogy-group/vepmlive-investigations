@@ -261,35 +261,27 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         if (!dr.IsDBNull(4))
                             lblLastRun.Text = dr.GetDateTime(4).ToString();
 
-
-
-                        cmd =
-                            new SqlCommand(
-                                "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1",
-                                cn);
-                        cmd.Parameters.AddWithValue("@siteguid", web.Site.ID);
-
-                        dr.Close();
-                        using (dr = cmd.ExecuteReader())
+                        const string selectJobType1Command =
+                            "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1";
+                        using (var selectJobType1SqlCommand = new SqlCommand(selectJobType1Command, cn))
                         {
-                            if (!processing)
+                            selectJobType1SqlCommand.Parameters.AddWithValue("@siteguid", web.Site.ID);
+
+                            dr.Close();
+                            using (dr = selectJobType1SqlCommand.ExecuteReader())
                             {
-                                if (dr.Read())
+                                if (!processing && dr.Read())
                                 {
                                     if (!dr.IsDBNull(3))
                                     {
                                         if (dr.GetInt32(3) == 0)
                                         {
-                                            processing = true;
-                                            //lblLastRun.Text = "Queued";
                                             lblMessages.Text = "Queued";
                                             btnRunNow.Enabled = false;
                                         }
                                         else if (dr.GetInt32(3) == 1)
                                         {
-                                            processing = true;
-                                            //lblLastRun.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
-                                            lblMessages.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
+                                            lblMessages.Text = $"Processing ({dr.GetInt32(2):##0}%)";
                                             btnRunNow.Enabled = false;
                                         }
                                         else if (!dr.IsDBNull(5))
@@ -303,7 +295,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     }
 
                                     if (!dr.IsDBNull(4))
+                                    {
                                         lblMessages.Text = dr.GetDateTime(4).ToString();
+                                    }
                                 }
                             }
                         }
