@@ -13,6 +13,7 @@ namespace PortfolioEngineCore
         {
             get { return m_sLastError; }
         }
+
         public static string LastStackTrace
         {
             get { return m_sLastStackTrace; }
