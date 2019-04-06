@@ -26,7 +26,7 @@ namespace OptmizerDataCache
 
         public bool InitializeGridLayout(List<clsOptFieldDelf> fielddef, int curr_pos, int curr_digits, string curr_sym)
         {
-            var inOutAutojsonMenu = "{Items:["
+            const string inOutAutojsonMenu = "{Items:["
                 + "{Name:'1',Text:'In',Value:'In'},{Name:'2',Text:'Out',Value:'Out'},{Name:'3',Text:'Auto',Value:'Auto'}"
                 + "]}";
 
@@ -74,9 +74,9 @@ namespace OptmizerDataCache
             try
             {
                 var name = column.fname.Replace("/n", "");
-                name = name.Replace(" ", "");
-                name = name.Replace("\r", "");
-                name = name.Replace("\n", "");
+                name = name.Replace(" ", string.Empty);
+                name = name.Replace("\r", string.Empty);
+                name = name.Replace("\n", string.Empty);
                 var valueString = column.fname.Replace("/n", "\n");
 
                 name = $"zX{name}";
@@ -281,7 +281,7 @@ namespace OptmizerDataCache
             m_xHeader1.CreateIntAttr("Spanned", 1);
             m_xHeader1.CreateIntAttr("SortIcons", 2);
             m_xHeader1.CreateStringAttr("HoverCell", "Color");
-            m_xHeader1.CreateStringAttr("HoverRow", "");
+            m_xHeader1.CreateStringAttr("HoverRow", string.Empty);
         }
 
         private void AddDefinitionNode()
@@ -291,7 +291,7 @@ namespace OptmizerDataCache
             m_xDefNode.CreateStringAttr("Calculated", "0");
             m_xDefNode.CreateStringAttr("HoverCell", "Color");
             m_xDefNode.CreateStringAttr("HoverRow", "Color");
-            m_xDefNode.CreateStringAttr("FocusCell", "");
+            m_xDefNode.CreateStringAttr("FocusCell", string.Empty);
             m_xDefNode.CreateStringAttr("HoverCell", "Color");
             m_xDefNode.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefNode.CreateIntAttr("NoColorState", 1);
@@ -306,7 +306,7 @@ namespace OptmizerDataCache
             m_xDefTree.CreateStringAttr("Calculated", "1");
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
+            m_xDefTree.CreateStringAttr("FocusCell", string.Empty);
             m_xDefTree.CreateStringAttr("HoverCell", "Color");
             m_xDefTree.CreateIntAttr("NoColorState", 1);
             m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
