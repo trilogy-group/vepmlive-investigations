@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Web;
 using System.Xml;
 using System.Linq;
@@ -25,122 +26,269 @@ namespace OptmizerDataCache
 
         public bool InitializeGridLayout(List<clsOptFieldDelf> fielddef, int curr_pos, int curr_digits, string curr_sym)
         {
-            string InOutAutojsonMenu = "{Items:[" + "{Name:'1',Text:'In',Value:'In'},{Name:'2',Text:'Out',Value:'Out'},{Name:'3',Text:'Auto',Value:'Auto'}" + "]}";
+            var inOutAutojsonMenu = "{Items:["
+                + "{Name:'1',Text:'In',Value:'In'},{Name:'2',Text:'Out',Value:'Out'},{Name:'3',Text:'Auto',Value:'Auto'}"
+                + "]}";
 
-// set up the currency formatting
-            string currfmt;
-    
-            if (curr_digits == 0)
-                currfmt = ",0";
-            else if (curr_digits == 1)
-                currfmt = ",0.0";
-           else if (curr_digits == 0 || curr_digits == 2)
-                currfmt = ",0.00";
-            else
-                currfmt = ",0.000";
+            // set up the currency formatting
+            var currencyFormat = GetCurrencyFormat(curr_pos, curr_digits, curr_sym);
 
-            if  (curr_pos == 0)
-                currfmt = curr_sym + currfmt;
-            else if (curr_pos == 2)
-                currfmt = curr_sym + " " + currfmt;
-            else if (curr_pos == 1)
-                currfmt = currfmt + curr_sym;
-            else
-                currfmt = currfmt + " " + curr_sym;
- 
             xGrid = new CStruct();
             xGrid.Initialize("Grid");
 
-            CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-            xToolbar.CreateIntAttr("Visible", 0);
+            AddTollbar();
+            AddPanel();
+            AddConfigurationAttributes();
 
-            CStruct xPanel = xGrid.CreateSubStruct("Panel");
-            xPanel.CreateIntAttr("Visible", 0);
-            xPanel.CreateIntAttr("Select", 0);
-            xPanel.CreateIntAttr("Delete", 0);
-            xPanel.CreateIntAttr("CanHide", 0);
-            xPanel.CreateIntAttr("CanSelect", 0);
+            var leftColumns = xGrid.CreateSubStruct("LeftCols");
+            var columns = xGrid.CreateSubStruct("Cols");
 
-            CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-            xCfg.CreateStringAttr("MainCol", "PISelected");
-
-            xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-            xCfg.CreateIntAttr("SuppressCfg", 3);
-            xCfg.CreateIntAttr("SuppressMessage", 3);
-
-
-            xCfg.CreateIntAttr("Dragging", 0);
-            xCfg.CreateIntAttr("Sorting", 1);
-            xCfg.CreateIntAttr("ColsMoving", 1);
-            xCfg.CreateIntAttr("ColsPosLap", 1);
-            xCfg.CreateIntAttr("ColsLap", 1);
-            xCfg.CreateIntAttr("VisibleLap", 1);
-            xCfg.CreateIntAttr("SectionWidthLap", 1);
- //           xCfg.CreateIntAttr("GroupLap", 1);
-            xCfg.CreateIntAttr("WideHScroll", 0);
-            xCfg.CreateIntAttr("LeftWidth", 150);
-            xCfg.CreateIntAttr("Width", 400);
-            xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth", 50);
-            xCfg.CreateIntAttr("MinRightWidth", 400);
-            xCfg.CreateIntAttr("LeftCanResize", 0);
-            xCfg.CreateIntAttr("RightCanResize", 1);
-            xCfg.CreateIntAttr("FocusWholeRow", 1);
-
-
-
-            xCfg.CreateIntAttr("MaxHeight", 0);
-            xCfg.CreateIntAttr("ShowDeleted", 0);
-            xCfg.CreateBooleanAttr("DateStrings", true);
-            //     xCfg.CreateIntAttr("MinRowHeight",26);
-            xCfg.CreateIntAttr("MaxWidth", 1);
-            xCfg.CreateIntAttr("MaxSort", 2);
-            //     xCfg.CreateStringAttr("DefaultSort", "PortfolioItem");
-            xCfg.CreateIntAttr("AppendId", 0);
-            xCfg.CreateIntAttr("FullId", 0);
-            xCfg.CreateStringAttr("IdChars", "0123456789");
-            xCfg.CreateIntAttr("NumberId", 1);
-            xCfg.CreateIntAttr("LastId", 1);
-            xCfg.CreateIntAttr("CaseSensitiveId", 0);
-            xCfg.CreateStringAttr("Style", "GM");
-            xCfg.CreateStringAttr("CSS", "ResPlanAnalyzer");
-            xCfg.CreateIntAttr("FastColumns", 1);
-            xCfg.CreateIntAttr("ExpandAllLevels", 3);
-   //         xCfg.CreateIntAttr("GroupSortMain", 1);
-   //         xCfg.CreateIntAttr("GroupRestoreSort", 1);
-
-
-            xCfg.CreateIntAttr("NoTreeLines", 1);
-            xCfg.CreateIntAttr("ShowVScroll", 1);
-
-            CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-            CStruct xCols = xGrid.CreateSubStruct("Cols");
-
-            m_xMiddleCols = xCols;
+            m_xMiddleCols = columns;
 
             m_xDef = xGrid.CreateSubStruct("Def");
+            AddDefinitionTree();
+            AddDefinitionNode();
 
-            m_xDefTree = m_xDef.CreateSubStruct("D");
-            m_xDefTree.CreateStringAttr("Name", "R");
-            m_xDefTree.CreateStringAttr("Calculated", "1");
-            m_xDefTree.CreateStringAttr("Calculated", "1");
+            xGrid.CreateSubStruct("Head");
+            AddHeader();
 
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateStringAttr("HoverRow", "Color");
-            m_xDefTree.CreateStringAttr("FocusCell", "");
-            m_xDefTree.CreateStringAttr("HoverCell", "Color");
-            m_xDefTree.CreateIntAttr("NoColorState", 1);
-            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
+            AddRowId(leftColumns);
+            AddPId(leftColumns);
 
+            AddPiSelected(columns);
+            AddPiName(columns);
+            AddCellMain(columns, inOutAutojsonMenu);
+            AddPiStart(columns);
+            AddPiFinish(columns);
 
+            foreach (var column in fielddef)
+            {
+                SetColumnFormatting(column, columns, currencyFormat);
+            }
 
-            m_xDefTree.CreateIntAttr("ReCalc", 256);
+            return true;
+        }
 
+        private void SetColumnFormatting(clsOptFieldDelf column, CStruct columns, string currencyFormat)
+        {
+            try
+            {
+                var name = column.fname.Replace("/n", "");
+                name = name.Replace(" ", "");
+                name = name.Replace("\r", "");
+                name = name.Replace("\n", "");
+                var valueString = column.fname.Replace("/n", "\n");
 
+                name = $"zX{name}";
+
+                var cStruct = columns.CreateSubStruct("C");
+
+                cStruct.CreateStringAttr("Name", name);
+                cStruct.CreateStringAttr("Class", "GMCellMain");
+                cStruct.CreateIntAttr("CanDrag", 0);
+
+                if (column.fname != "Budget")
+                {
+                    cStruct.CreateIntAttr("Visible", 0);
+                }
+
+                cStruct.CreateIntAttr("ShowHint", 0);
+                cStruct.CreateIntAttr("CaseSensitive", 0);
+                cStruct.CreateStringAttr("OnDragCell", "Focus,DragCell");
+                m_xDefTree.CreateIntAttr($"{name}CanDrag", 0);
+                m_xDefTree.CreateStringAttr($"{name}HtmlPrefix", "<B>");
+                m_xDefTree.CreateStringAttr($"{name}HtmlPostfix", "</B>");
+                m_xDefNode.CreateIntAttr($"{name}CanDrag", 0);
+                m_xDefNode.CreateStringAttr($"{name}HtmlPrefix", string.Empty);
+                m_xDefNode.CreateStringAttr($"{name}HtmlPostfix", string.Empty);
+
+                var func = "(Row.id == 'Filter' ? '' : sum())";
+
+                if (column.ftype == 2)
+                {
+                    cStruct.CreateStringAttr("Type", "Text");
+                }
+                else if (column.ftype == 3)
+                {
+                    cStruct.CreateStringAttr("Type", "Float");
+                    cStruct.CreateStringAttr("Format", ",0.##");
+                    m_xDefTree.CreateStringAttr($"{name}Formula", func);
+                    m_xDefTree.CreateStringAttr($"{name}Format", ",0.##");
+                    m_xDefNode.CreateStringAttr($"{name}Formula", string.Empty);
+                }
+                else if (column.ftype == 8)
+                {
+                    cStruct.CreateStringAttr("Type", "Float");
+                    cStruct.CreateStringAttr("Format", currencyFormat);
+                    m_xDefTree.CreateStringAttr($"{name}Formula", func);
+                    m_xDefTree.CreateStringAttr($"{name}Format", currencyFormat);
+                    m_xDefNode.CreateStringAttr($"{name}Formula", string.Empty);
+                }
+                else
+                {
+                    cStruct.CreateStringAttr("Type", "Text");
+                }
+
+                cStruct.CreateIntAttr("CanEdit", 0);
+                cStruct.CreateIntAttr("CanMove", 1);
+
+                m_xHeader1.CreateStringAttr(name, valueString);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+            }
+        }
+
+        private void AddPiFinish(CStruct columns)
+        {
+            CStruct cStruct;
+            string name;
+            cStruct = columns.CreateSubStruct("C");
+
+            name = "PIFinish";
+            cStruct.CreateStringAttr("Name", "PIFinish");
+            cStruct.CreateStringAttr("Class", "GMCellMain");
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("CaseSensitive", 0);
+            cStruct.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPrefix", "<B>");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPostfix", "</B>");
+            m_xDefNode.CreateStringAttr($"{name}HtmlPrefix", string.Empty);
+            m_xDefNode.CreateStringAttr($"{name}HtmlPostfix", string.Empty);
+            cStruct.CreateStringAttr("Type", "Text");
+            m_xHeader1.CreateStringAttr(name, "Finish");
+        }
+
+        private void AddPiStart(CStruct columns)
+        {
+            CStruct cStruct;
+            string name;
+            cStruct = columns.CreateSubStruct("C");
+            name = "PIStart";
+            cStruct.CreateStringAttr("Name", "PIStart");
+            cStruct.CreateStringAttr("Class", "GMCellMain");
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("CaseSensitive", 0);
+            cStruct.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPrefix", "<B>");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPostfix", "</B>");
+            m_xDefNode.CreateStringAttr($"{name}HtmlPrefix", string.Empty);
+            m_xDefNode.CreateStringAttr($"{name}HtmlPostfix", string.Empty);
+            cStruct.CreateStringAttr("Type", "Text");
+            m_xHeader1.CreateStringAttr(name, "Start");
+        }
+
+        private void AddCellMain(CStruct columns, string inOutAutojsonMenu)
+        {
+            CStruct cStruct;
+            string name;
+            cStruct = columns.CreateSubStruct("C");
+            name = "PIStatus";
+            cStruct.CreateStringAttr("Name", name);
+            cStruct.CreateStringAttr("Class", "GMCellMain");
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("CaseSensitive", 0);
+            cStruct.CreateStringAttr("Defaults", inOutAutojsonMenu);
+            cStruct.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPrefix", "<B>");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPostfix", "</B>");
+            m_xDefNode.CreateStringAttr($"{name}HtmlPrefix", string.Empty);
+            m_xDefNode.CreateStringAttr($"{name}HtmlPostfix", string.Empty);
+            cStruct.CreateStringAttr("Type", "Text");
+            m_xHeader1.CreateStringAttr(name, "Selection");
+            cStruct.CreateIntAttr("CanHide", 0);
+        }
+
+        private void AddPiName(CStruct columns)
+        {
+            string name;
+            CStruct cStruct;
+            name = "PIName";
+            cStruct = columns.CreateSubStruct("C");
+            cStruct.CreateStringAttr("Name", name);
+            cStruct.CreateStringAttr("Class", "GMCellMain");
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("CaseSensitive", 0);
+            cStruct.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPrefix", "<B>");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPostfix", "</B>");
+            m_xDefNode.CreateStringAttr($"{name}HtmlPrefix", string.Empty);
+            m_xDefNode.CreateStringAttr($"{name}HtmlPostfix", string.Empty);
+            cStruct.CreateStringAttr("Type", "Text");
+            m_xHeader1.CreateStringAttr(name, "Item Name");
+            cStruct.CreateIntAttr("CanHide", 0);
+        }
+
+        private void AddPiSelected(CStruct columns)
+        {
+            CStruct cStruct;
+            string name;
+            cStruct = columns.CreateSubStruct("C");
+            name = "PISelected";
+            cStruct.CreateStringAttr("Name", name);
+            cStruct.CreateStringAttr("Class", "GMCellMain");
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("Width", 120);
+            cStruct.CreateIntAttr("CaseSensitive", 0);
+            cStruct.CreateStringAttr("OnDragCell", "Focus,DragCell");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPrefix", "<B>");
+            m_xDefTree.CreateStringAttr($"{name}HtmlPostfix", "</B>");
+            m_xDefNode.CreateStringAttr($"{name}HtmlPrefix", string.Empty);
+            m_xDefNode.CreateStringAttr($"{name}HtmlPostfix", string.Empty);
+            cStruct.CreateStringAttr("Type", "Text");
+            m_xHeader1.CreateStringAttr(name, "Selected");
+            cStruct.CreateIntAttr("CanHide", 0);
+        }
+
+        private void AddPId(CStruct leftColumns)
+        {
+            CStruct cStruct;
+            cStruct = leftColumns.CreateSubStruct("C");
+            cStruct.CreateStringAttr("Name", "pid");
+            cStruct.CreateStringAttr("Type", "Text");
+            cStruct.CreateIntAttr("CanExport", 0);
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("CanSort", 0);
+            cStruct.CreateIntAttr("CanFilter", 0);
+            cStruct.CreateIntAttr("CanResize", 0);
+            cStruct.CreateIntAttr("Visible", 0);
+            cStruct.CreateIntAttr("CanHide", 0);
+            cStruct.CreateIntAttr("CanSelect", 0);
+            m_xDefTree.CreateStringAttr("pid", string.Empty);
+        }
+
+        private void AddRowId(CStruct leftColumns)
+        {
+            CStruct cStruct;
+            cStruct = leftColumns.CreateSubStruct("C");
+            cStruct.CreateStringAttr("Name", "rowid");
+            cStruct.CreateStringAttr("Type", "Text");
+            cStruct.CreateIntAttr("CanExport", 0);
+            cStruct.CreateIntAttr("ShowHint", 0);
+            cStruct.CreateIntAttr("CanSort", 0);
+            cStruct.CreateIntAttr("CanFilter", 0);
+            cStruct.CreateIntAttr("CanResize", 0);
+            cStruct.CreateIntAttr("Visible", 0);
+            cStruct.CreateIntAttr("CanHide", 0);
+            cStruct.CreateIntAttr("CanSelect", 0);
+            m_xDefTree.CreateStringAttr("rowid", string.Empty);
+        }
+
+        private void AddHeader()
+        {
+            m_xHeader1 = xGrid.CreateSubStruct("Header");
+            m_xHeader1.CreateIntAttr("Spanned", 1);
+            m_xHeader1.CreateIntAttr("SortIcons", 2);
+            m_xHeader1.CreateStringAttr("HoverCell", "Color");
+            m_xHeader1.CreateStringAttr("HoverRow", "");
+        }
+
+        private void AddDefinitionNode()
+        {
             m_xDefNode = m_xDef.CreateSubStruct("D");
             m_xDefNode.CreateStringAttr("Name", "Leaf");
             m_xDefNode.CreateStringAttr("Calculated", "0");
-
             m_xDefNode.CreateStringAttr("HoverCell", "Color");
             m_xDefNode.CreateStringAttr("HoverRow", "Color");
             m_xDefNode.CreateStringAttr("FocusCell", "");
@@ -148,232 +296,122 @@ namespace OptmizerDataCache
             m_xDefNode.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefNode.CreateIntAttr("NoColorState", 1);
             m_xDefNode.CreateIntAttr("ReCalc", 256);
+        }
 
-            CStruct xHead = xGrid.CreateSubStruct("Head");
+        private void AddDefinitionTree()
+        {
+            m_xDefTree = m_xDef.CreateSubStruct("D");
+            m_xDefTree.CreateStringAttr("Name", "R");
+            m_xDefTree.CreateStringAttr("Calculated", "1");
+            m_xDefTree.CreateStringAttr("Calculated", "1");
+            m_xDefTree.CreateStringAttr("HoverCell", "Color");
+            m_xDefTree.CreateStringAttr("HoverRow", "Color");
+            m_xDefTree.CreateStringAttr("FocusCell", "");
+            m_xDefTree.CreateStringAttr("HoverCell", "Color");
+            m_xDefTree.CreateIntAttr("NoColorState", 1);
+            m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
+            m_xDefTree.CreateIntAttr("ReCalc", 256);
+        }
 
+        private void AddTollbar()
+        {
+            var toolbar = xGrid.CreateSubStruct("Toolbar");
+            toolbar.CreateIntAttr("Visible", 0);
+        }
 
-            m_xHeader1 = xGrid.CreateSubStruct("Header");
-   //         m_xHeader1.CreateIntAttr("PISelected", 1);
-            m_xHeader1.CreateIntAttr("Spanned", 1);
-            m_xHeader1.CreateIntAttr("SortIcons", 2);
-            //        m_xHeader1.CreateStringAttr("Def", "Tree");
+        private void AddPanel()
+        {
+            var panel = xGrid.CreateSubStruct("Panel");
+            panel.CreateIntAttr("Visible", 0);
+            panel.CreateIntAttr("Select", 0);
+            panel.CreateIntAttr("Delete", 0);
+            panel.CreateIntAttr("CanHide", 0);
+            panel.CreateIntAttr("CanSelect", 0);
+        }
 
-            m_xHeader1.CreateStringAttr("HoverCell", "Color");
-            m_xHeader1.CreateStringAttr("HoverRow", "");
+        private void AddConfigurationAttributes()
+        {
+            var config = xGrid.CreateSubStruct("Cfg");
+            config.CreateStringAttr("MainCol", "PISelected");
+            config.CreateStringAttr("Code", "GTACCNPSQEBSLC");
+            config.CreateIntAttr("SuppressCfg", 3);
+            config.CreateIntAttr("SuppressMessage", 3);
+            config.CreateIntAttr("Dragging", 0);
+            config.CreateIntAttr("Sorting", 1);
+            config.CreateIntAttr("ColsMoving", 1);
+            config.CreateIntAttr("ColsPosLap", 1);
+            config.CreateIntAttr("ColsLap", 1);
+            config.CreateIntAttr("VisibleLap", 1);
+            config.CreateIntAttr("SectionWidthLap", 1);
+            config.CreateIntAttr("WideHScroll", 0);
+            config.CreateIntAttr("LeftWidth", 150);
+            config.CreateIntAttr("Width", 400);
+            config.CreateIntAttr("RightWidth", 800);
+            config.CreateIntAttr("MinMidWidth", 50);
+            config.CreateIntAttr("MinRightWidth", 400);
+            config.CreateIntAttr("LeftCanResize", 0);
+            config.CreateIntAttr("RightCanResize", 1);
+            config.CreateIntAttr("FocusWholeRow", 1);
+            config.CreateIntAttr("MaxHeight", 0);
+            config.CreateIntAttr("ShowDeleted", 0);
+            config.CreateBooleanAttr("DateStrings", true);
+            config.CreateIntAttr("MaxWidth", 1);
+            config.CreateIntAttr("MaxSort", 2);
+            config.CreateIntAttr("AppendId", 0);
+            config.CreateIntAttr("FullId", 0);
+            config.CreateStringAttr("IdChars", "0123456789");
+            config.CreateIntAttr("NumberId", 1);
+            config.CreateIntAttr("LastId", 1);
+            config.CreateIntAttr("CaseSensitiveId", 0);
+            config.CreateStringAttr("Style", "GM");
+            config.CreateStringAttr("CSS", "ResPlanAnalyzer");
+            config.CreateIntAttr("FastColumns", 1);
+            config.CreateIntAttr("ExpandAllLevels", 3);
+            config.CreateIntAttr("NoTreeLines", 1);
+            config.CreateIntAttr("ShowVScroll", 1);
+        }
 
+        private static string GetCurrencyFormat(int currencyPosition, int currencyDigits, string currencySymbol)
+        {
+            string currencyFormat;
 
-
-
-            CStruct xC;
-
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "rowid");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateIntAttr("CanExport", 0);
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanFilter", 0);
-            xC.CreateIntAttr("CanResize", 0);
-            xC.CreateIntAttr("Visible", 0);
-
-            xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSelect", 0);
-
-            m_xDefTree.CreateStringAttr("rowid", "");
-
-            xC = xLeftCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", "pid");
-            xC.CreateStringAttr("Type", "Text");
-            xC.CreateIntAttr("CanExport", 0);
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanFilter", 0);
-            xC.CreateIntAttr("CanResize", 0);
-            xC.CreateIntAttr("Visible", 0);
-
-            xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSelect", 0);
-
-            m_xDefTree.CreateStringAttr("pid", "");
-
-   //         CStruct xSolid = xGrid.CreateSubStruct("Solid");
-   //         CStruct xGroup = xSolid.CreateSubStruct("Group");
-
-
-            string sn; 
-
-            xC = xCols.CreateSubStruct("C");
-
-            sn = "PISelected";
-            xC.CreateStringAttr("Name", sn);
-            xC.CreateStringAttr("Class", "GMCellMain");
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("Width", 120);
-            xC.CreateIntAttr("CaseSensitive", 0);
-            xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
-            xC.CreateStringAttr("Type", "Text");
-            m_xHeader1.CreateStringAttr(sn, "Selected");
-            xC.CreateIntAttr("CanHide", 0);
-
-            sn = "PIName";
-            xC = xCols.CreateSubStruct("C");
-            xC.CreateStringAttr("Name", sn);
-            xC.CreateStringAttr("Class", "GMCellMain");
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CaseSensitive", 0);
-            xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
-            xC.CreateStringAttr("Type", "Text");
-            m_xHeader1.CreateStringAttr(sn, "Item Name");
-            xC.CreateIntAttr("CanHide", 0);
-
-            xC = xCols.CreateSubStruct("C");
-            sn = "PIStatus";
-            xC.CreateStringAttr("Name", sn);
-            xC.CreateStringAttr("Class", "GMCellMain");
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CaseSensitive", 0);
-
-            xC.CreateStringAttr("Defaults", InOutAutojsonMenu);
-
-
-            xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
-            xC.CreateStringAttr("Type", "Text");
-            m_xHeader1.CreateStringAttr(sn, "Selection");
-            xC.CreateIntAttr("CanHide", 0);
-           
-
-            xC = xCols.CreateSubStruct("C");
-
-            sn = "PIStart";
-            xC.CreateStringAttr("Name", "PIStart");
-            xC.CreateStringAttr("Class", "GMCellMain");
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CaseSensitive", 0);
-            xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
-            xC.CreateStringAttr("Type", "Text");
-            m_xHeader1.CreateStringAttr(sn, "Start");
-
-            xC = xCols.CreateSubStruct("C");
-
-            sn = "PIFinish";
-            xC.CreateStringAttr("Name", "PIFinish");
-            xC.CreateStringAttr("Class", "GMCellMain");
-            xC.CreateIntAttr("ShowHint", 0);
-            xC.CreateIntAttr("CaseSensitive", 0);
-            xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-            m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
-            m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
-            xC.CreateStringAttr("Type", "Text");
-            m_xHeader1.CreateStringAttr(sn, "Finish");
-
-
-
-
-
-            foreach (clsOptFieldDelf col in fielddef)
+            if (currencyDigits == 0)
             {
-                try
-                {
-
-
-                    sn = col.fname.Replace("/n", "");
-                    sn = sn.Replace(" ", "");
-                    sn = sn.Replace("\r", "");
-                    sn = sn.Replace("\n", "");
-                    string snv = col.fname.Replace("/n", "\n");
-
-                    sn = "zX" + sn;
-
-                    xC = xCols.CreateSubStruct("C");
-
-                    xC.CreateStringAttr("Name", sn);
-                    xC.CreateStringAttr("Class", "GMCellMain");
-                    xC.CreateIntAttr("CanDrag", 0);
-
-                    if (col.fname != "Budget")
-                        xC.CreateIntAttr("Visible", 0);
-
-                    xC.CreateIntAttr("ShowHint", 0);
-                    xC.CreateIntAttr("CaseSensitive", 0);
-                    xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
-                    m_xDefTree.CreateIntAttr(sn + "CanDrag", 0);
-
-
-                    m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
-                    m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
-
-                    m_xDefNode.CreateIntAttr(sn + "CanDrag", 0);
-
-                    m_xDefNode.CreateStringAttr(sn + "HtmlPrefix", "");
-                    m_xDefNode.CreateStringAttr(sn + "HtmlPostfix", "");
-
-                    string sFunc = "(Row.id == 'Filter' ? '' : sum())";
-
-
-
-
-                    if (col.ftype == 2)
-                    {
-                        xC.CreateStringAttr("Type", "Text");
-                        //                       xC.CreateStringAttr("Type", "Date");
-                        //                       xC.CreateStringAttr("Format", "MM/dd/yyyy");
-                    }
-                    else if (col.ftype == 3)
-                    {
-                        xC.CreateStringAttr("Type", "Float");
-                        xC.CreateStringAttr("Format", ",0.##");
-                        m_xDefTree.CreateStringAttr(sn + "Formula", sFunc);
-                        m_xDefTree.CreateStringAttr(sn + "Format", ",0.##");
-                        m_xDefNode.CreateStringAttr(sn + "Formula", "");
-                    }
-                    else if (col.ftype == 8)
-                    {
-                        xC.CreateStringAttr("Type", "Float");
-                        xC.CreateStringAttr("Format", currfmt);
-                        m_xDefTree.CreateStringAttr(sn + "Formula", sFunc);
-                        m_xDefTree.CreateStringAttr(sn + "Format", currfmt);
-                        m_xDefNode.CreateStringAttr(sn + "Formula", "");
-                    }
-                    else
-                        xC.CreateStringAttr("Type", "Text");
-
-                    xC.CreateIntAttr("CanEdit", 0);
-                    xC.CreateIntAttr("CanMove", 1);
-
-                    m_xHeader1.CreateStringAttr(sn, snv);
-       //             m_xHeader2.CreateStringAttr(sn, " ");
-
-
-                 }
-                catch (Exception ex)
-                {
-
-                }
-
+                currencyFormat = ",0";
+            }
+            else if (currencyDigits == 1)
+            {
+                currencyFormat = ",0.0";
+            }
+            else if (currencyDigits == 0 || currencyDigits == 2)
+            {
+                currencyFormat = ",0.00";
+            }
+            else
+            {
+                currencyFormat = ",0.000";
             }
 
-
-            return true;
+            if (currencyPosition == 0)
+            {
+                currencyFormat = $"{currencySymbol}{currencyFormat}";
+            }
+            else if (currencyPosition == 2)
+            {
+                currencyFormat = $"{currencySymbol} {currencyFormat}";
+            }
+            else if (currencyPosition == 1)
+            {
+                currencyFormat = $"{currencyFormat}{currencySymbol}";
+            }
+            else
+            {
+                currencyFormat = $"{currencyFormat} {currencySymbol}";
+            }
+            return currencyFormat;
         }
-         public void FinalizeGridLayout()
+
+        public void FinalizeGridLayout()
         {
         }
         public string GetString()
