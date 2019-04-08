@@ -1071,7 +1071,7 @@ function SetTaskAssignments(Row) {
     var grid = Grids.WorkPlannerGrid;
 
     // To handle summary tasks EPMLCID-18836
-    if (Row.Summary && Row.AssignedTo != null) {
+    if (Row.Summary && Row.AssignedTo !== null) {
         alert("Resources should be assigned to sub tasks only, as the Summary Task is a sum of all sub tasks.");
         grid.SetValue(Row, "AssignedTo", "", 1);
         return;
@@ -1400,22 +1400,21 @@ function DeleteTasks() {
                 deleteWarningMessage = defaultDeleteMessage;
             }
             if (confirm(deleteWarningMessage)) {
-                {
-                    for (var i = 0; i < delRows.length; i++) {
+                for (var i = 0; i < delRows.length; i++) {
+                    try {
+                        var row = grid.GetRowById(delRows[i]);
                         try {
-                            var row = grid.GetRowById(delRows[i]);
-                            try {
-                                Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
-                            } catch (e) { }
-                            grid.DeleteRow(row, 2);
+                            Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
                         } catch (e) { }
-                    }
-                    grid.ActionCorrectAllDependencies();
+                        grid.DeleteRow(row, 2);
+                    } catch (e) { }
                 }
+                grid.ActionCorrectAllDependencies();
             }
         }
     }
 }
+
 
 function RemoveDescen(parentid, row) {
     var grid = Grids.WorkPlannerGrid;
