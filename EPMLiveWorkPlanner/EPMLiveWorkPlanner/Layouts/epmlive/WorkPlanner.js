@@ -1071,7 +1071,7 @@ function SetTaskAssignments(Row) {
     var grid = Grids.WorkPlannerGrid;
 
     // To handle summary tasks EPMLCID-18836
-    if (Row.Summary && Row.AssignedTo !== null) {
+    if (Row.Summary && Row.AssignedTo != null) {
         alert("Resources should be assigned to sub tasks only, as the Summary Task is a sum of all sub tasks.");
         grid.SetValue(Row, "AssignedTo", "", 1);
         return;
@@ -2807,7 +2807,7 @@ function CheckUpdatesClose(loader) {
 }
 
 function CheckProjectTimeSheetHours(data) {
-    if (data.xmlDoc.responseText !== null) {
+    if (data.xmlDoc.responseText != null) {
         var hoursresult = data.xmlDoc.responseText.trim();
         if (hoursresult !== '') {
             var timesheetbox = $('<div class="deletedtaskshours"><span tabindex="0" role="alert" class="ms-status-status planner-pub-status"><span class="ms-accessible">Information Status</span><span class="ms-bold ms-status-title">Note:</span><span class="ms-status-body">' + data.xmlDoc.responseText + '</span><br></span></div>');
