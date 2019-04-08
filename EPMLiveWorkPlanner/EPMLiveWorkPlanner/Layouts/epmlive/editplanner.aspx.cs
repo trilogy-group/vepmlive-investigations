@@ -233,24 +233,19 @@ namespace EPMLiveWorkPlanner
                         ddlResourceLink.SelectedValue = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "PJreslink");
 
                         txtIcon.Text = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "Icon");
-                        try
-                        {
-                            chkUseRes.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "PJuseres"));
-                        }
-                        catch { }
 
-                        try
-                        {
-                            chkLockPublisher.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "PJLock"));
-                        }
-                        catch { }
-
-                        try
-                        {
-                            chkStartSoon.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "StartSoon"));
-                        }
-                        catch { }
-
+                        var boolPJuseres = false;
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "PJuseres"), out boolPJuseres);
+                        chkUseRes.Checked = boolPJuseres;
+                        var boolPJLock = false;
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "PJLock"), out boolPJLock);
+                        chkLockPublisher.Checked = boolPJLock;
+                        var boolStartSoon = false;
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "StartSoon"), out boolStartSoon);
+                        chkStartSoon.Checked = boolStartSoon;
+                        var boolDeletedHours = false;
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "DeletedHours"), out boolDeletedHours);
+                        chkShowDeletedHours.Checked = boolDeletedHours;
                         #region KanBan Board Settings
 
                         GetStatusColumns(web);
@@ -404,6 +399,7 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "DisablePC", chkDisableParentChild.Checked.ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "EnableLink", "False");
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "StartSoon", chkStartSoon.Checked.ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "DeletedHours", chkShowDeletedHours.Checked.ToString());
 
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "EnableKanBan", chkKanBanPlanner.Checked.ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "KanBanStatusColumn", ddlKanBanStatusColumn.SelectedValue);
@@ -903,7 +899,7 @@ namespace EPMLiveWorkPlanner
             }
             else
             {
-               
+
                 foreach (SPList list in SPContext.Current.Web.Lists)
                 {
                     ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -648,14 +649,28 @@ namespace WorkEnginePPM.DataServiceModules
 
         private bool UpdateProject(int projectId)
         {
-            var projectList = _spWeb.Lists["Project Center"];
             try
             {
-                var item = projectList.GetItemById(projectId);
-                item.Update();
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    var listguid = new Guid(this._listId);
+                    var projectList = _spWeb.Lists[listguid];
+                    if (_dvProjects.Count > 0)
+                    {
+                        string project_ext_uid = Convert.ToString(_dvProjects[0]["project_ext_uid"]);
+                        int rptProjectId = 0;
+                        int.TryParse(project_ext_uid.Replace($"{_spWeb.ID}.{this._listId}.", string.Empty), out rptProjectId);
+                        if (rptProjectId != 0)
+                        {
+                            var item = projectList.GetItemById(rptProjectId);
+                            item.Update();
+                        }
+                    }
+                });
             }
-            catch
+            catch (Exception ex)
             {
+                Trace.TraceError("Exception occurred: {0}", ex);
                 return false;
             }
             return true;
