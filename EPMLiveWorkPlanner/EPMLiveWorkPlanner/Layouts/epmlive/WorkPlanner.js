@@ -1376,7 +1376,7 @@ function DeleteTasks() {
             for (var i = 0; i < selRows.length; i++) {
                 var sDs = grid.GetValue(selRows[i], "Predecessors").toString().split(';');
 
-                if (sDs == "")
+                if (sDs === "")
                     var sDs = grid.GetValue(selRows[i], "PredecessorsOrig").toString().split(';');
 
                 for (var sD in sDs) {
