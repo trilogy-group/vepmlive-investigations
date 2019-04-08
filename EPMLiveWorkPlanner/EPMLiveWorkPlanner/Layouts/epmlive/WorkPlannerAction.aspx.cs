@@ -659,16 +659,16 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             output = string.Empty;
             try
             {
-                string key = "EPMLivePlanner" + Request["PlannerID"];
+                var key = "EPMLivePlanner" + Request["PlannerID"];
                 var deletedHoursEnabled = false;
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, key + "DeletedHours"), out deletedHoursEnabled);
                 if (deletedHoursEnabled)
                 {
-                    int projectID = Convert.ToInt32(Request["ID"]);
-                    string listid = Request["listid"];
-                    string taskCenterListName = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenter", false);
-                    string taskCenterFields = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenterFields", false);
-                    string taskCenterProjectField = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenterProjectField", false);
+                    var projectID = Convert.ToInt32(Request["ID"]);
+                    var listid = Request["listid"];
+                    var taskCenterListName = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenter", false);
+                    var taskCenterFields = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenterFields", false);
+                    var taskCenterProjectField = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenterProjectField", false);
                     if (string.IsNullOrEmpty(taskCenterProjectField))
                     {
                         taskCenterProjectField = "Project";
@@ -678,8 +678,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         taskCenterProjectField = "Task Center";
                     }
 
-                    SPList oProjectCenter = SPContext.Current.Web.Lists[new Guid(listid)];
-                    SPList oTaskCenter = SPContext.Current.Web.Lists[taskCenterListName];
+                    var oProjectCenter = SPContext.Current.Web.Lists[new Guid(listid)];
+                    var oTaskCenter = SPContext.Current.Web.Lists[taskCenterListName];
                     DataTable dt = null;
                     SPSiteDataQuery query = null;
                     query = new SPSiteDataQuery();
