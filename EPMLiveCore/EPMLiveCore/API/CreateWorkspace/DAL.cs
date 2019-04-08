@@ -206,99 +206,81 @@ namespace EPMLiveCore.API
 
         public static void AddWsPermission(Guid siteId, Guid createdWebId)
         {
-                const string ensureRptWebScript = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[RPTWEBGROUPS]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1) " +
-                                                  "BEGIN " +
-                                                  "CREATE TABLE [dbo].[RPTWEBGROUPS]( " +
-                                                  "[RPTWEBGROUPID] [uniqueidentifier] NOT NULL, " +
-                                                  "[SITEID] [uniqueidentifier] NULL, " +
-                                                  "[WEBID] [uniqueidentifier] NULL, " +
-                                                  "[GROUPID] [int] NULL, " +
-                                                  "[SECTYPE] [int] NULL, " +
-                                                  "CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
-                                                  "( " +
-                                                  "[RPTWEBGROUPID] ASC " +
-                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
-                                                  ") ON [PRIMARY] " +
-                                    
-                                                  "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [DF_RPTWEBGROUPS_RPTWEBGROUPID]  DEFAULT (newid()) FOR [RPTWEBGROUPID] " +
-                                                  "ALTER TABLE[dbo].[RPTWEBGROUPS]      ADD CONSTRAINT UQ_RPTWEBGROUPS_SITEID_WEBID_GROUPID UNIQUE(SITEID, WEBID, GROUPID)" +
-                                                  "IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[RPTWEBGROUPS]') AND name = N'PK_RPTWEBGROUPS') " +
-                                                  "ALTER TABLE [dbo].[RPTWEBGROUPS] DROP CONSTRAINT [PK_RPTWEBGROUPS] " +
-                                
-                                                  "ALTER TABLE [dbo].[RPTWEBGROUPS] ADD  CONSTRAINT [PK_RPTWEBGROUPS] PRIMARY KEY CLUSTERED  " +
-                                                  "( " +
-                                                  "[RPTWEBGROUPID] ASC " +
-                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
-                                    
-                                                  "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID_SECTYPE] ON [dbo].[RPTWEBGROUPS]  " +
-                                                  "( " +
-                                                  "[GROUPID] ASC, " +
-                                                  "[SECTYPE] ASC " +
-                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
-                                    
-                                                  "CREATE NONCLUSTERED INDEX [IX_RPTWEBGROUPS_GROUPID] ON [dbo].[RPTWEBGROUPS]  " +
-                                                  "( " +
-                                                  "[GROUPID] ASC " +
-                                                  ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY] " +
-                                    
-                                                  "END ";
-
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 using (var spSite = new SPSite(siteId))
+                using (var spWeb = spSite.OpenWeb(createdWebId))
+                using (var sqlConnection = new SqlConnection(
+                    CoreFunctions.getReportingConnectionString(spSite.WebApplication.Id, spSite.ID)))
                 {
-                    using (var spWeb = spSite.OpenWeb(createdWebId))
+                    sqlConnection.Open();
+                    WriteTableToServer(spSite, spWeb, sqlConnection);
+
+                    try
                     {
-                        using (var con = new SqlConnection(
-                            CoreFunctions.getReportingConnectionString(spSite.WebApplication.Id, spSite.ID)))
+                        const string epmLiveReportingAssembly =
+                            "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+
+                        MethodInfo methodInfo;
+                        Assembly assemblyInstance;
+                        Type thisClass;
+
+                        GetReflectionData(
+                            epmLiveReportingAssembly,
+                            out methodInfo,
+                            out assemblyInstance,
+                            out thisClass);
+
+                        if (methodInfo != null && assemblyInstance != null && thisClass != null)
                         {
-                            con.Open();
-                            WriteTableToServer(spSite, spWeb, con);
-
-                            try
-                            {
-                                const string epmLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
-                                MethodInfo methodInfo = null;
-                                Assembly assemblyInstance = null;
-                                Type thisClass = null;
-                                object apiClass = null;
-                                // use reflection to map list
-                                try
-                                {
-                                    assemblyInstance = Assembly.Load(epmLiveReportingAssembly);
-                                    thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ProcessSecurity", true, true);
-                                    methodInfo = thisClass.GetMethod(
-                                        "ProcessSecurityGroups",
-                                        BindingFlags.Public | BindingFlags.Static);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Trace.WriteLine(ex);
-                                }
-
-                                if (methodInfo != null && assemblyInstance != null && thisClass != null)
-                                {
-                                    using (var conn = new SqlConnection(
-                                        CoreFunctions.getReportingConnectionString(spSite.WebApplication.Id, spSite.ID)))
-                                    {
-                                        conn.Open();
-                                        methodInfo.Invoke(null, new object[]
-                                        {
-                                            spSite,
-                                            conn,
-                                            string.Empty
-                                        });
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(ex);
-                            }
+                            InvokeProcessSecurityGroups(spSite, methodInfo);
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex);
                     }
                 }
             });
+        }
+
+        private static void GetReflectionData(
+            string epmLiveReportingAssembly,
+            out MethodInfo methodInfo,
+            out Assembly assemblyInstance,
+            out Type thisClass)
+        {
+            methodInfo = null;
+            assemblyInstance = null;
+            thisClass = null;
+
+            try
+            {
+                assemblyInstance = Assembly.Load(epmLiveReportingAssembly);
+                thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ProcessSecurity", true, true);
+                methodInfo = thisClass.GetMethod("ProcessSecurityGroups", BindingFlags.Public | BindingFlags.Static);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex);
+            }
+        }
+
+        private static void InvokeProcessSecurityGroups(SPSite spSite, MethodInfo methodInfo)
+        {
+            using (var connection = new SqlConnection(
+                CoreFunctions.getReportingConnectionString(spSite.WebApplication.Id, spSite.ID)))
+            {
+                connection.Open();
+                methodInfo.Invoke(
+                    null,
+                    new object[]
+                    {
+                        spSite,
+                        connection,
+                        string.Empty
+                    });
+            }
         }
 
         private static void WriteTableToServer(SPSite spSite, SPWeb spWeb, SqlConnection con)
