@@ -119,7 +119,7 @@
         font-size: 10px;
         padding-bottom: 2px;
     }
-	.deletedtaskshours {
+    .deletedtaskshours {
         color: #888;
         font-size: 10px;
         padding-bottom: 2px;
@@ -1370,25 +1370,12 @@
             }
         }
 
-        if (grid.id === "WorkPlannerGrid") 
+        if (grid.id == "WorkPlannerGrid") 
         {
             oldVal = grid.GetValue(row, col);
 
-            if(col === "Work")
-            {
+            if(col == "Work")
                 oldWork = grid.GetValue(row, col);
-            }
-			
-            if(col === "StartDate")
-            {
-                if (val > grid.GetRowById(0).DueDate)
-                {
-                    if (confirm("The edit violates the task constraint. Click Ok to honor the constraint and keep the original task dates or click Cancel to adjust to Dates")) {
-                        grid.SetValue(row, "DueDate", row.DueDateOrig, 1,0);
-                        return grid.GetValue(row, col);
-                    }
-                }
-            }
         }
 
         return val;
@@ -1690,10 +1677,6 @@ Name:&nbsp;&nbsp;<%=sProjectName %></div>
     <script>
         initmb();
         <%if(Request["isdlg"] == "1"){%>
-        if(parent.window.location.toString().indexOf('workplanner.aspx') > -1)
-        {
-            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.Cancel);
-        }
         document.getElementsByTagName("html")[0].className = "ms-dialog";
         <%}%>
     </script>
