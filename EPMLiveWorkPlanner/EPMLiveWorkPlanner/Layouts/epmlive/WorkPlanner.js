@@ -1070,14 +1070,14 @@ function SetTaskAssignments(Row) {
 
     var grid = Grids.WorkPlannerGrid;
 
-     // To handle summary tasks EPMLCID-18836
-     if (Row.Summary && Row.AssignedTo != null) {
-         alert("Resources should be assigned to sub tasks only, as the Summary Task is a sum of all sub tasks.");
-         grid.SetValue(Row, "AssignedTo", "", 1);
-         return;
-     }
+    // To handle summary tasks EPMLCID-18836
+    if (Row.Summary && Row.AssignedTo != null) {
+        alert("Resources should be assigned to sub tasks only, as the Summary Task is a sum of all sub tasks.");
+        grid.SetValue(Row, "AssignedTo", "", 1);
+        return;
+    }
 
-    
+
     var turnoncalc = false;
 
     if (grid.Calculated) {
@@ -1370,25 +1370,36 @@ function DeleteTasks() {
     if (!grid.EditMode) {
         selRows = grid.GetSelRows();
         if (selRows.length > 0) {
-            if (confirm("Are you sure you want to delete those task(s)?")) {
-                var delRows = [];
+            var deleteWarningMessage = "";
+            var defaultDeleteMessage = "Are you sure you want to delete those task(s)?";
+            var delRows = [];
+            for (var i = 0; i < selRows.length; i++) {
+                var sDs = grid.GetValue(selRows[i], "Predecessors").toString().split(';');
 
-                for (var i = 0; i < selRows.length; i++) {
-                    var sDs = grid.GetValue(selRows[i], "Predecessors").toString().split(';');
+                if (sDs === "")
+                    var sDs = grid.GetValue(selRows[i], "PredecessorsOrig").toString().split(';');
 
-                    if (sDs == "")
-                        var sDs = grid.GetValue(selRows[i], "PredecessorsOrig").toString().split(';');
-
-                    for (var sD in sDs) {
-                        var rId = sDs[sD];
-                        var iRow = grid.GetRowById(parseFloat(rId));
-                        if (iRow)
-                            grid.SetValue(iRow, "Descendants", RemoveDescen(selRows[i].id, iRow), 1);
-                    }
-                    delRows.push(selRows[i].id);
-                    grid.SetValue(selRows[i], "Predecessors", "", 1);
+                for (var sD in sDs) {
+                    var rId = sDs[sD];
+                    var iRow = grid.GetRowById(parseFloat(rId));
+                    if (iRow)
+                        grid.SetValue(iRow, "Descendants", RemoveDescen(selRows[i].id, iRow), 1);
                 }
-
+                delRows.push(selRows[i].id);
+                grid.SetValue(selRows[i], "Predecessors", "", 1);
+                var tsHours = grid.GetValue(selRows[i], "TimesheetHours")
+                if (tsHours > 0) {
+                    var taskTitle = grid.GetValue(selRows[i], "Title");
+                    deleteWarningMessage += taskTitle + ": has (" + tsHours + ") Hours submitted in timesheet.\n"
+                }
+            }
+            if (deleteWarningMessage !== '') {
+                deleteWarningMessage += defaultDeleteMessage;
+            }
+            else {
+                deleteWarningMessage = defaultDeleteMessage;
+            }
+            if (confirm(deleteWarningMessage)) {
                 for (var i = 0; i < delRows.length; i++) {
                     try {
                         var row = grid.GetRowById(delRows[i]);
@@ -1400,10 +1411,10 @@ function DeleteTasks() {
                 }
                 grid.ActionCorrectAllDependencies();
             }
-
         }
     }
 }
+
 
 function RemoveDescen(parentid, row) {
     var grid = Grids.WorkPlannerGrid;
@@ -1655,7 +1666,7 @@ function iChangeView(view, bHide) {
             }
         } catch (e) { }
         if (filters[0] == "1")
-            grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);        
+            grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);
         else
             grid.ActionFilterOff();
     }
@@ -2787,10 +2798,23 @@ function CheckUpdatesClose(loader) {
             }
         }
     }
+    if ($('.deletedtaskshours').length === 0) {
+        //Load deleted task hours
+        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProjectTSHours&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&listid=" + sProjectListId, CheckProjectTimeSheetHours);
+    }
 
     setTimeout("CheckUpdates()", 60000);
 }
 
+function CheckProjectTimeSheetHours(data) {
+    if (data.xmlDoc.responseText != null) {
+        var hoursresult = data.xmlDoc.responseText.trim();
+        if (hoursresult !== '') {
+            var timesheetbox = $('<div class="deletedtaskshours"><span tabindex="0" role="alert" class="ms-status-status planner-pub-status"><span class="ms-accessible">Information Status</span><span class="ms-bold ms-status-title">Note:</span><span class="ms-status-body">' + data.xmlDoc.responseText + '</span><br></span></div>');
+            $('#DeltaPlaceHolderMain').prepend(timesheetbox);
+        }
+    }
+}
 
 function CopyRemainingWork(grid, row) {
     var w = grid.GetValue(row, "Work");
@@ -3294,7 +3318,7 @@ function EnterButton(grid) {
                 grid.Focus(newtask, grid.FCol, null, 1);
             }
         }
-    }    
+    }
 }
 
 function SetRowRollDowns(grid, row) {
@@ -3488,7 +3512,7 @@ function SetPercent(percent) {
         row = grid.GetRowById(row.id);
         try {
             grid.SetValue(row, "PercentComplete", percent, 1);
-            WEStatusCalculatePercentComplete(grid, row, percent);            
+            WEStatusCalculatePercentComplete(grid, row, percent);
             grid.RefreshCell(row, "ScheduleStatus");
         } catch (e) { }
     }

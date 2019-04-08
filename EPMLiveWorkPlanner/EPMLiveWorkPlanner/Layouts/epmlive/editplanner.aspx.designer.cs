@@ -193,6 +193,15 @@ namespace EPMLiveWorkPlanner {
         protected global::System.Web.UI.WebControls.CheckBox chkStartSoon;
         
         /// <summary>
+        /// chkShowDeletedHours control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkShowDeletedHours;
+        
+        /// <summary>
         /// ddlStatusMethod control.
         /// </summary>
         /// <remarks>
