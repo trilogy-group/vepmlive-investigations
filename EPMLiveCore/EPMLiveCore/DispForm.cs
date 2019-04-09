@@ -11,6 +11,7 @@ using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveCore.ListDefinitions;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using EPMLiveCore.API;
 
 namespace EPMLiveCore
 {
@@ -34,7 +35,7 @@ namespace EPMLiveCore
             string extraParams = "";
 
             GridGanttSettings gSettings = API.ListCommands.GetGridGanttSettings(SPContext.Current.List);
-            
+
             writer.WriteLine("<script>");
             writer.WriteLine("WEWebId = '" + SPContext.Current.Web.ID + "';");
             writer.WriteLine("WEListId = '" + SPContext.Current.List.ID + "';");
@@ -45,7 +46,7 @@ namespace EPMLiveCore
             writer.WriteLine("WEWebId = '" + web.ID + "';");
             writer.WriteLine("WEEditForm = '" + editURL + "';");
             writer.WriteLine("WEExtraParams = '" + extraParams.Trim('&') + "';");
-            writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()).Replace("+","%20")+ "';");
+            writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()).Replace("+", "%20") + "';");
             writer.WriteLine("WEUseTeam = " + gSettings.BuildTeam.ToString().ToLower() + ";");
             writer.WriteLine("WEDLG = '" + Page.Request["IsDlg"] + "';");
             writer.WriteLine("</script>");
@@ -57,7 +58,7 @@ namespace EPMLiveCore
             var archiveProjectButtonVisible = archiveRestoreFeatureIsEnabled
                                               && (item[ArchivedColumn] == null || (bool)item[ArchivedColumn] == false);
             var restoreProjectButtonVisible = archiveRestoreFeatureIsEnabled && !archiveProjectButtonVisible;
-            
+
             var ribbonExtensions = new XmlDocument();
 
             if (archiveProjectButtonVisible)
@@ -115,8 +116,11 @@ namespace EPMLiveCore
 
             XmlDocument ribbonExtensions = new XmlDocument();
 
-            //WorkPlanner Tab
-            ribbonExtensions.LoadXml(@"<Button
+
+            if (NavigationService.LPPFEPermissionCheck(List, SPBasePermissions.EditListItems))
+            {
+                //WorkPlanner Tab
+                ribbonExtensions.LoadXml(@"<Button
                     Id=""Ribbon.ListForm.Display.Manage.EditItem2""
                     Sequence=""10""
                     Command=""Ribbon.ListForm.Display.Manage.EditItem2""
@@ -125,9 +129,14 @@ namespace EPMLiveCore
                     LabelText=""Edit Item""
                     TemplateAlias=""o1""/>");
 
-            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
-            "Ribbon.ListForm.Display.Manage.Controls._children");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
+                "Ribbon.ListForm.Display.Manage.Controls._children");
+            }
 
+            if (!NavigationService.LPPFEPermissionCheck(List, SPBasePermissions.DeleteListItems))
+            {
+                ribbon.TrimById("Ribbon.ListForm.Display.Manage.DeleteItem");
+            }
 
             EPMLiveCore.GridGanttSettings gSettings = API.ListCommands.GetGridGanttSettings(List);
 
