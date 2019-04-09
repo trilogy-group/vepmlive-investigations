@@ -13,6 +13,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class SetupListMapping : LayoutsPageBase
     {
+        private const int LogEventId = 4001;
+
         //protected InputFormCheckBox chkResource;
         //protected InputFormCheckBoxList cblFields;
         //protected CheckBoxList cblResources;
@@ -141,9 +143,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                         EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
-                    myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                    using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys"))
+                    {
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry($"{ex.Message}{ex.StackTrace}", EventLogEntryType.Error, LogEventId);
+                    }
                 });
             }
 
