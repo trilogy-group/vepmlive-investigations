@@ -386,6 +386,7 @@ namespace EPMLiveCore.API
             }
             catch (APIException ex)
             {
+                Trace.TraceError("Exception occurred: {0}", ex);
                 return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
@@ -396,14 +397,14 @@ namespace EPMLiveCore.API
             StringBuilder listAssociatedItemsDiv)
         {
             var sqlGetListHeaders = new StringBuilder();
-            var projectLinkedField = "Project";
+            const string projectLinkedField = "Project";
 
-            //Set values from parameter
+            // Set values from parameter
             var listId = new Guid(xmlDocument.GetElementsByTagName("FancyFormListID")[0].InnerText);
             var itemId = xmlDocument.GetElementsByTagName("FancyFormItemID")[0].InnerText;
             var sourceUrl = HttpUtility.UrlEncode(HttpContext.Current.Request.UrlReferrer.ToString());
 
-            //Using SharePoint Object Model fetching data values
+            // Using SharePoint Object Model fetching data values
             using (var spSite = new SPSite(web.Site.ID))
             using (var spWeb = spSite.OpenWeb(web.ID))
             {
@@ -523,11 +524,11 @@ namespace EPMLiveCore.API
                 "<table style='width:100%'><tr><td><table style='border-collapse: collapse;' class='fancy-col-table'>");
             foreach (AssociatedListInfo item in sharePointAssociatedItemData.AssociatedLists)
             {
-                listAssociatedItemsDiv.Append("<tr style=''>");
-                listAssociatedItemsDiv.Append($"<td>{item.Title}</td>");
-                listAssociatedItemsDiv.Append(
-                    $"<td><a href='#'><div id='div_{item.ListId}' class='listMainDiv'><span class='badge'>0</span></a></div>");
-                listAssociatedItemsDiv.Append("</tr>");
+                listAssociatedItemsDiv.Append("<tr style=''>")
+                    .Append($"<td>{item.Title}</td>")
+                    .Append(
+                        $"<td><a href='#'><div id='div_{item.ListId}' class='listMainDiv'><span class='badge'>0</span></a></div>")
+                    .Append("</tr>");
             }
             listAssociatedItemsDiv.Append("</table></td></tr></table>");
         }
@@ -591,9 +592,9 @@ namespace EPMLiveCore.API
                 listAssociatedItemsDiv.Append(
                     $"<div class='slidingDivAdd'><a href='#' onclick=\"javascript:FancyDispFormClient.showNewForm('{newFormUrl}');return false;\"><img title='Add new {associatedCountData.ListName}' alt='' src='/_layouts/epmlive/images/newitem5.png' class='ms-core-menu-buttonIcon'></img></a></div>");
             }
-            listAssociatedItemsDiv.Append("<br/>");
-            listAssociatedItemsDiv.Append("<div style='clear:both;'></div>");
-            listAssociatedItemsDiv.Append("<table class='fancy-col-table' style='color:#555555; font-weight:normal;'>");
+            listAssociatedItemsDiv.Append("<br/>")
+                .Append("<div style='clear:both;'></div>")
+                .Append("<table class='fancy-col-table' style='color:#555555; font-weight:normal;'>");
 
             var associatedItemsCount = 0;
             if (top5ListItems != null && top5ListItems.Rows.Count > 0)
@@ -621,19 +622,18 @@ namespace EPMLiveCore.API
                             $"<td><a href='#' alt='{title}' title='{title}' onclick=\"javascript:FancyDispFormClient.showNewForm('{otherList.DefaultDisplayFormUrl}?ID={id}&Source={sharePointAssociatedItemData.SourceUrl}');return false;\">{title}</a></td>");
                     }
 
-                    listAssociatedItemsDiv.Append("<td>");
-                    listAssociatedItemsDiv.Append("<li class='fancyDisplayFormAssociatedItemsContextMenu'>");
-                    listAssociatedItemsDiv.Append(
-                        $"<a data-itemid='{id}' data-listid='{otherList.ID}' data-webid='{web.ID}' data-siteid='{web.Site.ID}'>");
-                    listAssociatedItemsDiv.Append("</a>");
-                    listAssociatedItemsDiv.Append("</li>");
-                    listAssociatedItemsDiv.Append("</td>");
-                    listAssociatedItemsDiv.Append("</tr>");
+                    listAssociatedItemsDiv.Append("<td>")
+                        .Append("<li class='fancyDisplayFormAssociatedItemsContextMenu'>")
+                        .Append(
+                            $"<a data-itemid='{id}' data-listid='{otherList.ID}' data-webid='{web.ID}' data-siteid='{web.Site.ID}'>")
+                        .Append("</a>")
+                        .Append("</li>")
+                        .Append("</td>")
+                        .Append("</tr>");
                 }
             }
 
-            listAssociatedItemsDiv.Append("</table>");
-            listAssociatedItemsDiv.Append("<br/>");
+            listAssociatedItemsDiv.Append("</table>").Append("<br/>");
 
             if (top5ListItems != null && top5ListItems.Rows.Count > 5)
             {
@@ -643,9 +643,7 @@ namespace EPMLiveCore.API
                     $"<a href='#' onclick=\"javascript:FancyDispFormClient.showItemUrl('{viewAllItemsUrl}');return false;\">View All {otherList.Title}</a>");
             }
 
-            listAssociatedItemsDiv.Append("</div>");
-            listAssociatedItemsDiv.Append("</div>");
-            listAssociatedItemsDiv.Append("</td></tr>");
+            listAssociatedItemsDiv.Append("</div>").Append("</div>").Append("</td></tr>");
         }
 
         private static void LoadCount(
