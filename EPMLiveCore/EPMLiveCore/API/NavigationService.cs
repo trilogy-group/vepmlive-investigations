@@ -677,7 +677,7 @@ namespace EPMLiveCore.API
             return list.DoesUserHavePermissions(spBasePermissions);
         }
 
-        private static bool LPPFEPermissionCheck(SPList list, SPBasePermissions spBasePermissions)
+        public static bool LPPFEPermissionCheck(SPList list, SPBasePermissions spBasePermissions)
         {
             bool hasPFEResourceCenterPermissions = true;
             try
@@ -741,7 +741,6 @@ namespace EPMLiveCore.API
                 //Hence, Rather then setting hasPFEResourceCenterPermissions = false; Keeping this exception block blank.
                 return true;
             }
-            return true;
             return list.DoesUserHavePermissions(spBasePermissions);
         }
 
