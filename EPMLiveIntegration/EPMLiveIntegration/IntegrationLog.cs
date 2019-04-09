@@ -29,21 +29,24 @@ namespace EPMLiveIntegration
         {
             if (LocalLog)
             {
-                StreamWriter sw = new StreamWriter("log.txt", true);
-                sw.WriteLine(DateTime.Now.ToString() + "\t" + level.ToString() + "\t" + log);
-                sw.Close();
+                using (var streamWriter = new StreamWriter("log.txt", true))
+                {
+                    streamWriter.WriteLine("{0}\t{1}\t{2}", DateTime.Now, level, log);
+                }
             }
             else
             {
                 if (_cn.State == System.Data.ConnectionState.Closed)
                     _cn.Open();
 
-                SqlCommand cmdError = new SqlCommand("INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @level, @text)", _cn);
-                cmdError.Parameters.AddWithValue("@intlistid", _intlogid);
-                cmdError.Parameters.AddWithValue("@listid", _listid);
-                cmdError.Parameters.AddWithValue("@level", (int)level);
-                cmdError.Parameters.AddWithValue("@text", _title + ": " + log);
-                cmdError.ExecuteNonQuery();
+                using (var cmdError = new SqlCommand("INSERT INTO INT_LOG (INT_LIST_ID, LIST_ID, LOGTYPE, LOGTEXT) VALUES (@intlistid, @listid, @level, @text)", _cn))
+                {
+                    cmdError.Parameters.AddWithValue("@intlistid", _intlogid);
+                    cmdError.Parameters.AddWithValue("@listid", _listid);
+                    cmdError.Parameters.AddWithValue("@level", (int)level);
+                    cmdError.Parameters.AddWithValue("@text", $"{_title}: {log}");
+                    cmdError.ExecuteNonQuery();
+                }
 
                 _cn.Close();
             }

@@ -98,7 +98,8 @@ namespace WorkEnginePPM.DataServiceModules.Tests
                 pid,
                 company,
                 dataBaseConnectionString;
-            var fileId = listId = basePath = username = pid = company = dataBaseConnectionString = "Test Connection";
+            listId = Guid.NewGuid().ToString();
+            var fileId = basePath = username = pid = company = dataBaseConnectionString = "Test Connection";
             var secLevel = SecurityLevels.Base;
             var isDebug = false;
 
@@ -653,7 +654,7 @@ namespace WorkEnginePPM.DataServiceModules.Tests
             // Arrange
             _web.ListsGet = () => new ShimSPListCollection()
             {
-                ItemGetString = itemName => new ShimSPList()
+                ItemGetGuid = itemName => new ShimSPList()
                 {
                     GetItemByIdInt32 = itemId => new ShimSPListItem()
                     {
@@ -661,6 +662,11 @@ namespace WorkEnginePPM.DataServiceModules.Tests
                     }
                 }
             };
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (action) =>
+            {
+                action();
+            };
+            _privateObject.SetField(DvProjectsFieldName, CreateDataViewProject());
 
             // Act
             var actualResult = (bool)_privateObject.Invoke(UpdateProjectMethodName, DummyProjectId);

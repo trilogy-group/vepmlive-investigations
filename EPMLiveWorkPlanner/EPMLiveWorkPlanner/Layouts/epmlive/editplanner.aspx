@@ -745,6 +745,21 @@
 	                            </template_inputformcontrols>
                         </wssuc:InputFormSection>
 
+                        <wssuc:InputFormSection Title="Show deleted hours"
+                            Description=""
+                            runat="server">
+                            <template_description>
+                                    Use this to track deleted tasks hours.
+	                            </template_description>
+                            <template_inputformcontrols>
+		                            <wssuc:InputFormControl LabelText="" runat="server">
+			                             <Template_Control>
+			                               <asp:CheckBox runat="server" ID="chkShowDeletedHours" /> Show deleted hours
+			                             </Template_Control>
+		                            </wssuc:InputFormControl>
+	                            </template_inputformcontrols>
+                        </wssuc:InputFormSection>
+
                         <wssuc:InputFormSection Title="Select Statusing Method"
                             Description=""
                             runat="server">
