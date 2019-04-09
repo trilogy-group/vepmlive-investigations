@@ -9,9 +9,9 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using EPMLiveCore.API.ProjectArchiver;
 using EPMLiveCore.ListDefinitions;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using EPMLiveCore.API;
 
 namespace EPMLiveCore
 {
@@ -119,7 +119,6 @@ namespace EPMLiveCore
 
             if (NavigationService.LPPFEPermissionCheck(List, SPBasePermissions.EditListItems))
             {
-                //WorkPlanner Tab
                 ribbonExtensions.LoadXml(@"<Button
                     Id=""Ribbon.ListForm.Display.Manage.EditItem2""
                     Sequence=""10""
@@ -129,8 +128,7 @@ namespace EPMLiveCore
                     LabelText=""Edit Item""
                     TemplateAlias=""o1""/>");
 
-                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
-                "Ribbon.ListForm.Display.Manage.Controls._children");
+                ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListForm.Display.Manage.Controls._children");
             }
 
             if (!NavigationService.LPPFEPermissionCheck(List, SPBasePermissions.DeleteListItems))
