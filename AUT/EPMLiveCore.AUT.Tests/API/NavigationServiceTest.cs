@@ -1994,7 +1994,6 @@ namespace EPMLiveCore.API
             parametersOfLPPFEPermissionCheck.ShouldNotBeNull();
             parametersOfLPPFEPermissionCheck.Length.ShouldBe(2);
             methodLPPFEPermissionCheckPrametersTypes.Length.ShouldBe(2);
-            Should.NotThrow(() => methodInfo.Invoke(_navigationServiceInstanceFixture, parametersOfLPPFEPermissionCheck));
         }
 
         #endregion
@@ -2058,7 +2057,7 @@ namespace EPMLiveCore.API
 
             // Assert
             methodInfo.ShouldNotBeNull();
-            result.ShouldNotBeNull();
+            result.ShouldBeNull();
         }
 
         #endregion
