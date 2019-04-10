@@ -157,45 +157,44 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             SPWeb web = SPContext.Current.Web;
 
-            var cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-
-            SPSecurity.RunWithElevatedPrivileges(delegate { cn.Open(); });
-
-            try
+            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
             {
-                if (web.CurrentUser.IsSiteAdmin)
+                SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
+
+                try
                 {
-                    using (var sqlCommand = new SqlCommand(
-                        "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
-                        cn))
+                    if (web.CurrentUser.IsSiteAdmin)
                     {
-                        sqlCommand.Parameters.AddWithValue("@SiteId", web.Site.ID);
-                        var dataReader = sqlCommand.ExecuteReader();
-
-                        if (dataReader.Read() && !dataReader.IsDBNull(0))
+                        using (var sqlCommand = new SqlCommand(
+                            "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                            sqlConnection))
                         {
-                            var connectionString =
-                                $"Data Source={dataReader.GetString(2)};Initial Catalog={dataReader.GetString(3)}";
+                            sqlCommand.Parameters.AddWithValue("@SiteId", web.Site.ID);
+                            var dataReader = sqlCommand.ExecuteReader();
 
-                            var text = new StringBuilder("<br><br><b>Reporting Database Information:</b><br>");
-                            text.Append($"<b>Server:</b> {dataReader.GetString(2)}<br>");
-                            text.Append($"<b>Database:</b> {dataReader.GetString(3)}<br>");
-                            text.Append($"<b>Username:</b> {dataReader.GetString(0)}<br>");
-                            text.Append($"<b>Password:</b> {dataReader.GetString(1)}<br>");
-                            text.Append($"<b>Full Connection String: </b>{connectionString}<br>");
+                            if (dataReader.Read() && !dataReader.IsDBNull(0))
+                            {
+                                var connectionString =
+                                    $"Data Source={dataReader.GetString(2)};Initial Catalog={dataReader.GetString(3)}";
 
-                            lblAccountInfo.Visible = true;
-                            lblAccountInfo.Text = text.ToString();
+                                var text = new StringBuilder("<br><br><b>Reporting Database Information:</b><br>");
+                                text.Append($"<b>Server:</b> {dataReader.GetString(2)}<br>");
+                                text.Append($"<b>Database:</b> {dataReader.GetString(3)}<br>");
+                                text.Append($"<b>Username:</b> {dataReader.GetString(0)}<br>");
+                                text.Append($"<b>Password:</b> {dataReader.GetString(1)}<br>");
+                                text.Append($"<b>Full Connection String: </b>{connectionString}<br>");
+
+                                lblAccountInfo.Visible = true;
+                                lblAccountInfo.Text = text.ToString();
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Trace.TraceError("Exception suppressed {0}", ex);
+                }
             }
-            catch { }
-            try
-            {
-                cn.Close();
-            }
-            catch { }
         }
 
         private void LoadLists(DataTable tbl)
