@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -164,28 +165,27 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 if (web.CurrentUser.IsSiteAdmin)
                 {
-                    var cmd =
-                        new SqlCommand(
-                            "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
-                            cn);
-                    cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    using (var sqlCommand = new SqlCommand(
+                        "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                        cn))
                     {
-                        if (!dr.IsDBNull(0))
+                        sqlCommand.Parameters.AddWithValue("@SiteId", web.Site.ID);
+                        var dataReader = sqlCommand.ExecuteReader();
+
+                        if (dataReader.Read() && !dataReader.IsDBNull(0))
                         {
-                            string sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
+                            var connectionString =
+                                $"Data Source={dataReader.GetString(2)};Initial Catalog={dataReader.GetString(3)}";
 
-
-                            string sText = "<br><br><b>Reporting Database Information:</b><br>";
-                            sText += "<b>Server:</b> " + dr.GetString(2) + "<br>";
-                            sText += "<b>Database:</b> " + dr.GetString(3) + "<br>";
-                            sText += "<b>Username:</b> " + dr.GetString(0) + "<br>";
-                            sText += "<b>Password:</b> " + dr.GetString(1) + "<br>";
-                            sText += "<b>Full Connection String: </b>" + sCn + "<br>";
+                            var text = new StringBuilder("<br><br><b>Reporting Database Information:</b><br>");
+                            text.Append($"<b>Server:</b> {dataReader.GetString(2)}<br>");
+                            text.Append($"<b>Database:</b> {dataReader.GetString(3)}<br>");
+                            text.Append($"<b>Username:</b> {dataReader.GetString(0)}<br>");
+                            text.Append($"<b>Password:</b> {dataReader.GetString(1)}<br>");
+                            text.Append($"<b>Full Connection String: </b>{connectionString}<br>");
 
                             lblAccountInfo.Visible = true;
-                            lblAccountInfo.Text = sText;
+                            lblAccountInfo.Text = text.ToString();
                         }
                     }
                 }
