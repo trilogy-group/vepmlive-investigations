@@ -400,22 +400,22 @@ namespace EPMLiveEnterprise
                         conn.Open();
 
                         // Instantiate a new command with a query and connection
-                        SqlCommand cmd = new SqlCommand(insertString, conn);
+                        using (var sqlCommand = new SqlCommand(insertString, conn))
+                        {
+                            sqlCommand.Parameters.Add("@projectguid", SqlDbType.UniqueIdentifier, 16);
+                            sqlCommand.Parameters.Add("@webguid", SqlDbType.UniqueIdentifier, 16);
+                            sqlCommand.Parameters.Add("@weburl", SqlDbType.VarChar, 255);
+                            sqlCommand.Parameters.Add("@checkbit", SqlDbType.Bit, 1);
 
-                        // Add Parameters
-                        cmd.Parameters.Add("@projectguid", SqlDbType.UniqueIdentifier, 16);
-                        cmd.Parameters.Add("@webguid", SqlDbType.UniqueIdentifier, 16);
-                        cmd.Parameters.Add("@weburl", SqlDbType.VarChar, 255);
-                        cmd.Parameters.Add("@checkbit", SqlDbType.Bit, 1);
+                            // Set Parameter values
+                            sqlCommand.Parameters["@projectguid"].Value = projectGuid;
+                            sqlCommand.Parameters["@webguid"].Value = siteID;
+                            sqlCommand.Parameters["@weburl"].Value = SPContext.Current.Web.Url;
+                            sqlCommand.Parameters["@checkbit"].Value = false;
 
-                        // Set Parameter values
-                        cmd.Parameters["@projectguid"].Value = projectGuid;
-                        cmd.Parameters["@webguid"].Value = siteID;
-                        cmd.Parameters["@weburl"].Value = SPContext.Current.Web.Url;
-                        cmd.Parameters["@checkbit"].Value = false;
-
-                        // Call ExecuteNonQuery to send command
-                        cmd.ExecuteNonQuery();
+                            // Call ExecuteNonQuery to send command
+                            sqlCommand.ExecuteNonQuery();
+                        }
                     }
                     finally
                     {
