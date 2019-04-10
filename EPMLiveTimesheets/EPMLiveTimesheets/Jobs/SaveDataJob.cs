@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using System.Xml;
 using System.Data.SqlClient;
-using System.Collections.Concurrent;
 using Microsoft.SharePoint;
 using EPMLiveCore;
 
@@ -12,8 +10,6 @@ namespace TimeSheets
 {
     class SaveDataJob : BaseJob
     {
-        private static readonly ConcurrentDictionary<Guid, object> ProcessProjectWorkLocks = new ConcurrentDictionary<Guid, object>();
-
         private string NonUpdatingColumns = "Project,AssignedTo";
         SPList WorkList;
 
@@ -153,11 +149,7 @@ namespace TimeSheets
 
                                 if (liveHours)
                                 {
-                                    // NOTE: Updating project hours concurrently does not make sense due all but one will fail with save conflict
-                                    lock (ProcessProjectWorkLocks.GetOrAdd(TSUID, _ => new object()))
-                                    {
-                                        sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
-                                    }
+                                    sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
                                 }
                             }
                         }
