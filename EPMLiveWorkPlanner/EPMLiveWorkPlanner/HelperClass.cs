@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Collections;
+using EPMLiveCore;
 using Microsoft.SharePoint;
 
 namespace EPMLiveWorkPlanner
@@ -183,20 +184,22 @@ namespace EPMLiveWorkPlanner
                 if(lWeb == Guid.Empty)
                     lWeb = w.ID;
 
-                using(SPSite site = w.Site)
+                // NOTE: Now this is invoked only inside StatusingEvent.processItem() under elevated privileges, so we get elevated site here
+                var site = SaveDataJobExecuteCache.GetSiteFromCache(true, () => w.Site);
+                try
                 {
-                    using(SPWeb web = site.OpenWeb(lWeb))
+                    using (SPWeb web = site.OpenWeb(lWeb))
                     {
                         string planners = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlannerPlanners");
 
-                        foreach(string planner in planners.Split(','))
+                        foreach (string planner in planners.Split(','))
                         {
-                            if(planner != "")
+                            if (planner != "")
                             {
                                 string[] sPlanner = planner.Split('|');
                                 string taskcenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "TaskCenter");
 
-                                if(String.Equals(taskcenter, list, StringComparison.CurrentCultureIgnoreCase))
+                                if (String.Equals(taskcenter, list, StringComparison.CurrentCultureIgnoreCase))
                                 {
                                     method = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + sPlanner[0] + "StatusMethod");
                                     break;
@@ -204,6 +207,10 @@ namespace EPMLiveWorkPlanner
                             }
                         }
                     }
+                }
+                finally
+                {
+                    SaveDataJobExecuteCache.DisposeSite(site);
                 }
             }
             catch { }

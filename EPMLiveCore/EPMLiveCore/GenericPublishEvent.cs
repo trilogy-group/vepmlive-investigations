@@ -16,9 +16,10 @@ namespace EPMLiveCore
 
             try
             {
-                foreach(System.Collections.DictionaryEntry sField in properties.AfterProperties)
+                var list = SaveDataJobExecuteCache.GetList(properties);
+                foreach (System.Collections.DictionaryEntry sField in properties.AfterProperties)
                 {
-                    if(!properties.List.Fields.GetFieldByInternalName(sField.Key.ToString()).Hidden)
+                    if(!list.Fields.GetFieldByInternalName(sField.Key.ToString()).Hidden)
                     {
                         allHidden = false;
                         break;
@@ -36,15 +37,16 @@ namespace EPMLiveCore
 
                 try
                 {
-                    SPFieldLookupValue lv = new SPFieldLookupValue(properties.ListItem["Project"].ToString());
+                    SPFieldLookupValue lv = new SPFieldLookupValue(SaveDataJobExecuteCache.GetListItem(properties)["Project"].ToString());
 
-                    SPField f = properties.List.Fields.GetFieldByInternalName("Project");
+                    SPField f = SaveDataJobExecuteCache.GetList(properties).Fields.GetFieldByInternalName("Project");
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(f.SchemaXml);
 
                     string listid = doc.FirstChild.Attributes["List"].Value;
 
-                    SPList list = properties.Web.Lists[new Guid(listid)];
+                    var web = SaveDataJobExecuteCache.GetWeb(properties);
+                    SPList list = web.Lists[new Guid(listid)];
                     SPListItem li = list.GetItemById(lv.LookupId);
 
                     if(list.Fields.ContainsFieldWithInternalName("PendingUpdates"))
@@ -64,12 +66,12 @@ namespace EPMLiveCore
 
                             ArrayList arr = new ArrayList();
 
-                            SPFieldUserValue uv = new SPFieldUserValue(properties.Web, li["Author"].ToString());
+                            SPFieldUserValue uv = new SPFieldUserValue(web, li["Author"].ToString());
                             arr.Add(uv.LookupId);
 
                             try
                             {
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(properties.Web, li["Planners"].ToString());
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, li["Planners"].ToString());
                                 foreach(SPFieldUserValue u in uvc)
                                 {
                                     if(!arr.Contains(u.LookupId))
@@ -79,7 +81,7 @@ namespace EPMLiveCore
 
                             try
                             {
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(properties.Web, li["Project Manager"].ToString());
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, li["Project Manager"].ToString());
                                 foreach (SPFieldUserValue u in uvc)
                                 {
                                     if (!arr.Contains(u.LookupId))
@@ -104,7 +106,7 @@ namespace EPMLiveCore
                                 {
                                     //SPSecurity.RunWithElevatedPrivileges(delegate()
                                     //{
-                                        SPUser u = properties.Web.SiteUsers.GetByID(1073741823);
+                                        SPUser u = web.SiteUsers.GetByID(1073741823);
                                         API.APIEmail.QueueItemMessage(5, true, hshProps, new string[] { i.ToString() },null, false, true, li, u, false);
                                     //});
                                     //API.APIEmail.sendEmailHideReply(5, properties.SiteId, properties.Web.ID, properties.Web.CurrentUser, properties.Web.SiteUsers.GetByID(i), hshProps);
