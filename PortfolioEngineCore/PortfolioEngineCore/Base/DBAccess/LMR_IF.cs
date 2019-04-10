@@ -32,19 +32,22 @@ namespace PortfolioEngineCore
             //2 = SharePoint to EPK (Portfolio Fields)
             //3 = Both Directions
 
-            var command = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection);
-            command.Parameters.AddWithValue("SelectMode", type);
-            command.CommandType = CommandType.StoredProcedure;
-            dba.Open();
-
-            var reader = command.ExecuteReader();
-            while (reader.Read())
+            using (var command = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection))
             {
-                var nFieldID = (int)reader["FIELD_ID"];
-                var sFieldName = (string)reader["FIELD_NAME"];
-                dataTable.Rows.Add(sFieldName, nFieldID, type);
+                command.Parameters.AddWithValue("SelectMode", type);
+                command.CommandType = CommandType.StoredProcedure;
+                dba.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var nFieldID = (int)reader["FIELD_ID"];
+                        var sFieldName = (string)reader["FIELD_NAME"];
+                        dataTable.Rows.Add(sFieldName, nFieldID, type);
+                    }
+                }
             }
-            reader.Close();
             dba.Close();
             return dataTable;
         }
@@ -58,30 +61,32 @@ namespace PortfolioEngineCore
                 dba.Open();
                 transaction = dba.Connection.BeginTransaction();
                 var command = "DELETE EPG_WE_MAPPING WHERE WEM_ENTITY = 10";
-                var sqlCommand = new SqlCommand(command, dba.Connection, transaction);
-                var rowsAffected = sqlCommand.ExecuteNonQuery();
-                sqlCommand.Dispose();
+                using (var deleteSqlCommand = new SqlCommand(command, dba.Connection, transaction))
+                {
+                    deleteSqlCommand.ExecuteNonQuery();
+                }
 
                 command = "INSERT INTO EPG_WE_MAPPING "
                     + " (WEM_UID,WEM_ENTITY,WEM_EPK_FIELD_ID,WEM_WE_FIELD_ID,WEM_WE_NAME) "
                     + " VALUES(@WEM_UID,@WEM_ENTITY,@WEM_EPK_FIELD_ID,@WEM_WE_FIELD_ID,@WEM_WE_NAME)";
 
-                sqlCommand = new SqlCommand(command, dba.Connection, transaction);
-
-                var uId = sqlCommand.Parameters.Add("@WEM_UID", SqlDbType.Int);
-                sqlCommand.Parameters.Add("@WEM_ENTITY", SqlDbType.Int).Value = 10;
-                var epkId = sqlCommand.Parameters.Add("@WEM_EPK_FIELD_ID", SqlDbType.Int);
-                var weId = sqlCommand.Parameters.Add("@WEM_WE_FIELD_ID", SqlDbType.Int);
-                var weName = sqlCommand.Parameters.Add("@WEM_WE_NAME", SqlDbType.VarChar, 255);
-
-                var lUid = 0;
-                foreach (DataRow dr in dt.Rows)
+                using (var insertSqlCommand = new SqlCommand(command, dba.Connection, transaction))
                 {
-                    uId.Value = ++lUid;
-                    epkId.Value = dr["EPKID"];
-                    weId.Value = dr["WEID"];
-                    weName.Value = dr["WEName"];
-                    sqlCommand.ExecuteNonQuery();
+                    var uId = insertSqlCommand.Parameters.Add("@WEM_UID", SqlDbType.Int);
+                    insertSqlCommand.Parameters.Add("@WEM_ENTITY", SqlDbType.Int).Value = 10;
+                    var epkId = insertSqlCommand.Parameters.Add("@WEM_EPK_FIELD_ID", SqlDbType.Int);
+                    var weId = insertSqlCommand.Parameters.Add("@WEM_WE_FIELD_ID", SqlDbType.Int);
+                    var weName = insertSqlCommand.Parameters.Add("@WEM_WE_NAME", SqlDbType.VarChar, 255);
+
+                    var lUid = 0;
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        uId.Value = ++lUid;
+                        epkId.Value = dr["EPKID"];
+                        weId.Value = dr["WEID"];
+                        weName.Value = dr["WEName"];
+                        insertSqlCommand.ExecuteNonQuery();
+                    }
                 }
                 transaction.Commit();
                 result = true;
@@ -115,24 +120,26 @@ namespace PortfolioEngineCore
             dataTable.Columns.Add("epkField");
             dataTable.Columns.Add("epkFieldId");
 
-            var sqlCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection);
-            sqlCommand.Parameters.AddWithValue("SelectMode", 0);
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            dba.Open();
-
-            var reader = sqlCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection))
             {
-                var nFieldID = (int)reader["FIELD_ID"];
-                var sFieldName = (string)reader["FIELD_NAME"];
+                sqlCommand.Parameters.AddWithValue("SelectMode", 0);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
 
-                if (nFieldID >= 20000)
+                using (var reader = sqlCommand.ExecuteReader())
                 {
-                    dataTable.Rows.Add(sFieldName, nFieldID);
+                    while (reader.Read())
+                    {
+                        var nFieldID = (int)reader["FIELD_ID"];
+                        var sFieldName = (string)reader["FIELD_NAME"];
+
+                        if (nFieldID >= 20000)
+                        {
+                            dataTable.Rows.Add(sFieldName, nFieldID);
+                        }
+                    }
                 }
             }
-
-            reader.Close();
             dba.Close();
 
             return dataTable;
@@ -140,10 +147,10 @@ namespace PortfolioEngineCore
 
         public static DataTable getTaskFields(DBAccess dba)
         {
-            var dt = new DataTable();
-            dt.Columns.Add("epkField");
-            dt.Columns.Add("epkFieldId");
-            dt.Columns.Add("epkFieldType");
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("epkField");
+            dataTable.Columns.Add("epkFieldId");
+            dataTable.Columns.Add("epkFieldType");
 
             //epkFieldType:
             //0 = No Data Synch
@@ -153,23 +160,26 @@ namespace PortfolioEngineCore
 
             //// BUGBUG TODO: EPK Code to get WI fields
 
-            var sqlCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection);
-            sqlCommand.Parameters.AddWithValue("SelectMode", 3);
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            dba.Open();
-
-            var reader = sqlCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection))
             {
-                var fieldId = (int)reader["FIELD_ID"];
-                var fieldName = (string)reader["FIELD_NAME"];
+                sqlCommand.Parameters.AddWithValue("SelectMode", 3);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
 
-                dt.Rows.Add(fieldName, fieldId, 3);
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var fieldId = (int)reader["FIELD_ID"];
+                        var fieldName = (string)reader["FIELD_NAME"];
+
+                        dataTable.Rows.Add(fieldName, fieldId, 3);
+                    }
+                }
             }
-            reader.Close();
             dba.Close();
 
-            return dt;
+            return dataTable;
         }
 
         public static DataTable getPortfolioViews(DBAccess dba)
@@ -178,18 +188,21 @@ namespace PortfolioEngineCore
             dataTable.Columns.Add("epkView");
             dataTable.Columns.Add("epkViewId");
 
-            var sqlCommand = new SqlCommand("EPG_SP_ReadViewsForWE", dba.Connection);
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            dba.Open();
-
-            var reader = sqlCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("EPG_SP_ReadViewsForWE", dba.Connection))
             {
-                var viewUid = (int)reader["VIEW_UID"];
-                var viewName = (string)reader["VIEW_NAME"];
-                dataTable.Rows.Add(viewName, viewUid);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
+
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var viewUid = (int)reader["VIEW_UID"];
+                        var viewName = (string)reader["VIEW_NAME"];
+                        dataTable.Rows.Add(viewName, viewUid);
+                    }
+                }
             }
-            reader.Close();
             dba.Close();
 
             return dataTable;
@@ -203,18 +216,21 @@ namespace PortfolioEngineCore
             dataTable.Columns.Add("costView");
             dataTable.Columns.Add("costViewId");
 
-            var sqlCommand = new SqlCommand("PPM_SP_ReadCostViewsForWE", dba.Connection);
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            dba.Open();
-
-            var reader = sqlCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("PPM_SP_ReadCostViewsForWE", dba.Connection))
             {
-                var viewUId = (int)reader["VIEW_UID"];
-                var viewName = (string)reader["VIEW_NAME"];
-                dataTable.Rows.Add(viewName, viewUId);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
+
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var viewUId = (int)reader["VIEW_UID"];
+                        var viewName = (string)reader["VIEW_NAME"];
+                        dataTable.Rows.Add(viewName, viewUId);
+                    }
+                }
             }
-            reader.Close();
             dba.Close();
 
             return dataTable;
