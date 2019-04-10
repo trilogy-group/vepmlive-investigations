@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Data;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Collections.Concurrent;
 using Microsoft.SharePoint;
-using System.Collections;
 using EPMLiveCore;
-using EPMLiveCore.API;
 
 namespace TimeSheets
 {
     class SaveDataJob : BaseJob
     {
-        private static readonly object ProcessProjectWorkLock = new object();
+        private static readonly ConcurrentDictionary<Guid, object> ProcessProjectWorkLocks = new ConcurrentDictionary<Guid, object>();
 
         private string NonUpdatingColumns = "Project,AssignedTo";
         SPList WorkList;
@@ -156,7 +154,7 @@ namespace TimeSheets
                                 if (liveHours)
                                 {
                                     // NOTE: Updating project hours concurrently does not make sense due all but one will fail with save conflict
-                                    lock (ProcessProjectWorkLock)
+                                    lock (ProcessProjectWorkLocks.GetOrAdd(TSUID, _ => new object()))
                                     {
                                         sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
                                     }
@@ -539,8 +537,12 @@ namespace TimeSheets
                                             try
                                             {
                                                 var liProject = SaveDataJobExecuteCache.Cache.GetListItem(iWeb.ServerRelativeUrl, lGuid, int.Parse(project));
-                                                liProject["TimesheetHours"] = drProject["Hours"].ToString();
-                                                liProject.SystemUpdate();
+                                                var newHours = drProject["Hours"].ToString();
+                                                if (liProject["TimesheetHours"]?.ToString() != newHours)
+                                                {
+                                                    liProject["TimesheetHours"] = newHours;
+                                                    liProject.SystemUpdate();
+                                                }
                                             }
                                             catch { }
                                         }
