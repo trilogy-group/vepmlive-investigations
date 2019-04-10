@@ -170,22 +170,23 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                             sqlConnection))
                         {
                             sqlCommand.Parameters.AddWithValue("@SiteId", web.Site.ID);
-                            var dataReader = sqlCommand.ExecuteReader();
-
-                            if (dataReader.Read() && !dataReader.IsDBNull(0))
+                            using (var dataReader = sqlCommand.ExecuteReader())
                             {
-                                var connectionString =
-                                    $"Data Source={dataReader.GetString(2)};Initial Catalog={dataReader.GetString(3)}";
+                                if (dataReader.Read() && !dataReader.IsDBNull(0))
+                                {
+                                    var connectionString =
+                                        $"Data Source={dataReader.GetString(2)};Initial Catalog={dataReader.GetString(3)}";
 
-                                var text = new StringBuilder("<br><br><b>Reporting Database Information:</b><br>");
-                                text.Append($"<b>Server:</b> {dataReader.GetString(2)}<br>");
-                                text.Append($"<b>Database:</b> {dataReader.GetString(3)}<br>");
-                                text.Append($"<b>Username:</b> {dataReader.GetString(0)}<br>");
-                                text.Append($"<b>Password:</b> {dataReader.GetString(1)}<br>");
-                                text.Append($"<b>Full Connection String: </b>{connectionString}<br>");
+                                    var text = new StringBuilder("<br><br><b>Reporting Database Information:</b><br>");
+                                    text.Append($"<b>Server:</b> {dataReader.GetString(2)}<br>")
+                                        .Append($"<b>Database:</b> {dataReader.GetString(3)}<br>")
+                                        .Append($"<b>Username:</b> {dataReader.GetString(0)}<br>")
+                                        .Append($"<b>Password:</b> {dataReader.GetString(1)}<br>")
+                                        .Append($"<b>Full Connection String: </b>{connectionString}<br>");
 
-                                lblAccountInfo.Visible = true;
-                                lblAccountInfo.Text = text.ToString();
+                                    lblAccountInfo.Visible = true;
+                                    lblAccountInfo.Text = text.ToString();
+                                }
                             }
                         }
                     }
