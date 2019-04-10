@@ -262,9 +262,10 @@ namespace EPMLiveCore
             {
                 if (properties.AfterProperties["Status"] == null)
                 {
-                    if (properties.List.Fields["Status"].DefaultValue != null)
+                    var list = SaveDataJobExecuteCache.GetList(properties);
+                    if (list.Fields["Status"].DefaultValue != null)
                     {
-                        status = properties.List.Fields["Status"].DefaultValue;
+                        status = list.Fields["Status"].DefaultValue;
                     }
                 }
                 else
