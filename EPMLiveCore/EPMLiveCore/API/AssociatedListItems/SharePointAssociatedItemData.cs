@@ -7,7 +7,13 @@ namespace EPMLiveCore.API
 {
     internal class SharePointAssociatedItemData
     {
-        internal SharePointAssociatedItemData(ArrayList associatedLists, StringBuilder sqlGetListHeaders, DataTable listNameDataTable, string projectLinkedField, string itemId, string sourceUrl,
+        internal SharePointAssociatedItemData(
+            ArrayList associatedLists,
+            StringBuilder sqlGetListHeaders,
+            DataTable listNameDataTable,
+            string projectLinkedField,
+            string itemId,
+            string sourceUrl,
             Guid listId,
             string itemTitle)
         {
