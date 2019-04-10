@@ -130,7 +130,7 @@ namespace TimeSheets
                                             {
                                             }
 
-                                            ProcessItemRow(ndItem, ref dtItems, cn, site, settings, liveHours, worktype == settings.NonWorkList);
+                                            ProcessItemRow(ndItem, dtItems, cn, site, settings, liveHours, worktype == settings.NonWorkList);
 
                                             count++;
                                             float pct = count / total * 98;
@@ -184,7 +184,7 @@ namespace TimeSheets
             }
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
             if (id != "")
@@ -368,7 +368,11 @@ namespace TimeSheets
 
                                             if (liveHours)
                                             {
-                                                processLiveHours(li, list.ID);
+                                                if (!processLiveHours(li, list.ID))
+                                                {
+                                                    return;
+                                                }
+
                                                 if (li.Fields.ContainsFieldWithInternalName("PercentComplete") &&
                                                     li.Fields.ContainsFieldWithInternalName("Status"))
                                                 {
@@ -432,9 +436,12 @@ namespace TimeSheets
                     bErrors = true;
                     sErrors += "Item (" + id + ") Error x2: " + ex.ToString();
                 }
-                if (drItem.Length > 0)
+                finally
                 {
-                    dtItems.Rows.Remove(drItem[0]);
+                    if (drItem.Length > 0)
+                    {
+                        dtItems.Rows.Remove(drItem[0]);
+                    }
                 }
             }
             else
@@ -444,7 +451,7 @@ namespace TimeSheets
             }
         }
 
-        private void processLiveHours(SPListItem li, Guid listguid)
+        private bool processLiveHours(SPListItem li, Guid listguid)
         {
 
             double hours = 0;
@@ -466,13 +473,20 @@ namespace TimeSheets
                                         hours = dr1.GetDouble(0);
                                 dr1.Close();
                             }
-                            li["TimesheetHours"] = hours;
+
+                            if (li["TimesheetHours"] as double? != hours)
+                            {
+                                li["TimesheetHours"] = hours;
+                                return true;
+                            }
                         }
 
                     }
                 }
                 catch { }
             }
+
+            return false;
         }
 
         private static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
