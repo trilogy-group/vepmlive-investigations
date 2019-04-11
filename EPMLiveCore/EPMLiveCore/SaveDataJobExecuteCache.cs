@@ -88,6 +88,7 @@ namespace EPMLiveCore
         public SPWeb GetWeb(string id)
         {
             SPWeb result;
+            id = id.ToUpperInvariant();
             if (!_websCache.TryGetValue(id, out result))
             {
                 result = Site.OpenWeb(new Guid(id));
@@ -113,16 +114,15 @@ namespace EPMLiveCore
             _itemsCache.Clear();
             var groupByLists = items
                 .Where(i => !string.IsNullOrEmpty(i.WebId) && !string.IsNullOrEmpty(i.ListId) && !string.IsNullOrEmpty(i.ListItemId))
-                .GroupBy(i => Tuple.Create(i.WebId, i.ListId), i => i.ListItemId);
+                .GroupBy(i => Tuple.Create(i.WebId.ToUpperInvariant(), i.ListId.ToUpperInvariant()), i => i.ListItemId);
             var anyError = false;
             var errors = new StringBuilder();
             foreach (var listInfo in groupByLists)
             {
-                var web = GetWeb(listInfo.Key.Item1);
-                var list = web.Lists[new Guid(listInfo.Key.Item2)];
-
                 try
                 {
+                    var web = GetWeb(listInfo.Key.Item1);
+                    var list = web.Lists[new Guid(listInfo.Key.Item2)];
                     var query = new SPQuery();
                     query.RowLimit = (uint)listInfo.Count();
                     var values = string.Join(string.Empty, listInfo.Select(itemId => $"<Value Type='Counter'>{itemId}</Value>"));

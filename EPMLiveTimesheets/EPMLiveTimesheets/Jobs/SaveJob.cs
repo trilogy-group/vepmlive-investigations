@@ -908,7 +908,7 @@ namespace TimeSheets
             private readonly Dictionary<string, SPWeb> _websCache = new Dictionary<string, SPWeb>();
 
             /// <summary>
-            /// Maping of tuples of Web ID and List ID to SPListItemCollection
+            /// Mapping of tuples of Web ID and List ID to SPListItemCollection
             /// </summary>
             private readonly Dictionary<Tuple<string, string>, SPListItemCollection> _itemsCache = new Dictionary<Tuple<string, string>, SPListItemCollection>();
 
@@ -920,6 +920,7 @@ namespace TimeSheets
             public SPWeb GetWeb(string id)
             {
                 SPWeb result;
+                id = id.ToUpperInvariant();
                 if (!_websCache.TryGetValue(id, out result))
                 {
                     result = _site.OpenWeb(new Guid(id));
@@ -938,16 +939,15 @@ namespace TimeSheets
             {
                 var groupByLists = items
                     .Where(i => !string.IsNullOrEmpty(i.Item1) && !string.IsNullOrEmpty(i.Item2) && !string.IsNullOrEmpty(i.Item3))
-                    .GroupBy(i => Tuple.Create(i.Item1, i.Item2), i => i.Item3);
+                    .GroupBy(i => CreateItemCacheKey(i.Item1, i.Item2), i => i.Item3);
                 var anyError = false;
                 var errors = new StringBuilder();
                 foreach (var listInfo in groupByLists)
                 {
-                    var web = GetWeb(listInfo.Key.Item1);
-                    var list = web.Lists[new Guid(listInfo.Key.Item2)];
-
                     try
                     {
+                        var web = GetWeb(listInfo.Key.Item1);
+                        var list = web.Lists[new Guid(listInfo.Key.Item2)];
                         var query = new SPQuery();
                         query.RowLimit = (uint)listInfo.Count();
                         var values = string.Join(string.Empty, listInfo.Select(itemId => $"<Value Type='Counter'>{itemId}</Value>"));
@@ -962,7 +962,7 @@ namespace TimeSheets
                     catch (Exception ex)
                     {
                         anyError = true;
-                        errors.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex.ToString()}");
+                        errors.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex}");
                     }
                 }
 
@@ -971,7 +971,12 @@ namespace TimeSheets
 
             public SPListItem GetListItem(string webId, string listId, string itemId)
             {
-                return _itemsCache[Tuple.Create(webId, listId)].GetItemById(int.Parse(itemId));
+                return _itemsCache[CreateItemCacheKey(webId, listId)].GetItemById(int.Parse(itemId));
+            }
+
+            private static Tuple<string, string> CreateItemCacheKey(string webId, string listId)
+            {
+                return Tuple.Create(webId.ToUpperInvariant(), listId.ToUpperInvariant());
             }
 
             void IDisposable.Dispose()

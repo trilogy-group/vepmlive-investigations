@@ -454,7 +454,8 @@ namespace TimeSheets
                     cn.Open();
                     if (li != null)
                     {
-                        using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
+                        using (SqlCommand cmdHours =
+                            new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
                         {
                             cmdHours.Parameters.AddWithValue("@listuid", listguid);
                             cmdHours.Parameters.AddWithValue("@itemid", li.ID);
@@ -475,7 +476,10 @@ namespace TimeSheets
 
                     }
                 }
-                catch { }
+                catch
+                {
+                    return true; // Perform update if no TimesheetHours field, e.g. for non-work items
+                }
             }
 
             return false;
