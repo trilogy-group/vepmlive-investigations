@@ -372,6 +372,12 @@ namespace EPMLiveCore
                             ? "ID"
                             : "Text");
                     break;
+                case SPFieldType.Number:
+                    if (((SPFieldNumber)field).ShowAsPercentage)
+                    {
+                        nodeValue = Convert.ToString(double.Parse(nodeValue) / 100);
+                    }
+                    break;
                 default:
                     Trace.TraceError("Unexpected Value for {0}: {1}", nameof(field.Type), field.Type);
                     break;
