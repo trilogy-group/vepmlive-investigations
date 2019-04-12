@@ -42,9 +42,9 @@ namespace PortfolioEngineCore
                 {
                     while (reader.Read())
                     {
-                        var nFieldID = (int)reader["FIELD_ID"];
-                        var sFieldName = (string)reader["FIELD_NAME"];
-                        dataTable.Rows.Add(sFieldName, nFieldID, type);
+                        var fieldId = (int)reader["FIELD_ID"];
+                        var fieldName = (string)reader["FIELD_NAME"];
+                        dataTable.Rows.Add(fieldName, fieldId, type);
                     }
                 }
             }
