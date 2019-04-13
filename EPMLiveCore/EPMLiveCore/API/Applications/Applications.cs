@@ -963,27 +963,26 @@ namespace EPMLiveCore.API
                 id);
 
             SetListItem(id, verifyOnly, applicationList, query, applicationDefinition, out listItem);
-            UpdateListItem(verifyOnly, listItem);
-
-            return GetJob(verifyOnly, web, community, applicationList, listItem);
-        }
-
-        private static void UpdateListItem(bool verifyOnly, SPListItem listItem)
-        {
             listItem[InstallPercentFieldName] = 0;
 
             if (verifyOnly)
             {
-                listItem[InstallMessagesFieldName] = string.Empty;
-                listItem[StatusFieldName] = PreCheckQueuedStatus;
-                listItem.Update();
+                UpdateListItem(PreCheckQueuedStatus, listItem)
             }
             else
             {
-                listItem[InstallMessagesFieldName] = string.Empty;
-                listItem[StatusFieldName] = InstallQueuedStatus;
-                listItem.Update();
+                UpdateListItem(InstallQueuedStatus, listItem);
             }
+
+            return GetJob(verifyOnly, web, community, applicationList, listItem);
+        }
+
+        private static void UpdateListItem(string statusFieldName, SPListItem listItem)
+        {
+            listItem[InstallPercentFieldName] = 0;
+            listItem[InstallMessagesFieldName] = string.Empty;
+            listItem[StatusFieldName] = statusFieldName;
+            listItem.Update();
         }
 
         private static void SetListItem(
