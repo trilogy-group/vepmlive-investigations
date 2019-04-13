@@ -96,9 +96,7 @@ namespace PortfolioEngineCore
             if (name.Length == 0)
             {
                 reply = SqlDb.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Please enter a Lookup Name");
-                {
-                    return false;
-                }
+                return false;
             }
             const string commandText = "SELECT LOOKUP_UID From EPGP_LOOKUP_TABLES WHERE LOOKUP_NAME = @p1";
             DataTable dataTable;
@@ -252,7 +250,7 @@ namespace PortfolioEngineCore
             SqlTransaction transaction,
             bool inserts)
         {
-            var commandText =
+            const string commandText =
                 "SELECT LOOKUP_UID,LV_UID,LV_EXT_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_INACTIVE From EPGP_LOOKUP_VALUES WHERE LOOKUP_UID = @LookupUID";
             using (var sqlCommand = new SqlCommand(commandText, dba.Connection))
             {
@@ -301,9 +299,15 @@ namespace PortfolioEngineCore
                             }
                         }
 
-                        UpdateDbs(dba, updates, transaction, dataTable);
+                        if (updates)
+                        {
+                            UpdateDbs(dba, transaction, dataTable);
+                        }
 
-                        ApplyUpdates(dba, deletes, transaction, dataTable);
+                        if (deletes)
+                        {
+                            DeleteDbs(dba, transaction, dataTable);
+                        }
                     }
                 }
             }
@@ -311,65 +315,59 @@ namespace PortfolioEngineCore
             Insert(dba, lookUpId, inserts, transaction, valuesDictionary);
         }
 
-        private static void UpdateDbs(DBAccess dba, bool updates, SqlTransaction transaction, DataTable dataTable)
+        private static void UpdateDbs(DBAccess dba, SqlTransaction transaction, DataTable dataTable)
         {
             //  apply updates to dbs
-            if (updates)
+            var commandText =
+                @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid,"
+                + " LV_INACTIVE=@LV_inactive Where LV_UID=@LV_uid";
+            using (var sqlCommand = new SqlCommand(commandText, dba.Connection)
             {
-                var commandText =
-                    @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid,"
-                    + " LV_INACTIVE=@LV_inactive Where LV_UID=@LV_uid";
-                using (var sqlCommand = new SqlCommand(commandText, dba.Connection)
-                {
-                    Transaction = transaction,
-                    CommandType = CommandType.Text
-                })
-                {
-                    var uId = sqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                    var level = sqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                    var id = sqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                    var fieldValue = sqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                    var fullvalue = sqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                    var extId = sqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-                    var inactive = sqlCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
+                Transaction = transaction,
+                CommandType = CommandType.Text
+            })
+            {
+                var uId = sqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
+                var level = sqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
+                var id = sqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
+                var fieldValue = sqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
+                var fullValue = sqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
+                var extId = sqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+                var inactive = sqlCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
 
-                    foreach (DataRow row in dataTable.Rows)
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if (row.RowState == DataRowState.Modified)
                     {
-                        if (row.RowState == DataRowState.Modified)
-                        {
-                            uId.Value = row["LV_UID"];
-                            level.Value = row["LV_LEVEL"];
-                            id.Value = row["LV_ID"];
-                            fieldValue.Value = row["LV_VALUE"];
-                            fullvalue.Value = row["LV_FULLVALUE"];
-                            extId.Value = row["LV_EXT_UID"];
-                            inactive.Value = row["LV_INACTIVE"];
-                            sqlCommand.ExecuteNonQuery();
-                        }
+                        uId.Value = row["LV_UID"];
+                        level.Value = row["LV_LEVEL"];
+                        id.Value = row["LV_ID"];
+                        fieldValue.Value = row["LV_VALUE"];
+                        fullValue.Value = row["LV_FULLVALUE"];
+                        extId.Value = row["LV_EXT_UID"];
+                        inactive.Value = row["LV_INACTIVE"];
+                        sqlCommand.ExecuteNonQuery();
                     }
                 }
             }
         }
 
-        private static void ApplyUpdates(DBAccess dba, bool deletes, SqlTransaction transaction, DataTable dataTable)
+        private static void DeleteDbs(DBAccess dba, SqlTransaction transaction, DataTable dataTable)
         {
             //  apply deletes to dbs
-            if (deletes)
+            var commandText = @"Delete From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid";
+            using (var sqlCommand = new SqlCommand(commandText, dba.Connection))
             {
-                var commandText = @"Delete From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid";
-                using (var sqlCommand = new SqlCommand(commandText, dba.Connection))
-                {
-                    sqlCommand.Transaction = transaction;
-                    sqlCommand.CommandType = CommandType.Text;
+                sqlCommand.Transaction = transaction;
+                sqlCommand.CommandType = CommandType.Text;
 
-                    var uId = sqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                    foreach (DataRow row in dataTable.Rows)
+                var uId = sqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if (row.RowState == DataRowState.Deleted)
                     {
-                        if (row.RowState == DataRowState.Deleted)
-                        {
-                            uId.Value = row["LV_UID", DataRowVersion.Original];
-                            sqlCommand.ExecuteNonQuery();
-                        }
+                        uId.Value = row["LV_UID", DataRowVersion.Original];
+                        sqlCommand.ExecuteNonQuery();
                     }
                 }
             }
