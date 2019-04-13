@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
-using System.Net;
-using System.Xml;
-using Microsoft.SharePoint;
 using System.Collections;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.SharePoint.Navigation;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
-using System.IO;
 using EPMLiveCore.WorkEngineSolutionStoreListSvc;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Navigation;
 
 namespace EPMLiveCore.API
 {
@@ -1602,16 +1601,14 @@ namespace EPMLiveCore.API
                         if (childNode.Name == "z:row")
                         {
                             string rootFilePath;
-                            string xml;
                             SetApplicationDefinitionProperties(
                                 id,
                                 listSvc,
                                 childNode,
                                 applicationDefinition,
-                                out rootFilePath,
-                                out xml);
+                                out rootFilePath);
 
-                            if (!LoadApplicationDefinition(rootFilePath, xml, applicationDefinition))
+                            if (!LoadApplicationDefinition(rootFilePath, applicationDefinition))
                             {
                                 return applicationDefinition;
                             }
@@ -1646,8 +1643,7 @@ namespace EPMLiveCore.API
             Lists listSvc,
             XmlNode childNode,
             ApplicationDef applicationDefinition,
-            out string rootFilePath,
-            out string xml)
+            out string rootFilePath)
         {
             var versionInfo = GetVersionFolder(listSvc, getAttribute(childNode, "ows_Title"));
 
@@ -1662,7 +1658,6 @@ namespace EPMLiveCore.API
                 CoreFunctions.getFarmSetting("WorkEngineStore"),
                 getAttribute(childNode, "ows_Title"),
                 versionInfo);
-            xml = string.Empty;
             applicationDefinition.fullurl = rootFilePath;
             applicationDefinition.appurl = string.Format(
                 "Applications/{0}{1}",
@@ -1691,9 +1686,9 @@ namespace EPMLiveCore.API
 
         private static bool LoadApplicationDefinition(
             string rootFilePath,
-            string xml,
             ApplicationDef applicationDefinition)
         {
+            var xml = string.Empty;
             try
             {
                 using (var webClient = new WebClient())
