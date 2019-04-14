@@ -1052,7 +1052,7 @@ namespace EPMLiveCore.API
             SPList applicationList,
             SPListItem listItem)
         {
-            const int JobType = 51;
+            const int jobType = 51;
             const int runtime = -1;
             const int scheduleType = 9;
             const int defaultStatus = 0;
@@ -1063,7 +1063,7 @@ namespace EPMLiveCore.API
                 applicationList.ID,
                 listItem.ID,
                 "App PreCheck",
-                JobType,
+                jobType,
                 string.Format("<Data Verify=\"{0}\" Community=\"{1}\"/>", verifyOnly, community),
                 string.Empty,
                 runtime,
