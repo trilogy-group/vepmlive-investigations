@@ -965,14 +965,11 @@ namespace EPMLiveCore.API
             SetListItem(id, verifyOnly, applicationList, query, applicationDefinition, out listItem);
             listItem[InstallPercentFieldName] = 0;
 
-            if (verifyOnly)
-            {
-                UpdateListItem(PreCheckQueuedStatus, listItem);
-            }
-            else
-            {
-                UpdateListItem(InstallQueuedStatus, listItem);
-            }
+            UpdateListItem(
+                verifyOnly
+                    ? PreCheckQueuedStatus
+                    : InstallQueuedStatus,
+                listItem);
 
             return GetJob(verifyOnly, web, community, applicationList, listItem);
         }
