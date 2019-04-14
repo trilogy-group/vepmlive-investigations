@@ -967,7 +967,7 @@ namespace EPMLiveCore.API
 
             if (verifyOnly)
             {
-                UpdateListItem(PreCheckQueuedStatus, listItem)
+                UpdateListItem(PreCheckQueuedStatus, listItem);
             }
             else
             {
