@@ -33,9 +33,9 @@ namespace EPMLiveCore
             return _cache;
         }
 
-        public static SPSite GetSiteFromCache(bool elevated, Func<SPSite> noCacheCallback)
+        public static SPSite GetSiteFromCache(Guid siteId, bool elevated, Func<SPSite> noCacheCallback)
         {
-            if (!ShouldUseCache)
+            if (!ShouldUseCache || siteId != Cache.Site.ID)
             {
                 return noCacheCallback();
             }
@@ -55,18 +55,18 @@ namespace EPMLiveCore
 
         public static SPWeb GetWeb(SPItemEventProperties properties)
         {
-            return ShouldUseCache ? Cache.GetWebByRelativeUrl(properties.RelativeWebUrl) : properties.Web;
+            return ShouldUseCache ? Cache.GetWebByRelativeUrl(properties.RelativeWebUrl) ?? properties.Web : properties.Web;
         }
 
         public static SPList GetList(SPItemEventProperties properties)
         {
-            return ShouldUseCache ? GetWeb(properties).Lists[properties.ListId] : properties.List;
+            return ShouldUseCache ? Cache.GetWebByRelativeUrl(properties.RelativeWebUrl)?.Lists[properties.ListId] ?? properties.List : properties.List;
         }
 
         public static SPListItem GetListItem(SPItemEventProperties properties)
         {
             return ShouldUseCache 
-                ? Cache.GetListItem(properties.RelativeWebUrl, properties.ListId, properties.ListItemId)
+                ? Cache.GetListItem(properties.RelativeWebUrl, properties.ListId, properties.ListItemId) ?? properties.ListItem
                 : properties.ListItem;
         }
 
@@ -101,7 +101,8 @@ namespace EPMLiveCore
 
         public SPWeb GetWebByRelativeUrl(string relativeWebUrl)
         {
-            return _websByRelativeUrlCache[relativeWebUrl];
+            SPWeb result;
+            return _websByRelativeUrlCache.TryGetValue(relativeWebUrl, out result) ? result : null;
         }
 
         /// <summary>
@@ -142,7 +143,8 @@ namespace EPMLiveCore
 
         public SPListItem GetListItem(string relativeWebUrl, Guid listId, int itemId)
         {
-            return _itemsCache[Tuple.Create(relativeWebUrl, listId)].GetItemById(itemId);
+            SPListItemCollection items;
+            return _itemsCache.TryGetValue(Tuple.Create(relativeWebUrl, listId), out items) ? items.GetItemById(itemId) : null;
         }
 
         void IDisposable.Dispose()

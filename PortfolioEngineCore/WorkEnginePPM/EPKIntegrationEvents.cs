@@ -238,7 +238,7 @@ namespace WorkEnginePPM
                 catch { }
                 try
                 {
-                    var site = SaveDataJobExecuteCache.GetSiteFromCache(false, () => new SPSite(properties.SiteId));
+                    var site = SaveDataJobExecuteCache.GetSiteFromCache(properties.SiteId, false, () => new SPSite(properties.SiteId));
                     try
                     {
 

@@ -39,7 +39,7 @@ namespace EPMLiveCore
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
-                    var site = SaveDataJobExecuteCache.GetSiteFromCache(true, () => new SPSite(properties.SiteId));
+                    var site = SaveDataJobExecuteCache.GetSiteFromCache(properties.SiteId, true, () => new SPSite(properties.SiteId));
                     try
                     {
                         using (var web = site.OpenWeb(properties.Web.ID))

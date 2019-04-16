@@ -50,7 +50,7 @@ namespace EPMLiveCore.Tests
             var siteMock = new ShimSPSite();
             using (SaveDataJobExecuteCache.InitializeCache(siteMock))
             {
-                var site = SaveDataJobExecuteCache.GetSiteFromCache(false, () =>
+                var site = SaveDataJobExecuteCache.GetSiteFromCache(Guid.Empty, false, () =>
                 {
                     Assert.Fail();
                     return null;
@@ -64,11 +64,26 @@ namespace EPMLiveCore.Tests
         public void ShouldCallCallbackIfNoCache()
         {
             var siteMock = new ShimSPSite();
-            var site = SaveDataJobExecuteCache.GetSiteFromCache(false, () => siteMock);
+            var site = SaveDataJobExecuteCache.GetSiteFromCache(Guid.Empty, false, () => siteMock);
             site.ShouldBe(siteMock);
 
-            site = SaveDataJobExecuteCache.GetSiteFromCache(true, () => siteMock);
+            site = SaveDataJobExecuteCache.GetSiteFromCache(Guid.Empty, true, () => siteMock);
             site.ShouldBe(siteMock);
+        }
+
+        [TestMethod]
+        public void ShouldCallCallbackIfSiteOfDifferentId()
+        {
+            using (SaveDataJobExecuteCache.InitializeCache(new ShimSPSite()))
+            {
+                var siteId = Guid.NewGuid();
+                var siteMock = new ShimSPSite { IDGet = () => siteId };
+                var site = SaveDataJobExecuteCache.GetSiteFromCache(siteId, false, () => siteMock);
+                site.ShouldBe(siteMock);
+
+                site = SaveDataJobExecuteCache.GetSiteFromCache(siteId, true, () => siteMock);
+                site.ShouldBe(siteMock);
+            }
         }
 
         [TestMethod]
@@ -80,7 +95,7 @@ namespace EPMLiveCore.Tests
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = cb => cb();
             using (SaveDataJobExecuteCache.InitializeCache(siteMock))
             {
-                var site = SaveDataJobExecuteCache.GetSiteFromCache(true, () =>
+                var site = SaveDataJobExecuteCache.GetSiteFromCache(Guid.Empty, true, () =>
                 {
                     Assert.Fail();
                     return null;
@@ -139,6 +154,22 @@ namespace EPMLiveCore.Tests
         }
 
         [TestMethod]
+        public void ShouldReturnWebFromPropertiesIfNotFoundInCache()
+        {
+            var siteMock = new ShimSPSite();
+            const string TestUrl = "test/url";
+            var webMock = new ShimSPWeb();
+
+            using (SaveDataJobExecuteCache.InitializeCache(siteMock))
+            {
+                var properties = new ShimSPItemEventProperties { RelativeWebUrlGet = () => TestUrl, WebGet = () => webMock };
+                var web = SaveDataJobExecuteCache.GetWeb(properties);
+
+                web.ShouldBe(webMock);
+            }
+        }
+
+        [TestMethod]
         public void ShouldReturnWebFromPropertiesIfNoCache()
         {
             var webMock = new ShimSPWeb();
@@ -167,6 +198,22 @@ namespace EPMLiveCore.Tests
                 var list = SaveDataJobExecuteCache.GetList(properties);
 
                 webById.ShouldNotBeNull();
+                list.ShouldBe(listMock);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldReturnListFromPropertiesIfItIsNotFoundInCache()
+        {
+            var siteMock = new ShimSPSite();
+            const string TestUrl = "test/url";
+            var listMock = new ShimSPList();
+
+            using (SaveDataJobExecuteCache.InitializeCache(siteMock))
+            {
+                var properties = new ShimSPItemEventProperties { RelativeWebUrlGet = () => TestUrl, ListGet = () => listMock };
+                var list = SaveDataJobExecuteCache.GetList(properties);
+
                 list.ShouldBe(listMock);
             }
         }
@@ -230,6 +277,50 @@ namespace EPMLiveCore.Tests
                     RelativeWebUrlGet = () => TestUrl, 
                     ListIdGet = () => listId, 
                     ListItemIdGet = () => ItemId
+                };
+                var listItem = SaveDataJobExecuteCache.GetListItem(properties);
+                listItem.ShouldBe(listItemMock);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldReturnListItemFromPropertiesIfListIsNotInCache()
+        {
+            var webId = Guid.NewGuid();
+            var listId = Guid.NewGuid();
+            var list2Id = Guid.NewGuid();
+            const int ItemId = 1;
+
+            var siteMock = new ShimSPSite();
+
+            var listMock = new ShimSPList { GetItemsSPQuery = _ => new ShimSPListItemCollection(), IDGet = () => listId };
+            var listCollection = new ShimSPListCollection { ItemGetGuid = _ => listMock };
+
+            const string TestUrl = "test/url";
+            var webMock = new ShimSPWeb { ServerRelativeUrlGet = () => TestUrl, ListsGet = () => listCollection };
+            siteMock.OpenWebGuid = guid => webMock;
+
+            using (var cache = SaveDataJobExecuteCache.InitializeCache(siteMock))
+            {
+                var result = cache.PreloadListItems(new[]
+                {
+                    new SaveDataJobExecuteCache.ListItemInfo
+                    {
+                        WebId = webId.ToString(),
+                        ListId = listId.ToString(),
+                        ListItemId = ItemId.ToString()
+                    }
+                });
+
+                result.Item1.ShouldBe(false);
+
+                var listItemMock = new ShimSPListItem();
+                var properties = new ShimSPItemEventProperties
+                {
+                    RelativeWebUrlGet = () => TestUrl,
+                    ListIdGet = () => list2Id,
+                    ListItemIdGet = () => ItemId,
+                    ListItemGet = () => listItemMock
                 };
                 var listItem = SaveDataJobExecuteCache.GetListItem(properties);
                 listItem.ShouldBe(listItemMock);

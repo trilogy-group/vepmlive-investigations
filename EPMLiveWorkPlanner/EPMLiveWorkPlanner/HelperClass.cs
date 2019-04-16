@@ -185,7 +185,7 @@ namespace EPMLiveWorkPlanner
                     lWeb = w.ID;
 
                 // NOTE: Now this is invoked only inside StatusingEvent.processItem() under elevated privileges, so we get elevated site here
-                var site = SaveDataJobExecuteCache.GetSiteFromCache(true, () => w.Site);
+                var site = SaveDataJobExecuteCache.GetSiteFromCache(w.Site.ID, true, () => w.Site);
                 try
                 {
                     using (SPWeb web = site.OpenWeb(lWeb))
