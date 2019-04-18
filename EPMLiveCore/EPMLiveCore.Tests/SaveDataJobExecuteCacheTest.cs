@@ -260,17 +260,20 @@ namespace EPMLiveCore.Tests
 
             using (var cache = SaveDataJobExecuteCache.InitializeCache(siteMock))
             {
-                var result = cache.PreloadListItems(new[]
-                {
-                    new SaveDataJobExecuteCache.ListItemInfo
+                string preloadErrors;
+                var preloadHasErrors =
+                    cache.PreloadListItems(new[]
                     {
-                        WebId = webId.ToString(),
-                        ListId = listId.ToString(),
-                        ListItemId = ItemId.ToString()
-                    }
-                });
+                        new SaveDataJobExecuteCache.ListItemInfo
+                        {
+                            WebId = webId.ToString(),
+                            ListId = listId.ToString(),
+                            ListItemId = ItemId.ToString()
+                        }
+                    }, out preloadErrors);
 
-                result.Item1.ShouldBe(false);
+                preloadHasErrors.ShouldBe(false);
+                preloadErrors.ShouldBe(string.Empty);
 
                 var properties = new ShimSPItemEventProperties
                 {
@@ -302,7 +305,8 @@ namespace EPMLiveCore.Tests
 
             using (var cache = SaveDataJobExecuteCache.InitializeCache(siteMock))
             {
-                var result = cache.PreloadListItems(new[]
+                string preloadErrors;
+                var preloadHasErrors = cache.PreloadListItems(new[]
                 {
                     new SaveDataJobExecuteCache.ListItemInfo
                     {
@@ -310,9 +314,10 @@ namespace EPMLiveCore.Tests
                         ListId = listId.ToString(),
                         ListItemId = ItemId.ToString()
                     }
-                });
+                }, out preloadErrors);
 
-                result.Item1.ShouldBe(false);
+                preloadHasErrors.ShouldBe(false);
+                preloadErrors.ShouldBe(string.Empty);
 
                 var listItemMock = new ShimSPListItem();
                 var properties = new ShimSPItemEventProperties

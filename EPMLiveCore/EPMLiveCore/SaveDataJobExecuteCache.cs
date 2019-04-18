@@ -109,15 +109,16 @@ namespace EPMLiveCore
         /// Bulk loading of list items
         /// </summary>
         /// <param name="items">Triples of Web ID, List ID and Item ID</param>
-        /// <returns>Tuple of error presence flag and error message</returns>
-        public Tuple<bool, string> PreloadListItems(IEnumerable<ListItemInfo> items)
+        /// <param name="errors"></param>
+        /// <returns>Error presence flag</returns>
+        public bool PreloadListItems(IEnumerable<ListItemInfo> items, out string errors)
         {
             _itemsCache.Clear();
             var groupByLists = items
                 .Where(i => !string.IsNullOrEmpty(i.WebId) && !string.IsNullOrEmpty(i.ListId) && !string.IsNullOrEmpty(i.ListItemId))
                 .GroupBy(i => Tuple.Create(i.WebId.ToUpperInvariant(), i.ListId.ToUpperInvariant()), i => i.ListItemId);
             var anyError = false;
-            var errors = new StringBuilder();
+            var errorsBuilder = new StringBuilder();
             foreach (var listInfo in groupByLists)
             {
                 try
@@ -134,11 +135,12 @@ namespace EPMLiveCore
                 catch (Exception ex)
                 {
                     anyError = true;
-                    errors.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex}");
+                    errorsBuilder.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex}");
                 }
             }
 
-            return Tuple.Create(anyError, errors.ToString());
+            errors = errorsBuilder.ToString();
+            return anyError;
         }
 
         public SPListItem GetListItem(string relativeWebUrl, Guid listId, int itemId)

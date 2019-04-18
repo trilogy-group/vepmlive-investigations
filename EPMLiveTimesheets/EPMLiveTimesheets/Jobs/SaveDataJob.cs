@@ -101,17 +101,18 @@ namespace TimeSheets
                                             cmd3.ExecuteNonQuery();
                                         }
 
-                                        var preloadResult =
+                                        string preloadErrors;
+                                        var preloadHasErrors =
                                             cache.PreloadListItems(ndItems.Cast<XmlNode>().Select(i => new SaveDataJobExecuteCache.ListItemInfo
                                             {
                                                 WebId = iGetAttribute(i, "WebID"),
                                                 ListId = iGetAttribute(i, "ListID"),
                                                 ListItemId = iGetAttribute(i, "ItemID")
-                                            }));
-                                        if (preloadResult.Item1)
+                                            }), out preloadErrors);
+                                        if (preloadHasErrors)
                                         {
                                             bErrors = true;
-                                            sErrors += preloadResult.Item2;
+                                            sErrors += preloadErrors;
                                         }
 
                                         foreach (XmlNode ndItem in ndItems)
@@ -513,7 +514,8 @@ namespace TimeSheets
 
                         SPWeb iWeb = null;
 
-                        var preloadResult =
+                        string preloadErrors;
+                        var preloadHasErrors =
                             SaveDataJobExecuteCache.Cache.PreloadListItems(dsProjects.Tables[0].Rows.Cast<DataRow>().Select(r =>
                             {
                                 var listItemId = r["Project_id"].ToString();
@@ -523,10 +525,10 @@ namespace TimeSheets
                                     ListId = r["PROJECT_LIST_UID"].ToString(),
                                     ListItemId = listItemId != "0" ? listItemId : null
                                 };
-                            }));
-                        if (preloadResult.Item1)
+                            }), out preloadErrors);
+                        if (preloadHasErrors)
                         {
-                            error += preloadResult.Item2;
+                            error += preloadErrors;
                         }
 
                         foreach (DataRow drProject in dsProjects.Tables[0].Rows)

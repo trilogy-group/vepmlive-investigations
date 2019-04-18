@@ -754,12 +754,19 @@ namespace TimeSheets
 
                                                 using (var cache = new ExecuteCache(site))
                                                 {
-                                                    var preloadResult = 
-                                                        cache.PreloadListItems(ndItems.Cast<XmlNode>().Select(i => Tuple.Create(iGetAttribute(i, "WebID"), iGetAttribute(i, "ListID"), iGetAttribute(i, "ItemID"))));
-                                                    if (preloadResult.Item1)
+                                                    string preloadErrors;
+                                                    var preloadHasErrors =
+                                                        cache.PreloadListItems(ndItems.Cast<XmlNode>().Select(i =>
+                                                            new SaveDataJobExecuteCache.ListItemInfo
+                                                            {
+                                                                WebId = iGetAttribute(i, "WebID"),
+                                                                ListId = iGetAttribute(i, "ListID"),
+                                                                ListItemId = iGetAttribute(i, "ItemID")
+                                                            }), out preloadErrors);
+                                                    if (preloadHasErrors)
                                                     {
                                                         bErrors = true;
-                                                        sbErrors.Append(preloadResult.Item2);
+                                                        sbErrors.Append(preloadErrors);
                                                     }
 
                                                     foreach (XmlNode ndItem in ndItems)
@@ -934,14 +941,15 @@ namespace TimeSheets
             /// Bulk loading of list items
             /// </summary>
             /// <param name="items">Triples of Web ID, List ID and Item ID</param>
+            /// <param name="errors"></param>
             /// <returns>Tuple of error presence flag and error message</returns>
-            public Tuple<bool, string> PreloadListItems(IEnumerable<Tuple<string, string, string>> items)
+            public bool PreloadListItems(IEnumerable<SaveDataJobExecuteCache.ListItemInfo> items, out string errors)
             {
                 var groupByLists = items
-                    .Where(i => !string.IsNullOrEmpty(i.Item1) && !string.IsNullOrEmpty(i.Item2) && !string.IsNullOrEmpty(i.Item3))
-                    .GroupBy(i => CreateItemCacheKey(i.Item1, i.Item2), i => i.Item3);
+                    .Where(i => !string.IsNullOrEmpty(i.WebId) && !string.IsNullOrEmpty(i.ListId) && !string.IsNullOrEmpty(i.ListItemId))
+                    .GroupBy(i => CreateItemCacheKey(i.WebId, i.ListId), i => i.ListItemId);
                 var anyError = false;
-                var errors = new StringBuilder();
+                var errorsBuilder = new StringBuilder();
                 foreach (var listInfo in groupByLists)
                 {
                     try
@@ -962,11 +970,12 @@ namespace TimeSheets
                     catch (Exception ex)
                     {
                         anyError = true;
-                        errors.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex}");
+                        errorsBuilder.Append($"Items ({string.Join(", ", listInfo)}) Error: {ex}");
                     }
                 }
 
-                return Tuple.Create(anyError, errors.ToString());
+                errors = errorsBuilder.ToString();
+                return anyError;
             }
 
             public SPListItem GetListItem(string webId, string listId, string itemId)
