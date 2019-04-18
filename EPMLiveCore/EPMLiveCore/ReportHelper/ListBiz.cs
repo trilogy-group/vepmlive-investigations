@@ -13,6 +13,8 @@ namespace EPMLiveCore.ReportHelper
     public class ListBiz
     {
         private const int NewEventSequenceNumber = 11000;
+        private const string ResourceListName = "Resources";
+        private const string ResourceListEXTFieldName = "EXTID";
         public static Collection<string> AutomaticFields = new Collection<string>
         {
             "Title",
@@ -134,6 +136,16 @@ namespace EPMLiveCore.ReportHelper
                 columnsSnapshot.AddColumn(spField);
                 if (RequiredResourceFields.Contains(spField.InternalName))
                     matches++;
+            }
+            if (spList.Title == ResourceListName)
+            {
+                var extId = columns.FirstOrDefault(col => col.InternalName == ResourceListEXTFieldName);
+                if (extId == null)
+                {
+                    var spField = spList.Fields[ResourceListEXTFieldName];
+                    columns.AddColumn(spField);
+                    columnsSnapshot.AddColumn(spField);
+                }
             }
             _resourceList = (RequiredResourceFields.Count == matches);
             Update(columns);
