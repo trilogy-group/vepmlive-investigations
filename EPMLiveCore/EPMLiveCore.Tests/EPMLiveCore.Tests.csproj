@@ -308,7 +308,6 @@
     <Compile Include="ReportHelper\EPMDataTest.cs" />
     <Compile Include="ReportHelper\ReportDataTests.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEventTest.cs" />
-    <Compile Include="SaveDataJobExecuteCacheTest.cs" />
     <Compile Include="Shared\AssertException.cs" />
     <Compile Include="SocialEngine\Core\ThreadManagerTest.cs" />
     <Compile Include="SocialEngine\Modules\ListItemTests.cs" />
@@ -331,6 +330,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
+    <Compile Include="SaveDataJobExecuteCacheTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\AsyncResultTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CaseSettingsTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CustomFieldTest.cs" />

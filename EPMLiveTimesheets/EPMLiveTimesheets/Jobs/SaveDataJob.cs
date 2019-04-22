@@ -215,63 +215,63 @@ namespace TimeSheets
                                     var failures = 0;
                                     while (true)
                                     {
+                                    try
+                                    {
                                         try
                                         {
+                                                li = SaveDataJobExecuteCache.Cache.GetListItem(web.ServerRelativeUrl, list.ID, int.Parse(itemid), refresh: failures > 0);
+                                        }
+                                        catch
+                                        {
+                                        }
+
+                                        if (li != null)
+                                        {
+                                            int projectid = 0;
+                                            string project = "";
+                                            string projectlist = "";
                                             try
                                             {
-                                                li = SaveDataJobExecuteCache.Cache.GetListItem(web.ServerRelativeUrl, list.ID, int.Parse(itemid), refresh: failures > 0);
+                                                SPFieldLookupValue lv =
+                                                    new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
+                                                projectid = lv.LookupId;
+                                                project = lv.LookupValue;
                                             }
                                             catch
                                             {
                                             }
 
-                                            if (li != null)
+                                            if (liveHours)
                                             {
-                                                int projectid = 0;
-                                                string project = "";
-                                                string projectlist = "";
-                                                try
+                                                if (!processLiveHours(li, list.ID))
                                                 {
-                                                    SPFieldLookupValue lv =
-                                                        new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
-                                                    projectid = lv.LookupId;
-                                                    project = lv.LookupValue;
-                                                }
-                                                catch
-                                                {
+                                                    return;
                                                 }
 
-                                                if (liveHours)
+                                                if (li.Fields.ContainsFieldWithInternalName("PercentComplete") &&
+                                                    li.Fields.ContainsFieldWithInternalName("Status"))
                                                 {
-                                                    if (!processLiveHours(li, list.ID))
+                                                    SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
+                                                    SPField statusField = li.Fields.GetFieldByInternalName("Status");
+                                                    if (percentCompleteField != null && statusField != null)
                                                     {
-                                                        return;
-                                                    }
-
-                                                    if (li.Fields.ContainsFieldWithInternalName("PercentComplete") &&
-                                                        li.Fields.ContainsFieldWithInternalName("Status"))
-                                                    {
-                                                        SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
-                                                        SPField statusField = li.Fields.GetFieldByInternalName("Status");
-                                                        if (percentCompleteField != null && statusField != null)
+                                                        Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
+                                                        if (value == 0)
                                                         {
-                                                            Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
-                                                            if (value == 0)
-                                                            {
-                                                                li[statusField.InternalName] = "Not Started";
-                                                            }
-                                                            else if (value > 0 & value < 1)
-                                                            {
-                                                                li[statusField.InternalName] = "In Progress";
-                                                            }
-                                                            else if (value == 1)
-                                                            {
-                                                                li[statusField.InternalName] = "Completed";
-                                                            }
+                                                            li[statusField.InternalName] = "Not Started";
                                                         }
-
+                                                        else if (value > 0 & value < 1)
+                                                        {
+                                                            li[statusField.InternalName] = "In Progress";
+                                                        }
+                                                        else if (value == 1)
+                                                        {
+                                                            li[statusField.InternalName] = "Completed";
+                                                        }
                                                     }
+
                                                 }
+                                            }
 
                                                 SPSecurity.RunWithElevatedPrivileges(delegate { li.Update(); });
                                             }
@@ -279,12 +279,12 @@ namespace TimeSheets
                                         catch (SPException ex) when (ex.HResult == SaveConflictErrorCode && ++failures < MaxTaskFailures)
                                         {
                                             continue;
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            bErrors = true;
-                                            sErrors += "Item (" + id + ") Error: " + ex.ToString();
-                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        bErrors = true;
+                                        sErrors += "Item (" + id + ") Error: " + ex.ToString();
+                                    }
 
                                         break;
                                     }
@@ -437,13 +437,13 @@ namespace TimeSheets
                                             {
                                                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                                                 {
-                                                    var liProject = SaveDataJobExecuteCache.Cache.GetListItem(iWeb.ServerRelativeUrl, lGuid, int.Parse(project));
-                                                    var newHours = drProject["Hours"].ToString();
-                                                    if (liProject["TimesheetHours"]?.ToString() != newHours)
-                                                    {
-                                                        liProject["TimesheetHours"] = newHours;
+                                                var liProject = SaveDataJobExecuteCache.Cache.GetListItem(iWeb.ServerRelativeUrl, lGuid, int.Parse(project));
+                                                var newHours = drProject["Hours"].ToString();
+                                                if (liProject["TimesheetHours"]?.ToString() != newHours)
+                                                {
+                                                    liProject["TimesheetHours"] = newHours;
                                                         liProject.Update();
-                                                    }
+                                                }
                                                 });
                                             }
                                             catch(Exception ex) {
