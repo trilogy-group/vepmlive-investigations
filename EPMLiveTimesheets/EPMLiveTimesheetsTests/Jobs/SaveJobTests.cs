@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Fakes;
+using EPMLiveCore;
 using EPMLiveCore.Fakes;
 using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint;
@@ -1148,7 +1149,16 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             var executeCache = new SaveJob.ExecuteCache(spSite);
-            executeCache.PreloadListItems(new[] { Tuple.Create(DummyGuid.ToString(), DummyGuid.ToString(), DummyInt.ToString()) });
+            string preloadErrors;
+            executeCache.PreloadListItems(new[]
+            {
+                new SaveDataJobExecuteCache.ListItemInfo
+                {
+                    WebId = DummyGuid.ToString(),
+                    ListId = DummyGuid.ToString(),
+                    ListItemId = DummyInt.ToString()
+                }
+            }, out preloadErrors);
 
             // Act
             privateObject.Invoke(ProcessItemRowMethodName,
@@ -1267,7 +1277,18 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             var executeCache = new SaveJob.ExecuteCache(spSite);
-            executeCache.PreloadListItems(new[] { Tuple.Create(DummyGuid.ToString(), DummyGuid.ToString(), DummyInt.ToString()) });
+            string preloadErrors;
+            executeCache.PreloadListItems(
+                new[]
+                {
+                    new SaveDataJobExecuteCache.ListItemInfo
+                    {
+                        WebId = DummyGuid.ToString(),
+                        ListId = DummyGuid.ToString(),
+                        ListItemId = DummyInt.ToString()
+                    }
+                },
+                out preloadErrors);
 
             // Act
             privateObject.Invoke(ProcessItemRowMethodName,
@@ -1385,7 +1406,18 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
 
             var executeCache = new SaveJob.ExecuteCache(spSite);
-            executeCache.PreloadListItems(new[] { Tuple.Create(DummyGuid.ToString(), DummyGuid.ToString(), DummyInt.ToString()) });
+            string preloadErrors;
+            executeCache.PreloadListItems(
+                new[]
+                {
+                    new SaveDataJobExecuteCache.ListItemInfo
+                    {
+                        WebId = DummyGuid.ToString(),
+                        ListId = DummyGuid.ToString(),
+                        ListItemId = DummyInt.ToString()
+                    }
+                },
+                out preloadErrors);
 
             // Act    
             privateObject.Invoke(ProcessItemRowMethodName,
@@ -1983,10 +2015,11 @@ namespace EPMLiveTimesheets.Tests.Jobs
             };
             ShimSaveJob.AllInstances.ProcessItemRowXmlNodeDataTableRefSqlConnectionSPSiteSaveJobExecuteCacheTimesheetSettingsStringStringBooleanBoolean = ProcessItemRow;
             var preloadListItemsWasCalled = false;
-            ShimSaveJob.ShimExecuteCache.AllInstances.PreloadListItemsIEnumerableOfTupleOfStringStringString = (cache, tuples) =>
+            ShimSaveJob.ShimExecuteCache.AllInstances.PreloadListItemsIEnumerableOfSaveDataJobExecuteCacheListItemInfoStringOut = (SaveJob.ExecuteCache cache, IEnumerable<SaveDataJobExecuteCache.ListItemInfo> tuples, out string errors) =>
             {
                 preloadListItemsWasCalled = true;
-                return Tuple.Create(false, string.Empty);
+                errors = string.Empty;
+                return false;
             };
 
             // Act
