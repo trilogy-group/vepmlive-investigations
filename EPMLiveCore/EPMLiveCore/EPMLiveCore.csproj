@@ -1401,6 +1401,7 @@
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
+    <Compile Include="SaveDataJobExecuteCache.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\Creatables.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\Error.cs" />

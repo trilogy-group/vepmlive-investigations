@@ -23,13 +23,14 @@ namespace EPMLiveCore
             string pcGuid = "";
             bool isCopyingToParent = false;
 
+            var listItem = SaveDataJobExecuteCache.GetListItem(properties);
             try
             {
-                pcGuid = properties.ListItem["ChildItem"].ToString();
+                pcGuid = listItem["ChildItem"].ToString();
             }
             catch { }
             try{
-                pcGuid = properties.ListItem["ParentItem"].ToString();
+                pcGuid = listItem["ParentItem"].ToString();
                 isCopyingToParent = true;
 
                 try
@@ -40,7 +41,7 @@ namespace EPMLiveCore
                 {
                     try
                     {
-                        bWorkspaceDriven = bool.Parse(properties.ListItem["WorkspaceDriven"].ToString());
+                        bWorkspaceDriven = bool.Parse(listItem["WorkspaceDriven"].ToString());
                     }
                     catch { }
                 }
@@ -101,7 +102,7 @@ namespace EPMLiveCore
                                                 {
                                                     try
                                                     {
-                                                        li[parentField.Id] = properties.ListItem[f.Id];
+                                                        li[parentField.Id] = listItem[f.Id];
                                                     }
                                                     catch { }
                                                 }
