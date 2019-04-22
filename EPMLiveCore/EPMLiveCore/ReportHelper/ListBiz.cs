@@ -137,7 +137,6 @@ namespace EPMLiveCore.ReportHelper
                 if (RequiredResourceFields.Contains(spField.InternalName))
                     matches++;
             }
-            
             if (spList.Title == ResourceListName)
             {
                 var extId = columns.FirstOrDefault(col => col.InternalName == ResourceListEXTFieldName);
@@ -148,7 +147,6 @@ namespace EPMLiveCore.ReportHelper
                     columnsSnapshot.AddColumn(spField);
                 }
             }
-            
             _resourceList = (RequiredResourceFields.Count == matches);
             Update(columns);
             RegisterEvent();
