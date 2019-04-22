@@ -19,8 +19,8 @@ namespace EPMLiveCore.EPMLiveTaskCenterEvent
        {
            try
            {
-
-               if ((string)properties.AfterProperties["Status"] != (string)properties.ListItem["Status"])
+               var listItem = SaveDataJobExecuteCache.GetListItem(properties);
+               if ((string)properties.AfterProperties["Status"] != (string)listItem["Status"])
                {
                    if ((string)properties.AfterProperties["Status"] == "Completed")
                    {
@@ -38,7 +38,7 @@ namespace EPMLiveCore.EPMLiveTaskCenterEvent
                        properties.AfterProperties["PercentComplete"] = "0";
                    }
                }
-               else if ((string)properties.AfterProperties["PercentComplete"] != Convert.ToString(properties.ListItem["PercentComplete"]))
+               else if ((string)properties.AfterProperties["PercentComplete"] != Convert.ToString(listItem["PercentComplete"]))
                {
                    if ((string)properties.AfterProperties["PercentComplete"] == "0")
                    {
@@ -53,7 +53,6 @@ namespace EPMLiveCore.EPMLiveTaskCenterEvent
                        properties.AfterProperties["Status"] = "Completed";
                    }
                }
-
            }
            catch { }
        }

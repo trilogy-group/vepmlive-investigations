@@ -288,10 +288,13 @@ namespace WorkEnginePPM.Events.DataSync
                 }
                 else
                 {
-                    SPListItem spListItem = properties.List.GetItemByUniqueId(personalItem.UniqueId);
+                    var spListItem = properties.List.GetItemByUniqueId(personalItem.UniqueId);
 
-                    spListItem["EXTID"] = personalItem.ExtId;
-                    spListItem.SystemUpdate();
+                    if (spListItem["EXTID"]?.ToString() != personalItem.ExtId)
+                    {
+                        spListItem["EXTID"] = personalItem.ExtId;
+                        spListItem.SystemUpdate();
+                    }
                 }
             }
 
