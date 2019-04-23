@@ -137,15 +137,17 @@ namespace EPMLiveCore.ReportHelper
                 if (RequiredResourceFields.Contains(spField.InternalName))
                     matches++;
             }
-            
-            if (spList.Title == ResourceListName)
+            if (spList != null)
             {
-                var extId = columns.FirstOrDefault(col => col.InternalName == ResourceListEXTFieldName);
-                if (extId == null)
+                if (spList.Title == ResourceListName)
                 {
-                    var spField = spList.Fields[ResourceListEXTFieldName];
-                    columns.AddColumn(spField);
-                    columnsSnapshot.AddColumn(spField);
+                    var extId = columns.FirstOrDefault(col => col.InternalName == ResourceListEXTFieldName);
+                    if (extId == null)
+                    {
+                        var spField = spList.Fields[ResourceListEXTFieldName];
+                        columns.AddColumn(spField);
+                        columnsSnapshot.AddColumn(spField);
+                    }
                 }
             }
             
