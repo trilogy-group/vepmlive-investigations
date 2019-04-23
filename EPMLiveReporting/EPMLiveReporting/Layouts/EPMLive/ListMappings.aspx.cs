@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -156,46 +157,45 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             SPWeb web = SPContext.Current.Web;
 
-            var cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-
-            SPSecurity.RunWithElevatedPrivileges(delegate { cn.Open(); });
-
-            try
+            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
             {
-                if (web.CurrentUser.IsSiteAdmin)
+                SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
+
+                try
                 {
-                    var cmd =
-                        new SqlCommand(
-                            "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
-                            cn);
-                    cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
+                    if (web.CurrentUser.IsSiteAdmin)
                     {
-                        if (!dr.IsDBNull(0))
+                        using (var sqlCommand = new SqlCommand(
+                            "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                            sqlConnection))
                         {
-                            string sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
+                            sqlCommand.Parameters.AddWithValue("@SiteId", web.Site.ID);
+                            using (var dataReader = sqlCommand.ExecuteReader())
+                            {
+                                if (dataReader.Read() && !dataReader.IsDBNull(0))
+                                {
+                                    var connectionString =
+                                        $"Data Source={dataReader.GetString(2)};Initial Catalog={dataReader.GetString(3)}";
 
+                                    var text = new StringBuilder("<br><br><b>Reporting Database Information:</b><br>");
+                                    text.Append($"<b>Server:</b> {dataReader.GetString(2)}<br>")
+                                        .Append($"<b>Database:</b> {dataReader.GetString(3)}<br>")
+                                        .Append($"<b>Username:</b> {dataReader.GetString(0)}<br>")
+                                        .Append($"<b>Password:</b> {dataReader.GetString(1)}<br>")
+                                        .Append($"<b>Full Connection String: </b>{connectionString}<br>");
 
-                            string sText = "<br><br><b>Reporting Database Information:</b><br>";
-                            sText += "<b>Server:</b> " + dr.GetString(2) + "<br>";
-                            sText += "<b>Database:</b> " + dr.GetString(3) + "<br>";
-                            sText += "<b>Username:</b> " + dr.GetString(0) + "<br>";
-                            sText += "<b>Password:</b> " + dr.GetString(1) + "<br>";
-                            sText += "<b>Full Connection String: </b>" + sCn + "<br>";
-
-                            lblAccountInfo.Visible = true;
-                            lblAccountInfo.Text = sText;
+                                    lblAccountInfo.Visible = true;
+                                    lblAccountInfo.Text = text.ToString();
+                                }
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Trace.TraceError("Exception suppressed {0}", ex);
+                }
             }
-            catch { }
-            try
-            {
-                cn.Close();
-            }
-            catch { }
         }
 
         private void LoadLists(DataTable tbl)
