@@ -6,9 +6,8 @@ namespace PortfolioEngineCore
 {
     public class LMR_IF
     {
-        //private static string m_sConnectionString = "";
-        private static string m_sLastError = "";
-        private static string m_sLastStackTrace = "";
+        private static string m_sLastError = string.Empty;
+        private static string m_sLastStackTrace = string.Empty;
 
         public static string LastError
         {
@@ -20,104 +19,84 @@ namespace PortfolioEngineCore
             get { return m_sLastStackTrace; }
         }
 
-        //public static void Reset()
-        //{
-        //    m_sConnectionString = "";
-        //}
-
-        //private static void Initialize()
-        //{
-        //    m_sLastError = "";
-        //    m_sLastStackTrace = "";
-        //    //if (m_sConnectionString.Length > 0)
-        //    //    return;
-        //    HttpContext context = HttpContext.Current;
-        //    var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = WebAdmin.GetConnectionString(context) };
-        //    dbConnectionStringBuilder.Remove("Provider");
-
-        //    m_sConnectionString = dbConnectionStringBuilder.ToString();
-        //}
-
         public static DataTable getPortfolioFields(DBAccess dba, int type)
         {
-            //Initialize();
-            DataTable dt = new DataTable();
-            dt.Columns.Add("epkField");
-            dt.Columns.Add("epkFieldId");
-            dt.Columns.Add("epkFieldType");
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("epkField");
+            dataTable.Columns.Add("epkFieldId");
+            dataTable.Columns.Add("epkFieldType");
+
             //epkFieldType:
             //0 = No Data Synch
             //1 = EPK to SharePoint (Cost Totals + Calcs)
             //2 = SharePoint to EPK (Portfolio Fields)
             //3 = Both Directions
 
-            SqlCommand oCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection);
-            oCommand.Parameters.AddWithValue("SelectMode", type);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            dba.Open();
-
-            SqlDataReader reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            using (var command = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection))
             {
-                int nFieldID = (int)reader["FIELD_ID"];
-                string sFieldName = (string)reader["FIELD_NAME"];
-                //int nFieldFormat = (int)reader["FIELD_FORMAT"];
-                dt.Rows.Add(new object[] { sFieldName, nFieldID, type });
-            }
-            reader.Close();
-            dba.Close();
-            //conn.Dispose();
+                command.Parameters.AddWithValue("SelectMode", type);
+                command.CommandType = CommandType.StoredProcedure;
+                dba.Open();
 
-            return dt;
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var fieldId = (int)reader["FIELD_ID"];
+                        var fieldName = (string)reader["FIELD_NAME"];
+                        dataTable.Rows.Add(fieldName, fieldId, type);
+                    }
+                }
+            }
+            dba.Close();
+            return dataTable;
         }
 
         public static bool saveResourceFieldMappings(DBAccess dba, DataTable dt)
         {
-            //Initialize();
-            bool b = false;
-            //SqlConnection conn = null;
+            var result = false;
             SqlTransaction transaction = null;
-            SqlCommand oCommand = null;
-            string sCommand = "";
             try
             {
-                //conn = new SqlConnection(m_sConnectionString);
                 dba.Open();
                 transaction = dba.Connection.BeginTransaction();
-                sCommand = "DELETE EPG_WE_MAPPING WHERE WEM_ENTITY = 10";
-                oCommand = new SqlCommand(sCommand, dba.Connection, transaction);
-                int lRowsAffected = oCommand.ExecuteNonQuery();
-                oCommand.Dispose();
+                var command = "DELETE EPG_WE_MAPPING WHERE WEM_ENTITY = 10";
+                using (var deleteSqlCommand = new SqlCommand(command, dba.Connection, transaction))
+                {
+                    deleteSqlCommand.ExecuteNonQuery();
+                }
 
-                sCommand =
-                      "INSERT INTO EPG_WE_MAPPING "
+                command = "INSERT INTO EPG_WE_MAPPING "
                     + " (WEM_UID,WEM_ENTITY,WEM_EPK_FIELD_ID,WEM_WE_FIELD_ID,WEM_WE_NAME) "
                     + " VALUES(@WEM_UID,@WEM_ENTITY,@WEM_EPK_FIELD_ID,@WEM_WE_FIELD_ID,@WEM_WE_NAME)";
 
-                oCommand = new SqlCommand(sCommand, dba.Connection, transaction);
-
-                SqlParameter pUID = oCommand.Parameters.Add("@WEM_UID", SqlDbType.Int);
-                oCommand.Parameters.Add("@WEM_ENTITY", SqlDbType.Int).Value = 10;
-                SqlParameter pEPKID = oCommand.Parameters.Add("@WEM_EPK_FIELD_ID", SqlDbType.Int);
-                SqlParameter pWEID = oCommand.Parameters.Add("@WEM_WE_FIELD_ID", SqlDbType.Int);
-                SqlParameter pWEName = oCommand.Parameters.Add("@WEM_WE_NAME", SqlDbType.VarChar, 255);
-
-                int lUID = 0;
-                foreach (DataRow dr in dt.Rows)
+                using (var insertSqlCommand = new SqlCommand(command, dba.Connection, transaction))
                 {
-                    pUID.Value = ++lUID;
-                    pEPKID.Value = dr["EPKID"];
-                    pWEID.Value = dr["WEID"];
-                    pWEName.Value = dr["WEName"];
-                    lRowsAffected = oCommand.ExecuteNonQuery();
+                    var uId = insertSqlCommand.Parameters.Add("@WEM_UID", SqlDbType.Int);
+                    insertSqlCommand.Parameters.Add("@WEM_ENTITY", SqlDbType.Int).Value = 10;
+                    var epkId = insertSqlCommand.Parameters.Add("@WEM_EPK_FIELD_ID", SqlDbType.Int);
+                    var weId = insertSqlCommand.Parameters.Add("@WEM_WE_FIELD_ID", SqlDbType.Int);
+                    var weName = insertSqlCommand.Parameters.Add("@WEM_WE_NAME", SqlDbType.VarChar, 255);
+
+                    var lUid = 0;
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        uId.Value = ++lUid;
+                        epkId.Value = dr["EPKID"];
+                        weId.Value = dr["WEID"];
+                        weName.Value = dr["WEName"];
+                        insertSqlCommand.ExecuteNonQuery();
+                    }
                 }
                 transaction.Commit();
-                b = true;
+                result = true;
             }
             catch (Exception ex)
             {
                 if (transaction != null)
+                {
                     transaction.Rollback();
+                }
                 m_sLastError = ex.Message;
                 m_sLastStackTrace = ex.StackTrace;
             }
@@ -128,201 +107,51 @@ namespace PortfolioEngineCore
                     transaction.Dispose();
                 }
                 if (dba != null)
-                //{
+                {
                     dba.Close();
-                //    conn.Dispose();
-                //}
+                }
             }
-            return b;
+            return result;
         }
-
-        //public static bool saveTaskFieldMappings(DBAccess dba, GridView gridView)
-        //{
-        //    return saveFieldMappings(dba, gridView, 30);
-        //}
-
-        //private static bool saveFieldMappings(DBAccess dba, DataTable gridView, int nEntity)
-        //{
-        //    //Initialize();
-        //    bool b = false;
-        //    SqlTransaction transaction = null;
-        //    SqlCommand oCommand = null;
-        //    string sCommand = "";
-        //    try
-        //    {
-        //        transaction = dba.Connection.BeginTransaction();
-        //        sCommand = "DELETE EPG_WE_MAPPING WHERE WEM_ENTITY = " + nEntity.ToString();
-        //        oCommand = new SqlCommand(sCommand, dba.Connection, transaction);
-        //        int lRowsAffected = oCommand.ExecuteNonQuery();
-        //        oCommand.Dispose();
-
-        //        sCommand =
-        //              "INSERT INTO EPG_WE_MAPPING "
-        //            + " (WEM_UID,WEM_ENTITY,WEM_EPK_FIELD_ID,WEM_WE_FIELD_ID,WEM_WE_NAME) "
-        //            + " VALUES(@WEM_UID,@WEM_ENTITY,@WEM_EPK_FIELD_ID,@WEM_WE_FIELD_ID,@WEM_WE_NAM)";
-
-        //        oCommand = new SqlCommand(sCommand, dba.Connection, transaction);
-
-        //        SqlParameter pUID = oCommand.Parameters.Add("@WEM_UID", SqlDbType.Int);
-        //        oCommand.Parameters.Add("@WEM_ENTITY", SqlDbType.Int).Value = nEntity;
-        //        SqlParameter pEPKID = oCommand.Parameters.Add("@WEM_EPK_FIELD_ID", SqlDbType.Int);
-        //        SqlParameter pWEID = oCommand.Parameters.Add("@WEM_WE_FIELD_ID", SqlDbType.Int);
-        //        SqlParameter pWEName = oCommand.Parameters.Add("@WEM_WE_NAME", SqlDbType.VarChar, 255);
-
-        //        int lUID = 0;
-        //        foreach (GridViewRow gvr in gridView.Rows)
-        //        {
-        //            if (gvr.RowType == DataControlRowType.DataRow)
-        //            {
-        //                DropDownList ddl = (DropDownList)gvr.Cells[1].FindControl("ddlSPField");
-        //                if (ddl.SelectedValue != "")
-        //                {
-        //                    pUID.Value = ++lUID;
-        //                    int nID = 0;
-        //                    Int32.TryParse(gvr.Cells[2].Text, out nID);
-        //                    pEPKID.Value = nID;
-        //                    pWEID.Value = 0;
-        //                    pWEName.Value = ddl.SelectedValue;
-        //                    lRowsAffected = oCommand.ExecuteNonQuery();
-        //                }
-        //            }
-        //        }
-        //        transaction.Commit();
-        //        b = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (transaction != null)
-        //            transaction.Rollback();
-        //        m_sLastError = ex.Message;
-        //        m_sLastStackTrace = ex.StackTrace;
-        //    }
-        //    finally
-        //    {
-        //        if (transaction != null)
-        //        {
-        //            transaction.Dispose();
-        //        }
-        //    }
-        //    return b;
-        //}
-
-        //public static bool savePortfolioFieldMappings(DBAccess dba, GridView gridView, int mode)
-        //{
-        //    //1 = EPK to SharePoint (Cost Totals)
-        //    //2 = SharePoint to EPK (Portfolio Fields)
-        //    //Initialize();
-            
-        //    int nEntity = 0;
-        //    bool b = false;
-        //    if (mode == 1)
-        //        nEntity = 20;
-        //    else if (mode == 2)
-        //        nEntity = 21;
-        //    else
-        //        return b;
-
-            
-        //    SqlConnection conn = null;
-        //    SqlTransaction transaction = null;
-        //    SqlCommand oCommand = null;
-        //    string sCommand = "";
-        //    try
-        //    {
-        //        transaction = dba.Connection.BeginTransaction();
-        //        sCommand = "DELETE EPG_WE_MAPPING WHERE WEM_ENTITY = " + nEntity.ToString();
-        //        oCommand = new SqlCommand(sCommand, dba.Connection, transaction);
-        //        int lRowsAffected = oCommand.ExecuteNonQuery();
-        //        oCommand.Dispose();
-
-        //        sCommand =
-        //              "INSERT INTO EPG_WE_MAPPING "
-        //            + " (WEM_UID,WEM_ENTITY,WEM_EPK_FIELD_ID,WEM_WE_FIELD_ID,WEM_WE_NAME) "
-        //            + " VALUES(@WEM_UID,@WEM_ENTITY,@WEM_EPK_FIELD_ID,@WEM_WE_FIELD_ID,@WEM_WE_NAME)";
-
-        //        oCommand = new SqlCommand(sCommand, conn, transaction);
-
-        //        SqlParameter pUID = oCommand.Parameters.Add("@WEM_UID", SqlDbType.Int);
-        //        oCommand.Parameters.Add("@WEM_ENTITY", SqlDbType.Int).Value = nEntity;
-        //        SqlParameter pEPKID = oCommand.Parameters.Add("@WEM_EPK_FIELD_ID", SqlDbType.Int);
-        //        SqlParameter pWEID = oCommand.Parameters.Add("@WEM_WE_FIELD_ID", SqlDbType.Int);
-        //        SqlParameter pWEName = oCommand.Parameters.Add("@WEM_WE_NAME", SqlDbType.VarChar, 255);
-
-        //        int lUID = 0;
-        //        foreach (GridViewRow gvr in gridView.Rows)
-        //        {
-        //            if (gvr.RowType == DataControlRowType.DataRow)
-        //            {
-        //                DropDownList ddl = (DropDownList)gvr.Cells[1].FindControl("ddlSPField");
-        //                if (ddl.SelectedValue != "")
-        //                {
-        //                    pUID.Value = ++lUID;
-        //                    int nID = 0;
-        //                    Int32.TryParse(gvr.Cells[2].Text, out nID);
-        //                    pEPKID.Value = nID;
-        //                    pWEID.Value = 0;
-        //                    pWEName.Value = ddl.SelectedValue;
-        //                    lRowsAffected = oCommand.ExecuteNonQuery();
-        //                }
-        //            }
-        //        }
-        //        transaction.Commit();
-        //        b = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (transaction != null)
-        //            transaction.Rollback();
-        //        m_sLastError = ex.Message;
-        //        m_sLastStackTrace = ex.StackTrace;
-        //    }
-        //    finally
-        //    {
-        //        if (transaction != null)
-        //        {
-        //            transaction.Dispose();
-        //        }
-        //    }
-        //    return b;
-        //}
 
         public static DataTable getResourceFields(DBAccess dba)
         {
-            //Initialize();
-            DataTable dt = new DataTable();
-            dt.Columns.Add("epkField");
-            dt.Columns.Add("epkFieldId");
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("epkField");
+            dataTable.Columns.Add("epkFieldId");
 
-            SqlCommand oCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection);
-            oCommand.Parameters.AddWithValue("SelectMode", 0);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            dba.Open();
-
-            SqlDataReader reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection))
             {
-                int nFieldID = (int)reader["FIELD_ID"];
-                string sFieldName = (string)reader["FIELD_NAME"];
-                //int nFieldFormat = (int)reader["FIELD_FORMAT"];
+                sqlCommand.Parameters.AddWithValue("SelectMode", 0);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
 
-                // only custom fields in V43
-                if (nFieldID >= 20000)
-                  dt.Rows.Add(new object[] { sFieldName, nFieldID });
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var nFieldID = (int)reader["FIELD_ID"];
+                        var sFieldName = (string)reader["FIELD_NAME"];
+
+                        if (nFieldID >= 20000)
+                        {
+                            dataTable.Rows.Add(sFieldName, nFieldID);
+                        }
+                    }
+                }
             }
-
-            reader.Close();
             dba.Close();
-            //conn.Dispose();
-            return dt;
+
+            return dataTable;
         }
 
         public static DataTable getTaskFields(DBAccess dba)
         {
-            //Initialize();
-            DataTable dt = new DataTable();
-            dt.Columns.Add("epkField");
-            dt.Columns.Add("epkFieldId");
-            dt.Columns.Add("epkFieldType");
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("epkField");
+            dataTable.Columns.Add("epkFieldId");
+            dataTable.Columns.Add("epkFieldType");
+
             //epkFieldType:
             //0 = No Data Synch
             //1 = EPK to SharePoint
@@ -330,88 +159,81 @@ namespace PortfolioEngineCore
             //3 = Both Directions
 
             //// BUGBUG TODO: EPK Code to get WI fields
-            //dt.Rows.Add(new object[] { "Start", 1, 1 });
-            //dt.Rows.Add(new object[] { "Finish", 2, 1 });
 
-            SqlCommand oCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection);
-            oCommand.Parameters.AddWithValue("SelectMode", 3);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            dba.Open();
-
-            SqlDataReader reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("EPG_SP_ReadFieldsForWE", dba.Connection))
             {
-                int nFieldID = (int)reader["FIELD_ID"];
-                string sFieldName = (string)reader["FIELD_NAME"];
-                //int nFieldFormat = (int)reader["FIELD_FORMAT"];
-                dt.Rows.Add(new object[] { sFieldName, nFieldID, 3 });
-            }
-            reader.Close();
-            dba.Close();
-            //conn.Dispose();
+                sqlCommand.Parameters.AddWithValue("SelectMode", 3);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
 
-            return dt;
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var fieldId = (int)reader["FIELD_ID"];
+                        var fieldName = (string)reader["FIELD_NAME"];
+
+                        dataTable.Rows.Add(fieldName, fieldId, 3);
+                    }
+                }
+            }
+            dba.Close();
+
+            return dataTable;
         }
 
         public static DataTable getPortfolioViews(DBAccess dba)
         {
-            //Initialize();
-            DataTable dt = new DataTable();
-            dt.Columns.Add("epkView");
-            dt.Columns.Add("epkViewId");
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("epkView");
+            dataTable.Columns.Add("epkViewId");
 
-            SqlCommand oCommand = new SqlCommand("EPG_SP_ReadViewsForWE", dba.Connection);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            dba.Open();
-
-            SqlDataReader reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("EPG_SP_ReadViewsForWE", dba.Connection))
             {
-                int nViewUID = (int)reader["VIEW_UID"];
-                string sViewName = (string)reader["VIEW_NAME"];
-                dt.Rows.Add(new object[] { sViewName, nViewUID });
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
+
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var viewUid = (int)reader["VIEW_UID"];
+                        var viewName = (string)reader["VIEW_NAME"];
+                        dataTable.Rows.Add(viewName, viewUid);
+                    }
+                }
             }
-            reader.Close();
             dba.Close();
-            //conn.Dispose();
-            return dt;
+
+            return dataTable;
         }
 
         public static DataTable getCostViews(DBAccess dba)
         {
-            //DataTable dt = new DataTable();
-            //dt.Columns.Add("costView");
-            //dt.Columns.Add("costViewId");
+            // TODO: EPK Code to get Portfolio Views
 
-            ////TODO: EPK Code to get Portfolio Views
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("costView");
+            dataTable.Columns.Add("costViewId");
 
-            //dt.Rows.Add(new object[] { "cView 1", 1 });
-            //dt.Rows.Add(new object[] { "cView 2", 2 });
-            //dt.Rows.Add(new object[] { "cExecutive Summary", 3 });
-
-            //return dt;
-            //Initialize();
-            DataTable dt = new DataTable();
-            dt.Columns.Add("costView");
-            dt.Columns.Add("costViewId");
-
-            SqlCommand oCommand = new SqlCommand("PPM_SP_ReadCostViewsForWE", dba.Connection);
-            oCommand.CommandType = System.Data.CommandType.StoredProcedure;
-            dba.Open();
-
-            SqlDataReader reader = oCommand.ExecuteReader();
-            while (reader.Read())
+            using (var sqlCommand = new SqlCommand("PPM_SP_ReadCostViewsForWE", dba.Connection))
             {
-                int nViewUID = (int)reader["VIEW_UID"];
-                string sViewName = (string)reader["VIEW_NAME"];
-                dt.Rows.Add(new object[] { sViewName, nViewUID });
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                dba.Open();
+
+                using (var reader = sqlCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var viewUId = (int)reader["VIEW_UID"];
+                        var viewName = (string)reader["VIEW_NAME"];
+                        dataTable.Rows.Add(viewName, viewUId);
+                    }
+                }
             }
-            reader.Close();
             dba.Close();
-            //conn.Dispose();
 
-            return dt;
+            return dataTable;
         }
-
     }
 }
