@@ -130,7 +130,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             ShimSPUser.AllInstances.LoginNameGet = _ => DummyString;
             ShimListBiz.AllInstances.UpdateColumnDefCollection = (_, _1) => { };
             ShimListBiz.AllInstances.RegisterEvent = _ => { };
-
+            ShimSPList.AllInstances.TitleGet = _ => DummyString;
             // Act
             var actualResult = _privateObject.Invoke(
                 UpdateListMapping,
