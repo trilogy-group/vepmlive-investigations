@@ -526,4 +526,13 @@ begin
 	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID])
 end
 													  
-													  
+IF EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_SiteId_WebId_ListId_ItemId' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
+BEGIN
+	CREATE CLUSTERED INDEX [IX_SiteId_WebId_ListId_ItemId] ON [dbo].[LSTMyWork]
+	(	
+		[ListId] ASC,
+		[ItemId] ASC,
+		[SiteId] ASC,
+		[WebId] ASC
+	) WITH (ONLINE = ON, DROP_EXISTING = ON) ON [PRIMARY]
+END													  
