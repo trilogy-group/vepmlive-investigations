@@ -548,7 +548,7 @@ namespace EPMLiveCore.Tests
         public void GetReportQueryNode_NodeDefaultSign()
         {
             // Arrange
-            var expectedText = $"{DummyString} = '1'";
+            var expectedText = $"[{DummyString}] = '1'";
             var spWeb = new ShimSPWeb().Instance;
             var xmlNode = new ShimXmlNode(new XmlDocument()).Instance;
             var spList = new ShimSPList
