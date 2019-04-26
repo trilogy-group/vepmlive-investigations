@@ -221,7 +221,7 @@ namespace EPMLiveCore
                 // Need to use actual sign operator to match only the date part 
                 return string.Format("CONVERT(nvarchar, {0}, 111) {1} CONVERT(nvarchar, CONVERT(DateTime, '{2}'), 111)", fieldName, sign, nodeValue);
             }
-            return string.Format("{0} {1} '{2}'", fieldName, sign, nodeValue);
+            return string.Format("[{0}] {1} '{2}'", fieldName, sign, nodeValue);
         }
 
         private static string GetNodeValue(SPWeb web, XmlNode nd, SPField field, StringBuilder fieldNameStringBuilder, out bool lookup, out string fieldName)
@@ -377,6 +377,9 @@ namespace EPMLiveCore
                     {
                         nodeValue = Convert.ToString(double.Parse(nodeValue) / 100);
                     }
+                    break;
+                case SPFieldType.Choice:
+                    nodeValue = nd.SelectSingleNode("Value").InnerXml;
                     break;
                 default:
                     Trace.TraceError("Unexpected Value for {0}: {1}", nameof(field.Type), field.Type);
