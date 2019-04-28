@@ -14,6 +14,7 @@ namespace EPMLiveCore.ReportHelper
         private readonly Guid _webAppId;
         private readonly Guid _webId;
         private string _webTitle = string.Empty;
+        private readonly int FK_Trim_Length = 11;
 
         public ReportBiz(Guid siteId)
         {
@@ -773,35 +774,35 @@ namespace EPMLiveCore.ReportHelper
                                     string childTableSnapShotName = lookupField["TableNameSnapshot"].ToString();
                                     string fieldName = lookupField["InternalName"].ToString();
 
+                                    string tableFKName = TrimLongFKID("FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                       childTableName.ToUpper() + "_" + parentTableName.ToUpper());
+
+                                    string snapshotFKName = TrimLongFKID("FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper());
+
                                     //Init. LST_XXXX_Table FK SCRIPT
                                     string LST_TABLE_FK_SCRIPT =
                                         "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" +
-                                        childTableName + "\')) " +
+                                        childTableName + "\') AND OBJECT_ID('[" + tableFKName + "]','F') IS NULL) " +
                                         "BEGIN " +
                                         "ALTER TABLE [dbo].[" + childTableName + "] WITH NOCHECK " +
-                                        "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
-                                        childTableName.ToUpper() + "_" + parentTableName.ToUpper() +
-                                        "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
+                                        "ADD CONSTRAINT [" + tableFKName + "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
                                         parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
-                                        "ALTER TABLE [dbo].[" + childTableName + "] NOCHECK CONSTRAINT [FK_EPMLIVE_" +
-                                        lookupField["InternalName"] + "_" + childTableName.ToUpper() + "_" +
-                                        parentTableName.ToUpper() + "] " +
+                                        "ALTER TABLE [dbo].[" + childTableName + "] NOCHECK CONSTRAINT [" + tableFKName + "] " +
                                         "END ";
 
                                     //Init. LST_XXXX_Snapshot_Table FK SCRIPT
                                     string LST_SNAPSHOT_TABLE_FK_SCRIPT =
                                         "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" +
-                                        childTableSnapShotName + "\')) " +
+                                        childTableSnapShotName + "\') AND OBJECT_ID('[" + snapshotFKName + "]','F') IS NULL) " +
                                         "BEGIN " +
                                         "ALTER TABLE [dbo].[" + childTableSnapShotName + "] WITH NOCHECK " +
-                                        "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
-                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() +
-                                        "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
+                                        "ADD CONSTRAINT [" + snapshotFKName + "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
                                         parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
                                         "ALTER TABLE [dbo].[" + childTableSnapShotName.ToUpper() +
-                                        "] NOCHECK CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
-                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() + "] " +
+                                        "] NOCHECK CONSTRAINT [" + snapshotFKName + "] " +
                                         "END ";
+
 
                                     //Add FK SCRIPTS
                                     DataRow row = ForeignKeysByTable.NewRow();
@@ -834,6 +835,16 @@ namespace EPMLiveCore.ReportHelper
                 }
             }
             return ForeignKeysByTable;
+        }
+
+        private string TrimLongFKID(string fkID)
+        {
+            if (fkID.Length > 128)
+            {
+                fkID = fkID.Substring(FK_Trim_Length, Math.Min(fkID.Length - FK_Trim_Length, 128));
+            }
+
+            return fkID;
         }
 
         private bool HasForeignKey(EPMData DAO, string tableName, string columnName)
