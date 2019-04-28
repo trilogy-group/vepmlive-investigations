@@ -1670,7 +1670,7 @@ namespace PortfolioEngineCore
                 resourceId = FindIdBy("WRES_EXT_UID", externalUId);
             }
 
-            if (resourceId == null && !string.IsNullOrEmpty(username))
+            if (resourceId == null && id.HasValue && id.Value > 0 && !string.IsNullOrEmpty(username))
             {
                 resourceId = FindIdBy("WRES_NT_ACCOUNT", username);
             }
