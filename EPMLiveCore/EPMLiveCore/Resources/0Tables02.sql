@@ -526,18 +526,13 @@ begin
 	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID])
 end
 													  
-/*
-Only update existing clustered index and not to create new if does not already exist in order to avoid regression as
-SQL Server only allows one clustered index per table so require to verify if no other clustered index exists on table
-before creating new one.
-*/
-IF EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_SiteId_WebId_ListId_ItemId' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
+IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_LSTMyWork_ListId_ItemID_SiteID_AssignedToID' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
 BEGIN
-	CREATE CLUSTERED INDEX [IX_SiteId_WebId_ListId_ItemId] ON [dbo].[LSTMyWork]
-	(	
-		[ListId] ASC,
-		[ItemId] ASC,
-		[SiteId] ASC,
-		[WebId] ASC
-	) WITH (ONLINE = ON, DROP_EXISTING = ON) ON [PRIMARY]
+	CREATE INDEX IX_LSTMyWork_ListId_ItemID_SiteID_AssignedToID ON [dbo].[LSTMyWork]
+	(
+		ListId ASC, 
+		ItemId ASC, 
+		SiteId ASC, 
+		AssignedToID ASC
+	) WITH (ONLINE=ON, FILLFACTOR=80)
 END													  
