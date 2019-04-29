@@ -528,11 +528,9 @@ end
 													  
 IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_LSTMyWork_ListId_ItemID_SiteID_AssignedToID' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
 BEGIN
-	CREATE INDEX IX_LSTMyWork_ListId_ItemID_SiteID_AssignedToID ON [dbo].[LSTMyWork]
+	CREATE INDEX IX_LSTMyWork_ListId_ItemID ON [dbo].[LSTMyWork]
 	(
 		ListId ASC, 
-		ItemId ASC, 
-		SiteId ASC, 
-		AssignedToID ASC
+		ItemId ASC
 	) WITH (ONLINE=ON, FILLFACTOR=80)
 END													  
