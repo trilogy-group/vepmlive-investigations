@@ -526,7 +526,7 @@ begin
 	CREATE INDEX [IX_TSRESMETA_TS_UID] ON [dbo].[TSRESMETA] ([TS_UID])
 end
 													  
-IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_LSTMyWork_ListId_ItemID_SiteID_AssignedToID' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
+IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_LSTMyWork_ListId_ItemID' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
 BEGIN
 	CREATE INDEX IX_LSTMyWork_ListId_ItemID ON [dbo].[LSTMyWork]
 	(
