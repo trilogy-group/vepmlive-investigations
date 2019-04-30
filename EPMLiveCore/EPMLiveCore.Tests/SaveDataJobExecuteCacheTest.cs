@@ -136,51 +136,6 @@ namespace EPMLiveCore.Tests
         }
 
         [TestMethod]
-        public void ShouldReturnCachedWeb()
-        {
-            var siteMock = new ShimSPSite();
-            const string TestUrl = "test/url";
-            var webMock = new ShimSPWeb { ServerRelativeUrlGet = () => TestUrl };
-            siteMock.OpenWebGuid  = guid => webMock;
-
-            using (var cache = SaveDataJobExecuteCache.InitializeCache(siteMock))
-            {
-                var properties = new ShimSPItemEventProperties { RelativeWebUrlGet = () => TestUrl };
-                var webById = cache.GetWeb(Guid.Empty.ToString());
-                var web = SaveDataJobExecuteCache.GetWeb(properties);
-
-                web.ShouldBe(webById);
-            }
-        }
-
-        [TestMethod]
-        public void ShouldReturnWebFromPropertiesIfNotFoundInCache()
-        {
-            var siteMock = new ShimSPSite();
-            const string TestUrl = "test/url";
-            var webMock = new ShimSPWeb();
-
-            using (SaveDataJobExecuteCache.InitializeCache(siteMock))
-            {
-                var properties = new ShimSPItemEventProperties { RelativeWebUrlGet = () => TestUrl, WebGet = () => webMock };
-                var web = SaveDataJobExecuteCache.GetWeb(properties);
-
-                web.ShouldBe(webMock);
-            }
-        }
-
-        [TestMethod]
-        public void ShouldReturnWebFromPropertiesIfNoCache()
-        {
-            var webMock = new ShimSPWeb();
-
-            var properties = new ShimSPItemEventProperties { WebGet = () => webMock };
-            var web = SaveDataJobExecuteCache.GetWeb(properties);
-
-            web.ShouldBe(webMock);
-        }
-
-        [TestMethod]
         public void ShouldReturnCachedList()
         {
             var siteMock = new ShimSPSite();
