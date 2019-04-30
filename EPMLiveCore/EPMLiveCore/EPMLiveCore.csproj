@@ -166,8 +166,10 @@
     <Compile Include="API\Applications\ApplicationUninstaller.cs" />
     <Compile Include="API\Applications\ErrorLevels.cs" />
     <Compile Include="API\AppsStoreHelper.cs" />
+    <Compile Include="API\AssociatedListItems\AssociatedCountData.cs" />
     <Compile Include="API\AssociatedListItems\AssociatedListItems.cs" />
     <Compile Include="API\AssociatedListItems\ProjectData.cs" />
+    <Compile Include="API\AssociatedListItems\SharePointAssociatedItemData.cs" />
     <Compile Include="API\AssociatedListItems\SiteData.cs" />
     <Compile Include="API\BaseJob.cs" />
     <Compile Include="API\ChartWizard\ChartWizardDataHelper.cs" />
@@ -1401,6 +1403,7 @@
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
+    <Compile Include="SaveDataJobExecuteCache.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\Creatables.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\Error.cs" />

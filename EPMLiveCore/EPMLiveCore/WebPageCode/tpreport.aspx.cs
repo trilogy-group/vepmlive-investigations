@@ -146,9 +146,10 @@ namespace EPMLiveCore
         {
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
-                StreamWriter sw = new StreamWriter("C:\\tpreportlog.txt");
-                sw.WriteLine(error);
-                sw.Close();
+                using (var streamWriter = new StreamWriter("C:\\tpreportlog.txt"))
+                {
+                    streamWriter.WriteLine(error);
+                }
             });
         }
 

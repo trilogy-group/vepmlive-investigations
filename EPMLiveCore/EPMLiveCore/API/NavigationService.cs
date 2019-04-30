@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -226,7 +227,12 @@ namespace EPMLiveCore.API
             }
         }
 
-        public DataTable GetMenuItems(Guid siteId, Guid webId, Guid listId, int itemId, int userId,
+        public DataTable GetMenuItems(
+            Guid siteId,
+            Guid webId,
+            Guid listId,
+            int itemId,
+            int userId,
             out Dictionary<string, string> diagnosticInfo)
         {
             var info = new Dictionary<string, string>();
@@ -238,206 +244,325 @@ namespace EPMLiveCore.API
             dataTable.Columns.Add("ImageUrl", typeof(string));
             dataTable.Columns.Add("Kind", typeof(string));
 
-            SPSecurity.RunWithElevatedPrivileges(() =>
-            {
-                using (var site = new SPSite(siteId))
+            SPSecurity.RunWithElevatedPrivileges(
+                () =>
                 {
-                    using (SPWeb web = site.OpenWeb(webId))
+                    using (var site = new SPSite(siteId))
+                    using (var web = site.OpenWeb(webId))
                     {
                         info.Add("Web", web.Url);
 
-                        SPUser user = web.AllUsers.GetByID(userId);
-                        SPUserToken userToken = user.UserToken;
+                        var user = web.AllUsers.GetByID(userId);
+                        var userToken = user.UserToken;
 
                         info.Add("Username", user.LoginName);
                         info.Add("User", user.Name);
 
-                        Task<object[]> t1 = Task.Factory.StartNew(() =>
-                        {
-                            Dictionary<string, string> di;
-
-                            var result = new Tuple<string, string, string, string, bool>[] { };
-
-                            try
-                            {
-                                using (var spSite = new SPSite(siteId, userToken))
-                                {
-                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                                    {
-                                        SPList list = spWeb.Lists.GetList(listId, true);
-                                        GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
-                                        result = GetGeneralActions(gSettings.UsePopup, list, gSettings.EnableFancyForms, out di);
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                di = new Dictionary<string, string> { { "General Actions Exception", e.Message } };
-                            }
-
-                            return new object[] { result, di };
-                        });
-
-                        Task<object[]> t2 = Task.Factory.StartNew(() =>
-                        {
-                            Dictionary<string, string> di;
-
-                            var result = new Tuple<string, string, string, string, bool>[] { };
-
-                            try
-                            {
-                                using (var spSite = new SPSite(siteId, userToken))
-                                {
-                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                                    {
-                                        SPList list = spWeb.Lists.GetList(listId, true);
-                                        result = GetPlannerActions(list, out di);
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                di = new Dictionary<string, string> { { "Planner Actions Exception", e.Message } };
-                            }
-
-                            return new object[] { result, di };
-                        });
-
-                        Task<object[]> t3 = Task.Factory.StartNew(() =>
-                        {
-                            Dictionary<string, string> di;
-
-                            var result = new Tuple<string, string, string, string, bool>[] { };
-
-                            try
-                            {
-                                using (var spSite = new SPSite(siteId, userToken))
-                                {
-                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                                    {
-                                        SPList list = spWeb.Lists.GetList(listId, true);
-                                        SPListItem item = list.GetItemById(itemId);
-
-                                        result = GetSocialActions(item, ListCommands.GetGridGanttSettings(list), out di);
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                di = new Dictionary<string, string> { { "Social Actions Exception", e.Message } };
-                            }
-
-                            return new object[] { result, di };
-                        });
-
-                        Task<object[]> t4 = Task.Factory.StartNew(() =>
-                        {
-                            Dictionary<string, string> di;
-
-                            var result = new Tuple<string, string, string, string, bool>[] { };
-
-                            try
-                            {
-                                using (var spSite = new SPSite(siteId, userToken))
-                                {
-                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                                    {
-                                        SPList list = spWeb.Lists.GetList(listId, true);
-                                        SPListItem item = list.GetItemById(itemId);
-
-                                        result = GetWorkspaceActions(item, out di);
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                di = new Dictionary<string, string> { { "Workspace Actions Exception", e.Message } };
-                            }
-
-                            return new object[] { result, di };
-                        });
-
-                        Task<object[]> t5 = Task.Factory.StartNew(() =>
-                        {
-                            Dictionary<string, string> di;
-
-                            var result = new Tuple<string, string, string, string, bool>[] { };
-
-                            try
-                            {
-                                using (var spSite = new SPSite(siteId, userToken))
-                                {
-                                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                                    {
-                                        SPList list = spWeb.Lists.GetList(listId, true);
-                                        result = GetPFEActions(list, out di);
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                di = new Dictionary<string, string> { { "PFE Actions Exception", e.Message } };
-                            }
-
-                            return new object[] { result, di };
-                        });
-
+                        var tasks = GetTasks(siteId, webId, listId, itemId, userToken);
                         var actions = new List<Tuple<string, string, string, string, bool>>();
 
-                        foreach (var t in new[] { t1, t2, t3, t4, t5 })
+                        ProcessTasksIntoActions(tasks, actions, info);
+
+                        if (!actions.Any())
                         {
-                            object[] result = t.Result;
-
-                            var et = new Tuple<string, string, string, string, bool>(null, null, null, null, false);
-                            var tuples = (Tuple<string, string, string, string, bool>[])(result[0] ?? new[] { et });
-
-                            actions.AddRange(tuples);
-
-                            var di = result[1] as Dictionary<string, string>;
-
-                            if (di == null) continue;
-
-                            foreach (var pair in di)
-                            {
-                                info.Add(pair.Key, pair.Value);
-                            }
+                            return;
                         }
 
-                        if (!actions.Any()) return;
+                        var lastTitle = string.Empty;
 
-                        string lastTitle = string.Empty;
+                        var lastAction = actions.Last();
 
-                        Tuple<string, string, string, string, bool> lastAction = actions.Last();
-
-                        string sepItem = lastAction.Item1;
-                        if (!string.IsNullOrEmpty(sepItem) && sepItem.Equals("--SEP--"))
+                        var sepItem = lastAction.Item1;
+                        if (!string.IsNullOrWhiteSpace(sepItem) && sepItem.Equals("--SEP--"))
                         {
                             actions.Remove(lastAction);
                         }
 
-                        foreach (var action in actions)
-                        {
-                            if (!action.Item5) continue;
-                            if (action.Item1.Equals("--SEP--") && action.Item1.Equals(lastTitle)) continue;
-
-                            lastTitle = action.Item1;
-
-                            DataRow row = dataTable.NewRow();
-
-                            row["Title"] = action.Item1;
-                            row["Command"] = action.Item2;
-                            row["ImageUrl"] = action.Item3;
-                            row["Kind"] = action.Item4;
-
-                            dataTable.Rows.Add(row);
-                        }
+                        ProcessActions(actions, lastTitle, dataTable);
                     }
-                }
-            });
+                });
 
             diagnosticInfo = info;
 
             return dataTable;
+        }
+
+        private Task<object[]>[] GetTasks(Guid siteId, Guid webId, Guid listId, int itemId, SPUserToken userToken)
+        {
+            var generalActionsTask = GetGeneralActionsTask(siteId, webId, listId, userToken);
+            var plannerActionsTask = GetPlannerActionsTask(siteId, webId, listId, userToken);
+            var gridGanttSettingsTask = GetGridGanttSettingsTask(siteId, webId, listId, itemId, userToken);
+            var workspaceActionsTask = GetWorkspaceActionsTask(siteId, webId, listId, itemId, userToken);
+            var pfeActionsTask = GetPfeActionsTask(siteId, webId, listId, userToken);
+
+            return new[]
+            {
+                generalActionsTask,
+                plannerActionsTask,
+                gridGanttSettingsTask,
+                workspaceActionsTask,
+                pfeActionsTask
+            };
+        }
+
+        private static void ProcessActions(List<Tuple<string, string, string, string, bool>> actions, string lastTitle, DataTable dataTable)
+        {
+            foreach (var action in actions)
+            {
+                if (!action.Item5)
+                {
+                    continue;
+                }
+                if (action.Item1.Equals("--SEP--") && action.Item1.Equals(lastTitle))
+                {
+                    continue;
+                }
+
+                lastTitle = action.Item1;
+
+                AddActionsToTable(dataTable, action);
+            }
+        }
+
+        private static void AddActionsToTable(DataTable dataTable, Tuple<string, string, string, string, bool> action)
+        {
+            var row = dataTable.NewRow();
+
+            row["Title"] = action.Item1;
+            row["Command"] = action.Item2;
+            row["ImageUrl"] = action.Item3;
+            row["Kind"] = action.Item4;
+
+            dataTable.Rows.Add(row);
+        }
+
+        private static void ProcessTasksIntoActions(Task<object[]>[] tasks, List<Tuple<string, string, string, string, bool>> actions, Dictionary<string, string> info)
+        {
+            foreach (var task in tasks)
+            {
+                var result = task.Result;
+
+                var tuple = new Tuple<string, string, string, string, bool>(null, null, null, null, false);
+                var tuples = (Tuple<string, string, string, string, bool>[])(result[0]
+                    ?? new[]
+                    {
+                        tuple
+                    });
+
+                actions.AddRange(tuples);
+
+                var dictionary = result[1] as Dictionary<string, string>;
+
+                if (dictionary == null)
+                {
+                    continue;
+                }
+
+                foreach (var pair in dictionary)
+                {
+                    info.Add(pair.Key, pair.Value);
+                }
+            }
+        }
+
+        private Task<object[]> GetPfeActionsTask(Guid siteId, Guid webId, Guid listId, SPUserToken userToken)
+        {
+            return Task.Factory.StartNew(
+                () =>
+                {
+                    Dictionary<string, string> dictionary;
+
+                    var result = new Tuple<string, string, string, string, bool>[]
+                    {
+                    };
+
+                    try
+                    {
+                        using (var spSite = new SPSite(siteId, userToken))
+                        {
+                            using (var spWeb = spSite.OpenWeb(webId))
+                            {
+                                var list = spWeb.Lists.GetList(listId, true);
+                                result = GetPFEActions(list, out dictionary);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", e);
+                        dictionary = new Dictionary<string, string>
+                        {
+                            { "PFE Actions Exception", e.Message }
+                        };
+                    }
+
+                    return new object[]
+                    {
+                        result,
+                        dictionary
+                    };
+                });
+        }
+
+        private Task<object[]> GetWorkspaceActionsTask(Guid siteId, Guid webId, Guid listId, int itemId, SPUserToken userToken)
+        {
+            return Task.Factory.StartNew(
+                () =>
+                {
+                    Dictionary<string, string> dictionary;
+
+                    var result = new Tuple<string, string, string, string, bool>[]
+                    {
+                    };
+
+                    try
+                    {
+                        using (var spSite = new SPSite(siteId, userToken))
+                        {
+                            using (var spWeb = spSite.OpenWeb(webId))
+                            {
+                                var list = spWeb.Lists.GetList(listId, true);
+                                var item = list.GetItemById(itemId);
+
+                                result = GetWorkspaceActions(item, out dictionary);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", e);
+                        dictionary = new Dictionary<string, string>
+                        {
+                            { "Workspace Actions Exception", e.Message }
+                        };
+                    }
+
+                    return new object[]
+                    {
+                        result,
+                        dictionary
+                    };
+                });
+        }
+
+        private Task<object[]> GetGridGanttSettingsTask(Guid siteId, Guid webId, Guid listId, int itemId, SPUserToken userToken)
+        {
+            return Task.Factory.StartNew(
+                () =>
+                {
+                    Dictionary<string, string> dictionary;
+
+                    var result = new Tuple<string, string, string, string, bool>[]
+                    {
+                    };
+
+                    try
+                    {
+                        using (var spSite = new SPSite(siteId, userToken))
+                        {
+                            using (var spWeb = spSite.OpenWeb(webId))
+                            {
+                                var list = spWeb.Lists.GetList(listId, true);
+                                var item = list.GetItemById(itemId);
+
+                                result = GetSocialActions(item, ListCommands.GetGridGanttSettings(list), out dictionary);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", e);
+                        dictionary = new Dictionary<string, string>
+                        {
+                            { "Social Actions Exception", e.Message }
+                        };
+                    }
+
+                    return new object[]
+                    {
+                        result,
+                        dictionary
+                    };
+                });
+        }
+
+        private Task<object[]> GetPlannerActionsTask(Guid siteId, Guid webId, Guid listId, SPUserToken userToken)
+        {
+            return Task.Factory.StartNew(
+                () =>
+                {
+                    Dictionary<string, string> dictionary;
+
+                    var result = new Tuple<string, string, string, string, bool>[]
+                    {
+                    };
+
+                    try
+                    {
+                        using (var spSite = new SPSite(siteId, userToken))
+                        {
+                            using (var spWeb = spSite.OpenWeb(webId))
+                            {
+                                var list = spWeb.Lists.GetList(listId, true);
+                                result = GetPlannerActions(list, out dictionary);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", e);
+                        dictionary = new Dictionary<string, string>
+                        {
+                            { "Planner Actions Exception", e.Message }
+                        };
+                    }
+
+                    return new object[]
+                    {
+                        result,
+                        dictionary
+                    };
+                });
+        }
+
+        private static Task<object[]> GetGeneralActionsTask(Guid siteId, Guid webId, Guid listId, SPUserToken userToken)
+        {
+            return Task.Factory.StartNew(
+                () =>
+                {
+                    Dictionary<string, string> dictionary;
+
+                    var result = new Tuple<string, string, string, string, bool>[]
+                    {
+                    };
+
+                    try
+                    {
+                        using (var spSite = new SPSite(siteId, userToken))
+                        {
+                            using (var spWeb = spSite.OpenWeb(webId))
+                            {
+                                var list = spWeb.Lists.GetList(listId, true);
+                                var settings = ListCommands.GetGridGanttSettings(list);
+                                result = GetGeneralActions(settings.UsePopup, list, settings.EnableFancyForms, out dictionary);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError("Exception Suppressed {0}", e);
+                        dictionary = new Dictionary<string, string>
+                        {
+                            { "General Actions Exception", e.Message }
+                        };
+                    }
+
+                    return new object[]
+                    {
+                        result,
+                        dictionary
+                    };
+                });
         }
 
         public void RemoveNavigationLink(string data)
@@ -677,7 +802,7 @@ namespace EPMLiveCore.API
             return list.DoesUserHavePermissions(spBasePermissions);
         }
 
-        private static bool LPPFEPermissionCheck(SPList list, SPBasePermissions spBasePermissions)
+        public static bool LPPFEPermissionCheck(SPList list, SPBasePermissions spBasePermissions)
         {
             bool hasPFEResourceCenterPermissions = true;
             try
@@ -741,7 +866,6 @@ namespace EPMLiveCore.API
                 //Hence, Rather then setting hasPFEResourceCenterPermissions = false; Keeping this exception block blank.
                 return true;
             }
-            return true;
             return list.DoesUserHavePermissions(spBasePermissions);
         }
 

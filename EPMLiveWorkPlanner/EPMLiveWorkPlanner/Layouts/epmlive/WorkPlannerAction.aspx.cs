@@ -4,6 +4,8 @@ using Microsoft.SharePoint.WebControls;
 using System.Text;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Data;
+using EPMLiveCore;
 
 namespace EPMLiveWorkPlanner.Layouts.epmlive
 {
@@ -96,6 +98,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                     Response.Redirect(url);
 
+                    break;
+                case "ProjectTSHours":
+                    GetProjectTSHours();
                     break;
                 default:
                     output = "Error: Invalid Command";
@@ -427,7 +432,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     {
                         date = currentContextRegionalSettings.TimeZone.UTCToLocalTime(Convert.ToDateTime(time).ToUniversalTime()).ToString();
                     }
-                        
+
                     switch (pubStatus)
                     {
                         case "Queued":
@@ -594,7 +599,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             sb.Append(Request["summary"]);
                             sb.Append("|");
                             sb.Append(Request["allocation"]);
-                          
+
 
                             if (!String.IsNullOrEmpty(Request["agileleft"]))
                             {
@@ -648,6 +653,73 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             }
 
             output = "Success";
+        }
+        private void GetProjectTSHours()
+        {
+            output = string.Empty;
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    var key = "EPMLivePlanner" + Request["PlannerID"];
+                    var deletedHoursEnabled = false;
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, key + "DeletedHours"), out deletedHoursEnabled);
+                    if (deletedHoursEnabled)
+                    {
+                        var projectID = Convert.ToInt32(Request["ID"]);
+                        var listid = Request["listid"];
+                        var taskCenterListName = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenter", false);
+                        var taskCenterFields = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenterFields", false);
+                        var taskCenterProjectField = CoreFunctions.getLockConfigSetting(SPContext.Current.Web, key + "TaskCenterProjectField", false);
+                        if (string.IsNullOrEmpty(taskCenterProjectField))
+                        {
+                            taskCenterProjectField = "Project";
+                        }
+                        if (string.IsNullOrEmpty(taskCenterListName))
+                        {
+                            taskCenterProjectField = "Task Center";
+                        }
+
+                        var oProjectCenter = SPContext.Current.Web.Lists[new Guid(listid)];
+                        var oTaskCenter = SPContext.Current.Web.Lists[taskCenterListName];
+                        DataTable dt = null;
+                        SPSiteDataQuery query = null;
+                        query = new SPSiteDataQuery();
+                        query.Lists = "<Lists><List ID=\"" + oTaskCenter.ID.ToString() + "\"/></Lists>";
+                        query.Query = "<Where><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + projectID + "</Value></Eq></Where>";
+                        query.ViewFields = "<FieldRef Name=\"taskuid\"/><FieldRef Name=\"TimesheetHours\"/>";
+
+                        dt = new DataTable();
+                        dt = oTaskCenter.ParentWeb.GetSiteData(query);
+                        decimal taskhours = 0;
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            decimal hour = 0;
+                            decimal.TryParse(Convert.ToString(dr["TimesheetHours"]), out hour);
+                            taskhours += hour;
+                        }
+
+                        var projectitem = oProjectCenter.GetItemById(projectID);
+
+                        decimal projectTimesheetHours = 0;
+
+                        if (projectitem["TimesheetHours"] != null)
+                        {
+                            decimal.TryParse(Convert.ToString(projectitem["TimesheetHours"]), out projectTimesheetHours);
+                        }
+
+                        if (Math.Round(taskhours, 2) != Math.Round(projectTimesheetHours, 2))
+                        {
+                            output = $"There are { Math.Round(projectTimesheetHours - taskhours, 2)} hours submitted on deleted tasks.";
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Exception occurred: {0}", ex);
+                output = string.Empty;
+            }
         }
     }
 }

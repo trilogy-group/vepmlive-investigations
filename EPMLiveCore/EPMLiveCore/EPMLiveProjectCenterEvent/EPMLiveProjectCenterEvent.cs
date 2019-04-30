@@ -225,20 +225,21 @@ namespace EPMLiveCore
         /// <param name="properties">The properties.</param>
         private static void CopyScheduleFieldValueToPCField(SPItemEventProperties properties)
         {
-            if (properties.List.Fields.ContainsFieldWithInternalName("ProjectUpdate"))
+            var list = SaveDataJobExecuteCache.GetList(properties);
+            if (list.Fields.ContainsFieldWithInternalName("ProjectUpdate"))
             {
                 var propertyValue = GetPropertyValue("ProjectUpdate", properties);
 
                 //SKYVERA-455: if project update is schedule driven but project is closed, we should avoid automatic updates for project fields
                 if (propertyValue != null &&
                     (!propertyValue.ToString().Equals(TypeScheduleDriven)
-                     || (properties.List.Fields.ContainsFieldWithInternalName(StateFieldName) &&
+                     || (list.Fields.ContainsFieldWithInternalName(StateFieldName) &&
                      properties.AfterProperties[StateFieldName].ToString().EndsWith(ClosedState, StringComparison.OrdinalIgnoreCase))))
                 {
                     return;
                 }
 
-                foreach (SPField spField in properties.List.Fields)
+                foreach (SPField spField in list.Fields)
                 {
                     if (spField.InternalName.IndexOf("project", StringComparison.OrdinalIgnoreCase) < 0) continue;
 
@@ -246,18 +247,18 @@ namespace EPMLiveCore
                     if (!match.Success) continue;
 
                     string field = match.Groups[1].Value;
-                    if (!properties.List.Fields.ContainsFieldWithInternalName(field)) continue;
+                    if (!list.Fields.ContainsFieldWithInternalName(field)) continue;
 
                     properties.AfterProperties[spField.InternalName] = GetPropertyValue(field, properties);
                 }
             }
-            else if (properties.List.Fields.ContainsFieldWithInternalName("PortfolioUpdate"))
+            else if (list.Fields.ContainsFieldWithInternalName("PortfolioUpdate"))
             {
                 var propertyValue = GetPropertyValue("PortfolioUpdate", properties);
 
                 if (propertyValue != null && !propertyValue.ToString().Equals("Schedule Driven")) return;
 
-                foreach (SPField spField in properties.List.Fields)
+                foreach (SPField spField in list.Fields)
                 {
                     if (spField.InternalName.IndexOf("portfolio", StringComparison.OrdinalIgnoreCase) < 0) continue;
 
@@ -265,7 +266,7 @@ namespace EPMLiveCore
                     if (!match.Success) continue;
 
                     string field = match.Groups[1].Value;
-                    if (!properties.List.Fields.ContainsFieldWithInternalName(field)) continue;
+                    if (!list.Fields.ContainsFieldWithInternalName(field)) continue;
 
                     properties.AfterProperties[spField.InternalName] = GetPropertyValue(field, properties);
                 }
@@ -286,13 +287,15 @@ namespace EPMLiveCore
 
                 if (value == null)
                 {
-                    if (properties.ListItem != null)
+                    var listItem = SaveDataJobExecuteCache.GetListItem(properties);
+                    if (listItem != null)
                     {
-                        if (properties.ListItem.Fields.ContainsFieldWithInternalName(fieldName))
+                        if (listItem.Fields.ContainsFieldWithInternalName(fieldName))
                         {
-                            value = properties.ListItem[fieldName];
+                            value = listItem[fieldName];
 
-                            var spField = properties.List.Fields.GetFieldByInternalName(fieldName);
+                            var list = SaveDataJobExecuteCache.GetList(properties);
+                            var spField = list.Fields.GetFieldByInternalName(fieldName);
                             if (spField.Type == SPFieldType.DateTime)
                             {
                                 value =

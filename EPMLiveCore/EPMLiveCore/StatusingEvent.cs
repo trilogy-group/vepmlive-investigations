@@ -39,12 +39,17 @@ namespace EPMLiveCore
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
                 {
-                    using (var site = new SPSite(properties.SiteId))
+                    var site = SaveDataJobExecuteCache.GetSiteFromCache(properties.SiteId, true, () => new SPSite(properties.SiteId));
+                    try
                     {
                         using (var web = site.OpenWeb(properties.Web.ID))
                         {
                             ProcessMethod(properties, web, ref newPercent, out method);
                         }
+                    }
+                    finally
+                    {
+                        SaveDataJobExecuteCache.DisposeSite(site);
                     }
                 });
 
@@ -80,7 +85,7 @@ namespace EPMLiveCore
             {
                 try
                 {
-                    var Work = float.Parse(properties.ListItem["Work"].ToString());
+                    var Work = float.Parse(SaveDataJobExecuteCache.GetListItem(properties)["Work"].ToString());
                     var rWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
 
                     if (Work == 0)
@@ -174,7 +179,7 @@ namespace EPMLiveCore
                 {
                     try
                     {
-                        newStatus = properties.ListItem["Status"].ToString();
+                        newStatus = SaveDataJobExecuteCache.GetListItem(properties)["Status"].ToString();
                     }
                     catch (Exception ex)
                     {
@@ -193,6 +198,7 @@ namespace EPMLiveCore
         {
             if (newPercent == null)
             {
+                var listItem = SaveDataJobExecuteCache.GetListItem(properties);
                 if (newComplete != null)
                 {
                     if (newComplete == "1" || string.Equals(newComplete, "true", StringComparison.OrdinalIgnoreCase))
@@ -203,8 +209,8 @@ namespace EPMLiveCore
                     {
                         newPercent = !string.IsNullOrWhiteSpace(newStatus)
                             ? getPercentFromStatus(newStatus, oldPercent)
-                            : properties.ListItem["PercentComplete"] != null
-                                ? properties.ListItem["PercentComplete"].ToString()
+                            : listItem["PercentComplete"] != null
+                                ? listItem["PercentComplete"].ToString()
                                 : "0";
                     }
                 }
@@ -216,7 +222,7 @@ namespace EPMLiveCore
                 {
                     try
                     {
-                        newPercent = properties.ListItem["PercentComplete"].ToString();
+                        newPercent = listItem["PercentComplete"].ToString();
                     }
                     catch (Exception ex)
                     {
@@ -230,7 +236,7 @@ namespace EPMLiveCore
         {
             try
             {
-                oldStatus = properties.ListItem["Status"].ToString();
+                oldStatus = SaveDataJobExecuteCache.GetListItem(properties)["Status"].ToString();
             }
             catch (Exception ex)
             {
@@ -242,7 +248,7 @@ namespace EPMLiveCore
         {
             try
             {
-                oldPercent = properties.ListItem["PercentComplete"].ToString();
+                oldPercent = SaveDataJobExecuteCache.GetListItem(properties)["PercentComplete"].ToString();
             }
             catch (Exception ex)
             {
@@ -256,9 +262,10 @@ namespace EPMLiveCore
             {
                 if (properties.AfterProperties["Status"] == null)
                 {
-                    if (properties.List.Fields["Status"].DefaultValue != null)
+                    var list = SaveDataJobExecuteCache.GetList(properties);
+                    if (list.Fields["Status"].DefaultValue != null)
                     {
-                        status = properties.List.Fields["Status"].DefaultValue;
+                        status = list.Fields["Status"].DefaultValue;
                     }
                 }
                 else
@@ -302,9 +309,10 @@ namespace EPMLiveCore
 
             try
             {
+                var list = SaveDataJobExecuteCache.GetList(properties);
                 foreach (DictionaryEntry field in properties.AfterProperties)
                 {
-                    if (!properties.List.Fields.GetFieldByInternalName(field.Key.ToString()).Hidden)
+                    if (!list.Fields.GetFieldByInternalName(field.Key.ToString()).Hidden)
                     {
                         allHidden = false;
                         break;
