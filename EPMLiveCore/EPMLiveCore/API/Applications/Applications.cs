@@ -66,6 +66,17 @@ namespace EPMLiveCore.API
         private const string QuickLaunchFieldName = "QuickLaunch";
         private const string ExtIdFieldName = "EXTID";
         private const string DescriptionFieldName = "Description";
+        private const string TitleFieldName = "Title";
+        private const string PreCheckQueuedStatus = "PreCheck Queued";
+        private const string PreCheckStartedStatus = "PreCheck Started";
+        private const string PreCheckFailedStatus = "PreCheck Failed";
+        private const string PreCheckSuccessfulStatus = "PreCheck Successful";
+        private const string NotInstalledStatus = "Not Installed";
+        private const string InstallQueuedStatus = "Install Queued";
+        private const string InstallStartedStatus = "Install Started";
+        private const string InstallingStatus = "Installing";
+        private const string InstalledStatus = "Installed";
+        private const string InstallFailedStatus = "Install Failed";
         private const string RowLimit = "10000";
 
         public static string getAttribute(XmlNode nd, string attribute)
@@ -941,80 +952,57 @@ namespace EPMLiveCore.API
 
         public static Guid QueueInstallAndConfigureApplication(string id, bool verifyOnly, SPWeb web, string community)
         {
-            ApplicationDef appDef = GetApplicationInfo(id);
+            var applicationDefinition = GetApplicationInfo(id);
+            ExecuteRootApplicationList(web);
+            var applicationList = GetApplicationList(web);
 
-            if (!web.IsRootWeb)
+            SPListItem listItem;
+
+            var query = new SPQuery();
+
+            query.Query = string.Format(
+                "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>{0}</Value></Eq></Where>",
+                id);
+
+            SetListItem(id, verifyOnly, applicationList, query, applicationDefinition, out listItem);
+            listItem[InstallPercentFieldName] = 0;
+
+            UpdateListItem(
+                verifyOnly
+                    ? PreCheckQueuedStatus
+                    : InstallQueuedStatus,
+                listItem);
+
+            return GetJob(verifyOnly, web, community, applicationList, listItem);
+        }
+
+        private static void UpdateListItem(string statusFieldName, SPListItem listItem)
+        {
+            listItem[InstallPercentFieldName] = 0;
+            listItem[InstallMessagesFieldName] = string.Empty;
+            listItem[StatusFieldName] = statusFieldName;
+            listItem.Update();
+        }
+
+        private static void SetListItem(
+            string id,
+            bool verifyOnly,
+            SPList applicationList,
+            SPQuery query,
+            ApplicationDef applicationDefinition,
+            out SPListItem listItem)
+        {
+            var listItems = applicationList.GetItems(query);
+            if (listItems.Count > 0)
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        using (SPSite site = new SPSite(web.Site.ID))
-                        {
-                            GetApplicationList(site.RootWeb);
-                        }
-                    });
-                }
-                catch { }
-            }
-
-            SPList oList = GetApplicationList(web);
-
-            SPListItem oListItem = null;
-
-            SPQuery query = new SPQuery();
-            query.Query = "<Where><Eq><FieldRef Name='EXTID' /><Value Type='Number'>" + id + "</Value></Eq></Where>";
-            SPListItemCollection lic = oList.GetItems(query);
-            if (lic.Count > 0)
-            {
-                try
-                {
-                    oListItem = lic[0];
-                    if (verifyOnly)
-                    {
-                        switch (oListItem["Status"].ToString())
-                        {
-                            case "PreCheck Queued":
-                            case "PreCheck Started":
-                                throw new Exception("PreCheck in Progress.");
-                            case "PreCheck Failed":
-                            case "PreCheck Successful":
-                            case "Not Installed":
-                                break;
-                            case "Install Queued":
-                            case "Install Started":
-                            case "Installing":
-                                throw new Exception("Application install in progress.");
-                            case "Install Failed":
-                            case "Installed":
-                                throw new Exception("Application already installed.");
-                            default:
-                                throw new Exception("Application install in progress.");
-                        }
-                    }
-                    else
-                    {
-                        switch (oListItem["Status"].ToString())
-                        {
-                            case "PreCheck Queued":
-                            case "PreCheck Started":
-                                throw new Exception("PreCheck in Progress.");
-                            case "PreCheck Failed":
-                            case "PreCheck Successful":
-                                break;
-                            case "Install Queued":
-                            case "Install Started":
-                            case "Installing":
-                                throw new Exception("Application install in progress.");
-                            case "Installed":
-                                throw new Exception("Application already installed.");
-                            default:
-                                throw new Exception("Application status unknown.");
-                        }
-                    }
+                    listItem = listItems[0];
+                    VerifyApplicationStatus(verifyOnly, listItem);
                 }
                 catch (Exception ex)
                 {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
                     throw new Exception(ex.Message);
                 }
             }
@@ -1022,35 +1010,112 @@ namespace EPMLiveCore.API
             {
                 if (verifyOnly)
                 {
-                    oListItem = oList.Items.Add();
-                    oListItem["Title"] = appDef.Title;
-                    oListItem["Visible"] = false;
-                    oListItem["EXTID"] = id;
+                    listItem = applicationList.Items.Add();
+                    listItem[TitleFieldName] = applicationDefinition.Title;
+                    listItem[VisibleFieldName] = false;
+                    listItem[ExtIdFieldName] = id;
                 }
                 else
                 {
                     throw new Exception("Application has not run through a PreCheck.");
                 }
             }
+        }
 
-            oListItem["InstallPercent"] = 0;
+        private static void ExecuteRootApplicationList(SPWeb web)
+        {
+            if (!web.IsRootWeb)
+            {
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(
+                        delegate
+                        {
+                            using (var site = new SPSite(web.Site.ID))
+                            {
+                                GetApplicationList(site.RootWeb);
+                            }
+                        });
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError("Exception Suppressed {0}", ex);
+                }
+            }
+        }
 
+        private static Guid GetJob(
+            bool verifyOnly,
+            SPWeb web,
+            string community,
+            SPList applicationList,
+            SPListItem listItem)
+        {
+            const int jobType = 51;
+            const int runtime = -1;
+            const int scheduleType = 9;
+            const int defaultStatus = 0;
+
+            var job = Timer.AddTimerJob(
+                web.Site.ID,
+                web.ID,
+                applicationList.ID,
+                listItem.ID,
+                "App PreCheck",
+                jobType,
+                string.Format("<Data Verify=\"{0}\" Community=\"{1}\"/>", verifyOnly, community),
+                string.Empty,
+                runtime,
+                scheduleType,
+                string.Empty);
+            CoreFunctions.enqueue(job, defaultStatus, web.Site);
+            return job;
+        }
+
+        private static void VerifyApplicationStatus(bool verifyOnly, SPListItem listItem)
+        {
             if (verifyOnly)
             {
-                oListItem["InstallMessages"] = "";
-                oListItem["Status"] = "PreCheck Queued";
-                oListItem.Update();
+                switch (listItem[StatusFieldName].ToString())
+                {
+                    case PreCheckQueuedStatus:
+                    case PreCheckStartedStatus:
+                        throw new Exception("PreCheck in Progress.");
+                    case PreCheckFailedStatus:
+                    case PreCheckSuccessfulStatus:
+                    case NotInstalledStatus:
+                        break;
+                    case InstallQueuedStatus:
+                    case InstallStartedStatus:
+                    case InstallingStatus:
+                        throw new Exception("Application install in progress.");
+                    case InstallFailedStatus:
+                    case InstalledStatus:
+                        throw new Exception("Application already installed.");
+                    default:
+                        throw new Exception("Application install in progress.");
+                }
             }
             else
             {
-                oListItem["InstallMessages"] = "";
-                oListItem["Status"] = "Install Queued";
-                oListItem.Update();
+                switch (listItem[StatusFieldName].ToString())
+                {
+                    case PreCheckQueuedStatus:
+                    case PreCheckStartedStatus:
+                        throw new Exception("PreCheck in Progress.");
+                    case PreCheckFailedStatus:
+                    case PreCheckSuccessfulStatus:
+                        break;
+                    case InstallQueuedStatus:
+                    case InstallStartedStatus:
+                    case InstallingStatus:
+                        throw new Exception("Application install in progress.");
+                    case InstalledStatus:
+                        throw new Exception("Application already installed.");
+                    default:
+                        throw new Exception("Application status unknown.");
+                }
             }
-
-            Guid job = EPMLiveCore.API.Timer.AddTimerJob(web.Site.ID, web.ID, oList.ID, oListItem.ID, "App PreCheck", 51, "<Data Verify=\"" + verifyOnly.ToString() + "\" Community=\"" + community + "\"/>", "", -1, 9, "");
-            CoreFunctions.enqueue(job, 0, web.Site);
-            return job;
         }
 
         public static XmlNode CheckUninstallStatus(string jobuid, SPWeb web)
