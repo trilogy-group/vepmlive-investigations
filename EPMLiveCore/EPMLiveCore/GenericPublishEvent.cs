@@ -45,7 +45,7 @@ namespace EPMLiveCore
 
                     string listid = doc.FirstChild.Attributes["List"].Value;
 
-                    var web = SaveDataJobExecuteCache.GetWeb(properties);
+                    var web = properties.Web;
                     SPList list = web.Lists[new Guid(listid)];
                     SPListItem li = list.GetItemById(lv.LookupId);
 
