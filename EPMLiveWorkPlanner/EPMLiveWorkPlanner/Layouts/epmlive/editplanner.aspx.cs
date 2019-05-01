@@ -487,7 +487,7 @@ namespace EPMLiveWorkPlanner
             try
             {
                 id = Request["ctl00$PlaceHolderMain$hdnId"];
-                isEdit = Request["ctl00$PlaceHolderMain$hdnOperationType"].ToString() == "edit";
+                isEdit = Request["ctl00$PlaceHolderMain$hdnOperationType"] == "edit";
             }
             catch { }
             SPWeb web = SPContext.Current.Web;
@@ -495,7 +495,7 @@ namespace EPMLiveWorkPlanner
             PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)ViewState["EPMLIVE-WPS"]);
 
             //If it's an edit operation, we should delete the entry first then add the new one because we use title for matching.
-            if(isEdit)
+            if (isEdit)
             {
                 wps.delete(id);
             }
