@@ -43,10 +43,11 @@ namespace EPMLiveTimesheets.Tests
             InitializeAllControls();
 
         }
+
         [TestMethod]
         public void iiGetTSData_MyWork_HasData()
         {
-            //Arrange
+            // Arrange
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
             ShimTimesheetSettings.ConstructorSPWeb = (instance, __) =>
@@ -56,18 +57,24 @@ namespace EPMLiveTimesheets.Tests
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
             ShimDataTable.AllInstances.PrimaryKeySetDataColumnArray = (_, __) => { };
 
-            //Act
-            DataSet result =(DataSet)PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
-            
-            //Assert
-            Assert.AreEqual(result.Tables.Count, Convert.ToInt32(PrivateType.GetStaticField("myworktableid")));
-        }
+            // Act
+            var result = (DataSet)PrivateType.InvokeStatic("iiGetTSData",
+                          new ShimSqlConnection().Instance,
+                          new ShimSPWeb().Instance,
+                          DummyString,
+                          Guid.Empty,
+                          new ShimMyWorkReportData().Instance,
+                          DummyString);
 
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(Convert.ToInt32(PrivateType.GetStaticField("myworktableid")), result.Tables.Count);
+        }
 
         [TestMethod]
         public void iiGetTSData_MyWork_IsEmpty()
         {
-            //Arrange
+            // Arrange
             SetupShimsForSqlClient();
             SetupShimsForSharePoint();
             ShimTimesheetSettings.ConstructorSPWeb = (instance, __) =>
@@ -77,12 +84,20 @@ namespace EPMLiveTimesheets.Tests
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => { return new DataTable(); };
             ShimDataTable.AllInstances.PrimaryKeySetDataColumnArray = (_, __) => { };
 
-            //Act
-            DataSet result = (DataSet)PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
+            // Act
+            var result = (DataSet)PrivateType.InvokeStatic("iiGetTSData",
+                         new ShimSqlConnection().Instance,
+                         new ShimSPWeb().Instance,
+                         DummyString,
+                         Guid.Empty,
+                         new ShimMyWorkReportData().Instance,
+                         DummyString);
 
-            //Assert
-            Assert.AreEqual(result.Tables.Count, Convert.ToInt32(PrivateType.GetStaticField("myworktableid")));
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(Convert.ToInt32(PrivateType.GetStaticField("myworktableid")), result.Tables.Count);
         }
+
         private void SetupShimsForSharePoint()
         {
             ShimSPContext.CurrentGet = () => new ShimSPContext();
@@ -129,12 +144,13 @@ namespace EPMLiveTimesheets.Tests
             ShimSPList.AllInstances.BaseTemplateGet = _ => SPListTemplateType.DiscussionBoard;
             ShimSPList.AllInstances.FormsGet = _ => new ShimSPFormCollection();
         }
+
         private static void SetupShimsForSqlClient()
         {
             ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) => new ShimSqlCommand();
-            
+
             ShimSqlDataAdapter.ConstructorSqlCommand = (_, __) => new ShimSqlDataAdapter();
-            
+
             ShimDbDataAdapter.AllInstances.FillDataSet = (_, dataset) =>
             {
                 dataset.Tables.Add(GetDataTable());
@@ -150,11 +166,11 @@ namespace EPMLiveTimesheets.Tests
                 dataTable.Columns.Add("ITEM_ID");
                 dataTable.Columns.Add("LIST");
                 dataTable.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString });
-                
+
                 ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
                 return DummyInt;
             };
-           
+
             ShimDataSet.Constructor = (@this) => new ShimDataSet(@this)
             {
                 // fake DataTableCollection of data set
