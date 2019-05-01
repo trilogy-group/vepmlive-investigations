@@ -57,8 +57,10 @@ namespace EPMLiveTimesheets.Tests
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
             ShimDataTable.AllInstances.PrimaryKeySetDataColumnArray = (_, __) => { };
             //Act
-            var result = PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
-
+            DataSet result =(DataSet)PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
+            
+            //Assert
+            Assert.AreEqual(result.Tables.Count, Convert.ToInt32(PrivateType.GetStaticField("myworktableid")));
         }
 
 
@@ -75,9 +77,10 @@ namespace EPMLiveTimesheets.Tests
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => { return new DataTable(); };
             ShimDataTable.AllInstances.PrimaryKeySetDataColumnArray = (_, __) => { };
             //Act
-            var result = PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
+            DataSet result = (DataSet)PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
 
-
+            //Assert
+            Assert.AreEqual(result.Tables.Count, Convert.ToInt32(PrivateType.GetStaticField("myworktableid")));
         }
         private void SetupShimsForSharePoint()
         {
