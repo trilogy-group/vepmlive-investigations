@@ -2,14 +2,11 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using EPMLiveWebParts.WebPageCode;
 using Microsoft.SharePoint;
-using DiagTrace = System.Diagnostics.Trace;
 
 namespace EPMLiveWebParts
 {
@@ -535,108 +532,201 @@ namespace EPMLiveWebParts
             }
         }
 
-        public virtual void getParams(SPWeb curWeb) 
+        public virtual void getParams(SPWeb curWeb)
         {
             try
             {
-                var hashTable = new Hashtable();
-                var encodedDataAsBytes = Convert.FromBase64String(Request["data"]);
-                var tokens = Encoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
+                Hashtable hshParams = new Hashtable();
 
-                foreach (var tempTokens in tokens.Select(token => token.Split('\t')))
+                byte[] encodedDataAsBytes = System.Convert.FromBase64String(Request["data"]);
+
+                string[] props = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
+
+                foreach (string s in props)
                 {
-                    hashTable.Add(tempTokens[0], tempTokens[1]);
+                    hshParams.Add(s.Split('\t')[0], s.Split('\t')[1]);
                 }
 
-                strlist = hashTable["List"].ToString();
-                strview = hashTable["View"].ToString();
-                TryPerform(() => executive = hashTable["Executive"].ToString());
-                TryPerform(() => linktype = hashTable["LType"].ToString());
-                TryPerform(() => start = hashTable["Start"].ToString());
-                TryPerform(() => finish = hashTable["Finish"].ToString());
-                TryPerform(() => progress = hashTable["Percent"].ToString());
-                TryPerform(() => wbsfield = hashTable["WBS"].ToString());
-                TryPerform(() => milestone = hashTable["Milestone"].ToString());
-                TryPerform(() => information = hashTable["Info"].ToString());
-                GetParamsRLists(hashTable);
-                filterfield = hashTable["FilterField"].ToString();
-                filtervalue = hashTable["FilterValue"].ToString();
+                strlist = hshParams["List"].ToString();
+                strview = hshParams["View"].ToString();
+                try
+                {
+                    executive = hshParams["Executive"].ToString();
+                }
+                catch { }
+                try
+                {
+                    linktype = hshParams["LType"].ToString();
+                }
+                catch { }
+                try
+                {
+                    start = hshParams["Start"].ToString();
+                }
+                catch { }
+                try
+                {
+                    finish = hshParams["Finish"].ToString();
+                }
+                catch { }
+                try
+                {
+                    progress = hshParams["Percent"].ToString();
+                }
+                catch { }
+                try
+                {
+                    wbsfield = hshParams["WBS"].ToString();
+                }
+                catch { }
+                try
+                {
+                    milestone = hshParams["Milestone"].ToString();
+                }
+                catch { }
+                try
+                {
+                    information = hshParams["Info"].ToString();
+                }
+                catch { }
 
-                TryPerform(
-                    () =>
+                try
+                {
+                    if (hshParams["RLists"].ToString() != "")
                     {
-                        var rSites = hashTable["RSites"].ToString();
-
-                        if (rSites != string.Empty)
+                        string[] tRollupLists = hshParams["RLists"].ToString().Split(',');
+                        rolluplists = new string[tRollupLists.Length];
+                        for (int i = 0; i < tRollupLists.Length; i++)
                         {
-                            rollupsites = rSites.Split(',');
+                            string[] tRlist = tRollupLists[i].Split('|');
+                            rolluplists[i] = tRlist[0];
+                            string icon = "";
+                            try
+                            {
+                                icon = tRlist[1];
+                            }
+                            catch { }
+                            hshLists.Add(rolluplists[i], icon);
                         }
-                    });
+                    }
+                }
+                catch { }
 
-                TryPerform(() => additionalgroups = hashTable["AGroups"].ToString());
+                filterfield = hshParams["FilterField"].ToString();
+                filtervalue = hshParams["FilterValue"].ToString();
+
+                try
+                {
+                    if (hshParams["RSites"].ToString() != "")
+                    {
+                        rollupsites = hshParams["RSites"].ToString().Split(',');
+                    }
+                }
+                catch { }
+                try
+                {
+                    additionalgroups = hshParams["AGroups"].ToString();
+                }
+                catch { }
 
                 SPList tempList = null;
 
-                SPSecurity.RunWithElevatedPrivileges(
-                    delegate
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (SPSite s = new SPSite(curWeb.Url))
                     {
-                        using (var spSite = new SPSite(curWeb.Url))
+                        using (SPWeb w = s.OpenWeb())
                         {
-                            using (var spWeb = spSite.OpenWeb())
-                            {
-                                tempList = spWeb.GetListFromUrl(strlist);
-                            }
+                            tempList = w.GetListFromUrl(strlist);
                         }
-                    });
+                    }
+                });
 
                 list = curWeb.Lists[tempList.ID];
                 view = list.Views[strview];
 
-                usePerformance = false;
-                TryPerform(() => usePerformance = bool.Parse(hashTable["UsePerf"].ToString()));
-                usePopup = false;
-                TryPerform(() => usePopup = bool.Parse(hashTable["UsePopup"].ToString()));
-            }
-            catch (Exception exception)
-            {
-                DiagTrace.Write(exception.ToString());
-            }
-        }
-
-        private void GetParamsRLists(Hashtable hashtable)
-        {
-            TryPerform(
-                () =>
+                try
                 {
-                    var rLists = hashtable["RLists"].ToString();
+                    usePerformance = false;
+                    usePerformance = bool.Parse(hshParams["UsePerf"].ToString());
+                }
+                catch { }
+                try
+                {
+                    usePopup = false;
+                    usePopup = bool.Parse(hshParams["UsePopup"].ToString());
+                }
+                catch { }
+            }
+            catch { }
 
-                    if (rLists != string.Empty)
+            /*try
+            {
+                byte[] encodedDataAsBytes = System.Convert.FromBase64String(Request["data"]);
+
+                string[] data = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
+
+                strlist = data[0];
+                strview = data[1];
+                start = data[2];
+                finish = data[3];
+                progress = data[4];
+                wbsfield = data[5];
+                milestone = data[6];
+                executive = data[7];
+                information = data[8];
+                linktype = data[9];
+                if (data[10] != "")
+                {
+                    string[] tRollupLists = data[10].Split(',');
+                    rolluplists = new string[tRollupLists.Length];
+                    for (int i = 0; i < tRollupLists.Length; i++)
                     {
-                        var tRollupLists = rLists.Split(',');
-                        rolluplists = new string[tRollupLists.Length];
-
-                        for (var index = 0; index < tRollupLists.Length; index++)
+                        string[] tRlist = tRollupLists[i].Split('|');
+                        rolluplists[i] = tRlist[0];
+                        string icon = "";
+                        try
                         {
-                            var tRlist = tRollupLists[index].Split('|');
-                            rolluplists[index] = tRlist[0];
-                            var icon = string.Empty;
-                            TryPerform(() => icon = tRlist[1]);
-                            hshLists.Add(rolluplists[index], icon);
+                            icon = tRlist[1];
                         }
+                        catch { }
+                        hshLists.Add(rolluplists[i], icon);
                     }
-                });
-        }
+                }
 
-        private static void TryPerform(Action setValue)
-        {
-            try
-            {
-                setValue();
+
+                filterfield = data[11];
+                filtervalue = data[12];
+
+                if (data[13] != "")
+                {
+                    rollupsites = data[13].Split(',');
+                }
+
+                try
+                {
+                    additionalgroups = data[14];
+                }
+                catch { }
+
+                try
+                {
+                    usePerformance = false;
+                    usePerformance = bool.Parse(data[15]);
+                }
+                catch { }
+
+                try
+                {
+                    usePopup = false;
+                    usePopup = bool.Parse(data[16]);
+                }
+                catch { }
+
+
             }
-            catch (Exception exception)
-            {
-                DiagTrace.Write(exception.ToString());
-            }
+            catch { }*/
+
         }
 
         private XmlNode addBar(XmlDocument doc, string nodeData)
