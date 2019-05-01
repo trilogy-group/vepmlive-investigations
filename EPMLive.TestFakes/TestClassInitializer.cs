@@ -21,6 +21,7 @@ namespace EPMLive.TestFakes
     public class TestClassInitializer<T> where T : class
     {
         protected const string DummyString = "DummyString";
+        protected const string DummyGuid = "fd812bf8-05a3-4d77-b9bc-6ad4991b8049";
         protected const int DummyInt = 1;
 
         public PrivateObject PrivateObject { get; set; }

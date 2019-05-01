@@ -4103,8 +4103,11 @@ namespace TimeSheets
                                     {
                                         try
                                         {
+                                        if (dr.Table.Columns.Contains(item.ColumnName))
+                                        {
                                             dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
                                         }
+                                    }
                                         catch (Exception ex)
                                         {
                                             dr[item.ColumnName] = DBNull.Value;
