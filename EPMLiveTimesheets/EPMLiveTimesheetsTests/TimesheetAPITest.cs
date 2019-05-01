@@ -24,9 +24,7 @@ namespace EPMLiveTimesheets.Tests
     [TestClass]
     public class TimesheetAPITest : TestClassInitializer<TimesheetAPI>
     {
-        private const string DummyUrl = "http://dummy.url";
         private const string FirstField = "FirstField";
-        private static int Count = 1;
 
         [TestInitialize]
         public new void TestInitialize()
@@ -56,6 +54,7 @@ namespace EPMLiveTimesheets.Tests
             };
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
             ShimDataTable.AllInstances.PrimaryKeySetDataColumnArray = (_, __) => { };
+
             //Act
             DataSet result =(DataSet)PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
             
@@ -76,6 +75,7 @@ namespace EPMLiveTimesheets.Tests
             };
             ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => { return new DataTable(); };
             ShimDataTable.AllInstances.PrimaryKeySetDataColumnArray = (_, __) => { };
+
             //Act
             DataSet result = (DataSet)PrivateType.InvokeStatic("iiGetTSData", new ShimSqlConnection().Instance, new ShimSPWeb().Instance, DummyString, new Guid(), new ShimMyWorkReportData().Instance, DummyString);
 
@@ -131,13 +131,9 @@ namespace EPMLiveTimesheets.Tests
         private static void SetupShimsForSqlClient()
         {
             ShimSqlCommand.ConstructorStringSqlConnection = (_, __, ___) => new ShimSqlCommand();
-            ShimSqlDataReader.AllInstances.NextResult = _ => true;
-            ShimSqlDataReader.AllInstances.Close = _ => { };
-            ShimSqlDataReader.AllInstances.GetInt32Int32 = (_, __) => DummyInt;
-            ShimSqlDataReader.AllInstances.GetBooleanInt32 = (_, __) => true;
+            
             ShimSqlDataAdapter.ConstructorSqlCommand = (_, __) => new ShimSqlDataAdapter();
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => DummyInt;
-            ShimSqlCommand.AllInstances.ExecuteScalar = _ => true;
+            
             ShimDbDataAdapter.AllInstances.FillDataSet = (_, dataset) =>
             {
                 dataset.Tables.Add(GetDataTable());
@@ -153,7 +149,7 @@ namespace EPMLiveTimesheets.Tests
                 dataTable.Columns.Add("ITEM_ID");
                 dataTable.Columns.Add("LIST");
                 dataTable.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString });
-                ShimDataRowCollection.AllInstances.AddDataRow = (__, ____) => { };
+                
                 ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
                 return DummyInt;
             };
