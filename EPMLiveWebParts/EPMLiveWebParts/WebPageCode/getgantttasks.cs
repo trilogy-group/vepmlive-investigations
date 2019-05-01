@@ -535,7 +535,7 @@ namespace EPMLiveWebParts
             }
         }
 
-        public virtual void getParams(SPWeb curWeb)
+        public virtual void getParams(SPWeb curWeb) 
         {
             try
             {
