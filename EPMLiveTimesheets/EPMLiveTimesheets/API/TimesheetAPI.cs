@@ -4038,7 +4038,10 @@ namespace TimeSheets
                                 {
                                     try
                                     {
-                                        dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                        if (dr.Table.Columns.Contains(item.ColumnName))
+                                        {
+                                            dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                        }
                                     }
                                     catch (Exception ex)
                                     {
@@ -4214,7 +4217,7 @@ namespace TimeSheets
 
                                     command.ExecuteNonQuery();
 
-                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ", 
+                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ",
                                         string.Format("Adding item id: {0} to TS: {1}, user id: {2}", itemRow["ITEM_ID"].ToString(), timesheetGuid, user.ID));
                                 }
                             }
