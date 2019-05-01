@@ -24,6 +24,7 @@ namespace EPMLiveTimesheets.Tests
     [TestClass]
     public class TimesheetAPITest : TestClassInitializer<TimesheetAPI>
     {
+        private const string DummyUrl = "http://dummy.url";
         private const string FirstField = "FirstField";
 
         [TestInitialize]
