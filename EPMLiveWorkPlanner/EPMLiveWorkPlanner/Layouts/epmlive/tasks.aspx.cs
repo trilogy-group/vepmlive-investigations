@@ -464,11 +464,7 @@ namespace EPMLiveWorkPlanner
             Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
             if (lockWeb == Guid.Empty || lockWeb == web.ID)
             {
-                lstProjectCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPProjectCenter")];
-                lstTaskCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPTaskCenter")];
-                wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWorkPlannerFields");
-                useResourcePool = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveWPUseResPool").ToLower();
-                resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, true).ToLower();
+                CopyWebSettings(web, web);
             }
             else
             {
@@ -476,11 +472,7 @@ namespace EPMLiveWorkPlanner
                 {
                     using (SPWeb w = site.OpenWeb(lockWeb))
                     {
-                        lstProjectCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPProjectCenter")];
-                        lstTaskCenter = web.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPTaskCenter")];
-                        wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWorkPlannerFields");
-                        useResourcePool = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveWPUseResPool").ToLower();
-                        resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLiveResourceURL", true, true).ToLower();
+                        CopyWebSettings(web, w);
                     }
                 }
             }
@@ -618,6 +610,15 @@ namespace EPMLiveWorkPlanner
                 }
             }
             catch { }
+        }
+
+        private void CopyWebSettings(SPWeb currentWeb, SPWeb openWeb)
+        {
+            lstProjectCenter = currentWeb.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(openWeb, "EPMLiveWPProjectCenter")];
+            lstTaskCenter = currentWeb.Lists[EPMLiveCore.CoreFunctions.getConfigSetting(openWeb, "EPMLiveWPTaskCenter")];
+            wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(openWeb, "EPMLiveWorkPlannerFields");
+            useResourcePool = EPMLiveCore.CoreFunctions.getConfigSetting(openWeb, "EPMLiveWPUseResPool").ToLower();
+            resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(openWeb, "EPMLiveResourceURL", true, true).ToLower();
         }
     }
 }
