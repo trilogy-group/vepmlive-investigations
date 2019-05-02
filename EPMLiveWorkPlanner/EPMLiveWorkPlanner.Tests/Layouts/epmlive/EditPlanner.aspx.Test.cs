@@ -9,6 +9,7 @@ using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EPMLive.TestFakes.Utility;
 using EPMLiveWorkPlanner.Fakes;
+using System.Collections.Generic;
 
 namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 {
@@ -24,12 +25,14 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         private ShimHttpRequest _pageHttpRequest;
         private SharepointShims _sharepointShims;
         private PrivateObject _privateObject;
+        private List<IDisposable> disposables;
 
         [TestInitialize]
         public void TestInitialize()
         {
             _editplanner = new editplanner();
             _privateObject = new PrivateObject(_editplanner);
+            disposables = new List<IDisposable>();
 
             SetupShims();
         }
@@ -37,7 +40,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
         [TestCleanup]    
         public void TestCleanup()
         {
-            _shimsContext?.Dispose();
+            disposables.ForEach(d => d?.Dispose());
         }
 
         private void SetupShims()
@@ -47,6 +50,7 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
             _args = new EventArgs();
             _stateBag = new StateBag();
             _sharepointShims = SharepointShims.ShimSharepointCalls();
+            disposables.Add(_shimsContext);
 
             ShimHttpRequest.AllInstances.ItemGetString = (_, __) =>
             {
@@ -56,8 +60,13 @@ namespace EPMLiveWorkPlanner.Tests.Layouts.epmlive
 
             _wps = new PlannerCore.WorkPlannerProperties("f1|Min");
 
-            _privateObject.SetField("ddlAddCalculation", new DropDownList() { SelectedValue = "Max" });
-            _privateObject.SetField("txtAddField", new TextBox() { Text = "f2" });
+            var dropDownList = new DropDownList() { SelectedValue = "Max" };
+            _privateObject.SetField("ddlAddCalculation", dropDownList);
+            disposables.Add(dropDownList);
+
+            var textBox =  new TextBox() { Text = "f2" };
+            _privateObject.SetField("txtAddField", textBox);
+            disposables.Add(textBox);
 
             Shimeditplanner.AllInstances.loadTaskCenterFieldsSPWebBoolean = (planner, web, flag) => { };
             Shimeditplanner.AllInstances.loadFieldsSPWeb = (planner, web) => { };
