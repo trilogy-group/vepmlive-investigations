@@ -149,4 +149,67 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         #endregion
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 3.0, Description = "Add faster index to LSTMyWork")]
+    internal class AddLSTMyWorkIndex : UpgradeStep
+    {
+        private SPWeb _spWeb;
+
+        #region Constructors (1) 
+        public AddLSTMyWorkIndex(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    LogMessage("Connecting to the database . . .", 2);
+                    Guid webAppId = Web.Site.WebApplication.Id;
+                    Guid SiteId = Web.Site.ID;
+                    string rptCnStr = CoreFunctions.getReportingConnectionString(webAppId, SiteId);
+                    using (var rptCn = new SqlConnection(rptCnStr))
+                    {
+                        rptCn.Open();
+
+                        #region Index Code
+
+                        rptCn.ExecuteNonQuery($@"
+                            IF NOT EXISTS (SELECT *  FROM sys.indexes  WHERE name='IX_LSTMyWork_ListId_ItemID' AND object_id = OBJECT_ID('dbo.LSTMyWork'))
+                            BEGIN
+	                            CREATE INDEX IX_LSTMyWork_ListId_ItemID ON [dbo].[LSTMyWork]
+	                            (
+		                            ListId ASC, 
+		                            ItemId ASC
+	                            ) WITH (FILLFACTOR=80)
+                            END													  
+                                ");
+
+                        #endregion
+
+                        LogMessage("Index IX_LSTMyWork_ListId_ItemID has been created on LSTMyWork.", MessageKind.SUCCESS, 4);
+
+                    }
+                });
+
+
+            }
+            catch (Exception exception)
+            {
+                string message = exception.InnerException != null
+                    ? exception.InnerException.Message
+                    : exception.Message;
+
+                LogMessage(message, MessageKind.FAILURE, 4);
+                return false;
+            }
+            return true;
+        }
+        
+        #endregion
+    }
 }
