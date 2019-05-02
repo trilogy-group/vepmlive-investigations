@@ -53,11 +53,6 @@ namespace EPMLiveCore
             site.Dispose();
         }
 
-        public static SPWeb GetWeb(SPItemEventProperties properties)
-        {
-            return ShouldUseCache ? Cache.GetWebByRelativeUrl(properties.RelativeWebUrl) ?? properties.Web : properties.Web;
-        }
-
         public static SPList GetList(SPItemEventProperties properties)
         {
             return ShouldUseCache ? Cache.GetWebByRelativeUrl(properties.RelativeWebUrl)?.Lists[properties.ListId] ?? properties.List : properties.List;

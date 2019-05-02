@@ -9,6 +9,8 @@ namespace PortfolioEngineCore
 {
     public class dbaLookups
     {
+        private const int KeyOffset = 200000000;
+
         public static StatusEnum SelectLookups(DBAccess dba, out DataTable dt)
         {
             string cmdText = "SELECT LOOKUP_UID, LOOKUP_NAME, LOOKUP_DESC FROM EPGP_LOOKUP_TABLES"
@@ -27,158 +29,258 @@ namespace PortfolioEngineCore
             string cmdText = "SELECT LV_UID, LV_VALUE, LV_LEVEL, LV_INACTIVE FROM EPGP_LOOKUP_VALUES WHERE LOOKUP_UID = @p1 ORDER BY LV_ID";
             return dba.SelectDataById(cmdText, nLookupId, (StatusEnum)99939, out dt);
         }
-        public static StatusEnum UpdateLookupInfo(DBAccess dba, ref int nLOOKUP_UID, string sName, string sDesc, DataTable dtValues, out string sReply)
+
+        public static StatusEnum UpdateLookupInfo(
+            DBAccess dba,
+            ref int nLOOKUP_UID,
+            string sName,
+            string sDesc,
+            DataTable dtValues,
+            out string sReply)
         {
-            string cmdText;
-            SqlCommand oCommand;
-            SqlDataReader reader;
-            sReply = "";
+            sReply = string.Empty;
             try
             {
-                // make sure there isn't already another Lookup with this name
+                if (!MakeSureNameIsUnique(dba, nLOOKUP_UID, ref sName, ref sReply))
                 {
-                    sName = sName.Trim();
-                    if (sName.Length == 0)
-                    {
-                        sReply = DBAccess.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Please enter a Lookup Name");
-                        return StatusEnum.rsRequestCannotBeCompleted;
-                    }
-                    cmdText = "SELECT LOOKUP_UID From EPGP_LOOKUP_TABLES WHERE LOOKUP_NAME = @p1";
-                    DataTable dt;
-                    if (dba.SelectDataByName(cmdText, sName, (StatusEnum)99999, out dt) != StatusEnum.rsSuccess)
-                        sReply = DBAccess.FormatAdminError("exception", "Lookups.UpdateLookupInfo1", dba.StatusText);
-                    else if (dt.Rows.Count > 0)
-                    {
-                        DataRow row = dt.Rows[0];
-                        int nExistingId = DBAccess.ReadIntValue(row["LOOKUP_UID"]);
-                        if (nExistingId != nLOOKUP_UID)
-                        {
-                            sReply = DBAccess.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Can't save Lookup.\nA Lookup with name '" + sName + "' already exists");
-                            return StatusEnum.rsRequestCannotBeCompleted;
-                        }
-                    }
+                    return StatusEnum.rsRequestCannotBeCompleted;
                 }
 
                 //  Save the new Lookup values ready for updating
-                bool bInserts = false;
-                bool bUpdates = false;
-                bool bDeletes = false;
+                var inserts = false;
+                var updates = false;
+                var deletes = false;
 
-                // read new lookup values into dic
-                Dictionary<int, PFELookupItem> dicValues = new Dictionary<int, PFELookupItem>();
-                int nIndex = 0;
-                int nMaxLevel = 0;
-                foreach (DataRow row in dtValues.Rows)
-                {
-                    PFELookupItem oItemLookup = new PFELookupItem();
-                    nIndex++;
-                    oItemLookup.UID = DBAccess.ReadIntValue(row["LV_UID"]);
-                    oItemLookup.ID = nIndex;
-                    oItemLookup.level = DBAccess.ReadIntValue(row["LV_LEVEL"]);
-                    oItemLookup.inactive = DBAccess.ReadIntValue(row["LV_INACTIVE"]);
-                    oItemLookup.name = DBAccess.ReadStringValue(row["LV_VALUE"]);
-
-                    int nkey;
-                    if (oItemLookup.UID == 0) { nkey = oItemLookup.ID + 200000000; bInserts = true; } else nkey = oItemLookup.UID;
-                    dicValues.Add(nkey, oItemLookup);
-
-                    if (nMaxLevel < oItemLookup.level) nMaxLevel = oItemLookup.level;
-                }
+                int maxLevel;
+                var valuesDictionary = PopulateDictionary(dtValues, out maxLevel, ref inserts);
 
                 // figure fullname
-                string[] sLevelName = new string[nMaxLevel + 1];
-                int l = 0;
-                string sParentName = "";
-                // used to check for duplicate siblings
-                Dictionary<string, string> dicFullnames = new Dictionary<string, string>();
+                var levelName = new string[maxLevel + 1];
 
-                foreach (KeyValuePair<int, PFELookupItem> oItemLookup in dicValues)
+                if (!CheckDuplicateSiblings(ref sReply, valuesDictionary, levelName))
                 {
-                    int lLevel = oItemLookup.Value.level;
-                    sLevelName[lLevel] = oItemLookup.Value.name;
-                    sParentName = "";
-                    for (l = 1; l <= lLevel - 1; l++)
-                    {
-                        if (l == 1)
-                            sParentName = sLevelName[l];
-                        else
-                            sParentName = sParentName + sLevelName[l];
-                        sParentName += ".";
-                    }
-                    oItemLookup.Value.fullname = sParentName + oItemLookup.Value.name;
-
-                    // need to check for duplicate siblings so stuff full name into dic, any error will be dup
-                    if (dicFullnames.ContainsKey(oItemLookup.Value.fullname))
-                    {
-                        sReply = DBAccess.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Can't save Lookup.\nDuplicate value not allowed: " + oItemLookup.Value.fullname);
-                        return StatusEnum.rsRequestCannotBeCompleted;
-                    }
-                    else
-                    {
-                        dicFullnames.Add(oItemLookup.Value.fullname, oItemLookup.Value.fullname);
-                    }
+                    return StatusEnum.rsRequestCannotBeCompleted;
                 }
 
-
-                if (nLOOKUP_UID == 0)
-                {
-                    // ADD TABLE - no need to figure new UID as IDENTITY
-                    Guid g = Guid.NewGuid();
-                    string sg = g.ToString();
-                    cmdText =
-                           "INSERT Into EPGP_LOOKUP_TABLES (LOOKUP_NAME,LOOKUP_DESC,LOOKUP_EXT_UID)"
-                       + " Values(@ppLOOKUP_NAME, @pLOOKUP_DESC,@pLOOKUP_EXT_UID)";
-                    oCommand = new SqlCommand(cmdText, dba.Connection);
-                    oCommand.Parameters.AddWithValue("@ppLOOKUP_NAME", sName);
-                    oCommand.Parameters.AddWithValue("@pLOOKUP_DESC", sDesc);
-                    oCommand.Parameters.AddWithValue("@pLOOKUP_EXT_UID", sg);
-                    oCommand.ExecuteNonQuery();
-                    dba.GetLastIdentityValue(out nLOOKUP_UID);
-
-                }
-                else
-                {
-                    //  update TABLE
-                    cmdText = "UPDATE EPGP_LOOKUP_TABLES "
-                                + " SET LOOKUP_NAME=@pLOOKUP_NAME,LOOKUP_DESC=@pLOOKUP_DESC"
-                                + " WHERE LOOKUP_UID = @pLOOKUP_UID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection);
-                    oCommand.Parameters.AddWithValue("@pLOOKUP_NAME", sName);
-                    oCommand.Parameters.AddWithValue("@pLOOKUP_DESC", sDesc);
-                    oCommand.Parameters.AddWithValue("@pLOOKUP_UID", nLOOKUP_UID);
-                    oCommand.ExecuteNonQuery();
-                }
+                CreateOrUpdateTable(dba, ref nLOOKUP_UID, sName, sDesc);
 
                 if (nLOOKUP_UID > 0)
                 {
                     // update the Lookup VALUES - update existing then insert new value - using IDENTITY so can't delete and re-add
+                    using (var transaction = dba.Connection.BeginTransaction())
+                    {
+                        ProcessLookUps(
+                            dba,
+                            nLOOKUP_UID,
+                            valuesDictionary,
+                            updates,
+                            deletes,
+                            transaction,
+                            inserts);
+                        transaction.Commit();
+                    }
+                }
+                return StatusEnum.rsSuccess;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Exception Suppressed {0}", ex);
+                sReply = SqlDb.FormatAdminError("exception", "Lookups.UpdateLookupInfo", ex.Message);
+                return StatusEnum.rsRequestCannotBeCompleted;
+            }
+        }
 
-                    SqlTransaction transaction = dba.Connection.BeginTransaction();
-                    cmdText = "SELECT LOOKUP_UID,LV_UID,LV_EXT_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_INACTIVE From EPGP_LOOKUP_VALUES WHERE LOOKUP_UID = @LookupUID";
-                    oCommand = new SqlCommand(cmdText, dba.Connection);
-                    oCommand.Transaction = transaction;
-                    oCommand.Parameters.AddWithValue("@LookupUID", nLOOKUP_UID);
-                    DataTable dataTable = new DataTable();
-                    dataTable.Load(oCommand.ExecuteReader());
+        private static bool MakeSureNameIsUnique(DBAccess dbAccess, int lookUpId, ref string name, ref string reply)
+        {
+            name = name.Trim();
+            if (name.Length == 0)
+            {
+                reply = SqlDb.FormatAdminError("error", "Lookups.UpdateLookupInfo", "Please enter a Lookup Name");
+                return false;
+            }
+            const string commandText = "SELECT LOOKUP_UID From EPGP_LOOKUP_TABLES WHERE LOOKUP_NAME = @p1";
+            DataTable dataTable;
+            if (dbAccess.SelectDataByName(commandText, name, (StatusEnum)99999, out dataTable) != StatusEnum.rsSuccess)
+            {
+                reply = SqlDb.FormatAdminError("exception", "Lookups.UpdateLookupInfo1", dbAccess.StatusText);
+            }
+            else if (dataTable.Rows.Count > 0)
+            {
+                var row = dataTable.Rows[0];
+                var existingId = SqlDb.ReadIntValue(row["LOOKUP_UID"]);
+                if (existingId != lookUpId)
+                {
+                    reply = SqlDb.FormatAdminError(
+                        "error",
+                        "Lookups.UpdateLookupInfo",
+                        string.Format("Can't save Lookup.\nA Lookup with name '{0}' already exists", name));
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private static Dictionary<int, PFELookupItem> PopulateDictionary(
+            DataTable dtValues,
+            out int maxLevel,
+            ref bool inserts)
+        {
+            // read new lookup values into dic
+            var valuesDictionary = new Dictionary<int, PFELookupItem>();
+            var index = 0;
+            maxLevel = 0;
+            foreach (DataRow row in dtValues.Rows)
+            {
+                var itemLookup = new PFELookupItem();
+                index++;
+                itemLookup.UID = SqlDb.ReadIntValue(row["LV_UID"]);
+                itemLookup.ID = index;
+                itemLookup.level = SqlDb.ReadIntValue(row["LV_LEVEL"]);
+                itemLookup.inactive = SqlDb.ReadIntValue(row["LV_INACTIVE"]);
+                itemLookup.name = SqlDb.ReadStringValue(row["LV_VALUE"]);
+
+                int key;
+                if (itemLookup.UID == 0)
+                {
+                    key = itemLookup.ID + KeyOffset;
+                    inserts = true;
+                }
+                else
+                {
+                    key = itemLookup.UID;
+                }
+                valuesDictionary.Add(key, itemLookup);
+
+                if (maxLevel < itemLookup.level)
+                {
+                    maxLevel = itemLookup.level;
+                }
+            }
+            return valuesDictionary;
+        }
+
+        private static bool CheckDuplicateSiblings(
+            ref string reply,
+            Dictionary<int, PFELookupItem> valuesDictionary,
+            string[] levelName)
+        {
+            // used to check for duplicate siblings
+            var fullNames = new Dictionary<string, string>();
+
+            foreach (var itemLookup in valuesDictionary)
+            {
+                var level = itemLookup.Value.level;
+                levelName[level] = itemLookup.Value.name;
+                var stringBuilder = new StringBuilder(string.Empty);
+                for (var index = 1; index <= level - 1; index++)
+                {
+                    stringBuilder.Append(levelName[index]).Append(".");
+                }
+                var parentName = stringBuilder.ToString();
+
+                itemLookup.Value.fullname = string.Format("{0}{1}", parentName, itemLookup.Value.name);
+
+                // need to check for duplicate siblings so stuff full name into dic, any error will be dup
+                if (fullNames.ContainsKey(itemLookup.Value.fullname))
+                {
+                    reply = SqlDb.FormatAdminError(
+                        "error",
+                        "Lookups.UpdateLookupInfo",
+                        string.Format(
+                            "Can't save Lookup.\nDuplicate value not allowed: {0}",
+                            itemLookup.Value.fullname));
+                    return false;
+                }
+                fullNames.Add(itemLookup.Value.fullname, itemLookup.Value.fullname);
+            }
+            return true;
+        }
+
+        private static void CreateOrUpdateTable(DBAccess dbAccess, ref int lookUpId, string name, string desc)
+        {
+            string commandText;
+            SqlCommand sqlCommand;
+            if (lookUpId == 0)
+            {
+                AddTable(dbAccess, out lookUpId, name, desc);
+            }
+            else
+            {
+                UpdateTable(dbAccess, lookUpId, name, desc);
+            }
+        }
+
+        private static void AddTable(DBAccess dbAccess, out int lookUpId, string name, string desc)
+        {
+            var guid = Guid.NewGuid();
+            var guidString = guid.ToString();
+            const string commandText = "INSERT Into EPGP_LOOKUP_TABLES (LOOKUP_NAME,LOOKUP_DESC,LOOKUP_EXT_UID)"
+                + " Values(@ppLOOKUP_NAME, @pLOOKUP_DESC,@pLOOKUP_EXT_UID)";
+            using (var sqlCommand = new SqlCommand(commandText, dbAccess.Connection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ppLOOKUP_NAME", name);
+                sqlCommand.Parameters.AddWithValue("@pLOOKUP_DESC", desc);
+                sqlCommand.Parameters.AddWithValue("@pLOOKUP_EXT_UID", guidString);
+                sqlCommand.ExecuteNonQuery();
+            }
+            dbAccess.GetLastIdentityValue(out lookUpId);
+        }
+
+        private static void UpdateTable(DBAccess dbAccess, int lookUpId, string name, string desc)
+        {
+            const string commandText = "UPDATE EPGP_LOOKUP_TABLES  SET LOOKUP_NAME=@pLOOKUP_NAME,"
+                + "LOOKUP_DESC=@pLOOKUP_DESC WHERE LOOKUP_UID = @pLOOKUP_UID";
+            using (var sqlCommand = new SqlCommand(commandText, dbAccess.Connection))
+            {
+                sqlCommand.Parameters.AddWithValue("@pLOOKUP_NAME", name);
+                sqlCommand.Parameters.AddWithValue("@pLOOKUP_DESC", desc);
+                sqlCommand.Parameters.AddWithValue("@pLOOKUP_UID", lookUpId);
+                sqlCommand.ExecuteNonQuery();
+            }
+        }
+
+        private static void ProcessLookUps(
+            DBAccess dba,
+            int lookUpId,
+            Dictionary<int, PFELookupItem> valuesDictionary,
+            bool updates,
+            bool deletes,
+            SqlTransaction transaction,
+            bool inserts)
+        {
+            const string commandText =
+                "SELECT LOOKUP_UID,LV_UID,LV_EXT_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_INACTIVE From EPGP_LOOKUP_VALUES WHERE LOOKUP_UID = @LookupUID";
+            using (var sqlCommand = new SqlCommand(commandText, dba.Connection))
+            {
+                sqlCommand.Transaction = transaction;
+                sqlCommand.Parameters.AddWithValue("@LookupUID", lookUpId);
+                using (var dataTable = new DataTable())
+                {
+                    dataTable.Load(sqlCommand.ExecuteReader());
 
                     if (dataTable != null)
                     {
                         foreach (DataRow row in dataTable.Rows)
                         {
-                            string sExistingName = DBAccess.ReadStringValue(row["LV_VALUE"]);
-                            int nExistingLevel = DBAccess.ReadIntValue(row["LV_LEVEL"]);
-                            int nExistingInActive = DBAccess.ReadIntValue(row["LV_INACTIVE"]);
-                            int nUID = DBAccess.ReadIntValue(row["LV_UID"]);
-                            int nExistingID = DBAccess.ReadIntValue(row["LV_ID"]);
-                            //string sExistingExtID = DBAccess.ReadStringValue(row["LV_EXT_UID"]);
-                            string sExistingFullName = DBAccess.ReadStringValue(row["LV_FULLVALUE"]);
+                            var existingName = SqlDb.ReadStringValue(row["LV_VALUE"]);
+                            var existingLevel = SqlDb.ReadIntValue(row["LV_LEVEL"]);
+                            var existingInActive = SqlDb.ReadIntValue(row["LV_INACTIVE"]);
+                            var uId = SqlDb.ReadIntValue(row["LV_UID"]);
+                            var existingId = SqlDb.ReadIntValue(row["LV_ID"]);
 
-                            if (dicValues.ContainsKey(nUID))
+                            var existingFullName = SqlDb.ReadStringValue(row["LV_FULLVALUE"]);
+
+                            if (valuesDictionary.ContainsKey(uId))
                             {
-                                PFELookupItem value = dicValues[nUID];
+                                var value = valuesDictionary[uId];
                                 value.bflag = true;
-                                if (nExistingID != value.ID || nExistingLevel != value.level || sExistingName != value.name || sExistingFullName != value.fullname
-                                             || nExistingInActive != value.inactive)
+                                if (existingId != value.ID
+                                    || existingLevel != value.level
+                                    || existingName != value.name
+                                    || existingFullName != value.fullname
+                                    || existingInActive != value.inactive)
                                 {
                                     row["LV_VALUE"] = value.name;
                                     row["LV_LEVEL"] = value.level;
@@ -186,119 +288,142 @@ namespace PortfolioEngineCore
                                     row["LV_ID"] = value.ID;
                                     row["LV_INACTIVE"] = value.inactive;
                                     row["LV_FULLVALUE"] = value.fullname;
-                                    bUpdates = true;
+                                    updates = true;
                                 }
                             }
                             else
                             {
                                 //  item deleted
-                                bDeletes = true;
+                                deletes = true;
                                 row.Delete();
                             }
                         }
-                        //  apply updates to dbs
-                        if (bUpdates)
+
+                        if (updates)
                         {
-                            cmdText = @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid," +
-                                " LV_INACTIVE=@LV_inactive Where LV_UID=@LV_uid";
-                            oCommand = new SqlCommand(cmdText, dba.Connection);
-                            oCommand.Transaction = transaction;
-                            oCommand.CommandType = CommandType.Text;
-
-                            SqlParameter pUID = oCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                            SqlParameter pLEVEL = oCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                            SqlParameter pID = oCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                            SqlParameter pVALUE = oCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                            SqlParameter pFULLVALUE = oCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                            SqlParameter pEXTID = oCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-                            SqlParameter pINACTIVE = oCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
-
-                            foreach (DataRow row in dataTable.Rows)
-                            {
-                                if (row.RowState == DataRowState.Modified)
-                                {
-                                    pUID.Value = row["LV_UID"];
-                                    pLEVEL.Value = row["LV_LEVEL"];
-                                    pID.Value = row["LV_ID"];
-                                    pVALUE.Value = row["LV_VALUE"];
-                                    pFULLVALUE.Value = row["LV_FULLVALUE"];
-                                    pEXTID.Value = row["LV_EXT_UID"];
-                                    pINACTIVE.Value = row["LV_INACTIVE"];
-                                    oCommand.ExecuteNonQuery();
-                                }
-                            }
-                        }
-                        //  apply deletes to dbs
-                        if (bDeletes)
-                        {
-                            cmdText = @"Delete From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid";
-                            oCommand = new SqlCommand(cmdText, dba.Connection);
-                            oCommand.Transaction = transaction;
-                            oCommand.CommandType = CommandType.Text;
-
-                            SqlParameter pUID = oCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
-                            foreach (DataRow row in dataTable.Rows)
-                            {
-                                if (row.RowState == DataRowState.Deleted)
-                                {
-                                    pUID.Value = row["LV_UID", DataRowVersion.Original];
-                                    oCommand.ExecuteNonQuery();
-                                }
-                            }
+                            UpdateDbs(dba, transaction, dataTable);
                         }
 
-                    }
-                    dataTable.Dispose();
-
-                    //  check for inserts
-                    if (bInserts)
-                    {
-                        cmdText = @"SET NOCOUNT ON;"
-                                   + "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID,LV_INACTIVE)"
-                                   + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid,@LV_inactive);"
-                                   + "Select @@IDENTITY as NewID";
-                        oCommand = new SqlCommand(cmdText, dba.Connection);
-                        oCommand.Transaction = transaction;
-                        oCommand.CommandType = CommandType.Text;
-
-                        SqlParameter pLookupUID = oCommand.Parameters.Add("@LV_lookupuid", SqlDbType.Int);
-                        SqlParameter pLEVEL = oCommand.Parameters.Add("@LV_level", SqlDbType.Int);
-                        SqlParameter pID = oCommand.Parameters.Add("@LV_id", SqlDbType.Int);
-                        SqlParameter pVALUE = oCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
-                        SqlParameter pFULLVALUE = oCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
-                        SqlParameter pEXTID = oCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
-                        SqlParameter pINACTIVE = oCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
-
-                        foreach (KeyValuePair<int, PFELookupItem> lookupitem in dicValues)
+                        if (deletes)
                         {
-                            if (lookupitem.Value.bflag == false)
-                            {
-                                pLookupUID.Value = nLOOKUP_UID;
-                                pLEVEL.Value = lookupitem.Value.level;
-                                pID.Value = lookupitem.Value.ID;
-                                pVALUE.Value = lookupitem.Value.name;
-                                pFULLVALUE.Value = lookupitem.Value.fullname;
-                                Guid g = Guid.NewGuid();
-                                pEXTID.Value = g.ToString();
-                                pINACTIVE.Value = lookupitem.Value.inactive;
-
-                                reader = oCommand.ExecuteReader();
-                                if (reader.Read())
-                                {
-                                    lookupitem.Value.UID = Convert.ToInt32(reader["NewID"]);
-                                }
-                                reader.Close();
-                            }
+                            DeleteDbs(dba, transaction, dataTable);
                         }
                     }
-                    transaction.Commit();
                 }
-                return StatusEnum.rsSuccess;
             }
-            catch (Exception ex)
+
+            Insert(dba, lookUpId, inserts, transaction, valuesDictionary);
+        }
+
+        private static void UpdateDbs(DBAccess dba, SqlTransaction transaction, DataTable dataTable)
+        {
+            //  apply updates to dbs
+            var commandText =
+                @"Update EPGP_LOOKUP_VALUES SET LV_VALUE=@LV_value, LV_FULLVALUE=@LV_fullvalue, LV_LEVEL=@LV_level, LV_ID=@LV_id, LV_EXT_UID=@LV_extid,"
+                + " LV_INACTIVE=@LV_inactive Where LV_UID=@LV_uid";
+            using (var sqlCommand = new SqlCommand(commandText, dba.Connection)
             {
-                sReply = DBAccess.FormatAdminError("exception", "Lookups.UpdateLookupInfo", ex.Message);
-                return StatusEnum.rsRequestCannotBeCompleted;
+                Transaction = transaction,
+                CommandType = CommandType.Text
+            })
+            {
+                var uId = sqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
+                var level = sqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
+                var id = sqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
+                var fieldValue = sqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
+                var fullValue = sqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
+                var extId = sqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+                var inactive = sqlCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if (row.RowState == DataRowState.Modified)
+                    {
+                        uId.Value = row["LV_UID"];
+                        level.Value = row["LV_LEVEL"];
+                        id.Value = row["LV_ID"];
+                        fieldValue.Value = row["LV_VALUE"];
+                        fullValue.Value = row["LV_FULLVALUE"];
+                        extId.Value = row["LV_EXT_UID"];
+                        inactive.Value = row["LV_INACTIVE"];
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private static void DeleteDbs(DBAccess dba, SqlTransaction transaction, DataTable dataTable)
+        {
+            //  apply deletes to dbs
+            var commandText = @"Delete From EPGP_LOOKUP_VALUES Where LV_UID=@LV_uid";
+            using (var sqlCommand = new SqlCommand(commandText, dba.Connection))
+            {
+                sqlCommand.Transaction = transaction;
+                sqlCommand.CommandType = CommandType.Text;
+
+                var uId = sqlCommand.Parameters.Add("@LV_uid", SqlDbType.Int);
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    if (row.RowState == DataRowState.Deleted)
+                    {
+                        uId.Value = row["LV_UID", DataRowVersion.Original];
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private static void Insert(
+            DBAccess dba,
+            int nLOOKUP_UID,
+            bool inserts,
+            SqlTransaction transaction,
+            Dictionary<int, PFELookupItem> valuesDictionary)
+        {
+            //  check for inserts
+            if (inserts)
+            {
+                var commandText = @"SET NOCOUNT ON;"
+                    + "Insert Into EPGP_LOOKUP_VALUES (LOOKUP_UID,LV_VALUE,LV_FULLVALUE,LV_ID,LV_LEVEL,LV_EXT_UID,LV_INACTIVE)"
+                    + " Values (@LV_lookupuid,@LV_value,@LV_fullvalue,@LV_id,@LV_level,@LV_extid,@LV_inactive);"
+                    + "Select @@IDENTITY as NewID";
+                using (var sqlCommand = new SqlCommand(commandText, dba.Connection)
+                {
+                    Transaction = transaction,
+                    CommandType = CommandType.Text
+                })
+                {
+                    var lookupUId = sqlCommand.Parameters.Add("@LV_lookupuid", SqlDbType.Int);
+                    var level = sqlCommand.Parameters.Add("@LV_level", SqlDbType.Int);
+                    var id = sqlCommand.Parameters.Add("@LV_id", SqlDbType.Int);
+                    var fieldValue = sqlCommand.Parameters.Add("@LV_value", SqlDbType.VarChar);
+                    var fullValue = sqlCommand.Parameters.Add("@LV_fullvalue", SqlDbType.VarChar);
+                    var extId = sqlCommand.Parameters.Add("@LV_extid", SqlDbType.VarChar);
+                    var inactive = sqlCommand.Parameters.Add("@LV_inactive", SqlDbType.Int);
+
+                    foreach (var lookupItem in valuesDictionary)
+                    {
+                        if (lookupItem.Value.bflag == false)
+                        {
+                            lookupUId.Value = nLOOKUP_UID;
+                            level.Value = lookupItem.Value.level;
+                            id.Value = lookupItem.Value.ID;
+                            fieldValue.Value = lookupItem.Value.name;
+                            fullValue.Value = lookupItem.Value.fullname;
+                            var guid = Guid.NewGuid();
+                            extId.Value = guid.ToString();
+                            inactive.Value = lookupItem.Value.inactive;
+
+                            using (var dataReader = sqlCommand.ExecuteReader())
+                            {
+                                if (dataReader.Read())
+                                {
+                                    lookupItem.Value.UID = Convert.ToInt32(dataReader["NewID"]);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
