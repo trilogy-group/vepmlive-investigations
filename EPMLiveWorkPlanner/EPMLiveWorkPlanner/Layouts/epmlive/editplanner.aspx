@@ -39,6 +39,7 @@
             document.getElementById("Field").style.display = "";
 
             document.getElementById("ctl00_PlaceHolderMain_hdnId").value = "";
+            document.getElementById("ctl00_PlaceHolderMain_hdnOperationType").value = "add";
             document.getElementById("ctl00_PlaceHolderMain_ddlAddCalculation").value = "";
             document.getElementById("ctl00_PlaceHolderMain_txtAddField").value = "";
             document.getElementById("ctl00_PlaceHolderMain_btnAdd").value = "Add Field";
@@ -51,6 +52,7 @@
             document.getElementById("Field").style.display = "";
 
             document.getElementById("ctl00_PlaceHolderMain_hdnId").value = id;
+            document.getElementById("ctl00_PlaceHolderMain_hdnOperationType").value = "edit";
             document.getElementById("ctl00_PlaceHolderMain_ddlAddCalculation").value = calc;
             document.getElementById("ctl00_PlaceHolderMain_txtAddField").value = field;
             document.getElementById("ctl00_PlaceHolderMain_btnAdd").value = "Save Field";
@@ -606,6 +608,7 @@
                     </table>
 
                     <div id="Field" style="display: none;">
+                        <asp:HiddenField ID="hdnOperationType" runat="server" />
                         <asp:HiddenField ID="hdnId" runat="server" />
                         <table border="0" bgcolor="FFFFFF" style="border: solid 1px black" width="250" cellpadding="5" cellspacing="0">
                             <tr>
