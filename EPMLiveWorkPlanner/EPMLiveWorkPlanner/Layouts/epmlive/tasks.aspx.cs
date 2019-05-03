@@ -63,86 +63,19 @@ namespace EPMLiveWorkPlanner
         {
             LiteralControl sep = new LiteralControl("<TD class=ms-separator></td>");
 
-            ToolBarButton toolbuttonGrouping = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            toolbuttonGrouping.Text = "";
-            toolbuttonGrouping.ImageUrl = "../_layouts/images/NEWITEM.gif";
-            toolbuttonGrouping.OnClientClick = "addRow();(arguments[0]||event).cancelBubble=true;";
-            toolbuttonGrouping.NavigateUrl = "";
+            var toolbar = (ToolBar)Page.LoadControl("~/_controltemplates/ToolBar.ascx");
 
-            ToolBarButton tbView = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbView.Text = "";
-            tbView.ImageUrl = "../_layouts/images/DETAIL.gif";
-            tbView.OnClientClick = "Javascript:viewItem();";
-            tbView.NavigateUrl = "";
-            tbView.ToolTip = "View";
+            AddNewToolBarButton(toolbar, "NEWITEM", "addRow();(arguments[0]||event).cancelBubble=true;", null);
+            AddNewToolBarButton(toolbar, "DETAIL", "Javascript:viewItem();", "View");
+            AddNewToolBarButton(toolbar, "EDIT", "Javascript:editItem();", "Edit");
+            AddNewToolBarButton(toolbar, "delete", "Javascript:deleteRow();", "Delete");
+            AddNewToolBarButton(toolbar, "left", "Javascript:outdent();", "Outdent");
+            AddNewToolBarButton(toolbar, "right", "Javascript:indent();", "Indent");
+            AddNewToolBarButton(toolbar, "up", "moveup();", "Move Up");
+            AddNewToolBarButton(toolbar, "down", "Javascript:movedown();", "Move Down");
+            AddNewToolBarButton(toolbar, "link", "Javascript:link();", "Link");
+            AddNewToolBarButton(toolbar, "unlink", "Javascript:unlink();", "UnLink");
 
-            ToolBarButton tbEdit = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbEdit.Text = "";
-            tbEdit.ImageUrl = "../_layouts/images/EDIT.gif";
-            tbEdit.OnClientClick = "Javascript:editItem();";
-            tbEdit.NavigateUrl = "";
-            tbEdit.ToolTip = "Edit";
-
-            ToolBarButton tbDelete = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbDelete.Text = "";
-            tbDelete.ImageUrl = "../_layouts/epmlive/images/delete.gif";
-            tbDelete.OnClientClick = "Javascript:deleteRow();";
-            tbDelete.NavigateUrl = "";
-            tbDelete.ToolTip = "Delete";
-
-            ToolBarButton tbOutdent = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbOutdent.Text = "";
-            tbOutdent.ImageUrl = "../_layouts/epmlive/images/left.gif";
-            tbOutdent.OnClientClick = "Javascript:outdent();";
-            tbOutdent.NavigateUrl = "";
-            tbOutdent.ToolTip = "Outdent";
-
-            ToolBarButton tbIndent = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbIndent.Text = "";
-            tbIndent.ImageUrl = "../_layouts/epmlive/images/right.gif";
-            tbIndent.OnClientClick = "Javascript:indent();";
-            tbIndent.NavigateUrl = "";
-            tbIndent.ToolTip = "Indent";
-
-            ToolBarButton tbUp = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbUp.Text = "";
-            tbUp.ImageUrl = "../_layouts/epmlive/images/up.gif";
-            tbUp.OnClientClick = "moveup();";
-            tbUp.NavigateUrl = "";
-            tbUp.ToolTip = "Move Up";
-
-            ToolBarButton tbDown = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbDown.Text = "";
-            tbDown.ImageUrl = "../_layouts/epmlive/images/down.gif";
-            tbDown.OnClientClick = "Javascript:movedown();";
-            tbDown.NavigateUrl = "";
-            tbDown.ToolTip = "Move Down";
-
-            ToolBarButton tbLink = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbLink.Text = "";
-            tbLink.ImageUrl = "../_layouts/epmlive/images/link.gif";
-            tbLink.OnClientClick = "Javascript:link();";
-            tbLink.NavigateUrl = "";
-            tbLink.ToolTip = "Link";
-
-            ToolBarButton tbUnLink = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
-            tbUnLink.Text = "";
-            tbUnLink.ImageUrl = "../_layouts/epmlive/images/unlink.gif";
-            tbUnLink.OnClientClick = "Javascript:unlink();";
-            tbUnLink.NavigateUrl = "";
-            tbUnLink.ToolTip = "UnLink";
-
-            ToolBar toolbar = (ToolBar)Page.LoadControl("~/_controltemplates/ToolBar.ascx");
-            toolbar.Buttons.Controls.Add(toolbuttonGrouping);
-            toolbar.Buttons.Controls.Add(tbView);
-            toolbar.Buttons.Controls.Add(tbEdit);
-            toolbar.Buttons.Controls.Add(tbDelete);
-            toolbar.Buttons.Controls.Add(tbOutdent);
-            toolbar.Buttons.Controls.Add(tbIndent);
-            toolbar.Buttons.Controls.Add(tbUp);
-            toolbar.Buttons.Controls.Add(tbDown);
-            toolbar.Buttons.Controls.Add(tbLink);
-            toolbar.Buttons.Controls.Add(tbUnLink);
             toolbar.Attributes.Add("style", "height:10px");
 
             pnlToolbar.Controls.Add(toolbar);
@@ -212,6 +145,16 @@ namespace EPMLiveWorkPlanner
             }
         }
 
+        private void AddNewToolBarButton(ToolBar toolbar, string image, string onClientClick, string toolTip)
+        {
+            var button = (ToolBarButton)Page.LoadControl("~/_controltemplates/ToolBarButton.ascx");
+            button.Text = string.Empty;
+            button.ImageUrl = string.Format("../_layouts/epmlive/images/{0}.gif", image);
+            button.OnClientClick = onClientClick;
+            button.NavigateUrl = string.Empty;
+            button.ToolTip = toolTip;
+            toolbar.Buttons.Controls.Add(button);
+        }
 
         private void loadViews(SPWeb web)
         {
