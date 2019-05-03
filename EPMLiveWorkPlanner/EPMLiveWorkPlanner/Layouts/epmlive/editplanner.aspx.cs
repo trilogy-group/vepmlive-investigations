@@ -483,14 +483,22 @@ namespace EPMLiveWorkPlanner
         {
 
             string id = "";
+            bool isEdit = false;
             try
             {
                 id = Request["ctl00$PlaceHolderMain$hdnId"];
+                isEdit = Request["ctl00$PlaceHolderMain$hdnOperationType"] == "edit";
             }
             catch { }
             SPWeb web = SPContext.Current.Web;
 
             PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)ViewState["EPMLIVE-WPS"]);
+
+            //If it's an edit operation, we should delete the entry first then add the new one because we use title for matching.
+            if (isEdit)
+            {
+                wps.delete(id);
+            }
 
             wps.set(txtAddField.Text.Replace(" ", "_x0020_"), ddlAddCalculation.SelectedValue);
 
