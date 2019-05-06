@@ -896,7 +896,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
 
             // Assert
-            dataTable.Rows.Count.ShouldNotBe(rowCount);
+            Assert.IsNotNull(rowCount);
+            rowCount.ShouldBe(2);
         }
         [TestMethod]
         public void PublishTasks_WhenCalled_NoTaskDeleted()
@@ -930,7 +931,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
 
             // Assert
-            dataTable.Rows.Count.ShouldBe(rowCount);
+            Assert.IsNotNull(rowCount);
+            rowCount.ShouldBe(dataTable.Rows.Count);
         }
         
         public DataTable CreateDataTable()
