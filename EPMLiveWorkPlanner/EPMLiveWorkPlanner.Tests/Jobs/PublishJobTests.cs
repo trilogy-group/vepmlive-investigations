@@ -893,14 +893,16 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 <Title>{Five}</Title>
             </Task>
         </xmlcfg>";
-            rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
+            ShimPublishJob.MoveListItemToFolderSPListItemSPFolder = (_1, _2) => { };
 
+            rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
+            
             // Assert
             Assert.IsNotNull(rowCount);
             rowCount.ShouldBe(2);
         }
         [TestMethod]
-        public void PublishTasks_WhenCalled_NoTaskDeleted()
+        public void PublishTasks_WhenCalled_NoTaskDeleted_With_Exception()
         {
             // Arrange, Act
             DataTable dataTable = CreateDataTable();
@@ -928,6 +930,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                 <Title>{Five}</Title>
             </Task>
         </xmlcfg>";
+            ShimPublishJob.MoveListItemToFolderSPListItemSPFolder = (_1, _2) => { throw new Exception(); };
             rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
 
             // Assert
@@ -1006,7 +1009,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
               spContentType
             }.GetEnumerator();
             ShimPublishJob.AllInstances.ensureFolderSPListString = (_, _1, _2) => { };
-            ShimPublishJob.MoveListItemToFolderSPListItemSPFolder = (_1, _2) => { };
+            
             ShimPublishJob.AllInstances.processTaskXmlNodeSPListItemHashtableSPWebStringString = (_, _1, _2, _3, _4, _5, _6) => { };
             ShimBaseJob.AllInstances.updateProgressSingle = (_, __) => { };
             ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => { return DummyInt; };
