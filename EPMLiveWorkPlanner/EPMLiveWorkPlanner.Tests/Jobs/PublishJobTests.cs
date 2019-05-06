@@ -7,11 +7,13 @@ using System.Data.Common.Fakes;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Fakes;
 using System.Diagnostics.CodeAnalysis;
+using System.Data.Fakes;
 using System.IO.Fakes;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
+using Shouldly;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveWorkPlanner.Fakes;
@@ -21,9 +23,7 @@ using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Shouldly;
 using static EPMLiveWorkPlanner.WorkPlannerAPI;
-using System.Data.Fakes;
 
 namespace EPMLiveWorkPlanner.Tests.Jobs
 {
@@ -932,6 +932,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             // Assert
             dataTable.Rows.Count.ShouldBe(rowCount);
         }
+        
         public DataTable CreateDataTable()
         {
             var dataTable = new DataTable();
@@ -964,6 +965,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
 
             return dataTable;
         }
+        
         private int ArrangeAndActPublishTasks(string xmlString, DataTable dataTable)
         {
             // Arrange
