@@ -23,6 +23,7 @@ using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 using static EPMLiveWorkPlanner.WorkPlannerAPI;
+using System.Data.Fakes;
 
 namespace EPMLiveWorkPlanner.Tests.Jobs
 {
@@ -864,6 +865,168 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
 
             // Assert
             validations.ShouldBe(37);
+        }
+
+        [TestMethod]
+        public void PublishTasks_WhenCalled_OneTaskDeleted()
+        {
+            // Arrange, Act
+            DataTable dataTable = CreateDataTable();
+            int rowCount = 0;
+            var xmlString = $@"
+        <xmlcfg>
+            <Task UID=""0"" SPID=""0"" SPUID=""0"" Folder=""{DummyString}"" ID=""0"" Title=""{DummyString}"" Iteration=""{One}""/>
+            <Task UID=""{One}"" SPID=""{One}"" SPUID=""{One}"" Folder=""{DummyString}"" ID=""{One}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{One}</Title>
+            </Task>
+            <Task UID=""{Two}"" SPID=""{Two}"" Folder=""{DummyString}"" ID=""{Two}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Two}</Title>
+            </Task>
+            <Task UID=""{Three}"" SPID=""{Three}"" Folder="""" ID=""{Three}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Three}</Title>
+            </Task>
+            <Task UID=""{Five}"" SPID=""{Five}"" Folder="""" ID=""{Five}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Five}</Title>
+            </Task>
+        </xmlcfg>";
+            rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
+
+            // Assert
+            dataTable.Rows.Count.ShouldNotBe(rowCount);
+        }
+        [TestMethod]
+        public void PublishTasks_WhenCalled_NoTaskDeleted()
+        {
+            // Arrange, Act
+            DataTable dataTable = CreateDataTable();
+            int rowCount = 0;
+            var xmlString = $@"
+        <xmlcfg>
+            <Task UID=""{Four}"" SPID=""{Four}"" SPUID=""{Four}"" Folder=""{DummyString}"" ID=""{Four}"" Title=""{DummyString}"" Iteration=""{Four}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Four}</Title>
+            </Task>
+            <Task UID=""{One}"" SPID=""{One}"" SPUID=""{One}"" Folder=""{DummyString}"" ID=""{One}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{One}</Title>
+            </Task>
+            <Task UID=""{Two}"" SPID=""{Two}"" Folder=""{DummyString}"" ID=""{Two}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Two}</Title>
+            </Task>
+            <Task UID=""{Three}"" SPID=""{Three}"" Folder="""" ID=""{Three}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Three}</Title>
+            </Task>
+            <Task UID=""{Five}"" SPID=""{Five}"" Folder="""" ID=""{Five}"" Title=""{DummyString}"" Iteration=""{One}"">
+                <Field Name=""CT{DummyString}"">0</Field>
+                <Title>{Five}</Title>
+            </Task>
+        </xmlcfg>";
+            rowCount = ArrangeAndActPublishTasks(xmlString, dataTable);
+
+            // Assert
+            dataTable.Rows.Count.ShouldBe(rowCount);
+        }
+        public DataTable CreateDataTable()
+        {
+            var dataTable = new DataTable();
+            var row = default(DataRow);
+            dataTable.Columns.Add(TaskUidColumnName);
+            dataTable.Columns.Add(IDStringCaps);
+            dataTable.Columns.Add(IDStringCaps.ToLower());
+            dataTable.Columns.Add(IsPublishedColumnName);
+
+            row = dataTable.NewRow();
+            row[TaskUidColumnName] = Three;
+            row[IDStringCaps] = Three;
+            row[IDStringCaps.ToLower()] = Three;
+            row[IsPublishedColumnName] = One;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[TaskUidColumnName] = Four;
+            row[IDStringCaps] = Four;
+            row[IDStringCaps.ToLower()] = Four;
+            row[IsPublishedColumnName] = One;
+            dataTable.Rows.Add(row);
+
+            row = dataTable.NewRow();
+            row[TaskUidColumnName] = Five;
+            row[IDStringCaps] = Five;
+            row[IDStringCaps.ToLower()] = Five;
+            row[IsPublishedColumnName] = One;
+            dataTable.Rows.Add(row);
+
+            return dataTable;
+        }
+        private int ArrangeAndActPublishTasks(string xmlString, DataTable dataTable)
+        {
+            // Arrange
+            int rowCount = 0;
+            const string randomDestination = "1.2.3.4.5";
+            const string randomSource = "1.2.3";
+            var document = new XmlDocument();
+
+            var plannerProps = new PlannerProps()
+            {
+                sIterationCT = DummyString,
+                bAgile = true
+            };
+            var hashLinks = new Hashtable()
+            {
+                [randomSource] = randomDestination,
+                [randomDestination] = randomDestination,
+            };
+
+            document.LoadXml(xmlString);
+
+            spWeb.GetSiteDataSPSiteDataQuery = _ => dataTable;
+            spContentType.NameGet = () => DummyString;
+            spList.AddItem = () => { return spListItem; };
+            spList.AddItemStringSPFileSystemObjectTypeString = (_1, _2, _3) => { return spListItem; };
+            spListItem.ItemSetStringObject = (_, __) => { };
+            spListItem.ItemSetGuidObject = (_, __) => { };
+            spListItem.Recycle = () => { return guid; };
+            spFieldCollection.ContainsFieldString = _ => true;
+
+            ShimPath.GetDirectoryNameString = input => input;
+            ShimSPUrlUtility.CombineUrlStringString = (_, __) => SampleUrl;
+            ShimSPUtility.GetUrlDirectoryString = _ => SampleUrl;
+            ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPContentType>()
+            {
+              spContentType
+            }.GetEnumerator();
+            ShimPublishJob.AllInstances.ensureFolderSPListString = (_, _1, _2) => { };
+            ShimPublishJob.MoveListItemToFolderSPListItemSPFolder = (_1, _2) => { };
+            ShimPublishJob.AllInstances.processTaskXmlNodeSPListItemHashtableSPWebStringString = (_, _1, _2, _3, _4, _5, _6) => { };
+            ShimBaseJob.AllInstances.updateProgressSingle = (_, __) => { };
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => { return DummyInt; };
+            ShimDataRowCollection.AllInstances.RemoveDataRow = (_, __) => { rowCount += 1; };
+
+            privateObject.SetFieldOrProperty(HashLinksFieldName, nonPublicInstance, hashLinks);
+
+            // Act
+            privateObject.Invoke(
+                PublishTasksMethodName,
+                nonPublicInstance,
+                new object[]
+                {
+                    document,
+                    spList.Instance,
+                    DummyInt.ToString(),
+                    default(Hashtable),
+                    DummyString,
+                    DummyString,
+                    plannerProps,
+                    DummyInt.ToString()
+                });
+
+            return rowCount;
         }
     }
 }
