@@ -64,7 +64,7 @@ namespace EPMLiveReportsAdmin
         {
             try
             {
-                if (Initialize(true, properties))
+                if (Initialize(false, properties))
                 {
                     DeleteItem();
 
@@ -74,13 +74,22 @@ namespace EPMLiveReportsAdmin
                         _myWorkReportData.DeleteWork(_listId, _properties.ListItemId);
                     }
                 }
+                else
+                {
+                    // It will skip deletion of main task center item if LSTMyWork Item failed to delete
+                    properties.Status = SPEventReceiverStatus.CancelWithError;
+                }
 
                 _myWorkReportData.Dispose();
             }
             catch (Exception exception)
             {
+                // It will skip deletion of main task center item if LSTMyWork Item failed to delete
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+                _myWorkReportData?.Dispose();
                 SPSecurity.RunWithElevatedPrivileges(
                     () => LogEvent(exception, 6003, "EPMLive My Work Reporting Item Deleting"));
+
             }
         }
 
@@ -117,7 +126,7 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         private bool DeleteItem()
         {
-           return _myWorkReportData.DeleteListItem(GetSql("DELETE"));
+            return _myWorkReportData.DeleteListItem(GetSql("DELETE"));
         }
 
         private Dictionary<string, object> GetItemFieldValueFromDB(string listId, string itemId)
@@ -207,10 +216,10 @@ namespace EPMLiveReportsAdmin
                 _siteName = _myWorkReportData.SiteName;
                 _siteUrl = _myWorkReportData.SiteUrl;
 
-                _currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
-
                 if (!populateColumns)
                     return true;
+
+                _currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
 
                 _defaultColumns = new ArrayList { "siteid", "webid", "listid", "itemid", "weburl" };
                 _mandatoryHiddenFlds = new ArrayList
