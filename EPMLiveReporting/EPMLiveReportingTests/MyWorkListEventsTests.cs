@@ -52,8 +52,9 @@ namespace EPMLiveReportsAdmin.Tests
             _myWorkListEvents.ItemDeleting(properties);
 
             // Assert
-            _disposeWasCalled.ShouldBe(true);
-            _CancelledCalled.ShouldBe(false);
+            this.ShouldSatisfyAllConditions(
+                () => _disposeWasCalled.ShouldBe(true),
+                () => _CancelledCalled.ShouldBe(false));
         }
 
         [TestMethod()]
@@ -69,8 +70,9 @@ namespace EPMLiveReportsAdmin.Tests
             _myWorkListEvents.ItemDeleting(properties);
 
             // Assert
-            _disposeWasCalled.ShouldBe(true);
-            _CancelledCalled.ShouldBe(true);
+            this.ShouldSatisfyAllConditions(
+                () => _disposeWasCalled.ShouldBe(true),
+                () => _CancelledCalled.ShouldBe(true));
         }
 
         [TestMethod()]
@@ -86,27 +88,9 @@ namespace EPMLiveReportsAdmin.Tests
             _myWorkListEvents.ItemDeleting(properties);
 
             // Assert
-            _disposeWasCalled.ShouldBe(true);
-            _CancelledCalled.ShouldBe(true);
-        }
-
-        [TestMethod()]
-        public void InitializeTest_When_Populate_Column_False()
-        {
-            // Arrange
-            bool populate = false;
-            SetupShim();
-            ShimMyWorkReportData.ConstructorGuid = (_, __) => { };
-            var properties = CreateSPItemEventProperties();
-            var parameters = new object[] { populate, properties.Instance };
-
-            // Act
-            var methodInfo = typeof(MyWorkListEvents).GetMethod(InitializeMethodName, BindingFlags.Instance | BindingFlags.NonPublic);
-            var result = methodInfo.Invoke(_myWorkListEvents, parameters);
-            
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue((bool)result);
+            this.ShouldSatisfyAllConditions(
+                () => _disposeWasCalled.ShouldBe(true),
+                () => _CancelledCalled.ShouldBe(true));
         }
         
         private void SetupShim()
@@ -127,12 +111,7 @@ namespace EPMLiveReportsAdmin.Tests
             {
                 _CancelledCalled = true;
             };
-
-            ShimSPEventPropertiesBase.AllInstances.SiteIdGet = (_) =>
-            {
-                return Guid.Empty;
-            };
-
+            
             var properties = CreateSPItemEventProperties();
             var _listItem = new ShimSPListItem
             {
