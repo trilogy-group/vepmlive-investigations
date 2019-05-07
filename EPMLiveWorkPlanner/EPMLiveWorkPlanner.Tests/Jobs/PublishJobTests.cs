@@ -1002,7 +1002,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             spFieldCollection.ContainsFieldString = _ => true;
 
             ShimPath.GetDirectoryNameString = input => input;
-            ShimSPUrlUtility.CombineUrlStringString = (_, __) => SampleUrl;
+            ShimSPUrlUtility.CombineUrlStringString = (_, __1) => SampleUrl;
             ShimSPUtility.GetUrlDirectoryString = _ => SampleUrl;
             ShimSPBaseCollection.AllInstances.GetEnumerator = _ => new List<SPContentType>()
             {
