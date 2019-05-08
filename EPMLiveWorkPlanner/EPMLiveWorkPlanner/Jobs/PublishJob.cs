@@ -425,9 +425,9 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if (taskuid != "0")
                     {
+                        DataRow[] dr = null;
                         try
                         {
-                            DataRow[] dr = null;
                             try
                             {
                                 dr = dt.Select("taskuid='" + taskuid + "'");
@@ -534,15 +534,15 @@ namespace EPMLiveWorkPlanner
                             {
                                 sErrors += "Task (" + ndTask.SelectSingleNode("Title").InnerText + ") skipped because it is waiting for update.<br>";
                             }
-                            if (dr != null && dr.Length > 0)
-                            {
-                                dt.Rows.Remove(dr[0]);
-                            }
                         }
                         catch (Exception ex)
                         {
                             bErrors = true;
                             sErrors += "Error Task UID(" + taskuid + ") Error: " + ex.Message + "<br>";
+                        }
+                        if (dr != null && dr.Length > 0)
+                        {
+                            dt.Rows.Remove(dr[0]);
                         }
                         updateProgress(taskCount++);
                     }
