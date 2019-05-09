@@ -64,6 +64,7 @@ namespace EPMLiveReportsAdmin
         {
             try
             {
+                // We are sending false here because delete event does not need column information. it is required in Insert and Update event to create SQL statements
                 if (Initialize(false, properties))
                 {
                     DeleteItem();
