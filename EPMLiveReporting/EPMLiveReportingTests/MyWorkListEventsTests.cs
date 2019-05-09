@@ -19,12 +19,14 @@ namespace EPMLiveReportsAdmin.Tests
     public class MyWorkListEventsTests
     {
         private IDisposable _context;
-        private string DummyString = "Dummy String";
 
-        private string InitializeMethodName = "Initialize";
-        private int DummyInt = 0;
+        private const string DummyString = "Dummy String";
+        private const string InitializeMethodName = "Initialize";
+        private const int DummyInt = 0;
+
         private bool _disposeWasCalled;
         private bool _CancelledCalled = false;
+        private string _ErrorMessage = string.Empty;
 
         private MyWorkListEvents _myWorkListEvents;
         private PrivateObject _privateObject;
@@ -72,7 +74,8 @@ namespace EPMLiveReportsAdmin.Tests
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _disposeWasCalled.ShouldBe(true),
-                () => _CancelledCalled.ShouldBe(true));
+                () => _CancelledCalled.ShouldBe(true),
+                () => _ErrorMessage.ShouldNotBeNullOrEmpty());
         }
 
         [TestMethod()]
@@ -90,9 +93,10 @@ namespace EPMLiveReportsAdmin.Tests
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _disposeWasCalled.ShouldBe(true),
-                () => _CancelledCalled.ShouldBe(true));
+                () => _CancelledCalled.ShouldBe(true),
+                () => _ErrorMessage.ShouldNotBeNullOrEmpty());
         }
-        
+
         private void SetupShim()
         {
             ShimMyWorkListEvents.AllInstances.DeleteItem = (_) => { return true; };
@@ -111,7 +115,19 @@ namespace EPMLiveReportsAdmin.Tests
             {
                 _CancelledCalled = true;
             };
-            
+            ShimSPEventPropertiesBase.AllInstances.ErrorMessageSetString = (_, __string) =>
+            {
+                _ErrorMessage = __string;
+            };
+
+            ShimSPItemEventProperties.AllInstances.BeforePropertiesGet = (_) =>
+            {
+                return new ShimSPItemEventDataCollection()
+                {
+                    ItemGetString = (_1) => { return DummyString; },
+                };
+            };
+
             var properties = CreateSPItemEventProperties();
             var _listItem = new ShimSPListItem
             {

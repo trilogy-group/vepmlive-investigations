@@ -76,20 +76,20 @@ namespace EPMLiveReportsAdmin
                 }
                 else
                 {
-                    // It will skip deletion of main task center item if LSTMyWork Item failed to delete
                     properties.Status = SPEventReceiverStatus.CancelWithError;
+                    properties.ErrorMessage = $"Failed to delete item: {properties.BeforeProperties["Title"]}";
                 }
-
-                _myWorkReportData.Dispose();
             }
             catch (Exception exception)
             {
-                // It will skip deletion of main task center item if LSTMyWork Item failed to delete
                 properties.Status = SPEventReceiverStatus.CancelWithError;
-                _myWorkReportData?.Dispose();
+                properties.ErrorMessage = exception.Message;
                 SPSecurity.RunWithElevatedPrivileges(
                     () => LogEvent(exception, 6003, "EPMLive My Work Reporting Item Deleting"));
-
+            }
+            finally
+            {
+                _myWorkReportData?.Dispose();
             }
         }
 
@@ -231,14 +231,20 @@ namespace EPMLiveReportsAdmin
                 };
 
                 _listColumns = _myWorkReportData.GetListColumns("My Work");
+
+                if (_listColumns == null)
+                    return false;
+
                 _listColumns = _listColumns.DefaultView.ToTable(true,
                     (from DataColumn dataColumn in _listColumns.Columns
                      select dataColumn.ColumnName).ToArray());
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                SPSecurity.RunWithElevatedPrivileges(
+                       () => LogEvent(exception, 6002, "EPMLive My Work Reporting Item Initializing"));
                 return false;
             }
         }
