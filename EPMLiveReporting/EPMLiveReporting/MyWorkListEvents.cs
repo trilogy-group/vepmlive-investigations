@@ -245,7 +245,7 @@ namespace EPMLiveReportsAdmin
             catch (Exception exception)
             {
                 SPSecurity.RunWithElevatedPrivileges(
-                       () => LogEvent(exception, 6002, "EPMLive My Work Reporting Item Initializing"));
+                       () => LogEvent(exception, 6004, "EPMLive My Work Reporting Item Initializing"));
                 return false;
             }
         }
