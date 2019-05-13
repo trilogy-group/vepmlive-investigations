@@ -4,6 +4,7 @@ using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.Win32;
+using System.Collections.Generic;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -211,5 +212,79 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
         
         #endregion
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 4.0, Description = "Invalid Data Clean Up for My Work")]
+    internal class InvalidDataCleanUpMyWork : UpgradeStep
+    {
+        private const string SelectCommandText = "SELECT DISTINCT RPL.RPTLISTID,RPL.TABLENAME FROM RPTLIST RPL INNER JOIN LSTMYWORK MY ON MY.LISTID=RPL.RPTLISTID";
+        public InvalidDataCleanUpMyWork(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        public override bool Perform()
+        {
+            var webAppId = Web.Site.WebApplication.Id;
+            var ListIdTableNameCollection = new Dictionary<string, string>();
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    LogMessage("Connecting to the database . . .", 2);
+                    string connectionString = CoreFunctions.getReportingConnectionString(Web.Site.WebApplication.Id, Web.Site.ID);
+                    if (string.IsNullOrEmpty(connectionString))
+                    {
+                        throw new InvalidOperationException("Connection string is not initialized ...");
+                    }
+                    using (var sqlConnection = new SqlConnection(connectionString))
+                    {
+                        sqlConnection.Open();
+                        using (var sqlCommand = new SqlCommand(SelectCommandText, sqlConnection))
+                        {
+                            using (var sqlDatareader = sqlCommand.ExecuteReader())
+                            {
+                                while (sqlDatareader.Read())
+                                {
+                                    ListIdTableNameCollection.Add(Convert.ToString(sqlDatareader[0]), Convert.ToString(sqlDatareader[1]));
+                                }
+                            }
+                        }
+                    }
+                    if (ListIdTableNameCollection.Count > 0)
+                    {
+                        foreach (var item in ListIdTableNameCollection)
+                        {
+                            DeleteMyWorkData(item.Key, item.Value, connectionString);
+                        }
+                    }
+                }
+                catch (Exception exception)
+                {
+                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                }
+            });
+            return true;
+        }
+
+        private void DeleteMyWorkData(string rptListId, string tableName, string connectionString)
+        {
+            try
+            {
+                using (var con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    using (var cmd = new SqlCommand(string.Format(@"DELETE FROM LSTMYWORK WHERE ListId='{0}' and ItemID not in (Select ItemID from [{1}])", rptListId, tableName), con))
+                    {
+                        var rowsaffected = cmd.ExecuteNonQuery();
+                        if (rowsaffected > 0)
+                        {
+                            LogMessage($"Cleaned up invalid data for table: [{tableName}] with {rowsaffected} row(s).", 2);
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+            }
+        }
     }
 }
