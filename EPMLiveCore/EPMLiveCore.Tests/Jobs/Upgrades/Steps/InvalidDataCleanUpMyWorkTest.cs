@@ -52,7 +52,13 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps
             _invalidDataCleanUpMyWork = new InvalidDataCleanUpMyWork(spweb.Instance, false);
             _privateObject = new PrivateObject(_invalidDataCleanUpMyWork);
         }
-
+        
+        [TestCleanup]
+        public void TearDown()
+        {
+            _context?.Dispose();
+        }
+        
         [TestMethod]
         public void Perform_When_Connection_String_Empty()
         {
