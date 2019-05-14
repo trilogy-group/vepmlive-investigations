@@ -10,6 +10,9 @@ using EPMLiveTimesheets.Tests;
 using Microsoft.SharePoint;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TimeSheets.Fakes;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Data.Fakes;
 
 namespace TimeSheets.Tests
 {
@@ -18,6 +21,8 @@ namespace TimeSheets.Tests
     {
         private const int UserId = 23;
         private static readonly string XmlSample = $"<root GridType=\"10\" Period=\"may\" GridId=\"91\" Editable=\"true\" UserId=\"{UserId}\"></root>";
+        private static string deletedLstMyWorkIds = "deletedLstMyWorkIds";
+        private int TSItemHour = 0;
 
         [TestMethod]
         public void GetTimesheetGrid_Called_SqlDisposed()
@@ -32,6 +37,56 @@ namespace TimeSheets.Tests
             Assert.AreEqual(
                 Resource.GetTimesheetGrid_Called_SqlDisposed_ExpectedResult,
                 message);
+            Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
+        }
+        [TestMethod]
+        public void GetTimesheetGrid_Hide_StrikeItem_With_No_Hours()
+        {
+            // Arrange
+            TSItemHour = 0;
+
+            // Act,Assert
+            ArangeActAssert();
+        }
+
+        [TestMethod]
+        public void GetTimesheetGrid_Hide_StrikeItem_With_Hours()
+        {
+            // Arrange
+            TSItemHour = 1;
+
+            // Act,Assert
+            ArangeActAssert();
+        }
+
+        private void ArangeActAssert()
+        {
+            SetupShims();
+            var field = typeof(TimesheetAPI).GetField(deletedLstMyWorkIds,
+                            BindingFlags.Static |
+                            BindingFlags.NonPublic);
+
+            // Normally the first argument to "SetValue" is the instance
+            // of the type but since we are mutating a static field we pass "null"
+            field.SetValue(null, new List<string>() { "100" });
+
+
+            // Act
+            var message = TimesheetAPI.GetTimesheetGrid(XmlSample, _sharepointShims.WebShim);
+
+            // Assert
+            if (TSItemHour == 0)
+            {
+                //Assert.AreEqual(
+                //    Resource.GetTimesheetGrid_No_Hours_ExpectedResult,
+                //    message);
+            }
+            else
+            {
+                Assert.AreEqual(
+                    Resource.GetTimesheetGrid_Called_SqlDisposed_ExpectedResult,
+                    message);
+            }
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
         }
 
@@ -52,7 +107,7 @@ namespace TimeSheets.Tests
             ShimTimesheetAPI.GetPeriodDaysArraySqlConnectionTimesheetSettingsSPWebString =
                 (cn, settings, web, sPeriod) =>
                 {
-                    return new ArrayList(new [] { new DateTime(2018, 01, 22) });
+                    return new ArrayList(new[] { new DateTime(2018, 01, 22) });
                 };
 
             var dataSet = new DataSet();
@@ -62,24 +117,53 @@ namespace TimeSheets.Tests
 
             var table1 = new DataTable();
             table1.Columns.Add("SUBMITTED");
+
             var row10 = table1.NewRow();
             row10["SUBMITTED"] = "True";
+
             table1.Rows.Add(row10);
             dataSet.Tables.Add(table1);
 
             var table2 = new DataTable();
             table2.Columns.Add("TS_ITEM_UID");
+            table2.Columns.Add("tsuid");
+            table2.Columns.Add("TS_ITEM_HOURS");
             var row20 = table2.NewRow();
             row20["TS_ITEM_UID"] = "100";
+            row20["tsuid"] = Guid.Empty;
+            row20["TS_ITEM_HOURS"] = TSItemHour;
             table2.Rows.Add(row20);
             var row21 = table2.NewRow();
             row21["TS_ITEM_UID"] = "102";
-            row21["TS_ITEM_UID"] = "102";
+            row21["tsuid"] = Guid.Empty;
+            row21["TS_ITEM_HOURS"] = TSItemHour;
             table2.Rows.Add(row21);
             dataSet.Tables.Add(table2);
-            ShimTimesheetAPI.GetTSDataSetSqlConnectionSPWebSPUserString = (connection, web, user, period) => dataSet;
 
-            ShimTimesheetAPI.CreateTSRowXmlDocumentRefDataSetDataRowArrayListArrayListTimesheetSettingsBooleanSPWeb = 
+
+            ShimTimesheetAPI.GetTSDataSetSqlConnectionSPWebSPUserString = (connection, web, user, period) => dataSet;
+            ShimDataSet.AllInstances.TablesGet = (_ds) =>
+            {
+                // fake DataTableCollection of data set
+                return new ShimDataTableCollection()
+                {
+                    ItemGetInt32 = (S) =>
+                    {
+                        switch (S)
+                        {
+                            case 1:
+                                return table1;
+                            default:
+                                return table2;
+                        }
+                    },
+                };
+            };
+            ShimDataTable.AllInstances.SelectString = (_dt, _string) =>
+            {
+                return table2.Select();
+            };
+            ShimTimesheetAPI.CreateTSRowXmlDocumentRefDataSetDataRowArrayListArrayListTimesheetSettingsBooleanSPWeb =
                 (ref XmlDocument docData,
                 DataSet set,
                 DataRow dataRow,
@@ -88,10 +172,10 @@ namespace TimeSheets.Tests
                 TimesheetSettings settings,
                 bool edit,
                 SPWeb web) =>
-            {
-                var node = docData.FirstChild.FirstChild;
-                return node;
-            };
+                {
+                    var node = docData.FirstChild.FirstChild;
+                    return node;
+                };
 
             ShimMyWorkReportData.ConstructorGuid = (instance, __) =>
             {

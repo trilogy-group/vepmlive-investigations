@@ -35,7 +35,7 @@ namespace TimeSheets
         private const string ElementEntries = "Element_Entries";
         private const string ManagerName = "Manager_Name";
         private const string ManagerNotes = "Manager_Notes";
-
+        private static List<string> deletedLstMyWorkIds = new List<string>();
         static TimesheetAPI()
         {
             RoleChecker = new SPRoleChecker();
@@ -3280,7 +3280,46 @@ namespace TimeSheets
 
                 foreach (DataRow dr in dsTS.Tables[2].Rows)
                 {
-                    ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
+                    var showItemToPage = false;
+                    if (dr != null)
+                    {
+                        var tsitemuid = dr["TS_ITEM_UID"].ToString();
+                        if (deletedLstMyWorkIds.Contains(tsitemuid))
+                        {
+                            if (dsTS.Tables[3] != null && dsTS.Tables[3].Rows.Count > 0)
+                            {
+                                var submittedHours = 0f;
+                                DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"] + "'");
+                                if (drHours.Count() > 0)
+                                {
+                                    foreach (DataRow drHour in drHours)
+                                    {
+                                        var hours = 0f;
+                                        float.TryParse(drHour["TS_ITEM_HOURS"].ToString(), out hours);
+                                        submittedHours += hours;
+                                    }
+                                }
+                                if (submittedHours > 0)
+                                {
+                                    showItemToPage = true;
+                                }
+                            }
+                            else
+                            {
+                                showItemToPage = true;
+                            }
+                        }
+                        else
+                        {
+                            showItemToPage = true;
+                        }
+
+                        if (showItemToPage)
+                        {
+                            ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
+                        }
+                    }
+
                 }
 
                 docData.SelectSingleNode("//Cfg").Attributes["TimesheetUID"].Value = dsTS.Tables[0].Rows[0]["tsuid"].ToString();
@@ -4005,7 +4044,7 @@ namespace TimeSheets
                     {
                         DataTable dtTSItem = new DataTable();
 
-                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn);
+                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID,itm.TS_ITEM_UID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn);
                         cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
                         cmdTSItem.Parameters.AddWithValue("@TSUID", Convert.ToString(drItem["TS_UID"]));
 
@@ -4021,6 +4060,7 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows.Count > 0)
                             {
+                                deletedLstMyWorkIds.Add(Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]));
                                 //Old Code  We had issue with Column sequence In select state we manually defined column sequence 
                                 //ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
 
@@ -4206,7 +4246,7 @@ namespace TimeSheets
 
                                     command.ExecuteNonQuery();
 
-                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ", 
+                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ",
                                         string.Format("Adding item id: {0} to TS: {1}, user id: {2}", itemRow["ITEM_ID"].ToString(), timesheetGuid, user.ID));
                                 }
                             }
