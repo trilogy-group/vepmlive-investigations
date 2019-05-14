@@ -77,14 +77,14 @@ namespace TimeSheets.Tests
             // Assert
             if (TSItemHour == 0)
             {
-                //Assert.AreEqual(
-                //    Resource.GetTimesheetGrid_No_Hours_ExpectedResult,
-                //    message);
+                Assert.AreEqual(
+                    Resource.GetTimesheetGrid_Hide_StrikeItem_With_No_Hours_ExpectedResult,
+                    message);
             }
             else
             {
                 Assert.AreEqual(
-                    Resource.GetTimesheetGrid_Called_SqlDisposed_ExpectedResult,
+                    Resource.GetTimesheetGrid_Hide_StrikeItem_With_Hours_ExpectedResult,
                     message);
             }
             Assert.IsTrue(_adoShims.ConnectionsDisposed.Any());
