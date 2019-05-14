@@ -3286,25 +3286,18 @@ namespace TimeSheets
                         var tsitemuid = dr["TS_ITEM_UID"].ToString();
                         if (deletedLstMyWorkIds.Contains(tsitemuid))
                         {
-                            if (dsTS.Tables[3] != null && dsTS.Tables[3].Rows.Count > 0)
+                            var submittedHours = 0f;
+                            DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"] + "'");
+                            if (drHours.Count() > 0)
                             {
-                                var submittedHours = 0f;
-                                DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"] + "'");
-                                if (drHours.Count() > 0)
+                                foreach (DataRow drHour in drHours)
                                 {
-                                    foreach (DataRow drHour in drHours)
-                                    {
-                                        var hours = 0f;
-                                        float.TryParse(drHour["TS_ITEM_HOURS"].ToString(), out hours);
-                                        submittedHours += hours;
-                                    }
-                                }
-                                if (submittedHours > 0)
-                                {
-                                    showItemToPage = true;
+                                    var hours = 0f;
+                                    float.TryParse(drHour["TS_ITEM_HOURS"].ToString(), out hours);
+                                    submittedHours += hours;
                                 }
                             }
-                            else
+                            if (submittedHours > 0)
                             {
                                 showItemToPage = true;
                             }
@@ -4044,45 +4037,44 @@ namespace TimeSheets
                     {
                         DataTable dtTSItem = new DataTable();
 
-                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID,itm.TS_ITEM_UID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn);
-                        cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
-                        cmdTSItem.Parameters.AddWithValue("@TSUID", Convert.ToString(drItem["TS_UID"]));
-
-                        SqlDataAdapter daTSItem = new SqlDataAdapter(cmdTSItem);
-                        daTSItem.Fill(dtTSItem);
-
-                        if (dtTSItem != null)
+                        using (SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID,itm.TS_ITEM_UID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn))
                         {
-                            string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
-                            string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
-                            sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
-                            myWorkDataTable = rptData.ExecuteSql(sql);
+                            cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
+                            cmdTSItem.Parameters.AddWithValue("@TSUID", Convert.ToString(drItem["TS_UID"]));
 
-                            if (myWorkDataTable.Rows.Count > 0)
+                            SqlDataAdapter daTSItem = new SqlDataAdapter(cmdTSItem);
+                            daTSItem.Fill(dtTSItem);
+
+                            if (dtTSItem != null)
                             {
-                                deletedLstMyWorkIds.Add(Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]));
-                                //Old Code  We had issue with Column sequence In select state we manually defined column sequence 
-                                //ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+                                string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
+                                string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
+                                sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
+                                myWorkDataTable = rptData.ExecuteSql(sql);
 
-                                //New Code 
-                                DataRow dr = ds.Tables[myworktableid].NewRow();
-                                foreach (DataColumn item in myWorkDataTable.Columns)
+                                if (myWorkDataTable.Rows.Count > 0)
                                 {
-                                    try
+                                    deletedLstMyWorkIds.Add(Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]));
+
+                                    DataRow dr = ds.Tables[myworktableid].NewRow();
+                                    foreach (DataColumn item in myWorkDataTable.Columns)
                                     {
-                                        dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                        try
+                                        {
+                                            dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            dr[item.ColumnName] = DBNull.Value;
+                                            Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                                        }
                                     }
-                                    catch (Exception ex)
+                                    DataView dv = new DataView(ds.Tables[myworktableid]);
+                                    dv.RowFilter = string.Format("ITEMID = '{0}' AND LISTID = '{1}'", dr["ITEMID"].ToString(), dr["LISTID"].ToString());
+                                    if (dv.Count == 0)
                                     {
-                                        dr[item.ColumnName] = DBNull.Value;
-                                        Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                                        ds.Tables[myworktableid].Rows.Add(dr);
                                     }
-                                }
-                                DataView dv = new DataView(ds.Tables[myworktableid]);
-                                dv.RowFilter = string.Format("ITEMID = '{0}' AND LISTID = '{1}'", dr["ITEMID"].ToString(), dr["LISTID"].ToString());
-                                if (dv.Count == 0)
-                                {
-                                    ds.Tables[myworktableid].Rows.Add(dr);
                                 }
                             }
                         }
