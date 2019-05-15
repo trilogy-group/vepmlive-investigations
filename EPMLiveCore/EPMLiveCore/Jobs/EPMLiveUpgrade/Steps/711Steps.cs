@@ -287,4 +287,45 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             }
         }
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 5.0, Description = "Updating timesheet administrator label.")]
+    internal class UpdateTimesheetLabel : UpgradeStep
+    {
+        SPWeb _spWeb = null;
+        private readonly string NewTitlte = "To view all the timesheets, you should add yourself into the timesheet manager field explicitly for all the desired resources.";
+        public UpdateTimesheetLabel(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
+        {
+            _spWeb = spWeb;
+        }
+
+        public override bool Perform()
+        {
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    SPList list = _spWeb.Lists["Resources"];
+
+                    var field = list.Fields.GetFieldByInternalName("TimesheetAdministrator");
+
+                    if (!field.Description.Contains(NewTitlte))
+                    {
+                        field.Description += "\r\n" + NewTitlte;
+                        field.Update();
+
+                        LogMessage("Timesheet field description updated.", 2);
+                    }
+                    else
+                    {
+                        LogMessage("Timesheet field description is up-to-date.", 2);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                }
+            });
+            return true;
+        }
+    }
 }
