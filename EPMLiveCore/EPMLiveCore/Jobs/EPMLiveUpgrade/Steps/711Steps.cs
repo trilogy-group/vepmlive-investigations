@@ -291,10 +291,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     [UpgradeStep(Version = EPMLiveVersion.V711, Order = 5.0, Description = "Updating timesheet administrator label.")]
     internal class UpdateTimesheetLabel : UpgradeStep
     {
-        SPWeb _spWeb = null;
+        private readonly SPWeb _spWeb = null;
         private readonly string NewTitlte = "To view all the timesheets, you should add yourself into the timesheet manager field explicitly for all the desired resources.";
         public UpdateTimesheetLabel(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
         {
+            if (spWeb == null)
+            {
+                throw new ArgumentNullException(nameof(spWeb));
+            }
+
             _spWeb = spWeb;
         }
 
