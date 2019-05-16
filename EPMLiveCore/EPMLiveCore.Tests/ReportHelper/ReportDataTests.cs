@@ -2318,7 +2318,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             actualResult.ShouldSatisfyAllConditions(
                 () => actualResult.ShouldNotBeNull(),
                 () => actualResult.SqlDbType.ShouldBe(expecteDbType),
-                () => actualResult.Size.ShouldBe(0));
+                () => actualResult.Size.ShouldBe(8001));
         }
 
         private void TestPopulateDefaultColumnValue(string sColumn)
