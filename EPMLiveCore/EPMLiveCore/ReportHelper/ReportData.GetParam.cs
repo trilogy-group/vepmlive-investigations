@@ -75,6 +75,10 @@ namespace EPMLiveCore.ReportHelper
             {
                 GetParamCalculated(field, param);
             }
+            else if (fieldType == SPFieldType.Note && field is SPFieldMultiLineText)
+            {
+                param.Size = Size8001;
+            }
             else if (fieldType == SPFieldType.Text || fieldType == SPFieldType.URL || typeString != TotalRollup)
             {
                 param.Size = Size256;
