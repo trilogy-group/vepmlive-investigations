@@ -1822,6 +1822,13 @@ namespace EPMLiveCore.ReportHelper.Tests
         }
 
         [TestMethod]
+        public void GetParam_OnMultiLineNote_ReturnSqlParameter()
+        {
+            // Arrange, Act, Assert
+            TestGetMultilineParam(SPFieldType.Note, DummyString, SqlDbType.NText);
+        }
+
+        [TestMethod]
         public void InsertAllItemsDB_OnValidCall_ReturnBoolean()
         {
             // Arrange
@@ -2295,6 +2302,23 @@ namespace EPMLiveCore.ReportHelper.Tests
                     }
                 },
                 () => actualResult.ParameterName.ShouldBe($"@{sColumn}"));
+        }
+
+        private void TestGetMultilineParam(SPFieldType type, string sColumn, SqlDbType expecteDbType)
+        {
+            // Arrange
+            ShimSPField.AllInstances.TypeGet = _ => type;
+            ShimSPField.AllInstances.TypeAsStringGet = _ => "note";
+            ShimSPField.AllInstances.GetPropertyString = (_, __) => sColumn;
+
+            // Act
+            var actualResult = ReportData.GetParam(new ShimSPFieldMultiLineText(), sColumn);
+
+            // Assert
+            actualResult.ShouldSatisfyAllConditions(
+                () => actualResult.ShouldNotBeNull(),
+                () => actualResult.SqlDbType.ShouldBe(expecteDbType),
+                () => actualResult.Size.ShouldBe(8001));
         }
 
         private void TestPopulateDefaultColumnValue(string sColumn)
