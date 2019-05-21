@@ -156,7 +156,11 @@ namespace EPMLiveCore
             var list = web.Lists[listId];
             items.Remove(item);
             item = list.GetItemById(itemId);
-            items.Add(item);
+            if (item != null)
+            {
+                items.Add(item);
+            }
+
             return item;
         }
 
