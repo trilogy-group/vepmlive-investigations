@@ -21,7 +21,7 @@ namespace TimeSheets.Tests
     {
         private const int UserId = 23;
         private static readonly string XmlSample = $"<root GridType=\"10\" Period=\"may\" GridId=\"91\" Editable=\"true\" UserId=\"{UserId}\"></root>";
-        private static string deletedLstMyWorkIds = "deletedLstMyWorkIds";
+        private static readonly string DeletedLstMyWorkIds = "DeletedLstMyWorkIds";
         private int TSItemHour = 0;
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace TimeSheets.Tests
         private void ArangeActAssert()
         {
             SetupShims();
-            var field = typeof(TimesheetAPI).GetField(deletedLstMyWorkIds,
+            var field = typeof(TimesheetAPI).GetField(DeletedLstMyWorkIds,
                             BindingFlags.Static |
                             BindingFlags.NonPublic);
 

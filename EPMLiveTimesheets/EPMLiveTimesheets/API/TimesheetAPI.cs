@@ -35,7 +35,7 @@ namespace TimeSheets
         private const string ElementEntries = "Element_Entries";
         private const string ManagerName = "Manager_Name";
         private const string ManagerNotes = "Manager_Notes";
-        private static List<string> deletedLstMyWorkIds = new List<string>();
+        private static readonly List<string> DeletedLstMyWorkIds = new List<string>();
         static TimesheetAPI()
         {
             RoleChecker = new SPRoleChecker();
@@ -3284,7 +3284,7 @@ namespace TimeSheets
                     if (dr != null)
                     {
                         var tsitemuid = dr["TS_ITEM_UID"].ToString();
-                        if (deletedLstMyWorkIds.Contains(tsitemuid))
+                        if (DeletedLstMyWorkIds.Contains(tsitemuid))
                         {
                             var submittedHours = 0f;
                             DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"] + "'");
@@ -4054,7 +4054,7 @@ namespace TimeSheets
 
                                 if (myWorkDataTable.Rows.Count > 0)
                                 {
-                                    deletedLstMyWorkIds.Add(Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]));
+                                    DeletedLstMyWorkIds.Add(Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]));
 
                                     DataRow dr = ds.Tables[myworktableid].NewRow();
                                     foreach (DataColumn item in myWorkDataTable.Columns)
