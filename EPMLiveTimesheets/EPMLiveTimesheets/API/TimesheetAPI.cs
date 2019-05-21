@@ -3288,7 +3288,7 @@ namespace TimeSheets
                         {
                             var submittedHours = 0f;
                             DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"] + "'");
-                            if (drHours.Count() > 0)
+                            if (drHours.Length > 0)
                             {
                                 foreach (DataRow drHour in drHours)
                                 {
