@@ -18,7 +18,7 @@ namespace EPMLiveCore
         /// <summary>
         /// Mapping of tuples of Web relative URL, and List ID to SPListItemCollection
         /// </summary>
-        private readonly Dictionary<Tuple<string, Guid>, List<SPListItem>> _itemsCache = new Dictionary<Tuple<string, Guid>, List<SPListItem>> ();
+        private readonly Dictionary<Tuple<string, Guid>, List<SPListItem>> _itemsCache = new Dictionary<Tuple<string, Guid>, List<SPListItem>>();
 
         public static SaveDataJobExecuteCache Cache => _cache;
 
