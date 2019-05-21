@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.QualityTools.Testing.Fakes;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -204,8 +206,8 @@ namespace EPMLiveCore.Tests
 
             var siteMock = new ShimSPSite();
             
-            var listItemMock = new ShimSPListItem();
-            var listItemCollection = new ShimSPListItemCollection { GetItemByIdInt32 = _ => listItemMock };
+            var listItemMock = new ShimSPListItem { IDGet = () => ItemId };
+            var listItemCollection = new ShimSPListItemCollection { GetEnumerator = () => Enumerable.Repeat<SPListItem>(listItemMock, 1).GetEnumerator() };
             var listMock = new ShimSPList { GetItemsSPQuery = _ => listItemCollection, IDGet = () => listId };
             var listCollection = new ShimSPListCollection { ItemGetGuid = _ => listMock };
 
@@ -251,7 +253,11 @@ namespace EPMLiveCore.Tests
 
             var siteMock = new ShimSPSite();
 
-            var listMock = new ShimSPList { GetItemsSPQuery = _ => new ShimSPListItemCollection(), IDGet = () => listId };
+            var listMock = new ShimSPList
+            {
+                GetItemsSPQuery = _ => new ShimSPListItemCollection { GetEnumerator = () => Enumerable.Empty<SPListItem>().GetEnumerator() },
+                IDGet = () => listId
+            };
             var listCollection = new ShimSPListCollection { ItemGetGuid = _ => listMock };
 
             const string TestUrl = "test/url";
@@ -284,6 +290,53 @@ namespace EPMLiveCore.Tests
                 };
                 var listItem = SaveDataJobExecuteCache.GetListItem(properties);
                 listItem.ShouldBe(listItemMock);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldReloadListItemOnRequest()
+        {
+            var webId = Guid.NewGuid();
+            var listId = Guid.NewGuid();
+            const int ItemId = 1;
+
+            var siteMock = new ShimSPSite();
+
+            var listItemMock = new ShimSPListItem { IDGet = () => ItemId };
+            var listItemMockNew = new ShimSPListItem { IDGet = () => ItemId };
+            var listItemCollection = new ShimSPListItemCollection { GetEnumerator = () => Enumerable.Repeat<SPListItem>(listItemMock, 1).GetEnumerator() };
+            var listMock = new ShimSPList
+            {
+                GetItemsSPQuery = _ => listItemCollection, IDGet = () => listId, GetItemByIdInt32 = _ => listItemMockNew
+            };
+            var listCollection = new ShimSPListCollection { ItemGetGuid = _ => listMock };
+
+            const string TestUrl = "test/url";
+            var webMock = new ShimSPWeb { ServerRelativeUrlGet = () => TestUrl, ListsGet = () => listCollection };
+            siteMock.OpenWebGuid = guid => webMock;
+
+            using (var cache = SaveDataJobExecuteCache.InitializeCache(siteMock))
+            {
+                string preloadErrors;
+                var preloadHasErrors =
+                    cache.PreloadListItems(new[]
+                    {
+                        new SaveDataJobExecuteCache.ListItemInfo
+                        {
+                            WebId = webId.ToString(),
+                            ListId = listId.ToString(),
+                            ListItemId = ItemId.ToString()
+                        }
+                    }, out preloadErrors);
+
+                preloadHasErrors.ShouldBe(false);
+                preloadErrors.ShouldBe(string.Empty);
+
+                var listItem = SaveDataJobExecuteCache.Cache.GetListItem(TestUrl, listId, ItemId, refresh: true);
+                listItem.ShouldBe(listItemMockNew);
+
+                listItem = SaveDataJobExecuteCache.Cache.GetListItem(TestUrl, listId, ItemId);
+                listItem.ShouldBe(listItemMockNew);
             }
         }
     }

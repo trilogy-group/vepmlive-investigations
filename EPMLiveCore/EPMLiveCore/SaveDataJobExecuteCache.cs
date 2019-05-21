@@ -18,7 +18,7 @@ namespace EPMLiveCore
         /// <summary>
         /// Mapping of tuples of Web relative URL, and List ID to SPListItemCollection
         /// </summary>
-        private readonly Dictionary<Tuple<string, Guid>, SPListItemCollection> _itemsCache = new Dictionary<Tuple<string, Guid>, SPListItemCollection>();
+        private readonly Dictionary<Tuple<string, Guid>, List<SPListItem>> _itemsCache = new Dictionary<Tuple<string, Guid>, List<SPListItem>>();
 
         public static SaveDataJobExecuteCache Cache => _cache;
 
@@ -125,7 +125,7 @@ namespace EPMLiveCore
                     var values = string.Join(string.Empty, listInfo.Select(itemId => $"<Value Type='Counter'>{itemId}</Value>"));
                     query.Query = $"<Where><In><FieldRef Name='ID' /><Values>{values}</Values></In></Where>";
                     query.MeetingInstanceId = -2; // It is part of SPList.GetItemById() implementation and so kept here
-                    _itemsCache.Add(Tuple.Create(web.ServerRelativeUrl, list.ID), list.GetItems(query));
+                    _itemsCache.Add(Tuple.Create(web.ServerRelativeUrl, list.ID), list.GetItems(query).Cast<SPListItem>().ToList());
                 }
                 catch (Exception ex)
                 {
@@ -138,10 +138,30 @@ namespace EPMLiveCore
             return anyError;
         }
 
-        public SPListItem GetListItem(string relativeWebUrl, Guid listId, int itemId)
+        public SPListItem GetListItem(string relativeWebUrl, Guid listId, int itemId, bool refresh = false)
         {
-            SPListItemCollection items;
-            return _itemsCache.TryGetValue(Tuple.Create(relativeWebUrl, listId), out items) ? items.GetItemById(itemId) : null;
+            List<SPListItem> items;
+            if (!_itemsCache.TryGetValue(Tuple.Create(relativeWebUrl, listId), out items))
+            {
+                return null;
+            }
+
+            var item = items.FirstOrDefault(x => x.ID == itemId);
+            if (!refresh)
+            {
+                return item;
+            }
+
+            var web = GetWebByRelativeUrl(relativeWebUrl);
+            var list = web.Lists[listId];
+            items.Remove(item);
+            item = list.GetItemById(itemId);
+            if (item != null)
+            {
+                items.Add(item);
+            }
+
+            return item;
         }
 
         void IDisposable.Dispose()
