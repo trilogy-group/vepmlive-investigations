@@ -21,7 +21,6 @@ namespace TimeSheets.Tests
     {
         private const int UserId = 23;
         private static readonly string XmlSample = $"<root GridType=\"10\" Period=\"may\" GridId=\"91\" Editable=\"true\" UserId=\"{UserId}\"></root>";
-        private static readonly string DeletedLstMyWorkIds = "DeletedLstMyWorkIds";
         private int TSItemHour = 0;
 
         [TestMethod]
@@ -61,16 +60,9 @@ namespace TimeSheets.Tests
 
         private void ArangeActAssert()
         {
+            // Arrange
             SetupShims();
-            var field = typeof(TimesheetAPI).GetField(DeletedLstMyWorkIds,
-                            BindingFlags.Static |
-                            BindingFlags.NonPublic);
-
-            // Normally the first argument to "SetValue" is the instance
-            // of the type but since we are mutating a static field we pass "null"
-            field.SetValue(null, new List<string>() { "100" });
-
-
+            
             // Act
             var message = TimesheetAPI.GetTimesheetGrid(XmlSample, _sharepointShims.WebShim);
 
@@ -128,15 +120,21 @@ namespace TimeSheets.Tests
             table2.Columns.Add("TS_ITEM_UID");
             table2.Columns.Add("tsuid");
             table2.Columns.Add("TS_ITEM_HOURS");
+            table2.Columns.Add("ITEM_ID");
+            table2.Columns.Add("LIST_UID");
             var row20 = table2.NewRow();
             row20["TS_ITEM_UID"] = "100";
             row20["tsuid"] = Guid.Empty;
             row20["TS_ITEM_HOURS"] = TSItemHour;
+            row20["ITEM_ID"] = "100";
+            row20["LIST_UID"] = "100";
             table2.Rows.Add(row20);
             var row21 = table2.NewRow();
             row21["TS_ITEM_UID"] = "102";
             row21["tsuid"] = Guid.Empty;
             row21["TS_ITEM_HOURS"] = TSItemHour;
+            row21["ITEM_ID"] = "100";
+            row21["LIST_UID"] = "100";
             table2.Rows.Add(row21);
             dataSet.Tables.Add(table2);
 

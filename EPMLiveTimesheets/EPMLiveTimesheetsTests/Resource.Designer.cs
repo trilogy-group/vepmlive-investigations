@@ -88,7 +88,7 @@ namespace EPMLiveTimesheets.Tests {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;Grid&gt;&lt;Body&gt;&lt;B&gt;&lt;Cfg TimesheetUID=&quot;00000000-0000-0000-0000-000000000000&quot; /&gt;&lt;/B&gt;&lt;/Body&gt;&lt;/Grid&gt;.
+        ///   Looks up a localized string similar to &lt;Grid&gt;&lt;Body&gt;&lt;B&gt;&lt;I Title=&quot;Data Error: Cannot insert a node or any ancestor of that node as a child of itself.&quot; /&gt;&lt;/B&gt;&lt;/Body&gt;&lt;/Grid&gt;.
         /// </summary>
         internal static string GetTimesheetGrid_Hide_StrikeItem_With_No_Hours_ExpectedResult {
             get {
