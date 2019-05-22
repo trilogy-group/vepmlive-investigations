@@ -3276,7 +3276,7 @@ namespace TimeSheets
                 {
                     bCanEdit = false;
                 }
- 
+
                 List<DeletedTSModel> AllItems = ProcessAllItems(dsTS);
                 foreach (DataRow dr in dsTS.Tables[2].Rows)
                 {
@@ -3285,8 +3285,15 @@ namespace TimeSheets
                         var ItemId = dr["ITEM_ID"].ToString();
                         var ListUId = dr["LIST_UID"].ToString();
                         var TSITEMUID = dr["TS_ITEM_UID"].ToString();
-                        if (AllItems.FirstOrDefault(itm => itm.ItemID == ItemId && itm.ListUID == ListUId && itm.TSItemUID == TSITEMUID).IsVisible)
+                        var currentTSItem = AllItems.FirstOrDefault(itm => itm.ItemID == ItemId && itm.ListUID == ListUId && itm.TSItemUID == TSITEMUID);
+                        if (currentTSItem != null)
                         {
+                            if (currentTSItem.IsVisible)
+                            {
+                                ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
+                            }
+                        }
+                        else {
                             ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
                         }
                     }
@@ -3366,7 +3373,6 @@ namespace TimeSheets
                     deletedTSModel.FirstOrDefault(itm => itm.ItemID == item.Key && itm.ListUID == item.Value).IsVisible = true;
                 }
             }
-
             return deletedTSModel;
         }
 
