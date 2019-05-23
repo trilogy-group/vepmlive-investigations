@@ -1034,6 +1034,16 @@ namespace EPMLiveCore.ReportHelper
             return _DAO.GetTable(_DAO.GetEPMLiveConnection, true);
         }
 
+        public DataSet GetTSAllDataBatchWithSchema(int pageNo, int pageSize)
+        {
+            _DAO.AddParam("@siteuid", _siteId);
+            _DAO.AddParam("@pageNo", pageNo);
+            _DAO.AddParam("@pageSize", pageSize);
+            _DAO.Command = "spTSAllDataBatch";
+            _DAO.CommandType = CommandType.StoredProcedure;
+            return _DAO.GetRRDataSet(_DAO.GetEPMLiveConnection, true);
+        }
+
         public bool InsertTSAllData(DataTable table, out string message)
         {
             var ds = new DataSet();
