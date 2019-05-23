@@ -61,7 +61,7 @@ namespace TimeSheets
         private DateTime periodStart;
         private string Project;
         protected Queue queueAllItems = new Queue();
-        private string curProject = string.Empty;
+        protected string curProject = string.Empty;
         private XmlNode projectNode = null;
 
         protected void Page_Load(object sender, EventArgs e)
