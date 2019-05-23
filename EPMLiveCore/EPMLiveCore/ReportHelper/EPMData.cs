@@ -1218,7 +1218,6 @@ namespace EPMLiveCore.ReportHelper
                         if (getFullSchema)
                             da.MissingSchemaAction = MissingSchemaAction.AddWithKey;
                         da.Fill(ds);
-                        da.Dispose();
                         return ds;
                     }
                 }
