@@ -1067,6 +1067,15 @@ declare @cols varchar(MAX)
 declare @count bigint
 print @customertablename
 set @cols = ''''
+declare @dropsql varchar(100)
+IF @pageNo=0
+BEGIN
+-- Checking and Droping table in the begining to make sure there is no table with same name already exists
+IF OBJECT_ID(''tempdb..''+@customertablename) IS NOT NULL
+BEGIN
+set @dropsql =''DROP TABLE ''+@customertablename
+ exec(@dropsql) 
+END
  DECLARE colsCursors CURSOR FOR 
 SELECT distinct IV.columnname
 FROM (
@@ -1104,17 +1113,10 @@ INTO @colname
  END
 CLOSE colsCursors
 DEALLOCATE colsCursors
-declare @dropsql varchar(100)
--- Checking and Droping table in the begining to make sure there is no table with same name already exists
-IF OBJECT_ID(''tempdb..''+@customertablename) IS NOT NULL
-BEGIN
-set @dropsql =''DROP TABLE ''+@customertablename
- exec(@dropsql) 
-END
  if @cols <> ''''
 begin
 	declare @sql varchar(MAX)
-	set @sql = ''SELECT  ROW_NUMBER() OVER (ORDER BY Username) AS SNO,Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES] as [Item Notes], APPROVAL_DATE as [Approval Date] ''
+	set @sql = ''SELECT  Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES] as [Item Notes], APPROVAL_DATE as [Approval Date] ''
 	set @sql = @sql + @cols
 	set @sql = @sql + '', [Item UID], [Timesheet UID] into ''+@customertablename+'' FROM ''
 		set @sql = @sql + ''(SELECT Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [LastSubmittedByName], [TS_ITEM_NOTES], [APPROVAL_DATE], columnname, columnvalue,site_id	FROM vwmeta Where hours > 0) ps
@@ -1129,11 +1131,12 @@ begin
 end
 else
 begin
-	set @sql = ''SELECT ROW_NUMBER() OVER (ORDER BY Username) AS SNO,Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] into ''+@customertablename+'' from vwmeta where hours > 0  and site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+	set @sql = ''SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] into ''+@customertablename+'' from vwmeta where hours > 0  and site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
 end
 --Executing SQL
 exec(@sql)
- DECLARE @offset INT
+END
+DECLARE @offset INT
 DECLARE @newsize INT
 declare @maxrow INT
 IF @pageNo=0
@@ -1147,14 +1150,8 @@ ELSE
     SET @newsize = @pageSize-1
 END
  Set @maxrow  = @offset + @newsize
- exec(''SELECT *,newid() as rpttsduid FROM ''+@customertablename+'' WHERE [SNO]  BETWEEN  ''+@offset+'' AND  ''+@maxrow+'' order by SNO;Select count(*) as RecCount from ''+@customertablename+'''');
--- Droping table in the end to release space from temp db
-IF OBJECT_ID(''tempdb..''+@customertablename) IS NOT NULL
-BEGIN
-set @dropsql =''DROP TABLE ''+@customertablename
- exec(@dropsql) 
-END')
-
+ exec(''SELECT * from(SELECT  ROW_NUMBER() OVER (ORDER BY Username) AS SNO,*,newid() as rpttsduid FROM ''+@customertablename+'') as RRData WHERE [SNO]  BETWEEN  ''+@offset+'' AND  ''+@maxrow+'' order by SNO;Select count(*) as RecCount from ''+@customertablename+'''');
+')
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetMyApprovals')
 begin
     Print 'Creating Stored Procedure spTSGetMyApprovals'
