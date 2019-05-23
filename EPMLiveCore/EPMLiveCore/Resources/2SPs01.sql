@@ -1044,6 +1044,116 @@ end
 
 exec(@sql)
 ')
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSAllDataBatch')
+begin
+    Print 'Creating Stored Procedure spTSAllDataBatch'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSAllDataBatch'
+    SET @createoralter = 'ALTER'
+end
+exec (@createoralter + ' PROC [dbo].[spTSAllDataBatch]
+               @siteuid uniqueidentifier,
+	  @pageNo int,
+	  @pageSize int
+AS
+declare @colname varchar(255)
+declare @customertablename varchar(50)
+--GlobalTemptable will be unique for all customers becasue if they share same table there could be security breach.
+set  @customertablename=(Select ''##RRTemp_''+ REPLACE(@siteuid, ''-'', ''''))
+declare @cols varchar(MAX)
+declare @count bigint
+print @customertablename
+set @cols = ''''
+ DECLARE colsCursors CURSOR FOR 
+SELECT distinct IV.columnname
+FROM (
+SELECT		COALESCE (dbo.TSMETA.ListName + ''_'' + dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		COALESCE (dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND dbo.TSITEM.LIST = dbo.TSMETA.ListName
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		''Resource_'' + dbo.TSRESMETA.ColumnName AS columnname
+FROM		dbo.TSTIMESHEET AS TSTIMESHEET_1
+INNER JOIN	dbo.TSRESMETA ON TSTIMESHEET_1.TS_UID = dbo.TSRESMETA.TS_UID
+INNER JOIN	dbo.TSITEM AS TSITEM_1 ON TSTIMESHEET_1.TS_UID = TSITEM_1.TS_UID
+INNER JOIN	dbo.TSITEMHOURS AS TSITEMHOURS_1 ON TSITEM_1.TS_ITEM_UID = TSITEMHOURS_1.TS_ITEM_UID
+WHERE TSTIMESHEET_1.SITE_UID = @siteuid
+UNION
+SELECT		''TempColumn'') as IV
+order by IV.columnname
+ OPEN colsCursors
+ FETCH NEXT FROM colsCursors 
+INTO @colname
+ WHILE @@FETCH_STATUS = 0
+BEGIN
+ set @cols = @cols + '',['' + @colname + '']''
+ FETCH NEXT FROM colsCursors 
+INTO @colname
+ END
+CLOSE colsCursors
+DEALLOCATE colsCursors
+declare @dropsql varchar(100)
+-- Checking and Droping table in the begining to make sure there is no table with same name already exists
+IF OBJECT_ID(''tempdb..''+@customertablename) IS NOT NULL
+BEGIN
+set @dropsql =''DROP TABLE ''+@customertablename
+ exec(@dropsql) 
+END
+ if @cols <> ''''
+begin
+	declare @sql varchar(MAX)
+	set @sql = ''SELECT  ROW_NUMBER() OVER (ORDER BY Username) AS SNO,Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES] as [Item Notes], APPROVAL_DATE as [Approval Date] ''
+	set @sql = @sql + @cols
+	set @sql = @sql + '', [Item UID], [Timesheet UID] into ''+@customertablename+'' FROM ''
+		set @sql = @sql + ''(SELECT Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes],[lastmodifiedbyn], [LastSubmittedByName], [TS_ITEM_NOTES], [APPROVAL_DATE], columnname, columnvalue,site_id	FROM vwmeta Where hours > 0) ps
+	PIVOT
+	(
+	min (columnvalue)
+	FOR columnname IN
+	(''
+	set @sql = @sql + substring(@cols,2,len(@cols)-1)
+	set @sql = @sql + '')''
+	set @sql = @sql + '') AS pvt where site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+end
+else
+begin
+	set @sql = ''SELECT ROW_NUMBER() OVER (ORDER BY Username) AS SNO,Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [LastSubmittedByName] as [Last Submitted By], [TS_ITEM_NOTES], [APPROVAL_DATE] into ''+@customertablename+'' from vwmeta where hours > 0  and site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+end
+--Executing SQL
+exec(@sql)
+ DECLARE @offset INT
+DECLARE @newsize INT
+declare @maxrow INT
+IF @pageNo=0
+BEGIN
+    SET @offset = @pageNo
+    SET @newsize = @pageSize-1
+   END
+ELSE 
+  BEGIN
+    SET @offset = @pageNo*@pageSize
+    SET @newsize = @pageSize-1
+END
+ Set @maxrow  = @offset + @newsize
+ exec(''SELECT *,newid() as rpttsduid FROM ''+@customertablename+'' WHERE [SNO]  BETWEEN  ''+@offset+'' AND  ''+@maxrow+'' order by SNO;Select count(*) as RecCount from ''+@customertablename+'''');
+-- Droping table in the end to release space from temp db
+IF OBJECT_ID(''tempdb..''+@customertablename) IS NOT NULL
+BEGIN
+set @dropsql =''DROP TABLE ''+@customertablename
+ exec(@dropsql) 
+END')
 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetMyApprovals')
 begin
