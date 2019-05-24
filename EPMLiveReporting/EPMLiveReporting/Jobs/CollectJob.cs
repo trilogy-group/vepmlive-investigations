@@ -227,15 +227,12 @@ namespace EPMLiveReportsAdmin.Jobs
                     bool consolidationdone;
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Starting Process TimeSheet Data for site: {0}.", site.Url), 2, 3, Convert.ToString(JobUid));
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliveconsolidation"), out consolidationdone);
-                    bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid, consolidationdone);
-                    if (tErrors)
-                        bErrors = true;
-                    if (bErrors)
+                    if (epmdata.RefreshTimesheets(out err, base.JobUid, consolidationdone))
                     {
+                        bErrors = true;
                         sbErrors.Append("<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>");
                         epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Process TimeSheet Data failed for site: {0}. Error {1}", site.Url, err), 2, 3, Convert.ToString(JobUid));
                     }
-
                     else
                     {
                         sbErrors.Append("Processed Timesheets<br>");
@@ -342,9 +339,9 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     string errMsg = string.Empty;
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Started DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                    bErrors = DataScrubber.CleanTables(site, epmdata, base.JobUid, ref errMsg);
-                    if (bErrors)
+                    if (DataScrubber.CleanTables(site, epmdata, base.JobUid, ref errMsg))
                     {
+                        bErrors = true;
                         sbErrors.Append("<font color=\"red\">Error while cleaning tables: " + errMsg + "</font><br>");
                         epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Error while cleaning tables for site: {0} error {1}", site.Url, errMsg), 2, 3, Convert.ToString(JobUid));
                     }
