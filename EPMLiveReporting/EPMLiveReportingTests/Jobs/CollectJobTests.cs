@@ -359,7 +359,7 @@ namespace EPMLiveReporting.Tests.Jobs
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => collectJob.sErrors.ShouldNotBeNullOrEmpty(),
-                () => expectedLogMEssages.ForEach(err => logMessages.Any(log => log.Contains(err))),
+                () => expectedLogMEssages.ShouldAllBe(err => logMessages.Any(log => log.Contains(err))),
                 () => collectJob.bErrors.ShouldBeTrue());
         }
 
@@ -369,18 +369,6 @@ namespace EPMLiveReporting.Tests.Jobs
             // Arrange
             bool executeReportExtractWasCalled = false;
             
-            var expectedLogMEssages = new List<string>
-            {
-                "Error processing security on site",
-                "Updating reporting settings failed for site",
-                "Process TimeSheet Data failed for site",
-                "Error Processing PfE Reporting for site",
-                "Error while checking SPRequirement for site",
-                "Error while updating schema for site",
-                "Error while cleaning tables for site",
-                "Error updating status fields",
-                "Cleaning Cache Failed for site",
-            };
             var logMessages = new List<string>();
             ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
                 (_, listId, listName, shortMessage, longMessage, level, type, job) =>
@@ -470,15 +458,13 @@ namespace EPMLiveReporting.Tests.Jobs
             };
             ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheets;
           
-
-
             // Act
             collectJob.execute(spSite, spWeb, string.Empty);
 
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => collectJob.sErrors.ShouldNotBeNullOrEmpty(),
-                () => expectedLogMEssages.ForEach(err => logMessages.Any(log => log.Contains(err))),
+                () => logMessages.Any().ShouldBeTrue(),
                 () => collectJob.bErrors.ShouldBeFalse());
         }
 
