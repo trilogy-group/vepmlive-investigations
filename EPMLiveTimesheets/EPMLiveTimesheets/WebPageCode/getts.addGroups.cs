@@ -259,6 +259,7 @@ namespace TimeSheets
 
             var drTasks = dsTimesheetTasks.Tables[0].Select("ts_uid = '" + dataRows[0][TsUid] + "'");
             var regex = new Regex("[^0-9a-zA-Z]+", RegexOptions.Compiled);
+            curProject = null;
             foreach (var drTask in drTasks)
             {
                 ProcessTask(timeSpan, listItemId, newNode, regex, drTask);
