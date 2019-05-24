@@ -35,7 +35,7 @@ namespace TimeSheets
         private const string ElementEntries = "Element_Entries";
         private const string ManagerName = "Manager_Name";
         private const string ManagerNotes = "Manager_Notes";
-
+        private static readonly List<DeletedTSModel> DeletedTSItems = new List<DeletedTSModel>();
         static TimesheetAPI()
         {
             RoleChecker = new SPRoleChecker();
@@ -3277,10 +3277,26 @@ namespace TimeSheets
                     bCanEdit = false;
                 }
 
-
+                List<DeletedTSModel> AllItems = ProcessAllItems(dsTS);
                 foreach (DataRow dr in dsTS.Tables[2].Rows)
                 {
-                    ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
+                    if (dr != null)
+                    {
+                        var ItemId = dr["ITEM_ID"].ToString();
+                        var ListUId = dr["LIST_UID"].ToString();
+                        var TSITEMUID = dr["TS_ITEM_UID"].ToString();
+                        var currentTSItem = AllItems.FirstOrDefault(itm => itm.ItemID == ItemId && itm.ListUID == ListUId && itm.TSItemUID == TSITEMUID);
+                        if (currentTSItem != null)
+                        {
+                            if (currentTSItem.IsVisible)
+                            {
+                                ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
+                            }
+                        }
+                        else {
+                            ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
+                        }
+                    }
                 }
 
                 docData.SelectSingleNode("//Cfg").Attributes["TimesheetUID"].Value = dsTS.Tables[0].Rows[0]["tsuid"].ToString();
@@ -3299,9 +3315,65 @@ namespace TimeSheets
                 ndBod.AppendChild(ndCol);
             }
 
-
-
             return docData.OuterXml;
+        }
+
+        private static List<DeletedTSModel> ProcessAllItems(DataSet dsTS)
+        {
+            List<DeletedTSModel> deletedTSModel = new List<DeletedTSModel>();
+            Dictionary<string, string> ItemList = new Dictionary<string, string>();
+            foreach (DataRow row in dsTS.Tables[2].Rows)
+            {
+                var ItemId = row["ITEM_ID"].ToString();
+                var ListUId = row["LIST_UID"].ToString();
+                if (!ItemList.ContainsKey(ItemId) || !ItemList.ContainsValue(ListUId))
+                {
+                    ItemList.Add(ItemId, ListUId);
+                }
+                var TSITEMUID = row["TS_ITEM_UID"].ToString();
+                var _DeletedItem = DeletedTSItems.FirstOrDefault(itm => itm.ItemID == ItemId && itm.ListUID == ListUId);
+                var submittedHours = 0f;
+                if (_DeletedItem != null)
+                {
+                    DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + TSITEMUID + "'");
+                    if (drHours.Length > 0)
+                    {
+                        foreach (DataRow drHour in drHours)
+                        {
+                            var hours = 0f;
+                            float.TryParse(drHour["TS_ITEM_HOURS"].ToString(), out hours);
+                            submittedHours += hours;
+                        }
+                    }
+                    deletedTSModel.Add(new DeletedTSModel()
+                    {
+                        ListUID = ListUId,
+                        TSItemUID = TSITEMUID,
+                        ItemID = ItemId,
+                        IsVisible = submittedHours > 0
+                    });
+                }
+                else
+                {
+                    deletedTSModel.Add(new DeletedTSModel()
+                    {
+                        ListUID = ListUId,
+                        TSItemUID = TSITEMUID,
+                        ItemID = ItemId,
+                        IsVisible = true
+                    });
+                }
+            }
+            foreach (var item in ItemList)
+            {
+                var ItemCount = deletedTSModel.Where(itm => itm.ItemID == item.Key && itm.ListUID == item.Value && itm.IsVisible).Count();
+                if (ItemCount == 0)
+                {
+                    // At least one timesheet entry should be visible for deleted tasks if there are multiple
+                    deletedTSModel.FirstOrDefault(itm => itm.ItemID == item.Key && itm.ListUID == item.Value).IsVisible = true;
+                }
+            }
+            return deletedTSModel;
         }
 
         private static XmlNode CreateTSRow(ref XmlDocument docData, DataSet dsTS, DataRow dr, ArrayList arrLookups, ArrayList arrPeriods, TimesheetSettings settings, bool bCanEdit, SPWeb web)
@@ -4005,44 +4077,46 @@ namespace TimeSheets
                     {
                         DataTable dtTSItem = new DataTable();
 
-                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn);
-                        cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
-                        cmdTSItem.Parameters.AddWithValue("@TSUID", Convert.ToString(drItem["TS_UID"]));
-
-                        SqlDataAdapter daTSItem = new SqlDataAdapter(cmdTSItem);
-                        daTSItem.Fill(dtTSItem);
-
-                        if (dtTSItem != null)
+                        using (SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, LIST, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID,itm.TS_ITEM_UID,itm.Title from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID and itm.TS_UID=@TSUID", cn))
                         {
-                            string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
-                            string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
-                            sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
-                            myWorkDataTable = rptData.ExecuteSql(sql);
+                            cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
+                            cmdTSItem.Parameters.AddWithValue("@TSUID", Convert.ToString(drItem["TS_UID"]));
 
-                            if (myWorkDataTable.Rows.Count > 0)
+                            SqlDataAdapter daTSItem = new SqlDataAdapter(cmdTSItem);
+                            daTSItem.Fill(dtTSItem);
+
+                            if (dtTSItem != null)
                             {
-                                //Old Code  We had issue with Column sequence In select state we manually defined column sequence 
-                                //ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+                                string project = EpmCoreFunctions.GetSafeGroupTitle(Convert.ToString(dtTSItem.Rows[0]["PROJECT"]));
+                                string projectID = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) == "" ? "null" : Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
+                                sql = string.Format(@"select '{0}' SiteId,'{1}' WebId,'{2}' ListId,{3} ItemId,{4} ProjectID, '{5}' ProjectText,0 IsAssignment,'{6}' WorkType,'true' IsDeleted ", Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]), Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]), Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]), Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]), projectID, project, dtTSItem.Rows[0]["LIST"]);
+                                myWorkDataTable = rptData.ExecuteSql(sql);
 
-                                //New Code 
-                                DataRow dr = ds.Tables[myworktableid].NewRow();
-                                foreach (DataColumn item in myWorkDataTable.Columns)
+                                if (myWorkDataTable.Rows.Count > 0)
                                 {
-                                    try
+                                    var ItemID = Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]);
+                                    var ListUID = Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]);
+                                    var TSItemUID = Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]);
+                                    DeletedTSItems.Add(new DeletedTSModel() { ItemID = ItemID, ListUID = ListUID, TSItemUID = TSItemUID });
+                                    DataRow dr = ds.Tables[myworktableid].NewRow();
+                                    foreach (DataColumn item in myWorkDataTable.Columns)
                                     {
-                                        dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                        try
+                                        {
+                                            dr[item.ColumnName] = myWorkDataTable.Rows[0][item.ColumnName];
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            dr[item.ColumnName] = DBNull.Value;
+                                            Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                                        }
                                     }
-                                    catch (Exception ex)
+                                    DataView dv = new DataView(ds.Tables[myworktableid]);
+                                    dv.RowFilter = string.Format("ITEMID = '{0}' AND LISTID = '{1}'", dr["ITEMID"].ToString(), dr["LISTID"].ToString());
+                                    if (dv.Count == 0)
                                     {
-                                        dr[item.ColumnName] = DBNull.Value;
-                                        Logger.WriteLog(Logger.Category.Unexpected, "TimeSheetAPI iiGetTSData", ex.ToString());
+                                        ds.Tables[myworktableid].Rows.Add(dr);
                                     }
-                                }
-                                DataView dv = new DataView(ds.Tables[myworktableid]);
-                                dv.RowFilter = string.Format("ITEMID = '{0}' AND LISTID = '{1}'", dr["ITEMID"].ToString(), dr["LISTID"].ToString());
-                                if (dv.Count == 0)
-                                {
-                                    ds.Tables[myworktableid].Rows.Add(dr);
                                 }
                             }
                         }
@@ -4206,7 +4280,7 @@ namespace TimeSheets
 
                                     command.ExecuteNonQuery();
 
-                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ", 
+                                    Logger.WriteLog(Logger.Category.Medium, "GenerateTSFromPast: ",
                                         string.Format("Adding item id: {0} to TS: {1}, user id: {2}", itemRow["ITEM_ID"].ToString(), timesheetGuid, user.ID));
                                 }
                             }
@@ -4895,6 +4969,16 @@ namespace TimeSheets
                 connection.Open();
             });
             return connection;
+        }
+
+        private class DeletedTSModel
+        {
+            public int Count { get; set; }
+            public string ItemID { get; set; }
+            public string ListUID { get; set; }
+            public string TSItemUID { get; set; }
+            public bool IsVisible { get; set; }
+
         }
     }
 }
