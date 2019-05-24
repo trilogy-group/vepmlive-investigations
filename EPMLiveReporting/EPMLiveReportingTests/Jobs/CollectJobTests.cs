@@ -359,7 +359,127 @@ namespace EPMLiveReporting.Tests.Jobs
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => collectJob.sErrors.ShouldNotBeNullOrEmpty(),
-                () => expectedLogMEssages.ForEach(err => logMessages.Any(log => log.Contains(err))));
+                () => expectedLogMEssages.ForEach(err => logMessages.Any(log => log.Contains(err))),
+                () => collectJob.bErrors.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void Execute_NoExceptions()
+        {
+            // Arrange
+            bool executeReportExtractWasCalled = false;
+            
+            var expectedLogMEssages = new List<string>
+            {
+                "Error processing security on site",
+                "Updating reporting settings failed for site",
+                "Process TimeSheet Data failed for site",
+                "Error Processing PfE Reporting for site",
+                "Error while checking SPRequirement for site",
+                "Error while updating schema for site",
+                "Error while cleaning tables for site",
+                "Error updating status fields",
+                "Cleaning Cache Failed for site",
+            };
+            var logMessages = new List<string>();
+            ShimEPMData.AllInstances.LogStatusStringStringStringStringInt32Int32String =
+                (_, listId, listName, shortMessage, longMessage, level, type, job) =>
+                {
+                    logMessages.Add(shortMessage);
+                    logMessages.Add(longMessage);
+                    return true;
+                };
+            var spSite = new ShimSPSite
+            {
+                IDGet = () => DummyGuid,
+                UrlGet = () => DummyString,
+                AllWebsGet = () => new ShimSPWebCollection(),
+                FeaturesGet = () => new ShimSPFeatureCollection
+                {
+                    ItemGetGuid = guid => new ShimSPFeature()
+                },
+                WebApplicationGet = () => new ShimSPWebApplication
+                {
+                    ApplicationPoolGet = () => new ShimSPApplicationPool()
+                }
+            }.Instance;
+            var spWeb = new ShimSPWeb
+            {
+                Dispose = () => { },
+                ListsGet = () => new ShimSPListCollection
+                {
+                    ItemGetString = name => new ShimSPList()
+                }
+            };
+            ShimProcessSecurity.ProcessSecurityGroupsSPSiteSqlConnectionString =
+                (site, conn, users) =>
+                {
+
+                };
+            ShimCollectJob.AllInstances.setRPTSettingsEPMDataSPSite =
+                (_, epmData, site) =>
+                {
+
+                };
+            ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
+            ReturnValue = false;
+            ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheetsException;
+            ShimWEIntegration.AllInstances.ExecuteReportExtractString =
+                (_, dataToExtract) =>
+                {
+                    executeReportExtractWasCalled = true;
+                    return DummyString;
+                };
+            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
+                (_, connection) =>
+                {
+
+                };
+            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
+                (_, connection) =>
+                {
+
+                };
+            ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRefFalse;
+
+            ShimDataSet.AllInstances.TablesGet = _ => null;
+            ShimCacheStore.AllInstances.RemoveSafelyStringStringString =
+                (_, url, category, key) =>
+                {
+
+                };
+            ShimDataSet.AllInstances.TablesGet = _ => new ShimDataTableCollection
+            {
+                ItemGetInt32 = index => new ShimDataTable
+                {
+                    RowsGet = () => new ShimDataRowCollection
+                    {
+                        ItemGetInt32 = i => new ShimDataRow
+                        {
+                            ItemGetInt32 = rowIndex => DummyString
+                        },
+                        GetEnumerator = () => new List<DataRow>
+                        {
+                            new ShimDataRow
+                            {
+                                ItemGetInt32 = i => DummyString
+                            }
+                        }.GetEnumerator()
+                    }
+                }
+            };
+            ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheets;
+          
+
+
+            // Act
+            collectJob.execute(spSite, spWeb, string.Empty);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => collectJob.sErrors.ShouldNotBeNullOrEmpty(),
+                () => expectedLogMEssages.ForEach(err => logMessages.Any(log => log.Contains(err))),
+                () => collectJob.bErrors.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -594,6 +714,18 @@ namespace EPMLiveReporting.Tests.Jobs
         {
             const string DummyError = "Dummy Error";
             throw new Exception(DummyError);
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private bool CleanTablesSPSiteEPMDataGuidStringRefFalse(
+            SPSite site,
+            EPMData epmData,
+            Guid jobId,
+            ref string error)
+        {
+            return false;
         }
 
         /// <summary>
