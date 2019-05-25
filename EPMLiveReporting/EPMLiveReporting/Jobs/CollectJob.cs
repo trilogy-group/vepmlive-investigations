@@ -224,15 +224,30 @@ namespace EPMLiveReportsAdmin.Jobs
                 try
                 {
                     string err = "";
-                    bool consolidationdone;
+                    bool consolidationdone = false;
+                    bool reportingRefreshBatch = false;
+
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Starting Process TimeSheet Data for site: {0}.", site.Url), 2, 3, Convert.ToString(JobUid));
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliveconsolidation"), out consolidationdone);
-                    if (epmdata.RefreshTimesheets(out err, base.JobUid, consolidationdone))
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmlivereportingrefreshbatch"), out reportingRefreshBatch);
+                    bool bErrorRefreshTimesheet = false;
+                    if (reportingRefreshBatch)
+                    {
+                        int pageSize = 0;
+                        int.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliverepotingrefreshbatchpagesize"), out pageSize);
+                        bErrorRefreshTimesheet = epmdata.RefreshTimesheetBatch(out err, base.JobUid, pageSize);
+                    }
+                    else
+                    {
+                        bErrorRefreshTimesheet = epmdata.RefreshTimesheets(out err, base.JobUid, consolidationdone);
+                    }
+                    if (bErrorRefreshTimesheet)
                     {
                         bErrors = true;
                         sbErrors.Append("<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>");
                         epmdata.LogStatus("", "", "Reporting Refresh Collect Job Process TimeSheet Data", string.Format("Process TimeSheet Data failed for site: {0}. Error {1}", site.Url, err), 2, 3, Convert.ToString(JobUid));
                     }
+
                     else
                     {
                         sbErrors.Append("Processed Timesheets<br>");
@@ -339,7 +354,8 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     string errMsg = string.Empty;
                     epmdata.LogStatus("", "", "Reporting Refresh Collect Job DataScrubber CleanTables", string.Format("Started DataScrubber.CleanTables for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                    if (DataScrubber.CleanTables(site, epmdata, base.JobUid, ref errMsg))
+                    bool bErrorCleanTables = DataScrubber.CleanTables(site, epmdata, base.JobUid, ref errMsg);
+                    if (bErrorCleanTables)
                     {
                         bErrors = true;
                         sbErrors.Append("<font color=\"red\">Error while cleaning tables: " + errMsg + "</font><br>");

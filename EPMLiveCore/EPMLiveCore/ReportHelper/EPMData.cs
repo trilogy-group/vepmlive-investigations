@@ -1203,7 +1203,43 @@ namespace EPMLiveCore.ReportHelper
 
             return dataTable;
         }
-
+        public DataSet GetRRDataSet(SqlConnection con, bool getFullSchema)
+        {
+            try
+            {
+                using (
+                    var command = new SqlCommand { CommandType = CommandType, CommandText = Command, Connection = con })
+                {
+                    command.CommandTimeout = 7200; // 2hour
+                    command.Parameters.AddRange(Params.ToArray());
+                    using (var da = new SqlDataAdapter(command))
+                    {
+                        var ds = new DataSet();
+                        if (getFullSchema)
+                            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+                        da.Fill(ds);
+                        return ds;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                {
+                    var eventMessage = CreateEventMessageWithParams(ex, Command, Params);
+                    LogWindowsEvents(EpmLiveKey, GetTableKey, eventMessage, false, ExecuteScalarEvent);
+                });
+                _sqlErrorOccurred = true;
+                _sqlError = ex.Message;
+                return null;
+            }
+            finally
+            {
+                Command = null;
+                Params.Clear();
+                CommandType = CommandType.Text;
+            }
+        }
         /// <summary>
         ///     Returns the value of an calculated field as an object type. Return type can be NULL.
         /// </summary>
@@ -1983,6 +2019,12 @@ namespace EPMLiveCore.ReportHelper
         {
             var oTimeSheet = new ReportBiz(SiteId);
             return (consolidationdone ? oTimeSheet.RefreshTimesheetInstant(out sMessage, jobUid) : oTimeSheet.RefreshTimesheet(out sMessage, jobUid));
+        }
+
+        public bool RefreshTimesheetBatch(out string sMessage, Guid jobUid, int pageSize = 0)
+        {
+            var oTimeSheet = new ReportBiz(SiteId);
+            return oTimeSheet.RefreshTimesheetBatch(out sMessage, jobUid, pageSize);
         }
 
         public bool SaveWork(SPListItem item)
