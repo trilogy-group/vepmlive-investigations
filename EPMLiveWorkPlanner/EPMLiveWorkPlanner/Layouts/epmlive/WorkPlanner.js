@@ -1142,10 +1142,14 @@ function SetTaskAssignments(Row) {
             if (oAssns[oAssn] != null && oAssns[oAssn] != "") {
                 //--EPML-4699 
                 var newrow = null;
-                if (grid.GetRowById(Row.id + "." + oAssn) == null) {
-                    newrow = grid.AddRow(Row, null, oShowAssignments, Row.id + "." + oAssn, "Assignment");
-                } else {
+                if (grid.GetRowById(Row.id + "." + oAssn) != null) {
                     newrow = grid.GetRowById(Row.id + "." + oAssn);
+                }            
+                else if (grid.GetRowById(Row.id) != null && grid.GetRowById(Row.id).Def != null && grid.GetRowById(Row.id).Def.Name === 'Assignment') {
+                    newrow = grid.GetRowById(Row.id);
+                }
+                else {
+                    newrow = grid.AddRow(Row, null, oShowAssignments, Row.id + "." + oAssn, "Assignment");
                 }
 
                 //newrow = grid.CopyRow(Row, Row, null, false, false);
