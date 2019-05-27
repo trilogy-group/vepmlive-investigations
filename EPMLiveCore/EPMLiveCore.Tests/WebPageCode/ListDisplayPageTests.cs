@@ -185,10 +185,48 @@ namespace EPMLiveCore.Tests.WebPageCode
             // Act
             _privateObj.Invoke(SaveCustomDisplayMethod, this, EventArgs.Empty);
 
+           
+
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _fieldUpdated.ShouldBeTrue(),
                 () => _redirected.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void SaveCustomDisplay_OnValidCall_ConfirmFieldHandling()
+        {
+            // Arrange            
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext
+            {
+                RequestGet = () => new ShimHttpRequest
+                {
+                    ParamsGet = () => new NameValueCollection
+                    {
+                        [$"Hidden{DummyString}New"] = "",
+                        [$"Hidden{DummyString}Display"] = "",
+                        [$"Hidden{DummyString}Edit"] = "",
+                        [$"Hidden{DummyString}Editable"] = "",
+                    }
+                }
+            };
+
+            SetupForRenderOptions(MemModeValue, DummyString, NewMode);
+
+            var newFieldProperties = new Dictionary<string, Dictionary<string, string>>();
+            ShimListDisplayUtils.ConvertToStringDictionaryOfStringDictionaryOfStringString = (newValue) =>
+            {
+                newFieldProperties = newValue;
+                return null;
+            };
+
+            // Act
+            _privateObj.Invoke(SaveCustomDisplayMethod, this, EventArgs.Empty);
+
+            // Assert
+            Assert.IsTrue(newFieldProperties != null);
+            Assert.IsTrue(newFieldProperties.Count > 0);
+            Assert.IsTrue(newFieldProperties[DummyString].Count > 0);
         }
 
         [TestMethod]

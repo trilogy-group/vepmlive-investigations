@@ -165,8 +165,11 @@ namespace EPMLiveCore
                 {
                     var hiddenValue = HttpContext.Current.Request.Params[$"Hidden{field}{mode}"];
 
-                    if (string.IsNullOrWhiteSpace(hiddenValue))
+                    if (string.IsNullOrEmpty(hiddenValue))
                     {
+                        if (_fieldProperties.ContainsKey(field) && _fieldProperties[field].ContainsKey(mode))
+                            newFieldProperties[field][mode] = _fieldProperties[field][mode];
+
                         continue;
                     }
 
