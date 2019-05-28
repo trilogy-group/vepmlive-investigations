@@ -414,6 +414,7 @@ namespace EPMLiveReporting.Tests.Jobs
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
             ReturnValue = false;
             ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheetsException;
+            ShimEPMData.AllInstances.RefreshTimesheetBatchStringOutGuidInt32 = RefreshTimesheetBatchNoErrors;
             ShimWEIntegration.AllInstances.ExecuteReportExtractString =
                 (_, dataToExtract) =>
                 {
@@ -430,6 +431,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 {
 
                 };
+            
             ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRefFalse;
 
             ShimDataSet.AllInstances.TablesGet = _ => null;
@@ -755,6 +757,16 @@ namespace EPMLiveReporting.Tests.Jobs
             bool consolidationDone)
         {
             throw new Exception();
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private bool RefreshTimesheetBatchNoErrors(
+            EPMData empData, out string sMessage, Guid jobUid, int pageSize = 0)
+        {
+            sMessage = "RefreshTimesheetBatch Called";
+            return false;
         }
     }
 }
