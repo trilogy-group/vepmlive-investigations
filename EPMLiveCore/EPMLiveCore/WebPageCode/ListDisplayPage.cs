@@ -167,6 +167,9 @@ namespace EPMLiveCore
 
                     if (string.IsNullOrWhiteSpace(hiddenValue))
                     {
+                        if (_fieldProperties.ContainsKey(field) && _fieldProperties[field].ContainsKey(mode))
+                            newFieldProperties[field][mode] = _fieldProperties[field][mode];
+
                         continue;
                     }
 
