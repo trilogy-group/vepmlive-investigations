@@ -46,8 +46,9 @@ namespace EPMLiveCore.Tests.WebPageCode
         private const string OnLoadMethod = "OnLoad";
         private const string SaveCustomDisplayMethod = "SaveCustomDisplay";
         private const string RenderOptionsMethod = "RenderOptions";
+        private const string FirstFieldPopulatedValue = "where;DummyString;DummyString;DummyString;DummyString";        
 
-        [TestInitialize]
+    [TestInitialize]
         public void TestInitialize()
         {
             _fieldUpdated = false;
@@ -225,6 +226,7 @@ namespace EPMLiveCore.Tests.WebPageCode
             Assert.IsTrue(newFieldProperties != null);
             Assert.IsTrue(newFieldProperties.Count > 0);
             Assert.IsTrue(newFieldProperties[DummyString].Count > 0);
+            Assert.IsTrue(newFieldProperties[DummyString][NewMode].Equals(FirstFieldPopulatedValue));
         }
 
         [TestMethod]
