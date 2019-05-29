@@ -48,7 +48,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         private const string RenderOptionsMethod = "RenderOptions";
         private const string FirstFieldPopulatedValue = "where;DummyString;DummyString;DummyString;DummyString";        
 
-    [TestInitialize]
+        [TestInitialize]
         public void TestInitialize()
         {
             _fieldUpdated = false;
