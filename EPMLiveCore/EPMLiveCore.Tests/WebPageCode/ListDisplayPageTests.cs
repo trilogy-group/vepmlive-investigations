@@ -46,6 +46,7 @@ namespace EPMLiveCore.Tests.WebPageCode
         private const string OnLoadMethod = "OnLoad";
         private const string SaveCustomDisplayMethod = "SaveCustomDisplay";
         private const string RenderOptionsMethod = "RenderOptions";
+        private const string FirstFieldPopulatedValue = "where;DummyString;DummyString;DummyString;DummyString";        
 
         [TestInitialize]
         public void TestInitialize()
@@ -189,6 +190,43 @@ namespace EPMLiveCore.Tests.WebPageCode
             this.ShouldSatisfyAllConditions(
                 () => _fieldUpdated.ShouldBeTrue(),
                 () => _redirected.ShouldBeTrue());
+        }
+
+        [TestMethod]
+        public void SaveCustomDisplay_OnValidCall_ConfirmFieldHandling()
+        {
+            // Arrange            
+            ShimHttpContext.CurrentGet = () => new ShimHttpContext
+            {
+                RequestGet = () => new ShimHttpRequest
+                {
+                    ParamsGet = () => new NameValueCollection
+                    {
+                        [$"Hidden{DummyString}New"] = "",
+                        [$"Hidden{DummyString}Display"] = "",
+                        [$"Hidden{DummyString}Edit"] = "",
+                        [$"Hidden{DummyString}Editable"] = "",
+                    }
+                }
+            };
+
+            SetupForRenderOptions(MemModeValue, DummyString, NewMode);
+
+            var newFieldProperties = new Dictionary<string, Dictionary<string, string>>();
+            ShimListDisplayUtils.ConvertToStringDictionaryOfStringDictionaryOfStringString = (newValue) =>
+            {
+                newFieldProperties = newValue;
+                return null;
+            };
+
+            // Act
+            _privateObj.Invoke(SaveCustomDisplayMethod, this, EventArgs.Empty);
+
+            // Assert
+            Assert.IsTrue(newFieldProperties != null);
+            Assert.IsTrue(newFieldProperties.Count > 0);
+            Assert.IsTrue(newFieldProperties[DummyString].Count > 0);
+            Assert.IsTrue(newFieldProperties[DummyString][NewMode].Equals(FirstFieldPopulatedValue));
         }
 
         [TestMethod]
