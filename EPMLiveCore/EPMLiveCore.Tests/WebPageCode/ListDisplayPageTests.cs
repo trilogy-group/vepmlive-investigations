@@ -184,9 +184,7 @@ namespace EPMLiveCore.Tests.WebPageCode
             
             // Act
             _privateObj.Invoke(SaveCustomDisplayMethod, this, EventArgs.Empty);
-
-           
-
+          
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _fieldUpdated.ShouldBeTrue(),
