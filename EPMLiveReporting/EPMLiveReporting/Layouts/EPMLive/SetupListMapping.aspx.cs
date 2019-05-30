@@ -274,11 +274,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     continue;
                 }
 
-                if (field.Hidden
+                // If field is hidden but already a part of Mapping. It should display on Front-end otherwise it will break mapping on saving
+                if ((field.Hidden && !mappedFields.Contains(field.InternalName))
                     || field.Type == SPFieldType.Computed
                     || automatic.Contains(field.InternalName) // Change: don't show automatic fields
                     )
+                {
                     continue;
+                }
 
                 if (mappedFields.Contains(field.InternalName))
                     item.Selected = true;
