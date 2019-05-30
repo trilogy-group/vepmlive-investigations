@@ -95,6 +95,7 @@
     <Compile Include="ListRefreshTestst2.cs" />
     <Compile Include="MyWorkListEventsTests.cs" />
     <Compile Include="ParentItemUpdateTests.cs" />
+    <Compile Include="SetupListMappingTests.cs" />
     <Compile Include="ViewLogDetailTests.cs" />
     <Compile Include="AllSnapshotsTests.cs" />
     <Compile Include="EventAuditTests.cs" />
