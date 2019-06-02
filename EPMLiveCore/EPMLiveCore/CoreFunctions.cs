@@ -826,6 +826,14 @@ namespace EPMLiveCore
             return safeGroupTitle;
         }
 
+        public static string GetTitleWithoutSpecialCharacters(string oldTitle)
+        {
+            var filteredString = string.Empty;
+            var rgx = new Regex("[!#$%^&()_{}~`-]");
+            filteredString = rgx.Replace(oldTitle, "");
+            return filteredString;
+        }
+
         /// <summary>
         /// remove apostophe from user's name
         /// </summary>
