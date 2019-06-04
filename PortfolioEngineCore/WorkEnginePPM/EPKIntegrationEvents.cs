@@ -214,8 +214,10 @@ namespace WorkEnginePPM
                         role.Member.Name = $"{projectNameNew} {ProjectGroupOwner}";
                     else if (role.Member.Name.IndexOf($"{projectNameDB} {ProjectGroupMember}", StringComparison.OrdinalIgnoreCase) != -1)
                         role.Member.Name = $"{projectNameNew} {ProjectGroupMember}";
-                    else
+                    else if (role.Member.Name.IndexOf($"{projectNameDB}", StringComparison.OrdinalIgnoreCase) != -1)
                         role.Member.Name = role.Member.Name.Replace(projectNameDB, projectNameNew);
+                    else
+                        role.Member.Name = role.Member.Name.Replace(CoreFunctions.GetTitleWithoutSpecialCharacters(projectNameDB), projectNameNew);
 
                     ((SPGroup)role.Member).Update();
                 }
