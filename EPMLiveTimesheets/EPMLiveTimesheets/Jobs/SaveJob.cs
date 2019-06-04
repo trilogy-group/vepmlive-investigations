@@ -403,7 +403,8 @@ namespace TimeSheets
                                                             @webid,@listid,@itemtype,@itemid,@title,@project,@projectid,@list,0,@projectlistid,@assignedtoid,@rate 
                                                             FROM TSTIMESHEET INNER JOIN TSUSER ON TSTIMESHEET.TSUSER_UID = TSUSER.TSUSERUID 
                                                             WHERE TS_UID=@currenttsuid OR (TS_UID NOT IN (SELECT TS_UID FROM TSITEM WHERE ITEM_ID=@itemid AND ITEM_TYPE = @worktype) 
-                                                            AND PERIOD_ID = @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)",
+                                                            AND PERIOD_ID > @currentperiodid AND SUBMITTED = 0 AND TSTIMESHEET.SITE_UID=@siteid AND TSUSEr.USER_ID=@userid)
+                                                            AND 1 = (CASE WHEN (PERIOD_ID <> @currentperiodid AND @itemtype = '2') THEN 2 ELSE 1 END)",
                                                     cn))
                                                 {
                                                     itemInsertCmd.Parameters.AddWithValue("@currenttsuid", TSUID);
