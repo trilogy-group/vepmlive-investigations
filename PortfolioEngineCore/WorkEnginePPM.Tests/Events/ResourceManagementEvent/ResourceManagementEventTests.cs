@@ -9,12 +9,36 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.SharePoint;
 using System.Collections;
 using EPMLiveCore.Fakes;
+using System.Data.Fakes;
+using System.Data.SqlClient.Fakes;
+using Microsoft.QualityTools.Testing.Fakes;
+using System.ComponentModel.Fakes;
+using Shouldly;
+using WorkEnginePPM.Events.Fakes;
 
 namespace WorkEnginePPM.Events.Tests
 {
     [TestClass()]
     public class ResourceManagementEventTests
     {
+        private IDisposable _shimObject;
+        private PrivateObject _privateObject;
+        private PrivateType _privateType;
+        private ResourceManagementEvent _resourcePoolEvent;
+        private const string DummyString = "DummyString";
+        private const int DummyInt = 1;
+        private const string ItemAdding = "ItemAdding";
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _shimObject = ShimsContext.Create();
+
+            _resourcePoolEvent = new ResourceManagementEvent();
+            _privateObject = new PrivateObject(_resourcePoolEvent);
+            _privateType = new PrivateType(typeof(ResourceManagementEvent));
+        }
+
         [TestMethod()]
         public void UpdateUserTest()
         {
@@ -120,6 +144,26 @@ namespace WorkEnginePPM.Events.Tests
                 };
                 ResourceManagementEvent.UpdateUser(shimitemeveprop);
             }
+        }
+        [TestMethod]
+        public void ItemAdding_SPItemEventPropertiesIsNotNull_ConfirmResult()
+        {
+            // Arrange
+            var parameters = new object[] { new ShimSPItemEventProperties().Instance };
+           
+            ShimSqlDataReader.AllInstances.Read = _ => true;
+            ShimSqlDataReader.AllInstances.Close = _ => { };
+            ShimComponent.AllInstances.Dispose = _ => { };
+            ShimResourceManagementEvent.AllInstances.ValidateRequestSPItemEventProperties = (_, _1) => true;
+            // Act
+            var actualResult = _privateObject.Invoke(
+                ItemAdding,
+                parameters);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _privateObject.ShouldNotBeNull(),
+                () => actualResult.ShouldBeNull());
         }
     }
     public class TestListEnumerator : IEnumerator
