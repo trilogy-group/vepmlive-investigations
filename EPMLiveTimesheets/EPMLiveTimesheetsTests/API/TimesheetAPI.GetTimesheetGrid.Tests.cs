@@ -121,13 +121,18 @@ namespace TimeSheets.Tests
             table2.Columns.Add("tsuid");
             table2.Columns.Add("TS_ITEM_HOURS");
             table2.Columns.Add("ITEM_ID");
+            
             table2.Columns.Add("LIST_UID");
+            table2.Columns.Add("PROJECT_ID");
+            table2.Columns.Add("TITLE");
             var row20 = table2.NewRow();
             row20["TS_ITEM_UID"] = "100";
             row20["tsuid"] = Guid.Empty;
             row20["TS_ITEM_HOURS"] = TSItemHour;
             row20["ITEM_ID"] = "100";
             row20["LIST_UID"] = "100";
+            row20["TITLE"] = "SameName";
+            row20["PROJECT_ID"] = "40";
             table2.Rows.Add(row20);
             var row21 = table2.NewRow();
             row21["TS_ITEM_UID"] = "102";
@@ -135,6 +140,8 @@ namespace TimeSheets.Tests
             row21["TS_ITEM_HOURS"] = TSItemHour;
             row21["ITEM_ID"] = "100";
             row21["LIST_UID"] = "100";
+            row21["TITLE"] = "SameName";
+            row21["PROJECT_ID"] = "40";
             table2.Rows.Add(row21);
             dataSet.Tables.Add(table2);
 
