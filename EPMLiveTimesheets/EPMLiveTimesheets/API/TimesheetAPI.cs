@@ -3329,7 +3329,7 @@ namespace TimeSheets
                 var Title = row["TITLE"].ToString();
                 var ProjectId = row["PROJECT_ID"].ToString();
                 var TSITEMUID = row["TS_ITEM_UID"].ToString();
-                var _DeletedItem = DeletedTSItems.FirstOrDefault(itm => itm.Title.Equals(Title, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == ProjectId);
+                var _DeletedItem = DeletedTSItems.FirstOrDefault(itm => itm.Title.Equals(Title, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == ProjectId && itm.TSItemUID == TSITEMUID);
                 var submittedHours = 0f;
                 if (_DeletedItem != null)
                 {
