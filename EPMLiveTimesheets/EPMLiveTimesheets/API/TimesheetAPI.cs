@@ -3365,8 +3365,8 @@ namespace TimeSheets
             }
             foreach (var item in ItemList)
             {
-                var ItemCount = deletedTSModel.Where(itm => itm.Title.Equals(item.Item1, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == item.Item2 && itm.IsVisible).Count();
-                if (ItemCount == 0)
+                var OneItemVisible = deletedTSModel.Any(itm => itm.Title.Equals(item.Item1, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == item.Item2 && itm.IsVisible);
+                if (!OneItemVisible)
                 {
                     // At least one timesheet entry should be visible for deleted tasks if there are multiple
                     var firstItem = deletedTSModel.FirstOrDefault(itm => itm.Title.Equals(item.Item1, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == item.Item2);
