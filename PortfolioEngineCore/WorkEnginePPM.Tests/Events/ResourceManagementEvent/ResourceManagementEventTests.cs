@@ -25,8 +25,6 @@ namespace WorkEnginePPM.Events.Tests
         private PrivateObject _privateObject;
         private PrivateType _privateType;
         private ResourceManagementEvent _resourcePoolEvent;
-        private const string DummyString = "DummyString";
-        private const int DummyInt = 1;
         private const string ItemAdding = "ItemAdding";
 
         [TestInitialize]
@@ -37,6 +35,12 @@ namespace WorkEnginePPM.Events.Tests
             _resourcePoolEvent = new ResourceManagementEvent();
             _privateObject = new PrivateObject(_resourcePoolEvent);
             _privateType = new PrivateType(typeof(ResourceManagementEvent));
+        }
+
+        [TestCleanup]
+        public void TestClean()
+        {
+            _shimObject?.Dispose();
         }
 
         [TestMethod()]
