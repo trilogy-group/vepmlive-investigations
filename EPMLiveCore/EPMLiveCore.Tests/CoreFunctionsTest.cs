@@ -40,6 +40,7 @@ namespace EPMLiveCore.Tests
         private Guid DummyGuid = Guid.NewGuid();
         private string DummyUrl = "http://xyz.com";
         private string DummyString = "DummyString";
+        private int DummyUserId = 4;
         private const string DummyStringWithSpecialCharacters = "Dummy-String!#$%^&()_{}~`-";
 
         [TestInitialize]
@@ -227,6 +228,27 @@ namespace EPMLiveCore.Tests
 
             // Act
             CoreFunctions.enqueue(_timerJobBuild, _defaultStatus, _sharepointShims.SiteShim);
+
+            // Assert
+            _adoShims.IsCommandCreated(commandTextExpected);
+            _adoShims.IsCommandDisposed(commandTextExpected);
+            _adoShims.IsCommandExecuted(commandTextExpected);
+
+            var command = _adoShims.CommandsCreated.Single(pred => pred.CommandText == commandTextExpected);
+            Assert.AreEqual(commandParametersExpected.Length, command.Parameters.Count);
+            Assert.IsTrue(commandParametersExpected.All(pred => command.Parameters.Contains(pred)));
+        }
+
+        [TestMethod]
+        public void enqueue_Always_CorrectlyMangesAndExecutesInsertIntoQueueCommand_UserIdSent()
+        {
+            // Arrange
+            const string commandTextExpected = @"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
+                                                                  VALUES (@timerjobuid, @status, 0, @userid) ";
+            var commandParametersExpected = new[] { "@timerjobuid", "@status", "@userid" };
+
+            // Act
+            CoreFunctions.enqueue(_timerJobBuild, _defaultStatus, _sharepointShims.SiteShim, DummyUserId);
 
             // Assert
             _adoShims.IsCommandCreated(commandTextExpected);
