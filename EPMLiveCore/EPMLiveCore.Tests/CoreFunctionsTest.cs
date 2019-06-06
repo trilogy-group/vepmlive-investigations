@@ -268,7 +268,12 @@ namespace EPMLiveCore.Tests
             const string commandTextExpected = @"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
                                                                   VALUES (@timerjobuid, @status, 0, @userid) ";
             var commandParametersExpected = new[] { "@timerjobuid", "@status", "@userid" };
-                       
+            SetupSPWeb();
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
+            {
+                w();
+            };
+
             // Act
             CoreFunctions.enqueue(_timerJobBuild, _defaultStatus, _sharepointShims.SiteShim, 0);
 
@@ -1068,9 +1073,11 @@ namespace EPMLiveCore.Tests
                 {
                     TopNavigationBarGet = () => null
                 },
-                AllowUnsafeUpdatesGet = () => false
+                AllowUnsafeUpdatesGet = () => false,
+                CurrentUserGet = () => { return new ShimSPUser() { IDGet = () => { return DummyUserId; } }; }
             };
-            ShimSPWebCollection.AllInstances.AddStringStringStringUInt32StringBooleanBoolean = (a, b, c, d, e, f, g, h) => spWeb;
+            ShimSPSite.AllInstances.OpenWeb = instance => spWeb;
+            ShimSPWebCollection.AllInstances.AddStringStringStringUInt32StringBooleanBoolean = (a, b, c, d, e, f, g, h) => spWeb;            
         }
     }
 }

@@ -10,7 +10,6 @@ namespace EPMLive.TestFakes.Utility
     public class SharepointShims
     {
         public readonly static string DatabaseConnectionString = "test-db-connection-string";
-        private readonly int dummyUserId = 4;
 
         public ShimSPWeb WebShim { get; private set; }
         public ShimSPSite SiteShim { get; private set; }
@@ -115,7 +114,7 @@ namespace EPMLive.TestFakes.Utility
 
         private ShimSPUser InitializeSPUserShim()
         {
-            return new ShimSPUser() { IDGet = () => { return dummyUserId; } };
+            return new ShimSPUser();
         }
 
         private ShimSPUserCollection InitializeSPUsersShim()
