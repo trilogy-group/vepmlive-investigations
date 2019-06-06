@@ -12,7 +12,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="editplanner.aspx.cs" Inherits="EPMLiveWorkPlanner.editplanner" DynamicMasterPageFile="~masterurl/default.master" %>
 
 
-<asp:Content ID="ccc" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<asp:content id="ccc" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
     <script language="javascript">
         function getWidth() {
             var winW = 640;
@@ -395,16 +395,16 @@
             ToggleProject();
         }
     </script>
-</asp:Content>
-<asp:Content ID="Content4" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+</asp:content>
+<asp:content id="Content4" contentplaceholderid="PlaceHolderPageTitle" runat="server">
     Planner Settings
-</asp:Content>
-<asp:Content ID="Content1" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
+</asp:content>
+<asp:content id="Content1" contentplaceholderid="PlaceHolderPageTitleInTitleArea" runat="server">
     Planner Settings
-</asp:Content>
-<asp:Content ID="Content2" ContentPlaceHolderID="PlaceHolderPageDescription" runat="server">
-</asp:Content>
-<asp:Content ID="Content3" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+</asp:content>
+<asp:content id="Content2" contentplaceholderid="PlaceHolderPageDescription" runat="server">
+</asp:content>
+<asp:content id="Content3" contentplaceholderid="PlaceHolderMain" runat="server">
 
     <input type="hidden" name="statusfields" id="statusfields" value="<%=statusfields%>" />
     <input type="hidden" name="kanbanAdditionalColumns" id="kanbanAdditionalColumns" value="<%=kanbanAdditionalColumns%>" />
@@ -762,7 +762,20 @@
 		                            </wssuc:InputFormControl>
 	                            </template_inputformcontrols>
                         </wssuc:InputFormSection>
-
+                        <wssuc:InputFormSection Title="Disable Timesheet Hours"
+                            Description=""
+                            runat="server">
+                            <template_description>
+                                    Use this to disable Timesheet hours edit option.
+	                            </template_description>
+                            <template_inputformcontrols>
+		                            <wssuc:InputFormControl LabelText="" runat="server">
+			                             <Template_Control>
+			                               <asp:CheckBox runat="server" ID="chkDisableEditTimesheetHours" /> Disable Timesheet Hours
+			                             </Template_Control>
+		                            </wssuc:InputFormControl>
+	                            </template_inputformcontrols>
+                        </wssuc:InputFormSection>
                         <wssuc:InputFormSection Title="Select Statusing Method"
                             Description=""
                             runat="server">
@@ -1165,4 +1178,4 @@
     <script language="javascript" type="text/javascript">
         ToggleAll();
     </script>
-</asp:Content>
+</asp:content>
