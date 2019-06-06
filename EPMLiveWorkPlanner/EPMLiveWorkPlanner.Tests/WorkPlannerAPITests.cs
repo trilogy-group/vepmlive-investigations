@@ -349,7 +349,6 @@ namespace EPMLiveWorkPlanner.Tests
         {
             // Arrange
             SetupShims();
-            var xmlDocument = new XmlDocument();
             ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Empty;
             var web = new ShimSPWeb
             {
@@ -359,9 +358,9 @@ namespace EPMLiveWorkPlanner.Tests
                     {
                         WorkDaysGet = () => 5
                     };
-                },               
+                },
             };
-            
+
             ShimWorkPlannerProperties.ConstructorString = (instance, ___2) =>
             {
             };
@@ -371,12 +370,13 @@ namespace EPMLiveWorkPlanner.Tests
             var result = WorkPlannerAPI.getSettings(web, "planner");
 
             // Assert
-            Assert.AreEqual(Dummy, result.KanBanAdditionalColumns);
-            Assert.AreEqual(Dummy, result.KanBanFilterColumn);
-            Assert.AreEqual(Dummy, result.KanBanItemStatusFields);
-            Assert.AreEqual(Dummy, result.KanBanItemStatusFieldsAvailable);
-            Assert.AreEqual(Dummy, result.KanBanStatusColumn);
-            Assert.AreEqual(false, result.bDisableEditTimesheetHours);
+            this.ShouldSatisfyAllConditions(
+                   () => Assert.AreEqual(Dummy, result.KanBanAdditionalColumns),
+                   () => Assert.AreEqual(Dummy, result.KanBanFilterColumn),
+                   () => Assert.AreEqual(Dummy, result.KanBanItemStatusFields),
+                   () => Assert.AreEqual(Dummy, result.KanBanItemStatusFieldsAvailable),
+                   () => Assert.AreEqual(Dummy, result.KanBanStatusColumn),
+                   () => Assert.AreEqual(false, result.bDisableEditTimesheetHours));
         }
 
         private void SetupShims()
