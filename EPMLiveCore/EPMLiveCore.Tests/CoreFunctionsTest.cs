@@ -258,6 +258,29 @@ namespace EPMLiveCore.Tests
             var command = _adoShims.CommandsCreated.Single(pred => pred.CommandText == commandTextExpected);
             Assert.AreEqual(commandParametersExpected.Length, command.Parameters.Count);
             Assert.IsTrue(commandParametersExpected.All(pred => command.Parameters.Contains(pred)));
+            Assert.AreEqual(command.Parameters[2].Value, DummyUserId);
+        }
+
+        [TestMethod]
+        public void enqueue_Always_CorrectlyMangesAndExecutesInsertIntoQueueCommand_UserIdSentWithZero()
+        {
+            // Arrange
+            const string commandTextExpected = @"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
+                                                                  VALUES (@timerjobuid, @status, 0, @userid) ";
+            var commandParametersExpected = new[] { "@timerjobuid", "@status", "@userid" };
+                       
+            // Act
+            CoreFunctions.enqueue(_timerJobBuild, _defaultStatus, _sharepointShims.SiteShim, 0);
+
+            // Assert
+            _adoShims.IsCommandCreated(commandTextExpected);
+            _adoShims.IsCommandDisposed(commandTextExpected);
+            _adoShims.IsCommandExecuted(commandTextExpected);
+
+            var command = _adoShims.CommandsCreated.Single(pred => pred.CommandText == commandTextExpected);
+            Assert.AreEqual(commandParametersExpected.Length, command.Parameters.Count);
+            Assert.IsTrue(commandParametersExpected.All(pred => command.Parameters.Contains(pred)));
+            Assert.AreEqual(command.Parameters[2].Value, DummyUserId);
         }
 
         [TestMethod]
