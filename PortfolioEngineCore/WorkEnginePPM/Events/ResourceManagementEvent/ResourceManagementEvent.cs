@@ -53,6 +53,11 @@ namespace WorkEnginePPM.Events
         {
             if (!ValidateRequest(properties)) return;
 
+            if (properties.ListItemId > 0) // This will true if item recovered from recycle otherwise it will be 0
+            {
+                return;
+            }
+
             try
             {
                 SPWeb spWeb = properties.Web;
