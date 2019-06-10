@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using static EPMLiveWorkPlanner.Fakes.ShimPlannerCore;
 
 namespace EPMLiveWorkPlanner.Tests
 {
@@ -19,6 +20,7 @@ namespace EPMLiveWorkPlanner.Tests
     public class WorkPlannerAPITests
     {
         private IDisposable shimsContext;
+        private readonly string Dummy = "Dummy";
 
         [TestInitialize()]
         public void Initialize()
@@ -342,6 +344,41 @@ namespace EPMLiveWorkPlanner.Tests
                 () => expectedContent.ForEach(p => result.ShouldContainWithoutWhitespace(p)));
         }
 
+        [TestMethod]
+        public void GetSettings_Should_ExecuteCorrectly()
+        {
+            // Arrange
+            SetupShims();
+            ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.Empty;
+            var web = new ShimSPWeb
+            {
+                RegionalSettingsGet = () =>
+                {
+                    return new ShimSPRegionalSettings()
+                    {
+                        WorkDaysGet = () => 5
+                    };
+                },
+            };
+
+            ShimWorkPlannerProperties.ConstructorString = (instance, ___2) =>
+            {
+            };
+            ShimWorkPlannerProperties.AllInstances.count = (__1) => 0;
+
+            // Act
+            var result = WorkPlannerAPI.getSettings(web, "planner");
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                   () => Assert.AreEqual(Dummy, result.KanBanAdditionalColumns),
+                   () => Assert.AreEqual(Dummy, result.KanBanFilterColumn),
+                   () => Assert.AreEqual(Dummy, result.KanBanItemStatusFields),
+                   () => Assert.AreEqual(Dummy, result.KanBanItemStatusFieldsAvailable),
+                   () => Assert.AreEqual(Dummy, result.KanBanStatusColumn),
+                   () => Assert.AreEqual(false, result.bDisableEditTimesheetHours));
+        }
+
         private void SetupShims()
         {
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = code => code();
@@ -349,8 +386,8 @@ namespace EPMLiveWorkPlanner.Tests
             ShimSPSite.AllInstances.OpenWebGuid = (_, guid) => new ShimSPWeb();
             ShimSPWeb.AllInstances.SiteGet = _ => new ShimSPSite();
             ShimCoreFunctions.getLockedWebSPWeb = _ => Guid.NewGuid();
-            ShimCoreFunctions.getConfigSettingSPWebString = (_, name) => "Dummy";
-            ShimWorkPlannerAPI.getAttributeXmlNodeString = (node, name) => "Dummy";
+            ShimCoreFunctions.getConfigSettingSPWebString = (_, name) => Dummy;
+            ShimWorkPlannerAPI.getAttributeXmlNodeString = (node, name) => Dummy;
             ShimWorkPlannerAPI.iGetGeneralLayoutSPWebStringXmlDocumentBoolean = (spWeb, plannerXml, data, agileLayout) => plannerXml;
             ShimAPITeam.GetResourcePoolStringSPWeb = (xml, spWeb) => new DataTable();
         }

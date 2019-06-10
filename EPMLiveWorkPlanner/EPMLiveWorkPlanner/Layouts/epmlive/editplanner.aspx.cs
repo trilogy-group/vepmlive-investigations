@@ -246,6 +246,11 @@ namespace EPMLiveWorkPlanner
                         var boolDeletedHours = false;
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "DeletedHours"), out boolDeletedHours);
                         chkShowDeletedHours.Checked = boolDeletedHours;
+                        var boolDisableEditTimesheetHours = false;
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "DisableEditTimesheetHours"), out boolDisableEditTimesheetHours);
+                        chkDisableEditTimesheetHours.Checked = boolDisableEditTimesheetHours;
+
+
                         #region KanBan Board Settings
 
                         GetStatusColumns(web);
@@ -400,6 +405,7 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "EnableLink", "False");
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "StartSoon", chkStartSoon.Checked.ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "DeletedHours", chkShowDeletedHours.Checked.ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "DisableEditTimesheetHours", chkDisableEditTimesheetHours.Checked.ToString());
 
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "EnableKanBan", chkKanBanPlanner.Checked.ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "KanBanStatusColumn", ddlKanBanStatusColumn.SelectedValue);

@@ -68,6 +68,7 @@ namespace EPMLiveWorkPlanner
             public string sFieldMappings;
             public bool bCalcWork = false;
             public bool bCalcCost = false;
+            public bool bDisableEditTimesheetHours = false;
             public bool bUseFolders = false;
             public int iTaskType = 0;
             public bool bEnableLinking = false;
@@ -4870,8 +4871,11 @@ namespace EPMLiveWorkPlanner
                     return p.bCalcCost;
                 case "StartDate":
                     return p.bStartSoon;
+                case "TimesheetHours":
+                    return p.bDisableEditTimesheetHours;
+                default:
+                    return false;
             }
-            return false;
         }
 
         private static string GetFieldType(SPField oField, XmlDocument docF, out string canEdit)
@@ -5403,7 +5407,7 @@ namespace EPMLiveWorkPlanner
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "CalcCost"), out p.bCalcCost);
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "StartSoon"), out p.bStartSoon);
-
+                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "DisableEditTimesheetHours"), out p.bDisableEditTimesheetHours);
                 #region KanBan Props
                 p.KanBanStatusColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanStatusColumn");
                 p.KanBanFilterColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanFilterColumn");
@@ -5423,7 +5427,7 @@ namespace EPMLiveWorkPlanner
                         p.sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "TaskCenter");
                         p.sProjectField = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "PCField");
                         p.sFieldMappings = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "FieldMappings");
-
+                        
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "UseFolders"), out p.bUseFolders);
                         int.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "TaskType"), out p.iTaskType);
 
@@ -5496,7 +5500,7 @@ namespace EPMLiveWorkPlanner
 
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "EnableAgile"), out p.bAgile);
                         p.sIterationCT = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "AgileIterationField");
-
+                        bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "DisableEditTimesheetHours"), out p.bDisableEditTimesheetHours);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "CalcWork"), out p.bCalcWork);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "CalcCost"), out p.bCalcCost);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "EnableLink"), out p.bEnableLinking);
