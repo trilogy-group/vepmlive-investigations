@@ -3282,10 +3282,10 @@ namespace TimeSheets
                 {
                     if (dr != null)
                     {
-                        var ItemId = dr["ITEM_ID"].ToString();
-                        var ListUId = dr["LIST_UID"].ToString();
+                        var Title = dr["Title"].ToString();
+                        var ProjectId = dr["PROJECT_ID"].ToString();
                         var TSITEMUID = dr["TS_ITEM_UID"].ToString();
-                        var currentTSItem = AllItems.FirstOrDefault(itm => itm.ItemID == ItemId && itm.ListUID == ListUId && itm.TSItemUID == TSITEMUID);
+                        var currentTSItem = AllItems.FirstOrDefault(itm => itm.Title.Equals(Title, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == ProjectId && itm.TSItemUID == TSITEMUID);
                         if (currentTSItem != null)
                         {
                             if (currentTSItem.IsVisible)
@@ -3293,7 +3293,8 @@ namespace TimeSheets
                                 ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
                             }
                         }
-                        else {
+                        else
+                        {
                             ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
                         }
                     }
@@ -3321,20 +3322,18 @@ namespace TimeSheets
         private static List<DeletedTSModel> ProcessAllItems(DataSet dsTS)
         {
             List<DeletedTSModel> deletedTSModel = new List<DeletedTSModel>();
-            Dictionary<string, string> ItemList = new Dictionary<string, string>();
+            var ItemList = new List<Tuple<string, string>>();
+
             foreach (DataRow row in dsTS.Tables[2].Rows)
             {
-                var ItemId = row["ITEM_ID"].ToString();
-                var ListUId = row["LIST_UID"].ToString();
-                if (!ItemList.ContainsKey(ItemId) || !ItemList.ContainsValue(ListUId))
-                {
-                    ItemList.Add(ItemId, ListUId);
-                }
+                var Title = row["TITLE"].ToString();
+                var ProjectId = row["PROJECT_ID"].ToString();
                 var TSITEMUID = row["TS_ITEM_UID"].ToString();
-                var _DeletedItem = DeletedTSItems.FirstOrDefault(itm => itm.ItemID == ItemId && itm.ListUID == ListUId);
+                var _DeletedItem = DeletedTSItems.FirstOrDefault(itm => itm.Title.Equals(Title, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == ProjectId && itm.TSItemUID == TSITEMUID);
                 var submittedHours = 0f;
                 if (_DeletedItem != null)
                 {
+                    ItemList.Add(Tuple.Create(Title, ProjectId));
                     DataRow[] drHours = dsTS.Tables[3].Select("TS_ITEM_UID='" + TSITEMUID + "'");
                     if (drHours.Length > 0)
                     {
@@ -3347,9 +3346,9 @@ namespace TimeSheets
                     }
                     deletedTSModel.Add(new DeletedTSModel()
                     {
-                        ListUID = ListUId,
+                        ProjectId = ProjectId,
                         TSItemUID = TSITEMUID,
-                        ItemID = ItemId,
+                        Title = Title,
                         IsVisible = submittedHours > 0
                     });
                 }
@@ -3357,20 +3356,24 @@ namespace TimeSheets
                 {
                     deletedTSModel.Add(new DeletedTSModel()
                     {
-                        ListUID = ListUId,
+                        ProjectId = ProjectId,
                         TSItemUID = TSITEMUID,
-                        ItemID = ItemId,
+                        Title = Title,
                         IsVisible = true
                     });
                 }
             }
             foreach (var item in ItemList)
             {
-                var ItemCount = deletedTSModel.Where(itm => itm.ItemID == item.Key && itm.ListUID == item.Value && itm.IsVisible).Count();
-                if (ItemCount == 0)
+                var OneItemVisible = deletedTSModel.Any(itm => itm.Title.Equals(item.Item1, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == item.Item2 && itm.IsVisible);
+                if (!OneItemVisible)
                 {
                     // At least one timesheet entry should be visible for deleted tasks if there are multiple
-                    deletedTSModel.FirstOrDefault(itm => itm.ItemID == item.Key && itm.ListUID == item.Value).IsVisible = true;
+                    var firstItem = deletedTSModel.FirstOrDefault(itm => itm.Title.Equals(item.Item1, StringComparison.OrdinalIgnoreCase) && itm.ProjectId == item.Item2);
+                    if (firstItem != null)
+                    {
+                        firstItem.IsVisible = true;
+                    }
                 }
             }
             return deletedTSModel;
@@ -4094,10 +4097,10 @@ namespace TimeSheets
 
                                 if (myWorkDataTable.Rows.Count > 0)
                                 {
-                                    var ItemID = Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]);
-                                    var ListUID = Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]);
+                                    var Title = Convert.ToString(dtTSItem.Rows[0]["TITLE"]);
+                                    var ProjectId = Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]);
                                     var TSItemUID = Convert.ToString(dtTSItem.Rows[0]["TS_ITEM_UID"]);
-                                    DeletedTSItems.Add(new DeletedTSModel() { ItemID = ItemID, ListUID = ListUID, TSItemUID = TSItemUID });
+                                    DeletedTSItems.Add(new DeletedTSModel() { Title = Title, ProjectId = ProjectId, TSItemUID = TSItemUID });
                                     DataRow dr = ds.Tables[myworktableid].NewRow();
                                     foreach (DataColumn item in myWorkDataTable.Columns)
                                     {
@@ -4974,8 +4977,8 @@ namespace TimeSheets
         private class DeletedTSModel
         {
             public int Count { get; set; }
-            public string ItemID { get; set; }
-            public string ListUID { get; set; }
+            public string Title { get; set; }
+            public string ProjectId { get; set; }
             public string TSItemUID { get; set; }
             public bool IsVisible { get; set; }
 
