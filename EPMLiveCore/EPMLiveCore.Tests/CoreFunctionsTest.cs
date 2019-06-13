@@ -266,6 +266,8 @@ namespace EPMLiveCore.Tests
             // Arrange
             const string commandTextExpected = @"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
                                                                   VALUES (@timerjobuid, @status, 0, @userid) ";
+
+            DummyUserId = 0;
             var commandParametersExpected = new[] { "@timerjobuid", "@status", "@userid" };
             SetupSPWeb();
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
