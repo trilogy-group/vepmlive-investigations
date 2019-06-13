@@ -758,12 +758,12 @@ namespace EPMLiveCore
                 SPUser u = uv.User;
                 if (u == null)
                 {
-                    u = properties.Web.EnsureUser(uv.LookupValue);
+                    u = uv.User;
                 }
                 SPUser u_new = null;
                 if (uv_new != null)
                 {
-                    u_new = properties.Web.EnsureUser(uv_new.LookupValue);
+                    u_new = uv_new.User;
                 }
 
                 // semicolon causes issues in list cleanup and potentially in other modules.
