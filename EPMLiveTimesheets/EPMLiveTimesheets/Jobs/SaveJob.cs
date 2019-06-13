@@ -373,7 +373,7 @@ namespace TimeSheets
                                                     }
                                                     else
                                                     {
-                                                        cmd.Parameters.AddWithValue("@project", project);
+                                                        cmd.Parameters.AddWithValue("@project", project != null ? (object)project : DBNull.Value);
                                                         cmd.Parameters.AddWithValue("@projectid", projectid);
                                                         cmd.Parameters.AddWithValue("@rate", rate);
                                                     }
@@ -836,7 +836,7 @@ namespace TimeSheets
                                 bErrors = true;
                                 sbErrors.Append("Timesheet does not exist");
                             }
-                            if (liveHours)
+                            if (liveHours && !bErrors)
                             {
                                 using (SqlCommand cmd8 = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn))
                                 {
