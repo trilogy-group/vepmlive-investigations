@@ -100,7 +100,7 @@ namespace EPMLiveCore
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
             {
                 int max;
-                int.TryParse(availableLevels[newFeatureId].ToString(), out max);
+                int.TryParse(Convert.ToString(availableLevels[newFeatureId]), out max);
 
                 if (max != 0 || newFeatureId == 0)
                 {
