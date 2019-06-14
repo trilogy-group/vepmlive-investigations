@@ -179,14 +179,7 @@ namespace EPMLiveCore.API
 
         public static void Enqueue(Guid timerjobuid, int defaultstatus, SPSite site, int userId)
         {
-            {
-                //SPSite site = SPContext.Current.Site;	            //SPSite site = SPContext.Current.Site;
-                {
-                    {
-                        EPMLiveCore.CoreFunctions.enqueue(timerjobuid, defaultstatus, site); EPMLiveCore.CoreFunctions.enqueue(timerjobuid, defaultstatus, site, userId);
-                    }
-                }
-            }
+            EPMLiveCore.CoreFunctions.enqueue(timerjobuid, defaultstatus, site, userId);
         }
 
         public static Guid AddTimerJob(Guid siteid, Guid webid, Guid listid, int itemid, string jobname, int jobtype, string data, string key, int runtime, int scheduletype, string days)
