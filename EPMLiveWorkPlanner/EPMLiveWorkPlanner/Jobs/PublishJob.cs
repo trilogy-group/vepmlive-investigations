@@ -96,6 +96,7 @@ namespace EPMLiveWorkPlanner
                             {
                                 oProjectCenter = web.Lists[new Guid(project[1])];
                                 oTaskCenter = web.Lists[taskCenterListName];
+                                int currentUserId = oweb.CurrentUser != null ? oweb.CurrentUser.ID : 1;
                                 StartPublish(doc, site, web, oProjectCenter, oTaskCenter, project[2], props, key);
                                 if (osite.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                                 {
@@ -107,7 +108,7 @@ namespace EPMLiveWorkPlanner
                                     if (!string.IsNullOrEmpty(sData))
                                     {
                                         Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, Convert.ToInt32(project[2]), "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + projectName + "." + key, 0, 9, "");
-                                        EPMLiveCore.API.Timer.Enqueue(jobid, 0, site);
+                                        EPMLiveCore.API.Timer.Enqueue(jobid, 0, site, currentUserId);
                                     }
                                     else
                                     {
@@ -119,6 +120,7 @@ namespace EPMLiveWorkPlanner
                     }
                     else
                     {
+                        int userId = oweb.CurrentUser != null ? oweb.CurrentUser.ID : 1;
                         StartPublish(doc, osite, oweb, oProjectCenter, oTaskCenter, project[2], props, key);
                         if (osite.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                         {
@@ -130,7 +132,7 @@ namespace EPMLiveWorkPlanner
                             if (!string.IsNullOrEmpty(sData))
                             {
                                 Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, Convert.ToInt32(project[2]), "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + projectName + "." + key, 0, 9, "");
-                                EPMLiveCore.API.Timer.Enqueue(jobid, 0, osite);
+                                EPMLiveCore.API.Timer.Enqueue(jobid, 0, osite, userId);
                             }
                             else
                             {
