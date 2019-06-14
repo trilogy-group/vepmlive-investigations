@@ -575,7 +575,7 @@ namespace TimeSheets
                                         cmd.ExecuteNonQuery();
                                     }
                                 }
-                                if (resWeb.ID != SPContext.Current.Web.ID)
+                                if (SPContext.Current != null && resWeb.ID != SPContext.Current.Web.ID)
                                     resWeb.Close();
 
                             }
