@@ -154,7 +154,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => checkSchemaWasCalled.ShouldBeTrue(),
                 () => cleanTablesWasCalled.ShouldBeTrue(),
                 () => removeSafelyWasCalled.ShouldBeTrue(),
-                () => RefreshTimeSheetWasCalled.ShouldBeFalse());
+                () => RefreshTimeSheetWasCalled.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -268,7 +268,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => checkSchemaWasCalled.ShouldBeTrue(),
                 () => cleanTablesWasCalled.ShouldBeTrue(),
                 () => removeSafelyWasCalled.ShouldBeTrue(),
-                () => RefreshTimeSheetWasCalled.ShouldBeFalse());
+                () => RefreshTimeSheetWasCalled.ShouldBeTrue());
         }
 
         [TestMethod]

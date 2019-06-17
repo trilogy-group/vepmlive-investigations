@@ -162,12 +162,13 @@ namespace EPMLiveTimesheets.Tests
                 dataTable.Columns.Add("PROJECT_ID");
                 dataTable.Columns.Add("SITE_UID");
                 dataTable.Columns.Add("LIST_UID");
+                dataTable.Columns.Add("TITLE");
                 dataTable.Columns.Add("TS_ITEM_UID");
                 
                 dataTable.Columns.Add("WEB_UID");
                 dataTable.Columns.Add("ITEM_ID");
                 dataTable.Columns.Add("LIST");
-                dataTable.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid,DummyGuid, DummyGuid, DummyInt, DummyString });
+                dataTable.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid, DummyString, DummyGuid, DummyGuid, DummyInt, DummyString });
 
                 ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
                 return DummyInt;
@@ -194,6 +195,7 @@ namespace EPMLiveTimesheets.Tests
             dt.Columns.Add("LIST_UID");
             dt.Columns.Add("ITEM_ID");
             dt.Columns.Add("ASSIGNEDTOID");
+            dt.Columns.Add("TITLE");
             dt.Columns.Add("LIST");
             dt.Columns.Add("TS_UID");
             dt.Columns.Add("WEB_UID");
@@ -203,7 +205,7 @@ namespace EPMLiveTimesheets.Tests
             dt.Columns.Add("PROJECT");
             dt.Columns.Add("PROJECT_ID");
             dt.Columns.Add("IsAssignment");
-            dt.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString });
+            dt.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyString, DummyGuid, DummyGuid, DummyInt, DummyString, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString });
             return dt;
         }
     }
