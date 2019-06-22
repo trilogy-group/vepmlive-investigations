@@ -8,14 +8,13 @@ using Izenda.AdHoc;
 using System.Data.SqlClient;
 using System.Xml;
 using System.IO;
-using log4net;
-using log4net.Core;
 
 public partial class _Default : System.Web.UI.Page
 {
 
-	private bool LoggedIn = false;
-	private bool HasAccess = false;
+    private bool LoggedIn = false;
+    private bool HasAccess = false;
+    private string sitecollectionid = string.Empty;
     protected void Page_Load(object sender, EventArgs e)
     {
 
@@ -23,11 +22,22 @@ public partial class _Default : System.Web.UI.Page
 
     protected override void OnLoad(EventArgs e)
     {
-        
+
         if (Request["InFrame"] != "")
             HttpContext.Current.Session["InFrame"] = Request["InFrame"];
         else
             HttpContext.Current.Session["InFrame"] = "1";
+
+
+        if (!string.IsNullOrEmpty(Request["siteid"]))
+        {
+            sitecollectionid = Request["siteid"];
+            
+        }
+        else if (Request.UrlReferrer != null && Request.UrlReferrer.Query.Contains("sitecollectionid"))
+        {
+            sitecollectionid = Request.UrlReferrer.Query.Substring(Request.UrlReferrer.Query.IndexOf("=") + 1);
+        }
         try
         {
             HttpContext.Current.Session["RepUrl"] = Request["RepUrl"];
@@ -35,6 +45,7 @@ public partial class _Default : System.Web.UI.Page
         catch
         {
         }
+
         //if (AdHocSettings.CurrentUserTenantId == null || AdHocSettings.CurrentUserTenantId == "")
         {
             AdHocSettings.LicenseKey = System.Configuration.ConfigurationManager.AppSettings["IzendaLicenseKey"];
@@ -44,14 +55,14 @@ public partial class _Default : System.Web.UI.Page
                 new SqlConnection(
                     System.Configuration.ConfigurationManager.ConnectionStrings["platform"].ConnectionString);
             cn.Open();
-            HttpContext.Current.Session["StorageConnectionString"] = "";
-            HttpContext.Current.Session["ConnectionString"] = "";
-            HttpContext.Current.Session["siteid"] = Request["siteid"];
+            HttpContext.Current.Session[sitecollectionid + "StorageConnectionString"] = "";
+            HttpContext.Current.Session[sitecollectionid + "ConnectionString"] = "";
+            HttpContext.Current.Session[sitecollectionid + "siteid"] = Request["siteid"];
 
             if (String.IsNullOrEmpty(Request["webid"]))
-                HttpContext.Current.Session["webid"] = Request["siteid"];
+                HttpContext.Current.Session[sitecollectionid + "webid"] = Request["siteid"];
             else
-                HttpContext.Current.Session["webid"] = Request["webid"];
+                HttpContext.Current.Session[sitecollectionid + "webid"] = Request["webid"];
 
             if (!string.IsNullOrEmpty(Request["reinit"]))
             {
@@ -80,10 +91,10 @@ public partial class _Default : System.Web.UI.Page
         {
         }
 
-        if (HttpContext.Current.Session["ConnectionString"] != null &&
-            HttpContext.Current.Session["ConnectionString"].ToString() != "" && Request["Debug"] != "true")
+        if (HttpContext.Current.Session[sitecollectionid + "ConnectionString"] != null &&
+            HttpContext.Current.Session[sitecollectionid + "ConnectionString"].ToString() != "" && Request["Debug"] != "true")
         {
-            string url = "ReportList.aspx";
+            string url = "ReportList.aspx"+ "?sitecollectionid=" + sitecollectionid;
 
             if (!string.IsNullOrEmpty(rn))
                 url = "ReportViewer.aspx?rn=" + rn;
@@ -121,7 +132,7 @@ public partial class _Default : System.Web.UI.Page
                   </soap:Body>
                 </soap:Envelope>");
 
-            HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(authinfo[0]);
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(authinfo[0]);
 
             webRequest.Headers.Add("SOAPAction: http://epmlive.com/CheckAuth");
             webRequest.ContentType = "text/xml; charset=utf-8";
@@ -145,7 +156,7 @@ public partial class _Default : System.Web.UI.Page
             {
                 LoggedIn = true;
                 bool validuser = false;
-                SqlConnection cn = new SqlConnection(HttpContext.Current.Session["ConnectionString"].ToString());
+                SqlConnection cn = new SqlConnection(HttpContext.Current.Session[sitecollectionid + "ConnectionString"].ToString());
                 cn.Open();
                 SqlCommand cmd = new SqlCommand(@"SELECT     TOP (100) PERCENT LSTUserInformationList_1.Title
                         FROM         dbo.LSTUserInformationList INNER JOIN
@@ -165,7 +176,7 @@ public partial class _Default : System.Web.UI.Page
                     if (sRole == "Administrators")
                         sRole = "Report Writers";
 
-                    HttpContext.Current.Session["Role"] = sRole;
+                    HttpContext.Current.Session[sitecollectionid + "Role"] = sRole;
                 }
                 dr.Close();
                 cn.Close();
@@ -192,10 +203,10 @@ public partial class _Default : System.Web.UI.Page
         SqlDataReader dr = cmd.ExecuteReader();
         if (dr.Read())
         {
-            HttpContext.Current.Session["ConnectionString"] = dr.GetString(1);
+            HttpContext.Current.Session[sitecollectionid + "ConnectionString"] = dr.GetString(1);
             HttpContext.Current.Session["LoginType"] = dr.GetInt32(0);
             HttpContext.Current.Session["Domain"] = dr.GetString(2);
-            HttpContext.Current.Session["StorageConnectionString"] =
+            HttpContext.Current.Session[sitecollectionid + "StorageConnectionString"] =
                 System.Configuration.ConfigurationManager.ConnectionStrings["platform"].ConnectionString;
         }
         else
@@ -240,7 +251,7 @@ public partial class _Default : System.Web.UI.Page
 
             if (sqlConn != "")
             {
-                HttpContext.Current.Session["StorageConnectionString"] = sqlConn;
+                HttpContext.Current.Session[sitecollectionid + "StorageConnectionString"] = sqlConn;
 
                 SqlConnection cn = new SqlConnection(sqlConn);
                 cn.Open();
@@ -289,7 +300,7 @@ public partial class _Default : System.Web.UI.Page
 
                     }*/
                     cn.Close();
-                    HttpContext.Current.Session["ConnectionString"] = rptcn;
+                    HttpContext.Current.Session[sitecollectionid + "ConnectionString"] = rptcn;
                 }
                 cn.Close();
             }
