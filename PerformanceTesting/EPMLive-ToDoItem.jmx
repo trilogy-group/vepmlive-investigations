@@ -163,7 +163,7 @@
                 <elementProp name="ReturnUrl" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">ReturnUrl</stringProp>
-                  <stringProp name="Argument.value">%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+                  <stringProp name="Argument.value">%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -258,7 +258,7 @@
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -337,7 +337,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -353,7 +353,7 @@
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
                 </elementProp>
                 <elementProp name="Accept-Language" elementType="Header">
                   <stringProp name="Header.name">Accept-Language</stringProp>
@@ -383,7 +383,7 @@
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -462,7 +462,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -478,7 +478,7 @@
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
                 </elementProp>
                 <elementProp name="Accept-Language" elementType="Header">
                   <stringProp name="Header.name">Accept-Language</stringProp>
@@ -575,7 +575,7 @@
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
                 </elementProp>
                 <elementProp name="Accept-Language" elementType="Header">
                   <stringProp name="Header.name">Accept-Language</stringProp>
@@ -625,7 +625,7 @@
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut&amp;Source=%2Fsites%2Faut</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2faut%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Faut</stringProp>
                 </elementProp>
                 <elementProp name="Accept-Language" elementType="Header">
                   <stringProp name="Header.name">Accept-Language</stringProp>
@@ -2290,7 +2290,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/SignOut.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">sites/aut/_layouts/15/SignOut.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
