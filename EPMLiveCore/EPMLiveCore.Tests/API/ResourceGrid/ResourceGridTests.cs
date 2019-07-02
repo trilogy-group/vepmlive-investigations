@@ -69,6 +69,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private const string IDField = "ID";
         private const string PictureField = "Picture";
         private const string NoValueString = "no";
+        private const string EPMLiveResourceGridPersonalView = "EPMLiveResourceGridPersonalView";
 
         private const string BuildDepartmentHierarchyMethod = "BuildDepartmentHierarchy";
         private const string RegisterGridIdAndCssMethod = "RegisterGridIdAndCss";
@@ -250,11 +251,13 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             {
                 RemoveGridView = grid => _gridViewRemoved = true,
                 AddGridView = grid => _gridViewAdded = true,
-                UpdateGridView = grid => _gridViewUpdated = true
+                UpdateGridView = grid => _gridViewUpdated = true,
+                KeyGet = () => { return EPMLiveResourceGridPersonalView; }
             };
             ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridViewManagerKind = (_, __, ___) => new StubIGridViewManager
             {
                 Initialize = () => _gridViewInitialized = true,
+                RemoveGridView = grid => _gridViewRemoved = true,
                 ListGet = () => new List<GridView>
                 {
                     new GridView
@@ -783,6 +786,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _gridViewAdded.ShouldBeTrue(),
+                () => _gridViewRemoved.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
                 () => result.ShouldBe(ResourcePoolViewsClosedTag));
