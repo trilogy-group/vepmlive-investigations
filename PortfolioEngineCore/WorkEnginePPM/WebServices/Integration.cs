@@ -1768,9 +1768,11 @@ namespace WorkEnginePPM
                         if (dr.Read())
                         {
                             timerjobuid = dr.GetGuid(0);
+                            dr.Close();
                         }
                         else
                         {
+                            dr.Close();
                             timerjobuid = Guid.NewGuid();
                             using (SPWeb web = SPContext.Current.Web)
                             {
@@ -1786,7 +1788,7 @@ namespace WorkEnginePPM
                                 cmd.ExecuteNonQuery();
                             }
                         }                       
-                        dr.Close();
+                        
                         cn.Close();
 
                         if (timerjobuid != Guid.Empty)
