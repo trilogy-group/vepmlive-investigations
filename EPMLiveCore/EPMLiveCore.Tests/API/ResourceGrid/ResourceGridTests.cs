@@ -34,9 +34,12 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private bool _itemDeleted;
         private bool _cacheRemoved;
         private bool _gridViewRemoved;
+        private bool _gridPersonalViewRemoved;
+        private bool _gridGlobalViewRemoved;
         private bool _gridViewInitialized;
         private bool _gridViewAdded;
         private bool _gridViewUpdated;
+        private GridViewManagerKind _GridViewManagerKind;
 
         private const int DummyIntOne = 1;
         private const int DummyIntTwo = 2;
@@ -70,6 +73,7 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         private const string PictureField = "Picture";
         private const string NoValueString = "no";
         private const string EPMLiveResourceGridPersonalView = "EPMLiveResourceGridPersonalView";
+        private const string EPMLiveResourceGridGlobalViews = "EPMLiveResourceGridGlobalViews";
 
         private const string BuildDepartmentHierarchyMethod = "BuildDepartmentHierarchy";
         private const string RegisterGridIdAndCssMethod = "RegisterGridIdAndCss";
@@ -83,6 +87,8 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
             _itemDeleted = false;
             _cacheRemoved = false;
             _gridViewRemoved = false;
+            _gridPersonalViewRemoved = false;
+            _gridGlobalViewRemoved = false;
             _gridViewInitialized = false;
             _gridViewAdded = false;
             _gridViewUpdated = false;
@@ -252,12 +258,12 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
                 RemoveGridView = grid => _gridViewRemoved = true,
                 AddGridView = grid => _gridViewAdded = true,
                 UpdateGridView = grid => _gridViewUpdated = true,
-                KeyGet = () => { return EPMLiveResourceGridPersonalView; }
+                KeyGet = () => { return _GridViewManagerKind == GridViewManagerKind.Personal? EPMLiveResourceGridPersonalView : EPMLiveResourceGridGlobalViews; }
             };
-            ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridViewManagerKind = (_, __, ___) => new StubIGridViewManager
+            ShimGridViewManagerFactory.AllInstances.MakeGridViewManagerStringGridViewManagerKind = (_, __, kind) => new StubIGridViewManager
             {
                 Initialize = () => _gridViewInitialized = true,
-                RemoveGridView = grid => _gridViewRemoved = true,
+                RemoveGridView = (____) => { _gridPersonalViewRemoved = kind == GridViewManagerKind.Personal; _gridGlobalViewRemoved = kind == GridViewManagerKind.Global; },
                 ListGet = () => new List<GridView>
                 {
                     new GridView
@@ -778,15 +784,40 @@ namespace EPMLiveCore.Tests.API.ResourceGrid
         }
 
         [TestMethod]
-        public void SaveResourcePoolViews_OnValidCall_ConfirmResult()
+        public void SaveResourcePoolViews_OnValidCall_EPMLiveResourceGridPersonalView_ConfirmResult()
         {
+            _GridViewManagerKind = GridViewManagerKind.Personal;
+            _gridPersonalViewRemoved = false;
+            _gridGlobalViewRemoved = false;
+
+            // Arrange, Act
+            var result = ResourceGridClass.SaveResourcePoolViews(DummyString, _web);            
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => _gridViewAdded.ShouldBeTrue(),
+                () => _gridGlobalViewRemoved.ShouldBeTrue(),
+                () => _gridPersonalViewRemoved.ShouldBeFalse(),
+                () => _cacheRemoved.ShouldBeTrue(),
+                () => result.ShouldNotBeNullOrEmpty(),
+                () => result.ShouldBe(ResourcePoolViewsClosedTag));
+        }
+
+        [TestMethod]
+        public void SaveResourcePoolViews_OnValidCall_EPMLiveResourceGridGlobalView_ConfirmResult()
+        {
+            _GridViewManagerKind = GridViewManagerKind.Global;
+            _gridPersonalViewRemoved = false;
+            _gridGlobalViewRemoved = false;
+
             // Arrange, Act
             var result = ResourceGridClass.SaveResourcePoolViews(DummyString, _web);
 
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => _gridViewAdded.ShouldBeTrue(),
-                () => _gridViewRemoved.ShouldBeTrue(),
+                () => _gridGlobalViewRemoved.ShouldBeFalse(),
+                () => _gridPersonalViewRemoved.ShouldBeTrue(),
                 () => _cacheRemoved.ShouldBeTrue(),
                 () => result.ShouldNotBeNullOrEmpty(),
                 () => result.ShouldBe(ResourcePoolViewsClosedTag));
