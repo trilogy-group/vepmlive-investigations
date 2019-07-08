@@ -252,6 +252,7 @@ namespace EPMLiveCore.Tests
         [TestMethod]
         public void ProcessItem_HasCompleteEmptyButNotPercentComplete_DoesntSetProperties()
         {
+            // Arrange
             var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Two;
@@ -504,7 +505,6 @@ namespace EPMLiveCore.Tests
 
         private static ShimSPItemEventProperties GetEventProperties()
         {
-            // Arrange
             return new ShimSPItemEventProperties()
             {
                 AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
