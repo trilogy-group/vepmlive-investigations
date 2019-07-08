@@ -11,6 +11,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using System.Reflection;
 
 namespace EPMLiveCore.Tests
 {
@@ -28,6 +29,7 @@ namespace EPMLiveCore.Tests
         private const string StatusInProgress = "In Progress";
         private const string StatusCompleted = "Completed";
         private const string MethodProcessItem = "processItem";
+        private const string MethodVerifyRequiredColumns = "VerifyRequiredColumns";
         private const string KeyPercentComplete = "PercentComplete";
         private const string KeyStatus = "Status";
         private const string KeyComplete = "Complete";
@@ -62,7 +64,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_AllHidden_DoesNotSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimSPField.AllInstances.HiddenGet = _ => true;
 
@@ -80,7 +82,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_MethodOne_SetsProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => One;
 
@@ -101,7 +103,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_MethodTwo_SetsProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Two;
 
@@ -122,7 +124,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_MethodInvalid_SetsProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Three;
 
@@ -143,7 +145,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_NoAfterProperties_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) => null;
 
@@ -164,7 +166,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_NoAfterPropertiesWithFieldDefaultStatus_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) => null;
             ShimSPFieldCollection.AllInstances.ItemGetString = (_, __) => new ShimSPField();
@@ -187,7 +189,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_HasCompleteHalfButNotPercentComplete_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Three;
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) =>
@@ -218,7 +220,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_HasCompleteTrueButNotPercentComplete_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Three;
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) =>
@@ -250,8 +252,7 @@ namespace EPMLiveCore.Tests
         [TestMethod]
         public void ProcessItem_HasCompleteEmptyButNotPercentComplete_DoesntSetProperties()
         {
-            // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Two;
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) =>
@@ -294,7 +295,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_HasCompleteTrueButNoStatus_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Three;
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) =>
@@ -327,7 +328,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_HasCompleteFalseButNoStatus_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Three;
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) =>
@@ -360,7 +361,7 @@ namespace EPMLiveCore.Tests
         public void ProcessItem_HasNoCompleteOrStatusOrPercent_DoesntSetProperties()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties();
+            var eventProperties = GetEventProperties();
             PrepareToProcess();
             ShimPlannerCore.getStatusMethodSPWebString = (_, __) => Three;
             ShimSPItemEventDataCollection.AllInstances.ItemGetString = (_, key) =>
@@ -391,6 +392,42 @@ namespace EPMLiveCore.Tests
                 () => _status.ShouldBe(StatusInProgress));
         }
 
+        [TestMethod]
+        public void VerifyRequiredColumns_HasStatusPercentCompleteColumn_ReturnTrue()
+        {
+            // Arrange
+            var eventProperties = GetEventProperties();
+            // Act
+            var result = _privateObject.Invoke(MethodVerifyRequiredColumns, BindingFlags.Instance | BindingFlags.NonPublic, new object[] { eventProperties.Instance });
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(true));
+        }
+
+        [TestMethod]
+        public void VerifyRequiredColumns_Has_No_StatusPercentCompleteColumn_ReturnFalse()
+        {
+            // Arrange
+            var eventProperties = new ShimSPItemEventProperties()
+            {
+                AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
+                {
+                    ChangedPropertiesGet = () =>
+                    {
+                        return new Hashtable();
+                    }
+                }
+            };
+            // Act
+            var result = _privateObject.Invoke(MethodVerifyRequiredColumns, new object[] { eventProperties.Instance });
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldNotBeNull(),
+                () => result.ShouldBe(false));
+        }
         private void PrepareToProcess()
         {
             _siteId = Guid.NewGuid();
@@ -463,6 +500,24 @@ namespace EPMLiveCore.Tests
                     _status = value as string;
                     break;
             }
+        }
+
+        private static ShimSPItemEventProperties GetEventProperties()
+        {
+            // Arrange
+            return new ShimSPItemEventProperties()
+            {
+                AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
+                {
+                    ChangedPropertiesGet = () =>
+                    {
+                        Hashtable changedproperties = new Hashtable();
+                        changedproperties.Add("Status", DummyString);
+                        changedproperties.Add("PercentComplete", DummyString);
+                        return changedproperties;
+                    }
+                }
+            };
         }
     }
 }
