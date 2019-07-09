@@ -17,6 +17,12 @@ namespace EPMLiveCore
 
         private void processItem(SPItemEventProperties properties, bool isAdd)
         {
+            // It should not execute if Status and PercentComplete is not changed otherwise it will revert the old values.
+            if (!isAdd && !VerifyRequiredColumns(properties))
+            {
+                return;
+            }
+
             if (!VerifyHiddenItems(properties))
             {
                 return;
@@ -301,6 +307,18 @@ namespace EPMLiveCore
             {
                 Trace.TraceError("Exception Suppressed {0}", ex);
             }
+        }
+
+        private bool VerifyRequiredColumns(SPItemEventProperties properties)
+        {
+            if (!properties.AfterProperties.ChangedProperties.ContainsKey("Status") 
+                && !properties.AfterProperties.ChangedProperties.ContainsKey("PercentComplete")
+                )
+            {
+                return (properties.AfterProperties["Status"] != null
+                || properties.AfterProperties["PercentComplete"] != null);
+            }
+            return true;
         }
 
         private static bool VerifyHiddenItems(SPItemEventProperties properties)
