@@ -394,40 +394,52 @@ namespace EPMLiveCore.Tests
         }
 
         [TestMethod]
-        public void VerifyRequiredColumns_HasStatusPercentCompleteColumn_ReturnTrue()
+        public void VerifyRequiredColumns_HasStatusPercentCompleteColumn()
         {
             // Arrange
-            var eventProperties = GetEventProperties();
-            // Act
-            var result = _privateObject.Invoke(MethodVerifyRequiredColumns, BindingFlags.Instance | BindingFlags.NonPublic, new object[] { eventProperties.Instance });
+            bool changedStatus = true;
+            bool changedPercentComplete = true;
+            bool expected = true;
 
-            // Assert
-            this.ShouldSatisfyAllConditions(
-                () => result.ShouldNotBeNull(),
-                () => result.ShouldBe(true));
+            // Act Assert
+            RunVerifyRequiredColumnsTest(changedStatus, changedPercentComplete, expected);
+        }
+        
+        [TestMethod]
+        public void VerifyRequiredColumns_Has_No_StatusPercentCompleteColumn()
+        {
+            // Arrange
+            bool changedStatus = false;
+            bool changedPercentComplete = false;
+            bool expected = false;
+
+            // Act Assert
+            RunVerifyRequiredColumnsTest(changedStatus, changedPercentComplete, expected);
         }
 
         [TestMethod]
-        public void VerifyRequiredColumns_Has_No_StatusPercentCompleteColumn_ReturnFalse()
+        public void VerifyRequiredColumns_Has_Status_No_PercentCompleteColumn()
         {
             // Arrange
-            var eventProperties = new ShimSPItemEventProperties()
-            {
-                AfterPropertiesGet = () => new ShimSPItemEventDataCollection()
-                {
-                    ChangedPropertiesGet = () =>
-                    {
-                        return new Hashtable();
-                    }
-                }
-            };
+            bool changedStatus = true;
+            bool changedPercentComplete = false;
+            bool expected = true;
+
+            // Act Assert
+            RunVerifyRequiredColumnsTest(changedStatus, changedPercentComplete, expected);
+        }
+
+
+        private void RunVerifyRequiredColumnsTest(bool changedStatus, bool changedPercentComplete, bool expected)
+        {
             // Act
+            var eventProperties = GetEventProperties(changedStatus, changedPercentComplete);
             var result = _privateObject.Invoke(MethodVerifyRequiredColumns, new object[] { eventProperties.Instance });
 
             // Assert
             this.ShouldSatisfyAllConditions(
                 () => result.ShouldNotBeNull(),
-                () => result.ShouldBe(false));
+                () => result.ShouldBe(expected));
         }
         private void PrepareToProcess()
         {
@@ -503,7 +515,7 @@ namespace EPMLiveCore.Tests
             }
         }
 
-        private static ShimSPItemEventProperties GetEventProperties()
+        private static ShimSPItemEventProperties GetEventProperties(bool changedStatus = true, bool changedPercentComplete = true)
         {
             return new ShimSPItemEventProperties()
             {
@@ -512,8 +524,14 @@ namespace EPMLiveCore.Tests
                     ChangedPropertiesGet = () =>
                     {
                         Hashtable changedproperties = new Hashtable();
-                        changedproperties.Add("Status", DummyString);
-                        changedproperties.Add("PercentComplete", DummyString);
+                        if (changedStatus)
+                        {
+                            changedproperties.Add("Status", DummyString);
+                        }
+                        if (changedPercentComplete)
+                        {
+                            changedproperties.Add("PercentComplete", DummyString);
+                        }
                         return changedproperties;
                     }
                 }
