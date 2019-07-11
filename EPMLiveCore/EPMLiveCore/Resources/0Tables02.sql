@@ -185,31 +185,32 @@ else
 		if not exists (select column_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where table_name = 'TSMETA' and CONSTRAINT_NAME = 'PK_TSMETA' and COLUMN_NAME='TSMETA_UID')
 		begin
 
-            Print 'Updating Table TSMETA with new constraint'			
-			
-			Print '     Drop Old Contraint'
+            Print 'Updating Table TSMETA with new constraint'	
+					
+			IF EXISTS (select column_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where table_name = 'TSMETA' and CONSTRAINT_NAME = 'PK_TSMETA')
+			BEGIN
+			    Print 'Drop Old Contraint'
 				ALTER TABLE TSMETA
 				DROP CONSTRAINT PK_TSMETA
-			
-			if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSMETA' and column_name = 'TSMETA_UID')
+			END
+
+			IF NOT EXISTS (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSMETA' and column_name = 'TSMETA_UID')
 			BEGIN
-			
-			Print '     Add Column TSMETA_UID'
+     			Print 'Add Column TSMETA_UID'
 				ALTER TABLE TSMETA
 				ADD TSMETA_UID uniqueidentifier NOT NULL DEFAULT (newid())
-			
 			END
 			
-			Print '     Add new Contraint with Column TSMETA_UID'
+			Print 'Add new Contraint with Column TSMETA_UID'
 			
 			ALTER TABLE TSMETA
 			ADD CONSTRAINT [PK_TSMETA] PRIMARY KEY CLUSTERED 
 			(
 				TSMETA_UID ASC
 			)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-		end
 		
-	end
+		end
+end
 
 ------------------TABLE: TSNOTES---------------------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'TSNOTES')
