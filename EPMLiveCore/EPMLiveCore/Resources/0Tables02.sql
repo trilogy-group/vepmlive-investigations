@@ -175,37 +175,42 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[ListName] [varchar](255) NULL,
 		 CONSTRAINT [PK_TSMETA] PRIMARY KEY CLUSTERED 
 		(
-			[TS_ITEM_UID] ASC,
-			[ColumnName] ASC
+			TSMETA_UID ASC
 		)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 		) ON [PRIMARY]
 	end
 else
 	begin
-		Print 'Updating Table TSMETA'
-		
-		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSMETA' and column_name = 'TSMETA_UID')
+
+		if not exists (select column_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where table_name = 'TSMETA' and CONSTRAINT_NAME = 'PK_TSMETA' and COLUMN_NAME='TSMETA_UID')
 		begin
-			Print '     Add Column TSMETA_UID'
-			
-			if exists (select column_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where table_name = 'TSMETA' and CONSTRAINT_NAME = 'PK_TSMETA')
-			begin
+
+            Print 'Updating Table TSMETA with new constraint'	
+					
+			IF EXISTS (select column_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where table_name = 'TSMETA' and CONSTRAINT_NAME = 'PK_TSMETA')
+			BEGIN
+			    Print 'Drop Old Contraint'
 				ALTER TABLE TSMETA
 				DROP CONSTRAINT PK_TSMETA
-			end
+			END
+
+			IF NOT EXISTS (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSMETA' and column_name = 'TSMETA_UID')
+			BEGIN
+     			Print 'Add Column TSMETA_UID'
+				ALTER TABLE TSMETA
+				ADD TSMETA_UID uniqueidentifier NOT NULL DEFAULT (newid())
+			END
 			
-			ALTER TABLE TSMETA
-			ADD TSMETA_UID uniqueidentifier NOT NULL DEFAULT (newid())
+			Print 'Add new Contraint with Column TSMETA_UID'
 			
 			ALTER TABLE TSMETA
 			ADD CONSTRAINT [PK_TSMETA] PRIMARY KEY CLUSTERED 
 			(
 				TSMETA_UID ASC
 			)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-			
-		end
 		
-	end
+		end
+end
 
 ------------------TABLE: TSNOTES---------------------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'TSNOTES')
