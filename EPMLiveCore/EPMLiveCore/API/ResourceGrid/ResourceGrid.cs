@@ -465,7 +465,7 @@ namespace EPMLiveCore.API
                 catch { }
 
                 XDocument resourceXml =
-                  XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), SPContext.Current.Site.RootWeb));
+                  XDocument.Parse(GetResources(HttpUtility.HtmlDecode(data), SPContext.Current.Site.RootWeb));
 
                 XDocument resourceTeam = new XDocument();
                 if (isRootWeb && listid == Guid.Empty && itemid == 0)
@@ -474,7 +474,7 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    XDocument teamXml = XDocument.Parse(APITeam.GetTeam(data, web));
+                    XDocument teamXml = XDocument.Parse(APITeam.GetTeam(HttpUtility.HtmlDecode(data), web));
                     XElement res = new XElement("Resources");
                     foreach (XElement ele in teamXml.Root.Elements("Member"))
                     {
