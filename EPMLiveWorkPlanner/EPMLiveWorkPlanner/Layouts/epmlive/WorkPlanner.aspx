@@ -1567,6 +1567,7 @@
 
         if (row.Def.Name == "Assignment" && grid.id == "WorkPlannerGrid" && show)
             return HideShowAssignment(grid, row);
+
         if(grid.FCol === "AssignedTo" && grid.id === "WorkPlannerGrid" && !show)
         {
            if(grid.FRow.AssignedTo !== '')
