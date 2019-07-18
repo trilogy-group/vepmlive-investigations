@@ -1567,7 +1567,16 @@
 
         if (row.Def.Name == "Assignment" && grid.id == "WorkPlannerGrid" && show)
             return HideShowAssignment(grid, row);
-        
+
+        if(grid.FCol === "AssignedTo" && grid.id === "WorkPlannerGrid" && !show)
+        {
+           if(grid.FRow.AssignedTo !== '')
+           { 
+              var filtervalues = grid.FRow.AssignedTo.toString().split(";");
+              var rowValues = row["AssignedTo"].toString().split(";");
+              return filtervalues.every(function(val) {return rowValues.indexOf(val) >= 0;});
+           }
+        }
         return show;
     }
     
