@@ -32,7 +32,7 @@
 		<C Name="G" GanttResourcesAssign="4" GanttResourcesExtra="0" GanttResources="USAGE" GanttAvailabilityMax="1" GanttAvailabilityExclude="0" GanttMinStart="MinStart" GanttMaxEnd="MaxEnd"/>
 	</RightCols>
 	<Def>
-
+		<D Name='C' CaseSensitive = "0" />
 		<D Name='Folder' TitleHtmlPrefix='&lt;img src="/_layouts/epmlive/images/folder.gif"&gt;' CanDrag='0' Class='BoldCell' Calculated="1" CanFilter='1'/>
 		<D Name="Folder" GGanttClass="GanttG" GGanttIcons="1" GGanttEdit="0" GGanttHover="0" CanExpand="0"/>
 		<D Name="Folder" PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" DurationFormula="ganttduration('G')"/>
