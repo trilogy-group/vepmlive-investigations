@@ -119,6 +119,7 @@
                 case "Milestone":
                 case "Timesheet":
                 case "Panel":
+                case "AssignedTo":
                     return false;
             }
             return true;
