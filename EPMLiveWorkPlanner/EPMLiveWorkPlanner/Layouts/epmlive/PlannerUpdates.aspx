@@ -83,7 +83,7 @@
             for (var C in ugrid.Cols) {
                 if (validColumn(C)) {
                     try {
-                        if ((C == "StartDate" || C == "DueDate") && ugrid.GetValue(oRow, C) == "") {
+                        if ((C == "StartDate" || C == "DueDate" || C == "AssignedTo") && ugrid.GetValue(oRow, C) == "") {
                         }
                         else {
                             parent.SetPlannerFieldValue(oToRow, C, ugrid.GetValue(oRow, C), true);
@@ -119,7 +119,6 @@
                 case "Milestone":
                 case "Timesheet":
                 case "Panel":
-                case "AssignedTo":
                     return false;
             }
             return true;
