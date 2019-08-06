@@ -753,6 +753,12 @@ namespace EPMLiveCore
                     u = properties.Web.EnsureUser(uv.LookupValue);
                 }
 
+                // semicolon causes issues in list cleanup and potentially in other modules.
+                if (u.Name.Contains(";"))
+                {
+                    throw new InvalidOperationException("Semicolon is not allowed for AD username.");
+                }
+
                 try
                 {
                     curProps = properties.ListItem["Permissions"].ToString().Trim();
@@ -810,6 +816,10 @@ namespace EPMLiveCore
                     properties.AfterProperties["Permissions"] = perms.Trim(", ".ToCharArray());
                 }
                 catch { }
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw ex;
             }
             catch { }
 
@@ -949,13 +959,7 @@ namespace EPMLiveCore
             }
 
             if (p != null)
-            {
-                // semicolon causes issues in list cleanup and potentially in other modules.
-                if (p.Name.Contains(";"))
-                {
-                    throw new SPException("Semicolon is not allowed for AD username.");
-                }
-
+            { 
                 return p.ID + ";#" + p.Name;
             }
 
