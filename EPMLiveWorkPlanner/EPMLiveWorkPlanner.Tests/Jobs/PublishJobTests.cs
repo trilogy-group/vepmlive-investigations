@@ -119,6 +119,7 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
             ShimDisabledItemEventScope.AllInstances.Dispose = _ => { };
             ShimSPUserCollection.AllInstances.GetByIDInt32 = (_, __) => spUser;
             ShimSPSiteDataQuery.Constructor = _ => new ShimSPSiteDataQuery();
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = codeToRun => codeToRun();
         }
 
         private void SetupVariables()
@@ -482,8 +483,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                     validations += 1;
                     return guid;
                 };
-            ShimTimer.EnqueueGuidInt32SPSite =
-                (_1, _2, _3) =>
+            ShimTimer.EnqueueGuidInt32SPSiteInt32 =
+                (_1, _2, _3, _4) =>
                 {
                     validations += 1;
                     throw new Exception(DummyString);
@@ -562,8 +563,8 @@ namespace EPMLiveWorkPlanner.Tests.Jobs
                     validations += 1;
                     return guid;
                 };
-            ShimTimer.EnqueueGuidInt32SPSite =
-                (_1, _2, _3) =>
+            ShimTimer.EnqueueGuidInt32SPSiteInt32 =
+                (_1, _2, _3, _4) =>
                 {
                     validations += 1;
                     throw new Exception(DummyString);

@@ -3957,62 +3957,72 @@ namespace EPMLiveCore
 
         public static void enqueue(Guid timerjobuid, int defaultstatus, SPSite site)
         {
+            enqueue(timerjobuid, defaultstatus, site, 0);
+        }
+
+        public static void enqueue(Guid timerjobuid, int defaultstatus, SPSite site, int userId)
+        {
             if (site == null)
             {
                 throw new ArgumentNullException("site");
             }
 
-            using (var web = site.OpenWeb())
+            if (userId == 0)
             {
-                //Added code for the Cost Planner Integration - EPML-5327
-
-                SPSecurity.RunWithElevatedPrivileges(delegate ()
+                using (var web = site.OpenWeb())
                 {
-                    var status = 2;
+                    userId = web.CurrentUser != null ? web.CurrentUser.ID : 1;
+                }
+            }
+            //Added code for the Cost Planner Integration - EPML-5327
 
-                    using (var connection = new SqlConnection(getConnectionString(site.WebApplication.Id)))
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                var status = 2;
+
+                using (var connection = new SqlConnection(getConnectionString(site.WebApplication.Id)))
+                {
+                    connection.Open();
+
+                    using (var command = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", connection))
                     {
-                        connection.Open();
+                        command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
 
-                        using (var command = new SqlCommand("select status from queue where timerjobuid=@timerjobuid", connection))
+                        using (var dataReader = command.ExecuteReader())
                         {
-                            command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-
-                            using (var dataReader = command.ExecuteReader())
+                            if (dataReader.Read())
                             {
-                                if (dataReader.Read())
-                                {
-                                    status = dataReader.GetInt32(0);
-                                }
-                            }
-                        }
-
-                        if (status == 2)
-                        {
-                            using (var command = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", connection))
-                            {
-                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                                command.ExecuteNonQuery();
-                            }
-
-                            using (var command = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid = @timerjobuid ", connection))
-                            {
-                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                                command.ExecuteNonQuery();
-                            }
-
-                            using (var command = new SqlCommand(@"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
-                                                                  VALUES (@timerjobuid, @status, 0, @userid) ", connection))
-                            {
-                                command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                                command.Parameters.AddWithValue("@status", defaultstatus);
-                                command.Parameters.AddWithValue("@userid", web.CurrentUser != null ? web.CurrentUser.ID : 1);
-                                command.ExecuteNonQuery();
+                                status = dataReader.GetInt32(0);
                             }
                         }
                     }
-                });
-            }
+
+                    if (status == 2)
+                    {
+                        using (var command = new SqlCommand("DELETE FROM QUEUE where timerjobuid = @timerjobuid ", connection))
+                        {
+                            command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                            command.ExecuteNonQuery();
+                        }
+
+                        using (var command = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid = @timerjobuid ", connection))
+                        {
+                            command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                            command.ExecuteNonQuery();
+                        }
+
+                        using (var command = new SqlCommand(@"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
+                                                                  VALUES (@timerjobuid, @status, 0, @userid) ", connection))
+                        {
+                            command.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                            command.Parameters.AddWithValue("@status", defaultstatus);
+                            command.Parameters.AddWithValue("@userid", userId);
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+            });
+
         }
 
         /// <summary>
