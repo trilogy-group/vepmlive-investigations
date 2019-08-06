@@ -110,6 +110,7 @@ namespace EPMLiveReporting.Tests.Jobs
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
             ReturnValue = true;
             ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheets;
+            ShimEPMData.AllInstances.RefreshTimesheetBatchStringOutGuidInt32 = RefreshTimesheetsBatch;
             ShimWEIntegration.AllInstances.ExecuteReportExtractString = (_, dataToExtract) =>
             {
                 executeReportExtractWasCalled = true;
@@ -207,6 +208,7 @@ namespace EPMLiveReporting.Tests.Jobs
             ShimCoreFunctions.getConfigSettingSPWebString = (web, setting) => bool.TrueString;
             ReturnValue = false;
             ShimEPMData.AllInstances.RefreshTimesheetsStringOutGuidBoolean = RefreshTimesheets;
+            ShimEPMData.AllInstances.RefreshTimesheetBatchStringOutGuidInt32 = RefreshTimesheetsBatch;
             ShimWEIntegration.AllInstances.ExecuteReportExtractString = (_, dataToExtract) =>
             {
                 executeReportExtractWasCalled = true;
@@ -268,6 +270,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => removeSafelyWasCalled.ShouldBeTrue(),
                 () => RefreshTimeSheetWasCalled.ShouldBeTrue());
         }
+
 
         [TestMethod]
         public void Execute_WithExceptions_LogErrorMessages()
@@ -604,6 +607,20 @@ namespace EPMLiveReporting.Tests.Jobs
             out string message,
             Guid jobUid,
             bool consolidationDone)
+        {
+            RefreshTimeSheetWasCalled = true;
+            message = DummyString;
+            return ReturnValue;
+        }
+
+        /// <summary>
+        /// This is a fake method. All the parameters are required, even though not all of them are used
+        /// </summary>
+        private bool RefreshTimesheetsBatch(
+          EPMData empData,
+          out string message,
+          Guid jobUid,
+          int pageSize)
         {
             RefreshTimeSheetWasCalled = true;
             message = DummyString;
