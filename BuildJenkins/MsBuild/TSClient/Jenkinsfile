@@ -8,7 +8,7 @@ pipeline {
 	options {
 		skipDefaultCheckout true
 		timestamps()
-		timeout(time: 4, unit: 'HOURS') 
+		timeout(time: 5, unit: 'HOURS') 
 	}
 	stages {
 		stage('Prepare to build') {
