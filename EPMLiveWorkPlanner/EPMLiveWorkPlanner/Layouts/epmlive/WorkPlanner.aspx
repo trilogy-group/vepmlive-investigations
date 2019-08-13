@@ -1381,8 +1381,8 @@
             {
                 oldWork = grid.GetValue(row, col);
             }
-
-            if (row.Kind === "Data"){
+            if (row.Kind === "Data")
+            {
                 if (col === "StartDate")
                 {
                     if (val > grid.GetRowById(0).DueDate)
