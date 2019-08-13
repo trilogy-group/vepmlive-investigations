@@ -935,9 +935,9 @@
 
         Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
         {   
-            if(row.Kind==="Data")
+            if (row.Kind === "Data")
             {
-                if(type == "main" && d1 != null && d2 != null)
+                if (type === "main" && d1 !== null && d2 !== null)
                 {
                     if(d1 < grid.Cols["G"].GanttBase)
                     {
@@ -1382,8 +1382,8 @@
                 oldWork = grid.GetValue(row, col);
             }
 
-            if(row.Kind==="Data"){
-                if(col === "StartDate")
+            if (row.Kind === "Data"){
+                if (col === "StartDate")
                 {
                     if (val > grid.GetRowById(0).DueDate)
                     {
