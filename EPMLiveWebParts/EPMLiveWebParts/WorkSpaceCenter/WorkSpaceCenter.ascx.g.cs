@@ -123,7 +123,9 @@ namespace EPMLiveWebParts.WorkSpaceCenter
             source.Data.Param.Function = 'GetWorkspaceCenterGridData';
             source.Data.Param.Dataxml = currentView;
             Grids[""gridWorkSpaceCenter""].Reload(source, null, false);
-            $( 'a[controlid = ""ddWorkspaceCenterView1""]' )[0].getElementsByTagName('span')[1].innerText = currentViewText;
+            var ancWorkspaceView = $( 'a[controlid = ""ddWorkspaceCenterView1""]' )[0];
+            var viewLabel = ancWorkspaceView.getElementsByTagName('span')[1];
+            viewLabel.innerText = currentViewText;
         };
 
         var createNewWorkspace = function () {
