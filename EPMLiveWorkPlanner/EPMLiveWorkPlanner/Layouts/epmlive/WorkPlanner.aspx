@@ -935,13 +935,16 @@
 
         Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
         {   
-            if(type == "main" && d1 != null && d2 != null)
+            if (row.Kind === "Data")
             {
-                if(d1 < grid.Cols["G"].GanttBase)
+                if (type === "main" && d1 !== null && d2 !== null)
                 {
-                    if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                    if(d1 < grid.Cols["G"].GanttBase)
                     {
-                        MoveProject();
+                        if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                        {
+                            MoveProject();
+                        }
                     }
                 }
             }
@@ -1378,14 +1381,16 @@
             {
                 oldWork = grid.GetValue(row, col);
             }
-			
-            if(col === "StartDate")
+            if (row.Kind === "Data")
             {
-                if (val > grid.GetRowById(0).DueDate)
+                if (col === "StartDate")
                 {
-                    if (confirm("The edit violates the task constraint. Click Ok to honor the constraint and keep the original task dates or click Cancel to adjust to Dates")) {
-                        grid.SetValue(row, "DueDate", row.DueDateOrig, 1,0);
-                        return grid.GetValue(row, col);
+                    if (val > grid.GetRowById(0).DueDate)
+                    {
+                        if (confirm("The edit violates the task constraint. Click Ok to honor the constraint and keep the original task dates or click Cancel to adjust to Dates")) {
+                            grid.SetValue(row, "DueDate", row.DueDateOrig, 1,0);
+                            return grid.GetValue(row, col);
+                        }
                     }
                 }
             }
