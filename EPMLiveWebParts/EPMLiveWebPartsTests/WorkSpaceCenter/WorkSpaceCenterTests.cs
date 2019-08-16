@@ -84,7 +84,7 @@ namespace EPMLiveWebParts.Tests.WorkSpaceCenter
                 () => _didRegisterScript.ShouldBeTrue(),
                 () => result.ShouldContainWithoutWhitespace("<div><style type=\"text/css\">#EPMWorkspaceCenterGrid {"),
                 () => result.ShouldContainWithoutWhitespace("<script type=\"text/javascript\">$(function () {ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.init, 'EPMLive.js');});"),
-                () => result.ShouldContainWithoutWhitespace($"var changeView = function (currentView) {{ EPM.UI.Loader.current().startLoading({{ id: 'EPMWorkspaceCenterLoadingDiv' }}); var source = Grids[\"gridWorkSpaceCenter\"].Source; source.Data.url = '{ExampleUrl}/_vti_bin/WorkEngine.asmx';"),
+                () => result.ShouldContainWithoutWhitespace($"var changeView = function (currentView,currentViewText) {{ EPM.UI.Loader.current().startLoading({{ id: 'EPMWorkspaceCenterLoadingDiv' }}); var source = Grids[\"gridWorkSpaceCenter\"].Source; source.Data.url = '{ExampleUrl}/_vti_bin/WorkEngine.asmx';"),
                 () => result.ShouldContainWithoutWhitespace($"var createNewWorkspace = function () {{ var createNewWorkspaceUrl = \"{ExampleUrl}/_layouts/epmlive/QueueCreateWorkspace.aspx\";"),
                 () => result.ShouldContainWithoutWhitespace($"window.TreeGrid('<treegrid data_url=\"{ExampleUrl}/_vti_bin/WorkEngine.asmx\" data_timeout=\"0\" data_method=\"Soap\""),
                 () => result.ShouldContainWithoutWhitespace("<div id=\"EPMWorkspaceCenter\"><div id=\"EPMWorkspaceCenterLoadingDiv\"><div id=\"WorkSpacecenterToolbarMenu\" style=\"width: 99%\"></div>"),

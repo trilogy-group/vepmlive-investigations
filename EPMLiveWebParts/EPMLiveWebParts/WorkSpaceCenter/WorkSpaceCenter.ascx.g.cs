@@ -92,14 +92,14 @@ namespace EPMLiveWebParts.WorkSpaceCenter
                     "          \'text\': \'All Items\',\r\n                                        \'events\'" +
                     ": [\r\n                                            {\r\n                            " +
                     "                    \'eventName\': \'click\',\r\n                                     " +
-                    "           \'function\': function () { changeView(\"AllItems\"); }\r\n                " +
+                    "           \'function\': function () { changeView(\"AllItems\", \"All Items\"); }\r\n                " +
                     "                            }\r\n                                        ]\r\n\r\n    " +
                     "                                },\r\n                                    {\r\n     " +
                     "                                   \'iconClass\': \'none\',\r\n                       " +
                     "                 \'text\': \'My Workspace\',\r\n                                      " +
                     "  \'events\': [\r\n                                            {\r\n                  " +
                     "                              \'eventName\': \'click\',\r\n                           " +
-                    "                     \'function\': function () { changeView(\"MyWorkspace\"); }\r\n   " +
+                    "                     \'function\': function () { changeView(\"MyWorkspace\", \"My Workspace\"); }\r\n   " +
                     "                                         }\r\n                                    " +
                     "    ]\r\n                                    },\r\n                                 " +
                     "   {\r\n                                        \'iconClass\': \'none\',\r\n            " +
@@ -107,12 +107,12 @@ namespace EPMLiveWebParts.WorkSpaceCenter
                     "            \'events\': [\r\n                                            {\r\n        " +
                     "                                        \'eventName\': \'click\',\r\n                 " +
                     "                               \'function\': function () { changeView(\"MyFavorite\"" +
-                    "); }\r\n                                            }\r\n                           " +
+                    ", \"My Favorite\"); }\r\n                                            }\r\n                           " +
                     "             ]\r\n                                    }\r\n\r\n                       " +
                     "         ]\r\n                            }\r\n                        ]\r\n          " +
                     "          }\r\n                    ]\r\n                }\r\n            ];\r\n         " +
                     "   epmLiveGenericToolBar.generateToolBar(\'WorkSpacecenterToolbarMenu\', cfgs);\r\n " +
-                    "       };\r\n\r\n        var changeView = function (currentView) {\r\n            EPM." +
+                    "       };\r\n\r\n        var changeView = function (currentView, currentViewText) {\r\n            EPM." +
                     "UI.Loader.current().startLoading({ id: \'EPMWorkspaceCenterLoadingDiv\' });\r\n     " +
                     "       var source = Grids[\"gridWorkSpaceCenter\"].Source;\r\n            source.Dat" +
                     "a.url = \'");
@@ -123,6 +123,9 @@ namespace EPMLiveWebParts.WorkSpaceCenter
             source.Data.Param.Function = 'GetWorkspaceCenterGridData';
             source.Data.Param.Dataxml = currentView;
             Grids[""gridWorkSpaceCenter""].Reload(source, null, false);
+            var ancWorkspaceView = $( 'a[controlid = ""ddWorkspaceCenterView1""]' )[0];
+            var viewLabel = ancWorkspaceView.getElementsByTagName('span')[1];
+            viewLabel.innerText = currentViewText;
         };
 
         var createNewWorkspace = function () {
