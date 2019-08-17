@@ -358,7 +358,7 @@ foreach ($platform in $platforms)
 	
 #	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\PublisherSetup2016$platform.msi" -Force
 	Remove-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016WiX\bin\$platform\Release\PublisherSetup2016.msi" -Force
-	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\setup$platform.exe" -Force
+	Move-Item "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016.exe" -Destination "$SourcesDirectory\ProjectPublisher2016\PublisherSetupBootstrapper\bin\$platform\Release\ProjectPublisher2016_$platform.exe" -Force
 	
 
 	$platformIndex++;
