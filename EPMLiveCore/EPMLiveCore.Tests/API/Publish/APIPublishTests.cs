@@ -350,7 +350,7 @@ namespace EPMLiveCore.Tests.API.Publish
             // Assert
             actual.ShouldSatisfyAllConditions(
                 () => actual.FirstChild.Name.ShouldBe("Properties"),
-                () => actual.FirstChild.ChildNodes.Count.ShouldBe(16),
+                () => actual.FirstChild.ChildNodes.Count.ShouldBe(15),
                 () => actual.FirstChild.ChildNodes[8].Name.ShouldBe("EPMLiveTSFlag"),
                 () => actual.FirstChild.ChildNodes[8].InnerText.ShouldBe("Flag15"),
                 () => actual.FirstChild.ChildNodes[9].Name.ShouldBe("EPMLiveTSTimesheetHours"),
