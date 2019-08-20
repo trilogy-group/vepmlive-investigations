@@ -118,9 +118,7 @@ namespace WorkEnginePPM.Events.DataSync
                         UniqueId = uniqueId
                     };
                     workScheduleManager.Synchronize(new List<WorkSchedule>() { workSchedule });
-                    List<WorkSchedule> workSchedules = workScheduleManager.GetExistingWorkSchedules(properties.List.Items);
-                    workSchedules.Add(workSchedule);
-                    SetExtId(properties, uniqueId, workSchedules);
+                    SetExtId(properties, uniqueId, workScheduleManager.GetExistingWorkSchedules(properties.List.Items));
                     workScheduleManager.AddPFEWorkSchedules(workSchedule);
                 }
 
