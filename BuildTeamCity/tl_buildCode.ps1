@@ -10,7 +10,7 @@ param (
     # Tools Version to pass to MSBuild
     [string]$ToolsVersion = "/tv:14.0",
     # user-specific additional command line parameters to pass to MSBuild
-    [string]$MsBuildArguments = "/p:visualstudioversion=14.0",
+    [string]$MsBuildArguments = "/p:visualstudioversion=14.0 /nr:False",
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true,
 	  # build test projects only
