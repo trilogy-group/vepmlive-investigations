@@ -1208,29 +1208,38 @@ exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
 AS
 BEGIN
-declare @topthreads varchar(2) = CONVERT(varchar(2), CONVERT(int, @maxthreads) / 2)
-declare @sql varchar(MAX)
+declare 
+@Running_Type_1 int
+, @Running_Type_2 int
+, @MaxThreads_type_1 int
+, @MaxThreads_type_2 int
+, @divisor int
 
-set @sql = '';WITH CTE AS 
-( 
-SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+set @divisor  = 2
+
+set @MaxThreads_type_2 = @maxthreads / @divisor 
+set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
+
+set @Running_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
+set @Running_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 32))
+
+
+UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+(
+SELECT top (CASE WHEN @MaxThreads_type_1 > @Running_Type_1 THEN (@MaxThreads_type_1 - @Running_Type_1) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
-WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and JOBTYPE_ID = 32
+WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
-) 
-UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0;
+)
 
-WITH CTE2 AS 
-( 
-SELECT TOP '' + @topthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
+UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+(
+SELECT TOP (CASE WHEN @MaxThreads_type_2 > @Running_Type_2 THEN (@MaxThreads_type_2 - @Running_Type_2) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
-WHERE (QUEUE is null or QUEUE='''''' + @servername + '''''') and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
+WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
-) 
-UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0
-''
+)
 
-exec(@sql)
 
 SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.LOCKED, dbo.TSTIMESHEET.SITE_UID, 
                       dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, dbo.TSTIMESHEET.TSUSER_UID, dbo.TSTIMESHEET.APPROVAL_DATE, 
@@ -2290,6 +2299,191 @@ FROM         dbo.TSNOTES INNER JOIN
                       dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID ON dbo.TSNOTES.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID
 WHERE period_id=@period_id and tstimesheet.site_uid = @siteguid and username like @username
 
+END
+')
+
+
+
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSAllData_V2')
+begin
+    Print 'Creating Stored Procedure spTSAllData_V2'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSAllData_V2'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROC [dbo].[spTSAllData_V2]
+	@siteuid uniqueidentifier
+AS
+BEGIN
+-- {versionMarker}
+declare @colname varchar(255)
+declare @cols varchar(MAX)
+
+set @cols = ''''
+
+IF (EXISTS (SELECT * 
+                 FROM INFORMATION_SCHEMA.TABLES 
+                 WHERE  TABLE_NAME = ''TempTSTable''))
+BEGIN
+  drop table TempTSTable
+END
+
+/*
+DECLARE colsCursors CURSOR FOR 
+SELECT distinct columnname
+from vwmeta
+where site_id = @siteuid
+*/
+/* Trial replacement of query (MAW, 2016-10-30) */
+DECLARE colsCursors CURSOR FOR 
+SELECT distinct IV.columnname
+FROM (
+SELECT		COALESCE (dbo.TSMETA.ListName + ''_'' + dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		COALESCE (dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName
+FROM		dbo.TSITEM
+INNER JOIN	dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID
+INNER JOIN	dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID
+INNER JOIN	dbo.TSMETA ON dbo.TSITEM.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND dbo.TSITEM.LIST = dbo.TSMETA.ListName
+WHERE		dbo.TSTIMESHEET.SITE_UID = @siteuid
+UNION
+SELECT		''Resource_'' + dbo.TSRESMETA.ColumnName AS columnname
+FROM		dbo.TSTIMESHEET AS TSTIMESHEET_1
+INNER JOIN	dbo.TSRESMETA ON TSTIMESHEET_1.TS_UID = dbo.TSRESMETA.TS_UID
+INNER JOIN	dbo.TSITEM AS TSITEM_1 ON TSTIMESHEET_1.TS_UID = TSITEM_1.TS_UID
+INNER JOIN	dbo.TSITEMHOURS AS TSITEMHOURS_1 ON TSITEM_1.TS_ITEM_UID = TSITEMHOURS_1.TS_ITEM_UID
+WHERE TSTIMESHEET_1.SITE_UID = @siteuid
+UNION
+SELECT		''TempColumn'') as IV
+order by IV.columnname
+
+OPEN colsCursors
+
+FETCH NEXT FROM colsCursors 
+INTO @colname
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+set @cols = @cols + '',['' + @colname + '']''
+
+FETCH NEXT FROM colsCursors 
+INTO @colname
+
+END
+
+CLOSE colsCursors
+DEALLOCATE colsCursors
+
+declare @sql varchar(MAX)
+
+if @cols <> ''''
+begin
+	set @sql = ''
+		WITH C1 AS (
+			SELECT 			dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSUSER.USER_ID AS SharePointAccountID, dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
+									 dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, dbo.TSITEM.ITEM_TYPE AS [Item Type], dbo.TSITEM.TS_UID AS [Timesheet UID], dbo.TSPERIOD.PERIOD_ID AS [Period Id], 
+									 dbo.TSPERIOD.SITE_ID, dbo.TSITEM.LIST AS List, dbo.TSITEMHOURS.TS_ITEM_DATE AS Date, dbo.TSITEMHOURS.TS_ITEM_HOURS AS Hours, dbo.TSITEMHOURS.TS_ITEM_TYPE_ID AS [Type Id], 
+									 dbo.TSTYPE.TSTYPE_NAME AS [Type Name], dbo.TSPERIOD.PERIOD_START AS [Period Start], dbo.TSPERIOD.PERIOD_END AS [Period End], 
+									 CASE dbo.TSTIMESHEET.SUBMITTED WHEN 0 THEN ''''No'''' WHEN 1 THEN ''''Yes'''' END AS Submitted, 
+									 CASE dbo.TSTIMESHEET.APPROVAL_STATUS WHEN 0 THEN ''''Pending'''' WHEN 1 THEN ''''Approved'''' WHEN 2 THEN ''''Rejected'''' END AS [Approval Status], 
+									 CASE dbo.TSITEM.APPROVAL_STATUS WHEN 0 THEN ''''Pending'''' WHEN 1 THEN ''''Approved'''' WHEN 2 THEN ''''Rejected'''' END AS [PM Approval Status], 
+									 CONVERT(varchar(8000), COALESCE (dbo.TSTIMESHEET.APPROVAL_NOTES, '''''''')) AS [Approval Notes], dbo.TSTIMESHEET.LASTMODIFIEDBYN, 
+									 CONVERT(varchar(MAX), dbo.TSNOTES.TS_ITEM_NOTES) AS TS_ITEM_NOTES, 
+									 dbo.TSTIMESHEET.APPROVAL_DATE, COALESCE (dbo.TSTIMESHEET.LastSubmittedByName, dbo.TSTIMESHEET.LASTMODIFIEDBYN) AS LastSubmittedByName, 
+									 COALESCE (dbo.TSTIMESHEET.LastSubmittedByUser, dbo.TSTIMESHEET.LASTMODIFIEDBYU) AS LastSubmittedByUser, dbo.TSITEM.TS_ITEM_UID, dbo.TSITEM.RATE Rate
+			FROM            dbo.TSITEM INNER JOIN
+									 dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
+									 dbo.TSPERIOD ON dbo.TSTIMESHEET.PERIOD_ID = dbo.TSPERIOD.PERIOD_ID AND dbo.TSTIMESHEET.SITE_UID = dbo.TSPERIOD.SITE_ID INNER JOIN
+									 dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID LEFT OUTER JOIN
+									 dbo.TSNOTES ON dbo.TSITEM.TS_ITEM_UID = dbo.TSNOTES.TS_ITEM_UID AND dbo.TSITEMHOURS.TS_ITEM_DATE = dbo.TSNOTES.TS_ITEM_DATE LEFT OUTER JOIN                        
+									 dbo.TSTYPE ON dbo.TSTIMESHEET.SITE_UID = dbo.TSTYPE.SITE_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID LEFT OUTER JOIN
+									 dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID
+		)
+		SELECT IDENTITY(bigint,1,1) ID, 
+				Username, [Resource Name], [SharePointAccountID], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], 
+				[ProjectID], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], 
+				[Period Start], [Period End],		 
+				[Submitted], [Approval Status],[PM Approval Status],[Approval Notes],
+				[lastmodifiedbyn], [TS_ITEM_NOTES], 
+				site_id, TS_ITEM_UID, Rate
+		INTO #META
+		FROM C1
+		WHERE HOURS > 0
+		AND site_id = '''''' + convert(varchar(50),@siteuid) + ''''''
+		OPTION (HASH JOIN)
+	'' 
+	+
+	''
+		;WITH
+		P0 AS (
+			SELECT M.ID, COALESCE (dbo.TSMETA.ListName + ''''_'''' + dbo.TSMETA.ColumnName, ''''TempColumn'''') AS ColumnName, dbo.TSMETA.ColumnValue
+			FROM #META M LEFT OUTER JOIN dbo.TSMETA ON M.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID	
+			UNION ALL
+			SELECT M.ID, COALESCE (dbo.TSMETA.ColumnName, ''''TempColumn'''') AS ColumnName, dbo.TSMETA.ColumnValue
+			FROM #META M LEFT OUTER JOIN dbo.TSMETA ON M.TS_ITEM_UID = dbo.TSMETA.TS_ITEM_UID AND M.LIST = dbo.TSMETA.ListName	
+			UNION ALL
+			SELECT M.ID, ''''Resource_'''' + dbo.TSRESMETA.ColumnName AS ColumnName, 
+			CASE dbo.TSRESMETA.ColumnName WHEN ''''StandardRate'''' THEN (CASE WHEN (M.Rate is null or M.Rate = '''''''') THEN dbo.TSRESMETA.ColumnValue ELSE M.Rate END) ELSE dbo.TSRESMETA.columnvalue  END AS ColumnValue
+			FROM #META M INNER JOIN dbo.TSRESMETA ON M.[Timesheet UID] = dbo.TSRESMETA.TS_UID	
+		)
+		SELECT * INTO #P0 FROM P0 
+	''
+	+
+	''
+		SELECT ID ''+ @cols +''			
+		INTO #P1
+		FROM (
+			SELECT ID, columnname, columnvalue 
+			FROM #P0 		
+			) ps PIVOT ( 
+			min (columnvalue) FOR columnname IN (
+				'' + substring(@cols,2,len(@cols)-1) + ''
+			)
+		) AS pvt
+	''
+	+
+	''
+		SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], LIST_UID, ITEM_ID, [Project], 
+			[ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], 
+			convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name],	
+			[Submitted], [Approval Status],[PM Approval Status],[Approval Notes], 
+			[lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] as [Item Notes]
+			''+@cols+'',
+			[Item UID], [Timesheet UID] 
+		INTO TempTSTable
+		FROM #META M JOIN #P1 P1 ON M.ID = P1.ID
+		OPTION (HASH JOIN)
+	''
+	+
+	''
+		DROP TABLE #P0
+		DROP TABLE #P1
+		DROP TABLE #META
+	''
+end
+else
+begin
+
+	set @sql = ''SELECT Username, [Resource Name], [SharePointAccountID], [Item Name], [Project], [ProjectID], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' 
+- '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status],[PM Approval Status],[Approval Notes], [lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] into  TempTSTable from vwmeta_V2 where hours > 0 and site_id = '''''' + convert(varchar(50),@siteuid) + ''''''''
+
+end
+set @sql=@sql+'' alter table TempTSTable add rpttsduid uniqueidentifier''
+set @sql=@sql+'' update TempTSTable set rpttsduid=newid()''
+
+ --print @sql
+--print @cols
+
+exec(@sql)
 END
 ')
 

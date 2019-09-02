@@ -9,6 +9,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Microsoft.SharePoint.Administration;
 using EPMLiveCore;
+using System.Diagnostics;
 
 namespace EPMLiveWorkPlanner
 {
@@ -203,10 +204,10 @@ namespace EPMLiveWorkPlanner
 
             try
             {
-                    oProject.Update();
+                oProject.Update();
             }
             catch
-            {  
+            {
                 //If user do not have access then  this method will update the SPList Without triggering any event.
                 using (new DisabledItemEventScope())
                 {
@@ -424,9 +425,9 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if (taskuid != "0")
                     {
+                        DataRow[] dr = null;
                         try
                         {
-                            DataRow[] dr = null;
                             try
                             {
                                 dr = dt.Select("taskuid='" + taskuid + "'");
@@ -533,15 +534,15 @@ namespace EPMLiveWorkPlanner
                             {
                                 sErrors += "Task (" + ndTask.SelectSingleNode("Title").InnerText + ") skipped because it is waiting for update.<br>";
                             }
-                            if (dr != null && dr.Length > 0)
-                            {
-                                dt.Rows.Remove(dr[0]);
-                            }
                         }
                         catch (Exception ex)
                         {
                             bErrors = true;
                             sErrors += "Error Task UID(" + taskuid + ") Error: " + ex.Message + "<br>";
+                        }
+                        if (dr != null && dr.Length > 0)
+                        {
+                            dt.Rows.Remove(dr[0]);
                         }
                         updateProgress(taskCount++);
                     }
@@ -555,7 +556,12 @@ namespace EPMLiveWorkPlanner
                             SPListItem l = list.GetItemById(int.Parse(dr["id"].ToString()));
                             l.Recycle();
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            bErrors = true;
+                            sErrors += "Error Task UID(" + dr["taskuid"] + ") Error: " + ex.Message + "<br>";
+                            Trace.TraceError("Exception Suppressed: {0}", ex);
+                        }
                     }
                 }
                 using (SqlConnection cn = CreateConnection())

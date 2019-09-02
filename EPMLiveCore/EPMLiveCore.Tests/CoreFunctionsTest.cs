@@ -41,6 +41,7 @@ namespace EPMLiveCore.Tests
         private string DummyUrl = "http://xyz.com";
         private int DummyUserId = 4;
         private string DummyString = "DummyString";
+        private const string DummyStringWithSpecialCharacters = "Dummy-String!#$%^&()_{}~`-";
 
         [TestInitialize]
         public void SetUp()
@@ -944,6 +945,16 @@ namespace EPMLiveCore.Tests
             // Assert
             Assert.AreEqual(1, _cryptographyShims.EncryptorsCreated.Count);
             Assert.IsTrue(_cryptographyShims.CheckIfAllEncryptorsDisposed());
+        }
+
+        [TestMethod]
+        public void GetTitleWithoutSpecialCharacters__OnValidCall_ConfirmResult()
+        {
+            // Arrange, Act
+            var result = CoreFunctions.GetTitleWithoutSpecialCharacters(DummyStringWithSpecialCharacters);
+
+            // Assert
+            Assert.AreEqual(result, DummyString);
         }
 
         [TestMethod]

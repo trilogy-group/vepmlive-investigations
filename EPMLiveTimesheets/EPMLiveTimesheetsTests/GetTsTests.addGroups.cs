@@ -10,6 +10,7 @@ using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 using TimeSheets.Fakes;
+using Microsoft.SharePoint;
 
 namespace TimeSheets.Tests
 {
@@ -18,7 +19,7 @@ namespace TimeSheets.Tests
         private IDisposable _shimContext;
         private SharepointShims _shimSharepointCalls;
         private PrivateObject _privateObject;
-        private AdoShims _adoShims;        
+        private AdoShims _adoShims;
 
         private const string AddGroupsMethod = "addGroups";
         private const string docXmlProperty = "docXml";
@@ -54,6 +55,7 @@ namespace TimeSheets.Tests
         private const string Rejected = "2";
 
         private const int Id = 0;
+        private int _userIndex = 0;
 
         [TestInitialize]
         public void TestInitialize()
@@ -62,8 +64,8 @@ namespace TimeSheets.Tests
             _shimSharepointCalls = SharepointShims.ShimSharepointCalls();
             _adoShims = AdoShims.ShimAdoNetCalls();
 
-            _privateObject = new PrivateObject(typeof(getts));            
-            
+            _privateObject = new PrivateObject(typeof(getts));
+
             ArrangeShims();
         }
 
@@ -127,11 +129,18 @@ namespace TimeSheets.Tests
             CommonTestData(Rejected, 0, EPMLiveTimesheets.Tests.Properties.Resources.addGroups_When_Rejected_1);
         }
 
+        [TestMethod]
+        public void AddGroups_When_Two_Projects()
+        {
+            TestConcecutiveNodes(0);
+        }
+
         private void CommonTestData(string approvalStatus1, int rowCount, string expected, string approvalStatus2 = "", string submitted = "")
         {
             // Arrange
             var queueAllItems = new Queue();
             queueAllItems.Enqueue(new ShimSPListItem().Instance);
+            _userIndex = 0;
 
             var docXml = new XmlDocument();
             docXml.LoadXml("<rows></rows>");
@@ -188,8 +197,120 @@ namespace TimeSheets.Tests
             actual.ShouldBe(expected);
         }
 
+        private void TestConcecutiveNodes(int rowCount)
+        {
+            // Arrange
+            var queueAllItems = new Queue();
+
+            SPListItem[] sPListItems = new SPListItem[2];
+
+            sPListItems[0] = new ShimSPListItem()
+            {
+                ItemGetGuid = (guid) =>
+                {
+                    return Guid.NewGuid();
+                },
+                IDGet = () =>
+                {
+                    return 0;
+                },
+                TitleGet = () =>
+                {
+                    return Name;
+                },
+                ItemGetString = (a) => { return string.Empty; }
+            };
+            sPListItems[1] = new ShimSPListItem()
+            {
+                ItemGetGuid = (guid) =>
+                {
+                    return Guid.NewGuid();
+                },
+                IDGet = () =>
+                {
+                    return 1;
+                },
+                TitleGet = () =>
+                {
+                    return Name + "1";
+                },
+                ItemGetString = (a) => { return string.Empty; }
+            };
+            _userIndex = 0;
+
+            queueAllItems.Enqueue(sPListItems[0]);
+            queueAllItems.Enqueue(sPListItems[1]);
+
+            var actualResNodes = _privateObject.GetFieldOrProperty(hshResNodesProperty) as Hashtable;
+            var actualItemNodes = _privateObject.GetFieldOrProperty(hshItemNodesProperty) as Hashtable;
+            var actual = GetXML(queueAllItems, rowCount);
+
+            // Assert
+            Assert.IsNotNull(actualResNodes);
+            Assert.AreEqual(2, actualResNodes.Count);
+
+            Assert.IsNotNull(actualItemNodes);
+            Assert.AreEqual(3, actualItemNodes.Count);
+
+            var firstIndex = actual.IndexOf("cell>project</cell>");
+            var lastIndex = actual.LastIndexOf("cell>project</cell>");
+
+            Assert.IsTrue(firstIndex > 0);
+            Assert.IsTrue(lastIndex > 0);
+            Assert.IsTrue(lastIndex > firstIndex);
+        }
+
+        private string GetXML(Queue items, int rowCount, string approvalStatus1 = "", string approvalStatus2 = "", string submitted = "")
+        {
+            var docXml = new XmlDocument();
+            docXml.LoadXml("<rows></rows>");
+
+            var ndMainParent = docXml.ChildNodes[0];
+
+            var arrItems = new SortedList();
+            arrItems.Add(0.ToString(), Group);
+            arrItems.Add(1.ToString(), Group);
+
+            var dayDefs = new[] { True, True, True, True };
+
+            _privateObject.SetFieldOrProperty(docXmlProperty, docXml);
+            _privateObject.SetFieldOrProperty(ndMainParentProperty, ndMainParent);
+            _privateObject.SetFieldOrProperty(queueAllItemsProperty, items);
+            _privateObject.SetFieldOrProperty(arrItemsProperty, arrItems);
+
+            _privateObject.SetFieldOrProperty(dsTimesheetsProperty, new ShimDataSet().Instance);
+            _privateObject.SetFieldOrProperty(dsTimesheetTasksProperty, new ShimDataSet().Instance);
+            _privateObject.SetFieldOrProperty(dsTimesheetTaskHoursProperty, new ShimDataSet().Instance);
+            _privateObject.SetFieldOrProperty(dsTimesheetNotesProperty, new ShimDataSet().Instance);
+            _privateObject.SetFieldOrProperty(dsTimesheetTypesProperty, new ShimDataSet().Instance);
+
+            _privateObject.SetFieldOrProperty(dayDefsProperty, dayDefs);
+
+            ShimDataRow.AllInstances.ItemGetString = (a, key) =>
+            {
+                switch (key)
+                {
+                    case Project: return Project;
+                    case ApprovalStatus1: return approvalStatus1;
+                    case ApprovalStatus2: return approvalStatus2;
+                    case Submitted: return submitted;
+                    case Hours: return "1";
+                    default: return string.Empty;
+                };
+            };
+
+            ShimDataRowCollection.AllInstances.CountGet = _ => rowCount;
+
+            // Act
+            _privateObject.Invoke(AddGroupsMethod, new ShimSPWeb().Instance);
+
+            return docXml.OuterXml;
+        }
+
+
         private void ArrangeShims()
         {
+
             ShimSPListItem.AllInstances.IDGet = _ => Id;
             ShimSPListItem.AllInstances.ItemGetString = (a, b) => string.Empty;
             ShimSPListItem.AllInstances.TitleGet = _ => Name;
@@ -210,7 +331,7 @@ namespace TimeSheets.Tests
             ShimSPFieldUserValue.AllInstances.UserGet = _ => new ShimSPUser();
 
             ShimSPUser.AllInstances.NameGet = _ => Name;
-            ShimSPUser.AllInstances.LoginNameGet = _ => LoginName;
+            ShimSPUser.AllInstances.LoginNameGet = _ => LoginName + _userIndex++;
 
             ShimDataRowCollection.AllInstances.GetEnumerator = _ =>
             {

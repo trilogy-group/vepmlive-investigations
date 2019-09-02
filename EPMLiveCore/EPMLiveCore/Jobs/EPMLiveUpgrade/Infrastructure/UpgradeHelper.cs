@@ -27,6 +27,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V703,
         V706,
         V710,
+        V711,
         GENERIC
     }
 

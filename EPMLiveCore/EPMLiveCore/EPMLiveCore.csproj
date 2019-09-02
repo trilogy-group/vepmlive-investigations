@@ -259,6 +259,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\701Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\700Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\710Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\711Steps.cs" />
     <Compile Include="JsonUtilHelper.cs" />
     <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
     <Compile Include="Layouts\epmlive\sitepermissions.Helpers.aspx.cs">
@@ -1389,6 +1390,7 @@
     <Compile Include="ResourcePermissions\ResourcePermissionsFieldControl.cs" />
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
+    <Compile Include="SaveDataJobExecuteCache.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\Creatables.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\Error.cs" />

@@ -64,7 +64,8 @@ namespace EPMLiveReportsAdmin
         {
             try
             {
-                if (Initialize(true, properties))
+                // We are sending false here because delete event does not need column information. it is required in Insert and Update event to create SQL statements
+                if (Initialize(false, properties))
                 {
                     DeleteItem();
 
@@ -74,13 +75,22 @@ namespace EPMLiveReportsAdmin
                         _myWorkReportData.DeleteWork(_listId, _properties.ListItemId);
                     }
                 }
-
-                _myWorkReportData.Dispose();
+                else
+                {
+                    properties.Status = SPEventReceiverStatus.CancelWithError;
+                    properties.ErrorMessage = $"Failed to delete item: {properties.BeforeProperties["Title"]}";
+                }
             }
             catch (Exception exception)
             {
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+                properties.ErrorMessage = exception.Message;
                 SPSecurity.RunWithElevatedPrivileges(
                     () => LogEvent(exception, 6003, "EPMLive My Work Reporting Item Deleting"));
+            }
+            finally
+            {
+                _myWorkReportData?.Dispose();
             }
         }
 
@@ -117,7 +127,7 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         private bool DeleteItem()
         {
-           return _myWorkReportData.DeleteListItem(GetSql("DELETE"));
+            return _myWorkReportData.DeleteListItem(GetSql("DELETE"));
         }
 
         private Dictionary<string, object> GetItemFieldValueFromDB(string listId, string itemId)
@@ -207,10 +217,10 @@ namespace EPMLiveReportsAdmin
                 _siteName = _myWorkReportData.SiteName;
                 _siteUrl = _myWorkReportData.SiteUrl;
 
-                _currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
-
                 if (!populateColumns)
                     return true;
+
+                _currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
 
                 _defaultColumns = new ArrayList { "siteid", "webid", "listid", "itemid", "weburl" };
                 _mandatoryHiddenFlds = new ArrayList
@@ -222,14 +232,20 @@ namespace EPMLiveReportsAdmin
                 };
 
                 _listColumns = _myWorkReportData.GetListColumns("My Work");
+
+                if (_listColumns == null)
+                    return false;
+
                 _listColumns = _listColumns.DefaultView.ToTable(true,
                     (from DataColumn dataColumn in _listColumns.Columns
                      select dataColumn.ColumnName).ToArray());
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                SPSecurity.RunWithElevatedPrivileges(
+                       () => LogEvent(exception, 6004, "EPMLive My Work Reporting Item Initializing"));
                 return false;
             }
         }

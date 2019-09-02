@@ -203,7 +203,7 @@ namespace WorkEnginePPM
         }
         private void UpdateGroupsNames(SPItemEventProperties properties, string projectNameDB, string projectNameNew)
         {
-            properties.ListItem.RoleAssignments.OfType<SPRoleAssignment>()?.ToList()?.ForEach(role =>
+            SaveDataJobExecuteCache.GetListItem(properties).RoleAssignments.OfType<SPRoleAssignment>()?.ToList()?.ForEach(role =>
             {
                 if (role != null && role.Member != null &&
                     role.Member is SPGroup && role.Member.Name != null)
@@ -214,8 +214,10 @@ namespace WorkEnginePPM
                         role.Member.Name = $"{projectNameNew} {ProjectGroupOwner}";
                     else if (role.Member.Name.IndexOf($"{projectNameDB} {ProjectGroupMember}", StringComparison.OrdinalIgnoreCase) != -1)
                         role.Member.Name = $"{projectNameNew} {ProjectGroupMember}";
-                    else
+                    else if (role.Member.Name.IndexOf($"{projectNameDB}", StringComparison.OrdinalIgnoreCase) != -1)
                         role.Member.Name = role.Member.Name.Replace(projectNameDB, projectNameNew);
+                    else
+                        role.Member.Name = role.Member.Name.Replace(CoreFunctions.GetTitleWithoutSpecialCharacters(projectNameDB), projectNameNew);
 
                     ((SPGroup)role.Member).Update();
                 }
@@ -224,8 +226,9 @@ namespace WorkEnginePPM
 
         private void processItem(SPItemEventProperties properties)
         {
+            var listItem = SaveDataJobExecuteCache.GetListItem(properties);
             //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99900, "WorkEnginePPM", "processItem", "Entry", "");
-            if (properties.ListItem != null)
+            if (listItem != null)
             {
                 Hashtable hshFields = new Hashtable();
                 Hashtable hshFields2 = new Hashtable();
@@ -237,10 +240,11 @@ namespace WorkEnginePPM
                 catch { }
                 try
                 {
-                    using (SPSite site = new SPSite(properties.SiteId))
+                    var site = SaveDataJobExecuteCache.GetSiteFromCache(properties.SiteId, false, () => new SPSite(properties.SiteId));
+                    try
                     {
 
-                        string fields = ConfigFunctions.getConfigSetting(site.RootWeb, "EPK" + properties.List.Title.Replace(" ", "") + "_fields");
+                        string fields = ConfigFunctions.getConfigSetting(site.RootWeb, "EPK" + SaveDataJobExecuteCache.GetList(properties).Title.Replace(" ", "") + "_fields");
 
                         if (fields == "")
                             fields = ConfigFunctions.getConfigSetting(site.RootWeb, "epkportfoliofields");
@@ -260,7 +264,7 @@ namespace WorkEnginePPM
                         string xml = "<Items>";
 
                         var dtResources = HelperFunctions.GetResourcePool(properties.Web);
-                        xml += ConfigFunctions.getItemXml(properties.ListItem, hshFields, properties.AfterProperties, properties.Web, dtResources);
+                        xml += ConfigFunctions.getItemXml(listItem, hshFields, properties.AfterProperties, properties.Web, dtResources);
 
                         xml += "</Items>";
 
@@ -289,8 +293,8 @@ namespace WorkEnginePPM
                         CStruct xUpdatePortfolioItems = xReply.GetSubStruct("UpdatePortfolioItems");
                         if (xUpdatePortfolioItems != null)
                         {
-                            SPList list = properties.ListItem.ParentList;
-                            string sItemID = list.ParentWeb.ID + "." + list.ID + "." + properties.ListItem.ID;
+                            SPList list = listItem.ParentList;
+                            string sItemID = list.ParentWeb.ID + "." + list.ID + "." + listItem.ID;
                             // <Item ItemId="cda5677f-08b8-44ab-8c63-f287d6200cd9.ec269b62-7fe5-47c9-8614-bb9752d4b8e8.3" ID="2" Error="2" ErrorText="Field Name 20017 not found"/>
                             // look for any item errors
                             List<CStruct> lstItems = xUpdatePortfolioItems.GetList("Item");
@@ -425,6 +429,10 @@ namespace WorkEnginePPM
                         //    properties.ErrorMessage = "Error processing item: Unable to get status from Portfolio Integration.";
                         //    //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99904, "WorkEnginePPM", "processItem", "error2", properties.ErrorMessage);
                         //}
+                    }
+                    finally
+                    {
+                        SaveDataJobExecuteCache.DisposeSite(site);
                     }
                 }
                 catch (Exception ex)

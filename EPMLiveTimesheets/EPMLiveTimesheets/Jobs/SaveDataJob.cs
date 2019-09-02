@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Data;
 using System.Xml;
 using System.Data.SqlClient;
-using Microsoft.SharePoint;
-using System.Collections;
-using EPMLiveCore;
-using EPMLiveCore.API;
 using System.Diagnostics;
+using Microsoft.SharePoint;
+using EPMLiveCore;
 
 namespace TimeSheets
 {
     class SaveDataJob : BaseJob
     {
+        private const int MaxTaskFailures = 32;
+        private const int SaveConflictErrorCode = unchecked((int)0x81020037);
+
         private string NonUpdatingColumns = "Project,AssignedTo";
         SPList WorkList;
 
@@ -83,55 +82,81 @@ namespace TimeSheets
 
                             SPUser editUser = site.RootWeb.AllUsers.GetByID(base.userid);
 
-                            using (SqlCommand cmd2 = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn))
+                            using (var cache = SaveDataJobExecuteCache.InitializeCache(site))
                             {
-                                cmd2.Parameters.AddWithValue("@tsuid", base.TSUID);
-                                using (SqlDataAdapter da = new SqlDataAdapter(cmd2))
+                                using (SqlCommand cmd2 = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn))
                                 {
-                                    da.Fill(dsItems);
-                                    dtItems = dsItems.Tables[0];
-
-                                    XmlNodeList ndItems = docTimesheet.FirstChild.SelectNodes("Item");
-
-                                    float percent = 0;
-                                    float count = 0;
-                                    float total = ndItems.Count;
-
-                                    using (SqlCommand cmd3 = new SqlCommand("update TSQUEUE set percentcomplete=2 where TSQUEUE_ID=@QueueUid", cn))
+                                    cmd2.Parameters.AddWithValue("@tsuid", base.TSUID);
+                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd2))
                                     {
-                                        cmd3.Parameters.AddWithValue("@queueuid", QueueUid);
-                                        cmd3.ExecuteNonQuery();
-                                    }
-                                    foreach (XmlNode ndItem in ndItems)
-                                    {
-                                        string worktype = "";
+                                        da.Fill(dsItems);
+                                        dtItems = dsItems.Tables[0];
 
-                                        try
+                                        XmlNodeList ndItems = docTimesheet.FirstChild.SelectNodes("Item");
+
+                                        float percent = 0;
+                                        float count = 0;
+                                        float total = ndItems.Count;
+
+                                        using (SqlCommand cmd3 = new SqlCommand("update TSQUEUE set percentcomplete=2 where TSQUEUE_ID=@QueueUid",
+                                            cn))
                                         {
-                                            worktype = ndItem.Attributes["WorkTypeField"].Value;
+                                            cmd3.Parameters.AddWithValue("@queueuid", QueueUid);
+                                            cmd3.ExecuteNonQuery();
                                         }
-                                        catch { }
 
-                                        ProcessItemRow(ndItem, ref dtItems, cn, site, settings, liveHours, worktype == settings.NonWorkList);
-
-                                        count++;
-                                        float pct = count / total * 98;
-
-                                        if (pct >= percent + 10)
-                                        {
-                                            using (SqlCommand cmd4 = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                        string preloadErrors;
+                                        var preloadHasErrors =
+                                            cache.PreloadListItems(ndItems.Cast<XmlNode>().Select(i => new SaveDataJobExecuteCache.ListItemInfo
                                             {
-                                                cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
-                                                cmd4.Parameters.AddWithValue("@pct", pct);
-                                                cmd4.ExecuteNonQuery();
+                                                WebId = iGetAttribute(i, "WebID"),
+                                                ListId = iGetAttribute(i, "ListID"),
+                                                ListItemId = iGetAttribute(i, "ItemID")
+                                            }), out preloadErrors);
+                                        if (preloadHasErrors)
+                                        {
+                                            bErrors = true;
+                                            sErrors += preloadErrors;
+                                        }
+
+                                        foreach (XmlNode ndItem in ndItems)
+                                        {
+                                            string worktype = "";
+
+                                            try
+                                            {
+                                                worktype = ndItem.Attributes["WorkTypeField"].Value;
                                             }
-                                            percent = pct;
+                                            catch
+                                            {
+                                            }
+
+                                            ProcessItemRow(ndItem, dtItems, cn, site, settings, liveHours, worktype == settings.NonWorkList);
+
+                                            count++;
+                                            float pct = count / total * 98;
+
+                                            if (pct >= percent + 10)
+                                            {
+                                                using (SqlCommand cmd4 =
+                                                    new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                                {
+                                                    cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
+                                                    cmd4.Parameters.AddWithValue("@pct", pct);
+                                                    cmd4.ExecuteNonQuery();
+                                                }
+
+                                                percent = pct;
+                                            }
                                         }
                                     }
                                 }
+
+                                if (liveHours)
+                                {
+                                    sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
+                                }
                             }
-                            if (liveHours)
-                                sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
                         }
                     }
                     else
@@ -139,8 +164,6 @@ namespace TimeSheets
                         bErrors = true;
                         sErrors = "Timesheet does not exist";
                     }
-
-
                 }
                 catch (Exception ex)
                 {
@@ -158,7 +181,7 @@ namespace TimeSheets
             }
         }
 
-        private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
+        private void ProcessItemRow(XmlNode ndRow, DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
             if (id != "")
@@ -182,86 +205,93 @@ namespace TimeSheets
                         {
                             if (itemid != "")
                             {
-
-
                                 try
                                 {
+                                    var web = SaveDataJobExecuteCache.Cache.GetWeb(webid);
+                                    SPListItem li = null;
 
-                                    using (SPWeb web = site.OpenWeb(new Guid(webid)))
+                                    var list = web.Lists[new Guid(listid)];
+
+                                    var failures = 0;
+                                    while (true)
                                     {
-                                        SPListItem li = null;
-
-                                        SPList list = web.Lists[new Guid(listid)];
-
+                                    try
+                                    {
                                         try
                                         {
+                                                li = SaveDataJobExecuteCache.Cache.GetListItem(web.ServerRelativeUrl, list.ID, int.Parse(itemid), refresh: failures > 0);
+                                        }
+                                        catch
+                                        {
+                                        }
+
+                                        if (li != null)
+                                        {
+                                            int projectid = 0;
+                                            string project = "";
+                                            string projectlist = "";
                                             try
                                             {
-                                                li = list.GetItemById(int.Parse(itemid));
+                                                SPFieldLookupValue lv =
+                                                    new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
+                                                projectid = lv.LookupId;
+                                                project = lv.LookupValue;
                                             }
-                                            catch { }
-
-                                            if (li != null)
+                                            catch
                                             {
-                                                int projectid = 0;
-                                                string project = "";
-                                                string projectlist = "";
-                                                try
+                                            }
+
+                                            if (liveHours)
+                                            {
+                                                if (!processLiveHours(li, list.ID))
                                                 {
-                                                    SPFieldLookupValue lv = new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
-                                                    projectid = lv.LookupId;
-                                                    project = lv.LookupValue;
+                                                    return;
                                                 }
-                                                catch { }
 
-
-                                                if (liveHours)
+                                                if (li.Fields.ContainsFieldWithInternalName("PercentComplete") &&
+                                                    li.Fields.ContainsFieldWithInternalName("Status"))
                                                 {
-                                                    processLiveHours(li, list.ID);
-                                                    if (li.Fields.ContainsFieldWithInternalName("PercentComplete") && li.Fields.ContainsFieldWithInternalName("Status"))
+                                                    SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
+                                                    SPField statusField = li.Fields.GetFieldByInternalName("Status");
+                                                    if (percentCompleteField != null && statusField != null)
                                                     {
-                                                        SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
-                                                        SPField statusField = li.Fields.GetFieldByInternalName("Status");
-                                                        if (percentCompleteField != null && statusField != null)
+                                                        Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
+                                                        if (value == 0)
                                                         {
-                                                            Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
-                                                            if (value == 0)
-                                                            {
-                                                                li[statusField.InternalName] = "Not Started";
-                                                            }
-                                                            else if (value > 0 & value < 1)
-                                                            {
-                                                                li[statusField.InternalName] = "In Progress";
-                                                            }
-                                                            else if (value == 1)
-                                                            {
-                                                                li[statusField.InternalName] = "Completed";
-                                                            }
+                                                            li[statusField.InternalName] = "Not Started";
                                                         }
-
+                                                        else if (value > 0 & value < 1)
+                                                        {
+                                                            li[statusField.InternalName] = "In Progress";
+                                                        }
+                                                        else if (value == 1)
+                                                        {
+                                                            li[statusField.InternalName] = "Completed";
+                                                        }
                                                     }
-                                                }
-                                                SPSecurity.RunWithElevatedPrivileges(delegate ()
-                                                {
-                                                    li.Update();
-                                                });
 
+                                                }
+                                            }
+
+                                                SPSecurity.RunWithElevatedPrivileges(delegate { li.Update(); });
                                             }
                                         }
-                                        catch (Exception ex)
+                                        catch (SPException ex) when (ex.HResult == SaveConflictErrorCode && ++failures < MaxTaskFailures)
                                         {
-                                            bErrors = true;
-                                            sErrors += "Item (" + id + ") Error: " + ex.ToString();
-                                        }
-
-
+                                            continue;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        bErrors = true;
+                                        sErrors += "Item (" + id + ") Error: " + ex.ToString();
                                     }
 
+                                        break;
+                                    }
                                 }
-                                catch { }
-
-
-
+                                catch
+                                {
+                                }
                             }
                             else
                             {
@@ -286,9 +316,12 @@ namespace TimeSheets
                     bErrors = true;
                     sErrors += "Item (" + id + ") Error x2: " + ex.ToString();
                 }
-                if (drItem.Length > 0)
+                finally
                 {
-                    dtItems.Rows.Remove(drItem[0]);
+                    if (drItem.Length > 0)
+                    {
+                        dtItems.Rows.Remove(drItem[0]);
+                    }
                 }
             }
             else
@@ -298,7 +331,7 @@ namespace TimeSheets
             }
         }
 
-        private void processLiveHours(SPListItem li, Guid listguid)
+        private bool processLiveHours(SPListItem li, Guid listguid)
         {
 
             double hours = 0;
@@ -309,7 +342,8 @@ namespace TimeSheets
                     cn.Open();
                     if (li != null)
                     {
-                        using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
+                        using (SqlCommand cmdHours =
+                            new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
                         {
                             cmdHours.Parameters.AddWithValue("@listuid", listguid);
                             cmdHours.Parameters.AddWithValue("@itemid", li.ID);
@@ -320,16 +354,26 @@ namespace TimeSheets
                                         hours = dr1.GetDouble(0);
                                 dr1.Close();
                             }
-                            li["TimesheetHours"] = hours;
+
+                            if (li["TimesheetHours"] as double? != hours)
+                            {
+                                li["TimesheetHours"] = hours;
+                                return true;
+                            }
                         }
 
                     }
                 }
-                catch { }
+                catch
+                {
+                    return true; // Perform update if no TimesheetHours field, e.g. for non-work items
+                }
             }
+
+            return false;
         }
 
-        public static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
+        private static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
         {
             string error = "";
             //SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -355,10 +399,24 @@ namespace TimeSheets
                         //cmd.Parameters.AddWithValue("@TS_UID", tsuid);
                         //SqlDataReader dr = cmd.ExecuteReader();
 
-                        Guid webGuid = new Guid();
-                        Guid listGuid = new Guid();
                         SPWeb iWeb = null;
-                        SPList iList = null;
+
+                        string preloadErrors;
+                        var preloadHasErrors =
+                            SaveDataJobExecuteCache.Cache.PreloadListItems(dsProjects.Tables[0].Rows.Cast<DataRow>().Select(r =>
+                            {
+                                var listItemId = r["Project_id"].ToString();
+                                return new SaveDataJobExecuteCache.ListItemInfo
+                                {
+                                    WebId = r["WEB_UID"].ToString(),
+                                    ListId = r["PROJECT_LIST_UID"].ToString(),
+                                    ListItemId = listItemId != "0" ? listItemId : null
+                                };
+                            }), out preloadErrors);
+                        if (preloadHasErrors)
+                        {
+                            error += preloadErrors;
+                        }
 
                         foreach (DataRow drProject in dsProjects.Tables[0].Rows)
                         {
@@ -366,34 +424,11 @@ namespace TimeSheets
                             {
                                 if (drProject["PROJECT_LIST_UID"].ToString() != "")
                                 {
-                                    Guid wGuid = new Guid(drProject["WEB_UID"].ToString());
                                     Guid lGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
 
-                                    if (webGuid != wGuid)
-                                    {
-                                        try
-                                        {
-                                            if (iWeb != null)
-                                            {
-                                                iWeb.Close();
-                                                iWeb = site.OpenWeb(wGuid);
-                                            }
-                                            else
-                                                iWeb = site.OpenWeb(wGuid);
-                                            webGuid = iWeb.ID;
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Trace.TraceError("Exception Suppressed: {0}", ex);
-                                        }
-                                    }
+                                    iWeb = SaveDataJobExecuteCache.Cache.GetWeb(drProject["WEB_UID"].ToString());
                                     if (iWeb != null)
                                     {
-                                        if (listGuid != lGuid)
-                                        {
-                                            iList = iWeb.Lists[lGuid];
-                                            listGuid = iList.ID;
-                                        }
                                         iWeb.AllowUnsafeUpdates = true;
                                         string project = drProject["Project_id"].ToString();
                                         if (project != "0")
@@ -402,13 +437,16 @@ namespace TimeSheets
                                             {
                                                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                                                 {
-                                                    SPListItem liProject = iList.GetItemById(int.Parse(project));
-                                                    liProject["TimesheetHours"] = drProject["Hours"].ToString();
-                                                    liProject.Update();
+                                                var liProject = SaveDataJobExecuteCache.Cache.GetListItem(iWeb.ServerRelativeUrl, lGuid, int.Parse(project));
+                                                var newHours = drProject["Hours"].ToString();
+                                                if (liProject["TimesheetHours"]?.ToString() != newHours)
+                                                {
+                                                    liProject["TimesheetHours"] = newHours;
+                                                        liProject.Update();
+                                                }
                                                 });
                                             }
-                                            catch (Exception ex)
-                                            {
+                                            catch(Exception ex) {
                                                 Trace.TraceError("Exception Suppressed: {0}", ex);
                                             }
                                         }
@@ -417,7 +455,7 @@ namespace TimeSheets
                             }
                             catch (Exception exception)
                             {
-                                error += "Error: " + exception.ToString() + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
+                                error += "Error: " + exception.ToString() + "<br>SharePoint User: " + iWeb?.CurrentUser.Name + "<br><br><br>";
                             }
                         }
 

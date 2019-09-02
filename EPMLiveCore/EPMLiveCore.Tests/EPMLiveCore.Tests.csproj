@@ -262,6 +262,7 @@
     <Compile Include="Jobs\SecurityUpdatesRemTests.cs" />
     <Compile Include="Jobs\SecurityUpdatesTests.cs" />
     <Compile Include="Jobs\TimerFixTests.cs" />
+    <Compile Include="Jobs\Upgrades\Steps\InvalidDataCleanUpMyWorkTest.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\AddListDataTests.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePoolTests.cs" />
     <Compile Include="Layouts\epmlive\AdsyncAdminTests.cs" />
@@ -329,6 +330,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="TestCheck.cs" />
+    <Compile Include="SaveDataJobExecuteCacheTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\AsyncResultTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CaseSettingsTest.cs" />
     <Compile Include="Web References\SalesforceMetadataService\CustomFieldTest.cs" />
