@@ -19,7 +19,7 @@ pipeline {
         string(name: 'StagingPassword', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 		string(name: 'StagingAppUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Staging SharePoint application url for deployment')
         
-		string(name: 'Staging2TargetHost', defaultValue: '10.25.2.85,10.25.2.57,10.25.2.54', description: 'Staging Target hosts to deploy to')
+		string(name: 'Staging2TargetHost', defaultValue: '10.25.2.85,10.25.2.54', description: 'Staging Target hosts to deploy to')
 		string(name: 'Staging2UserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'Staging2Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 
