@@ -162,10 +162,11 @@ namespace EPMLiveTimesheets.Tests
                 dataTable.Columns.Add("PROJECT_ID");
                 dataTable.Columns.Add("SITE_UID");
                 dataTable.Columns.Add("LIST_UID");
+                dataTable.Columns.Add("TS_ITEM_UID");
                 dataTable.Columns.Add("WEB_UID");
                 dataTable.Columns.Add("ITEM_ID");
                 dataTable.Columns.Add("LIST");
-                dataTable.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString });
+                dataTable.Rows.Add(new object[] { DummyString, DummyInt, DummyGuid, DummyGuid, DummyGuid, DummyGuid, DummyInt, DummyString });
 
                 ShimMyWorkReportData.AllInstances.ExecuteSqlString = (instance, _string) => GetDataTable();
                 return DummyInt;
