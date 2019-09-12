@@ -1,0 +1,92 @@
+pipeline { 
+	agent {
+		node {
+			label 'skyvera-non-docker-jenkins-win-build-prod'
+			customWorkspace "c:\\jenkins\\build"
+		}
+	}
+	options {
+		skipDefaultCheckout true
+		timestamps()
+		timeout(time: 2, unit: 'HOURS') 
+	}
+	parameters {
+		string(name: 'TargetHost', defaultValue: '10.25.8.94,10.25.8.96,10.25.8.97', description: 'Target host(s) to deploy to')
+		string(name: 'UserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
+		string(name: 'Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
+		string(name: 'PackageTarget', defaultValue: 'c:\\SilentInstaller', description: 'Folder on the target host to copy packages to')
+		string(name: 'FullHostName', defaultValue: 'https://apps22.epmlive.com', description: 'Target full host name')
+	    string(name: 'DoDeploy', defaultValue: 'True', description: 'Are you sure you want to deploy?')
+	}
+	stages {
+		stage('Prepare to build') {
+			steps {
+				echo 'Cleanup previous build workspace...'
+				dir ("${env.WORKSPACE}") {
+					deleteDir()
+				}
+				powershell "Write-Host 'Disk space usage:'(Get-PSDrive C | Select-Object Used,Free)"
+				
+				echo 'Checkout SCM...'
+				checkout scm
+			}
+		}
+		stage('Downloading artifacts') {
+			steps {
+				script {
+					def rootProjectName = '../'
+					echo 'Getting artifacts from Release branch with the same name as this branch'
+					env.FULLRC_BRANCH_NAME = currentBuild.getProjectName()
+					env.FULLRC_JOB_NAME = makeJobName(rootProjectName, 'EPML-RC', env.FULLRC_BRANCH_NAME)
+					readArtifactsFromBranch(env.FULLRC_JOB_NAME, params.FullRcBranchBuild?.trim())
+					echo 'Extracting build version...'
+					env.BUILD_VERSION = readFile("${env.WORKSPACE}/build_version.txt").readLines()[0]
+					echo "Build version is ${env.BUILD_VERSION}"
+				}
+			}
+		}
+		stage('Deploying') {
+			steps {
+				echo 'Executing deploy (upgrade) script...'
+				powershell "${env.WORKSPACE}/BuildTeamcity/DeployRemotely.ps1 -username \"${params.UserName}\" -password \"${params.Password}\" -webAppName \"${params.FullHostName}\" -buildNumber \"${env.BUILD_VERSION}\" -serverIPs ${params.TargetHost} -doDeploy \$${params.DoDeploy}"
+			}
+		}
+	}
+	post {
+	   
+		cleanup {
+		   
+			powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+			echo 'Cleanup workspace...'
+			dir ("${env.WORKSPACE}") {
+				deleteDir()
+			}
+			powershell "Write-Host 'Disk space usage after cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
+		}
+	}
+}
+
+def readArtifactsFromBranch(jobName, buildNumber) {
+	if (buildNumber) {
+		echo "Reading artifacts from ${jobName} (build #${buildNumber})"
+		buildSelector = [$class: 'hudson.plugins.copyartifact.SpecificBuildSelector', buildNumber: "#${buildNumber}"]
+	} else {
+		echo "Reading artifacts from ${jobName} (latest successful build)"
+		buildSelector = [$class: 'hudson.plugins.copyartifact.StatusBuildSelector', stable: true] // Selects latest successful build
+	}
+	try {
+		step (
+			[$class: "CopyArtifact",
+			projectName: jobName,
+			filter: "build_version.txt, SilentInstaller*.zip",
+			target: "${env.WORKSPACE}",
+			selector: buildSelector])
+	} catch (ex) {
+		echo ex.toString()
+		throw ex
+	}
+}
+
+def makeJobName(rootProjectName, parentJobName, branchName) {
+	return rootProjectName + parentJobName + '/' + branchName
+}
