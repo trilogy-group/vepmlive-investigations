@@ -3,7 +3,8 @@ Param(
 	[string]$password = '%epmlive.qa.farmadmin.password%',
 	[string]$webAppName = '%epmlive.qa.webAppName%',
 	[string]$buildNumber = '%build.number%',
-	[string[]]$serverIPs = '%epmlive.qa.ip%'
+	[string[]]$serverIPs = '%epmlive.qa.ip%',
+	[bool]$doDeploy = $true
 )
 
 Write-Host 'Configuring PS Remote locally'
@@ -51,7 +52,10 @@ foreach ($serverIP in $serverIPs)
 		Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 		C:\SilentInstaller\deploy.ps1 $username $password $webAppName $buildNumber -deploySolutions
 		")
-		Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName Microsoft.ipam
+		if ($doDeploy)
+		{
+			#Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName Microsoft.ipam
+		}
 	}
 	else
 	{
@@ -59,7 +63,10 @@ foreach ($serverIP in $serverIPs)
 		Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 		C:\SilentInstaller\deploy.ps1 $username $password $webAppName $buildNumber
 		")
-		Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock
+		if ($doDeploy)
+		{
+			#Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock
+		}
 	}
 	Write-Host "Run complete $serverIP"
 	$serverIndex = $serverIndex + 1;
