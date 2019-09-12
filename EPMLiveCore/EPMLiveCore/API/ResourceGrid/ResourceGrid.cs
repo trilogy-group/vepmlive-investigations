@@ -21,6 +21,7 @@ namespace EPMLiveCore.API
         #region Fields (2)
 
         private const string COMPONENT_NAME = "ResourceGrid";
+        private const string EPMLiveResourceGridPersonalView = "EPMLiveResourceGridPersonalView";
         private static readonly Dictionary<string, string> _resourceDictionary = new Dictionary<string, string>();
 
         #endregion Fields
@@ -1348,6 +1349,17 @@ namespace EPMLiveCore.API
                             }
 
                             gridViewManager.Add(gridView);
+
+                            if(gridViewManager.Key.Equals(EPMLiveResourceGridPersonalView))
+                            {
+                                var gridViewManagerGlobal = gridViewManagerFactory.MakeGridViewManager(COMPONENT_NAME, GridViewManagerKind.Global);
+                                gridViewManagerGlobal.Remove(gridView);
+                            }
+                            else
+                            {
+                                var gridViewManagerPersonal = gridViewManagerFactory.MakeGridViewManager(COMPONENT_NAME, GridViewManagerKind.Personal);
+                                gridViewManagerPersonal.Remove(gridView);
+                            }
                         }
                     }
                 }

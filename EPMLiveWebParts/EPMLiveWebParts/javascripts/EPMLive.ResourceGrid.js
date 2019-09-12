@@ -534,6 +534,11 @@ function registerEpmLiveResourceGridScript() {
                                 $$.views.collection[view.id] = view;
                                 $$.views.apply(view.id);
 
+                                if ($$.views.currentView != undefined) {
+                                    $$.views.currentView.ispersonal = view.ispersonal;
+                                    $$.views.currentView.isdefault = view.isdefault;
+                                }
+
                                 setTimeout(function () { SP.UI.Notify.removeNotification(notifyId); }, 1000);
                             } else {
                                 $$$.logFailure(responseJson.Result);

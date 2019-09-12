@@ -86,7 +86,9 @@
                         if ((C == "StartDate" || C == "DueDate") && ugrid.GetValue(oRow, C) == "") {
                         }
                         else {
-                            parent.SetPlannerFieldValue(oToRow, C, ugrid.GetValue(oRow, C), true);
+                            if (oToRow.Level > 1 || C !== "AssignedTo") {
+                                parent.SetPlannerFieldValue(oToRow, C, ugrid.GetValue(oRow, C), true);
+                            }
                         }
                     } catch (e) { }
                 }

@@ -313,6 +313,11 @@ begin
 	end
 end
 
+if not exists(select * from sys.indexes where name = 'IX_PERSONALIZATIONS_KEY_USERID')
+begin
+	CREATE NONCLUSTERED INDEX [IX_PERSONALIZATIONS_KEY_USERID] ON [dbo].[PERSONALIZATIONS] ([Key] ASC, [UserId] ASC) INCLUDE ([Value], [SiteId], [FK]) 
+end 
+
 ---------------------EMAILTEMPLATES-----------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EMAILTEMPLATES')
 begin
@@ -367,6 +372,10 @@ begin
 	end
 end
 
+if not exists(select * from sys.indexes where name = 'IX_NOTIFICATIONS_TYPE')
+begin
+	CREATE NONCLUSTERED INDEX [IX_NOTIFICATIONS_TYPE] ON [dbo].[NOTIFICATIONS] ([Type] ASC)INCLUDE ([ID]) 
+end 
 
 -----------------------------------TAGS------------------------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'TAGS')
