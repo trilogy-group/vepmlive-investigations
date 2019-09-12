@@ -48,7 +48,7 @@ pipeline {
 		stage('Deploying') {
 			steps {
 				echo 'Executing deploy (upgrade) script...'
-				powershell "${env.WORKSPACE}/BuildTeamcity/DeployRemotely.ps1 -username \"${params.UserName}\" -password \"${params.Password}\" -webAppName \"${params.FullHostName}\" -buildNumber \"${env.BUILD_VERSION}\" -serverIPs ${params.TargetHost} -doDeploy $${params.DoDeploy}"
+				powershell "${env.WORKSPACE}/BuildTeamcity/DeployRemotely.ps1 -username \"${params.UserName}\" -password \"${params.Password}\" -webAppName \"${params.FullHostName}\" -buildNumber \"${env.BUILD_VERSION}\" -serverIPs ${params.TargetHost} -doDeploy \$${params.DoDeploy}"
 			}
 		}
 	}
