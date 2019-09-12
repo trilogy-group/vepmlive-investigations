@@ -54,7 +54,7 @@ foreach ($serverIP in $serverIPs)
 		")
 		if ($doDeploy)
 		{
-			#Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName Microsoft.ipam
+			Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock -ConfigurationName Microsoft.ipam
 		}
 	}
 	else
@@ -65,7 +65,7 @@ foreach ($serverIP in $serverIPs)
 		")
 		if ($doDeploy)
 		{
-			#Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock
+			Invoke-Command -ComputerName $serverIP -Credential $cred -ScriptBlock $scriptBlock
 		}
 	}
 	Write-Host "Run complete $serverIP"
