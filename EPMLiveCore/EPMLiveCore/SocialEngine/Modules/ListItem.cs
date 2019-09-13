@@ -166,7 +166,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             switch (args.ActivityKind)
             {
                 case ActivityKind.Created:
-                    args.ValidateCommentCreationActivity();
+                    args.ValidateCreationActivity();
                     break;
                 case ActivityKind.Updated:
                     args.ValidateUpdationActivity();
