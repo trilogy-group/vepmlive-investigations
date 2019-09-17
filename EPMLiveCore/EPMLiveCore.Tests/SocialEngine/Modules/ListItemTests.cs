@@ -5,6 +5,7 @@ using System.Data.Fakes;
 using System.Data.SqlClient.Fakes;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Specialized.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Fakes;
 using EPMLiveCore.SocialEngine.Core;
@@ -16,6 +17,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration.Fakes;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.SharePoint.Utilities.Fakes;
 using Shouldly;
 
 namespace EPMLiveCore.Tests.SocialEngine.Modules
@@ -65,6 +67,7 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
         private const string ValidateCommentCreationActivityMethod = "ValidateCommentCreationActivity";
         private const string ValidateCommentDeletionActivityMethod = "ValidateCommentDeletionActivity";
         private const string GetRelatedActivityIntervalMethod = "GetRelatedActivityInterval";
+        private const string OnValidateActivityMethod = "OnValidateActivity";
         private const string CommentIdString = "CommentId";
         private const string CommentString = "Comment";
         private const string ChangedPropertiesString = "ChangedProperties";
@@ -103,6 +106,16 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
                     IDGet = () => guid,
                     WebApplicationGet = () => new ShimSPWebApplication(),
                     RootWebGet = () => new ShimSPWeb()
+                },                
+                PropertiesGet = () =>
+                {
+                    var propertyBag = new ShimSPPropertyBag();
+                    var sd = new ShimStringDictionary(propertyBag);
+                    sd.ItemGetString = (key) =>
+                    {
+                        return "EPMLive_MyWork_Grid_GlobalViews";
+                    };
+                    return propertyBag;
                 }
             }.Instance;
             ShimSqlConnection.AllInstances.Open = _ => { };
@@ -348,6 +361,33 @@ namespace EPMLiveCore.Tests.SocialEngine.Modules
 
             // Assert
             actual.ShouldBe(expected);
+        }
+
+        [TestMethod]
+        public void OnValidateActivityMethod_WhenCalled_CreationValidated()
+        {
+            // Arrange
+            const bool registerExpected = true;
+            var registerActual = false;
+
+            var processActivityEventArgs = new ProcessActivityEventArgs(ObjectKind.ListItem, ActivityKind.Created, CreateDataObject(), spWeb, streamManager, threadManager, activityManager);
+
+            ShimSqlCommand.AllInstances.ExecuteScalar = sqlCommand =>
+            {
+                if (sqlCommand.CommandText.StartsWith("SELECT COUNT(dbo.SS_Activities.Id) AS Total FROM dbo.SS_Activities"))
+                {
+                    registerActual = true;
+                }
+                return null;
+            };
+
+            privateObj.Invoke(
+                OnValidateActivityMethod,
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                new object[] { processActivityEventArgs });
+
+            // Assert
+            registerActual.ShouldBe(registerExpected);
         }
 
         [TestMethod]
