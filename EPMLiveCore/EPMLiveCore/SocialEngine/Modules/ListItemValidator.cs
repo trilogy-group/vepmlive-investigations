@@ -178,7 +178,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             EnsureNotIgnoredList(args, data);
         }
 
-        private static void ValidateCreationActivity(ProcessActivityEventArgs args)
+        internal static void ValidateCreationActivity(this ProcessActivityEventArgs args)
         {
             var data = args.Data;
 
