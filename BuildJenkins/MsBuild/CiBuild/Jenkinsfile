@@ -38,29 +38,23 @@ pipeline {
         }
         stage('Build') {
             steps {
-				devfactory (portfolio: "Default portfolio for Trilogy",
-				product: "Skyvera - EPM Live",
-				types: "dotnet",
-				runIf: true) {
+				
 					echo 'Executing build...'
 					powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\""
 				
-				}
+				
 			}
         }
 		stage('Unit tests') {
             steps {
                 timestamps {
-					devfactory (portfolio: "Default portfolio for Trilogy",
-					product: "Skyvera - EPM Live",
-					types: "dotnet",
-					runIf: true) {
+					
 						echo 'Run unit tests...'
 						dir ("${env.WORKSPACE}") {
 							powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/unittests.ps1" 
 						
 						}
-					}
+					
                 }
             }
         }

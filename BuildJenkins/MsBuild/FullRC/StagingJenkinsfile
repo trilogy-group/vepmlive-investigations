@@ -36,71 +36,70 @@ pipeline {
 		string(name: 'ForceStage', defaultValue: 'false', description: 'Force staging deployment')
     }
     stages {
-		stage ("Weekly Deploy") {
+	    stage('Preparing Release') {
+			when {
+					anyOf{ expression { params.ForceStage == 'true'}; branch 'develop' }
+			}
+			steps { 
+				timestamps {
+					script {
+						env.RELEASE_BRANCH = currentBuild.getProjectName()
+						echo 'Triggering Release build job...'
+						def releaseBuild = build(
+							job: "../EPML-RC/${env.RELEASE_BRANCH}",
+							wait: true,
+							parameters: [
+								[$class: 'StringParameterValue', name: 'Version', value: params.Version.replace('x', env.BUILD_NUMBER)]
+							]
+						)
+						env.RELEASE_BRANCH_BUILD = releaseBuild.getNumber()
+						echo "Release Branch Build #${env.RELEASE_BRANCH_BUILD}"
+					}
+				}
+			}
+		}
+		stage ('Deploy') {
 			when {
 				expression { params.ForceStage == 'true'}
 			}
-			stages {
-				stage('Preparing Release') {
-					steps { 
+			parallel {
+				stage('Deploy Staging') {
+					steps {
 						timestamps {
 							script {
-								env.RELEASE_BRANCH = currentBuild.getProjectName()
-								echo 'Triggering Release build job...'
-								def releaseBuild = build(
-									job: "../EPML-RC/${env.RELEASE_BRANCH}",
+								echo 'Triggering Deploy job...'
+								env.DEPLOY_BRANCH = currentBuild.getProjectName()
+								build(
+									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
 									wait: true,
 									parameters: [
-										[$class: 'StringParameterValue', name: 'Version', value: params.Version.replace('x', env.BUILD_NUMBER)]
+										[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
+										[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
+										[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
+										[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
 									]
 								)
-								env.RELEASE_BRANCH_BUILD = releaseBuild.getNumber()
-								echo "Release Branch Build #${env.RELEASE_BRANCH_BUILD}"
 							}
 						}
 					}
 				}
-				stage ('Deploy') {
-					parallel {
-						stage('Deploy Staging') {
-							steps {
-								timestamps {
-									script {
-										echo 'Triggering Deploy job...'
-										env.DEPLOY_BRANCH = currentBuild.getProjectName()
-										build(
-											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
-											wait: true,
-											parameters: [
-												[$class: 'StringParameterValue', name: 'TargetHost', value: params.StagingTargetHost],
-												[$class: 'StringParameterValue', name: 'UserName', value: params.StagingUserName],
-												[$class: 'StringParameterValue', name: 'Password', value: params.StagingPassword],
-												[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
-											]
-										)
-									}
-								}
-							}
-						}
-						stage('Deploy Staging2') {
-							steps {
-								timestamps {
-									script {
-										echo 'Triggering Deploy job...'
-										env.DEPLOY_BRANCH = currentBuild.getProjectName()
-										build(
-											job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
-											wait: true,
-											propagate: false,
-											parameters: [
-												[$class: 'StringParameterValue', name: 'TargetHost', value: params.Staging2TargetHost],
-												[$class: 'StringParameterValue', name: 'UserName', value: params.Staging2UserName],
-												[$class: 'StringParameterValue', name: 'Password', value: params.Staging2Password],
-												[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
-											]
-										)
-									}
-								}
+				stage('Deploy Staging2') {
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering Deploy job...'
+								env.DEPLOY_BRANCH = currentBuild.getProjectName()
+								build(
+									job: "../EPML-Deploy/${env.DEPLOY_BRANCH}", 
+									wait: true,
+									propagate: false,
+									parameters: [
+										[$class: 'StringParameterValue', name: 'TargetHost', value: params.Staging2TargetHost],
+										[$class: 'StringParameterValue', name: 'UserName', value: params.Staging2UserName],
+										[$class: 'StringParameterValue', name: 'Password', value: params.Staging2Password],
+										[$class: 'StringParameterValue', name: 'FullHostName', value: params.StagingAppUrl]
+									]
+								)
 							}
 						}
 					}
@@ -108,6 +107,9 @@ pipeline {
 			}
 		}		
 		stage('Tests') {
+			when { 
+				not { branch 'develop' }
+			}
 			parallel {
 				stage('Automated Tests') {
 					stages {
@@ -155,9 +157,6 @@ pipeline {
 							}
 						}
 						stage('Security Tests') {
-							when {
-								expression { new Date()[Calendar.DAY_OF_WEEK] == Calendar.SUNDAY }
-							}
 							steps {
 								timestamps {
 									script {
