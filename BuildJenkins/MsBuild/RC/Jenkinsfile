@@ -36,8 +36,13 @@ pipeline {
         }
         stage('Build') {
             steps {
-                echo 'Executing build...'
-                powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
+				devfactory (portfolio: "Default portfolio for Trilogy",
+				product: "Skyvera - EPM Live",
+				types: "dotnet",
+				runIf: true) {
+					echo 'Executing build...'
+					powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
+				}
             }
         }
     }
