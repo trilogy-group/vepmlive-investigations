@@ -37,9 +37,6 @@ pipeline {
     }
     stages {
 	    stage('Preparing Release') {
-			when {
-					anyOf{ expression { params.ForceStage == 'true'}; branch 'develop' }
-			}
 			steps { 
 				timestamps {
 					script {
@@ -107,9 +104,6 @@ pipeline {
 			}
 		}		
 		stage('Tests') {
-			when { 
-				not { branch 'develop' }
-			}
 			parallel {
 				stage('Automated Tests') {
 					stages {
