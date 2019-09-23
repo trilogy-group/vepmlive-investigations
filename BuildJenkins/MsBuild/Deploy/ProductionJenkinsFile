@@ -16,7 +16,7 @@ pipeline {
 		string(name: 'Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
 		string(name: 'PackageTarget', defaultValue: 'c:\\SilentInstaller', description: 'Folder on the target host to copy packages to')
 		string(name: 'FullHostName', defaultValue: 'https://apps22.epmlive.com', description: 'Target full host name')
-	    string(name: 'DoDeploy', defaultValue: 'True', description: 'Are you sure you want to deploy?')
+	    string(name: 'DoDeploy', defaultValue: 'False', description: 'Are you sure you want to deploy?')
 	}
 	stages {
 		stage('Prepare to build') {
