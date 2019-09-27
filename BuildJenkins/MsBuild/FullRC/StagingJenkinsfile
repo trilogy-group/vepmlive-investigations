@@ -27,7 +27,7 @@ pipeline {
     	string(name: 'ProtractorTargetHost', defaultValue: '10.25.2.54', description: 'Target host for protractor')
 		string(name: 'ProtractorHostsName', defaultValue: 'apps22.epmlive.com', description: 'Target full host name for protractor')
 		string(name: 'ProtractorBaseUrl', defaultValue: 'https://apps22.epmlive.com', description: 'Target baseUrl for protractor')
-		string(name: 'ProtractorSiteCollection', defaultValue: '/sites/AUT', description: 'Protractor siteCollection')
+		string(name: 'ProtractorSiteCollection', defaultValue: '/sites/AUT2', description: 'Protractor siteCollection')
 		string(name: 'ProtractorUsername', defaultValue: 'servicedesk', description: 'Protractor username')
 		string(name: 'ProtractorPassword', defaultValue: 'A123456*', description: 'Protractor password')
 		
