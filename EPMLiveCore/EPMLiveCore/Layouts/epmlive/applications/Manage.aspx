@@ -123,7 +123,7 @@
 
                                 <asp:LinkButton ID="LinkButton2"
                                     CommandArgument='<%# Eval("ID") %>'
-                                    CommandName="EditRow" runat="server">
+                                    CommandName="EditRow" runat="server" OnClientClick='<%# EditButton(Eval("ID")) %>'>
                                     Edit</asp:LinkButton><br />
 
                                 <asp:LinkButton ID="LinkButton3"
