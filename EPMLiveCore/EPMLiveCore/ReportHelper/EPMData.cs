@@ -1207,6 +1207,10 @@ namespace EPMLiveCore.ReportHelper
         {
             try
             {
+				if (con == null)
+                {
+                    throw new ArgumentNullException(nameof(con));
+                }
                 using (
                     var command = new SqlCommand { CommandType = CommandType, CommandText = Command, Connection = con })
                 {
