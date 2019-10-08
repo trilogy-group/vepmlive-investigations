@@ -36,6 +36,8 @@ pipeline {
         }
         stage('Build') {
             steps {
+				echo 'Clearing temp...'
+                powershell "${env.WORKSPACE}/BuildTeamCity/clearTemp.ps1"
                 echo 'Executing build...'
                 powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
             }
