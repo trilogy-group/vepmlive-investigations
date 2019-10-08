@@ -36,13 +36,15 @@ pipeline {
         }
         stage('Build') {
             steps {
-				//devfactory (portfolio: "Default portfolio for Trilogy",
-				//product: "Skyvera - EPM Live",
-				//types: "dotnet",
-				//runIf: true) {
+				echo 'Clearing temp...'
+                powershell "${env.WORKSPACE}/BuildTeamCity/clearTemp.ps1"
+				devfactory (portfolio: "Default portfolio for Trilogy",
+				product: "Skyvera - EPM Live",
+				types: "dotnet",
+				runIf: true) {
 					echo 'Executing build...'
 					powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/RC/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\" \"${env.WORKSPACE}/finalBuild\""
-				//}
+				}
             }
         }
     }
