@@ -7,7 +7,7 @@ using Microsoft.Win32;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 1.0, Description = "New email templates to accomplish a new feature: Timesheet rejection mail.")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 1.0, Description = "New email templates to accomplish a new feature: Timesheet rejection mail.")]
     internal class EmailNotificationsUpdateTemplates : UpgradeStep
     {
         public EmailNotificationsUpdateTemplates(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
@@ -58,7 +58,7 @@ END"
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 2.0, Description = "Disable throttling for the task center list")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 2.0, Description = "Disable throttling for the task center list")]
     internal class DisableTaskCenterThrolling : UpgradeStep
     {
         public DisableTaskCenterThrolling(SPWeb web, bool isPfeSite)
@@ -70,10 +70,13 @@ END"
 	
         public override bool Perform()
         {
+            bool result = true;
+            Web.AllowUnsafeUpdates = true;
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
+                    
                     var list = Web.Lists.TryGetList(TaskCenterListName);
 
                     if (list != null)
@@ -89,24 +92,27 @@ END"
                     }
                 });
 
-                return true;
+                
             }
             catch (Exception exception)
             {
                 var logException = exception.InnerException ?? exception;
                 LogMessage(logException.ToString(), MessageKind.FAILURE, 4);
-                return false;
+                result = false;
             }
+            Web.AllowUnsafeUpdates = false;
+            return result;
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 3.0, Description = "Updating My Work table")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 3.0, Description = "Updating My Work table")]
     internal class AddUpdateMyWorkColumn : UpgradeStep
     {
         public AddUpdateMyWorkColumn(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
         public override bool Perform()
         {
+            bool result = true;
             Guid webAppId = Web.Site.WebApplication.Id;
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -126,9 +132,10 @@ END"
                 catch (Exception exception)
                 {
                     LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                    result = false;
                 }
             });
-            return true;
+            return result;
         }
 
         private void AddColumn()
@@ -163,7 +170,7 @@ END"
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 4.0, Description = "Add unique Contraints on RPTWEBGROUPS ")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 4.0, Description = "Add unique Contraints on RPTWEBGROUPS ")]
     internal class AddRPTWEBGROUPSUniqueContraints_710 : UpgradeStep
     {
         private const string ContraintName = "UQ_RPTWEBGROUPS_SITEID_WEBID_GROUPID";
@@ -172,6 +179,7 @@ END"
         public override bool Perform()
         {
             Guid webAppId = Web.Site.WebApplication.Id;
+            bool result = true;
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 try
@@ -184,9 +192,10 @@ END"
                 catch (Exception exception)
                 {
                     LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                    result = false;
                 }
             });
-            return true;
+            return result;
         }
 
         private void AddConstraint(string connectionString)
@@ -211,7 +220,7 @@ END"
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V710, Order = 5.0, Description = "Unregister EPMLive Regitery From Application Folder")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 5.0, Description = "Unregister EPMLive Regitery From Application Folder")]
     internal class UnregisterEPMLiveRegitery : UpgradeStep
     {
         private const string EventLogApplicationRegistryKeyPath = @"SYSTEM\CurrentControlSet\services\eventlog\Application";

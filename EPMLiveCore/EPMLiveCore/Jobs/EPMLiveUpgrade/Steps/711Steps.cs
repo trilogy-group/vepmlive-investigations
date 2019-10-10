@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 1.0, Description = "Update SSRS Resouces Capacity Heat Map Report")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 6.0, Description = "Update SSRS Resouces Capacity Heat Map Report")]
     internal class UpdateSSRSResoucesCapacityHeatMapReport : UpgradeStep
     {
         private SPWeb _spWeb;
@@ -80,7 +80,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 2.0, Description = "Update SSRS Resouces Availability Report")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 7.0, Description = "Update SSRS Resouces Availability Report")]
     internal class UpdateSSRSResoucesAvailabilityReport : UpgradeStep
     {
         private SPWeb _spWeb;
@@ -151,7 +151,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 3.0, Description = "Add faster index to LSTMyWork")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 8.0, Description = "Add faster index to LSTMyWork")]
     internal class AddLSTMyWorkIndex : UpgradeStep
     {
         private SPWeb _spWeb;
@@ -214,7 +214,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 4.0, Description = "Invalid Data Clean Up for My Work")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 9.0, Description = "Invalid Data Clean Up for My Work")]
     internal class InvalidDataCleanUpMyWork : UpgradeStep
     {
         private const string SelectCommandText = "SELECT DISTINCT RPL.RPTLISTID,RPL.TABLENAME FROM RPTLIST RPL INNER JOIN LSTMYWORK MY ON MY.LISTID=RPL.RPTLISTID";
@@ -223,6 +223,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         public override bool Perform()
         {
             var webAppId = Web.Site.WebApplication.Id;
+            bool result = true;
             var ListIdTableNameCollection = new Dictionary<string, string>();
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -259,9 +260,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 catch (Exception exception)
                 {
                     LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                    result = false;
                 }
             });
-            return true;
+            return result;
         }
 
         private void DeleteMyWorkData(string rptListId, string tableName, string connectionString)
@@ -288,7 +290,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 5.0, Description = "Updating timesheet administrator label.")]
+    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 9.1, Description = "Updating timesheet administrator label.")]
     internal class UpdateTimesheetLabel : UpgradeStep
     {
         private readonly SPWeb _spWeb = null;
@@ -305,6 +307,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         public override bool Perform()
         {
+            bool result = true;
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
                 try
@@ -328,9 +331,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 catch (Exception exception)
                 {
                     LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                    result = false;
                 }
             });
-            return true;
+            return result;
         }
     }
 }
