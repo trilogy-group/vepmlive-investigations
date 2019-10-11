@@ -121,17 +121,9 @@ pipeline {
 											env.PROTRACTOR_BRANCH = params.ProtractorBranch
 										}
 										build(
-											job: "../EPML-Regression/${env.PROTRACTOR_BRANCH}", 
+											job: "../eng-qa-integration/epm-live-skyvera-protractor-devstaging-automation", 
 											wait: true,
-											propagate: false,
-											parameters: [
-												[$class: 'StringParameterValue', name: 'TargetHost', value: params.ProtractorTargetHost],
-												[$class: 'StringParameterValue', name: 'FullHostName', value: params.ProtractorHostsName],
-												[$class: 'StringParameterValue', name: 'BaseUrl', value: params.ProtractorBaseUrl],
-												[$class: 'StringParameterValue', name: 'SiteCollection', value: params.ProtractorSiteCollection],
-												[$class: 'StringParameterValue', name: 'Username', value: params.ProtractorUsername],
-												[$class: 'StringParameterValue', name: 'Password', value: params.ProtractorPassword]
-											]
+											propagate: false
 										)
 									}
 								}
