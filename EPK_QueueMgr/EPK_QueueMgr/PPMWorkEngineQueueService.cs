@@ -170,7 +170,7 @@ namespace WE_QueueMgr
         {
             try
             {
-                System.Diagnostics.Debugger.Launch();
+                //System.Diagnostics.Debugger.Launch();
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
 				string timeoutString = System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"];
