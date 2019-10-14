@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "aurea-git-hooks": "aurea-git-hooks",
+    "power-tools": "aurea-qa-power-tools",
     "postinstall": "webdriver-manager update && npm run clean",
     "lint": "tslint \"e2e/**/*.ts\" --fix",
     "clean": "rm -rf auto-generated/allure-results *.log",
@@ -19,8 +19,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "post-checkout": "npm run aurea-git-hooks -- --start"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
@@ -33,7 +32,7 @@
   "dependencies": {
     "@angular/compiler": "^6.1.8",
     "@angular/core": "^6.1.8",
-    "@aurea/eng-qa-integration-git-hooks": "^1.0.0",
+    "@aurea/eng-qa-integration-power-tools": "^1.0.0",
     "@aurea/aurea-jasmine-testrail-reporter": "^2.0.0",
     "@aurea/protractor-automation-helper": "0.0.1",
     "allure-commandline": "^2.5.0",
