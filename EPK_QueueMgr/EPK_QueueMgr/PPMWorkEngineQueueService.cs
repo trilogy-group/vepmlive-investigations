@@ -170,7 +170,7 @@ namespace WE_QueueMgr
         {
             try
             {
-                //System.Diagnostics.Debugger.Launch();
+                System.Diagnostics.Debugger.Launch();
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
 				string timeoutString = System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"];
@@ -180,18 +180,14 @@ namespace WE_QueueMgr
                     if (!int.TryParse(timeoutString, out timeoutMins))
                     {
                         TimeSpan timeoutSpan;
-                        if (!TimeSpan.TryParse(timeoutString, out timeoutSpan))
-                        {
-                            jobMaxTimeout = new TimeSpan(0, 2, 0);
-                        }
-                        else
+                        if (TimeSpan.TryParse(timeoutString, out timeoutSpan))
                         {
                             jobMaxTimeout = timeoutSpan;
                         }
                     }
                     else
                     {
-                        jobMaxTimeout = new TimeSpan(0, 0, timeoutMins);
+                        jobMaxTimeout = new TimeSpan(0, timeoutMins, 0);
                     }
                 }
 
@@ -371,9 +367,8 @@ namespace WE_QueueMgr
         }
         //Loop once every:
         TimeSpan longRunPeriod = new TimeSpan(0, 1, 0);
-        TimeSpan jobMaxTimeout = new TimeSpan(0, 1, 0);
-        TimeSpan cancellationWait = new TimeSpan(0, 0, 5);
-        TimeSpan pollPeriod = new TimeSpan(0, 0, 30);
+        TimeSpan jobMaxTimeout = new TimeSpan(1, 0, 0);
+        TimeSpan pollPeriod = new TimeSpan(0, 1, 0);
         void DoLongRun()
         {
             while (!token.IsCancellationRequested)
@@ -442,8 +437,8 @@ namespace WE_QueueMgr
 
         private void DoWork()
         {
-            DateTime queuedLastCheck = DateTime.Now;
-            DateTime timedLastCheck = DateTime.Now;
+            DateTime queuedLastCheck = DateTime.Now - queueJobsPeriod;
+            DateTime timedLastCheck = DateTime.Now - timedJobsPeriod;
             while (!token.IsCancellationRequested)
             {
                 try
