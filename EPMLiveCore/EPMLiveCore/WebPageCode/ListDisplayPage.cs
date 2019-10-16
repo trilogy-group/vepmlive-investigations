@@ -146,7 +146,7 @@ namespace EPMLiveCore
 
         private void UpdateGlobalScript(SPField field, string mode)
         {
-            _computeFieldsScript.Append($"ComputeField(\"{field.InternalName}{mode}\");");
+            //_computeFieldsScript.Append($"ComputeField(\"{field.InternalName}{mode}\");");
 
             ClientScript.RegisterHiddenField($"Hidden{field.InternalName}{mode}", string.Empty);
         }
@@ -160,7 +160,7 @@ namespace EPMLiveCore
             foreach (var field in _displayableFields.Values.Select(currentField => currentField.InternalName))
             {
                 newFieldProperties.Add(field, new Dictionary<string, string>());
-
+                SPField spField = null;
                 foreach (var mode in modes)
                 {
                     var hiddenValue = HttpContext.Current.Request.Params[$"Hidden{field}{mode}"];
@@ -172,9 +172,10 @@ namespace EPMLiveCore
 
                         continue;
                     }
-
+                    if (spField == null)
+                        spField = CurrentList.Fields.GetFieldByInternalName(field);
                     var condition = hiddenValue.Split(";".ToCharArray())[0].ToLower();
-                    var spField = CurrentList.Fields.GetFieldByInternalName(field);
+
 
                     var conditionAlwaysOrWhere = condition == Always || condition == WhereText;
 
@@ -193,7 +194,10 @@ namespace EPMLiveCore
                             SystemTrace.WriteLine($"Unexpected value : {mode}");
                             break;
                     }
-
+                    newFieldProperties[field].Add(mode, hiddenValue);
+                }
+                if (spField != null)
+                {
                     try
                     {
                         spField.Update();
@@ -203,8 +207,9 @@ namespace EPMLiveCore
                         SystemTrace.WriteLine(exception);
                     }
 
-                    newFieldProperties[field].Add(mode, hiddenValue);
+                    
                 }
+            
             }
 
             var gSettings = new GridGanttSettings(CurrentList)
