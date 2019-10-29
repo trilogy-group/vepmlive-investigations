@@ -56,16 +56,27 @@ namespace EPMLiveWebParts
         {
             get
             {
-                SPWeb theWeb = SPWeb;
-                Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
-
-                using (SPWeb configWeb = (theWeb.ID != lockedWeb
-                                              ? theWeb.Site.OpenWeb(lockedWeb)
-                                              : theWeb.Site.OpenWeb(theWeb.ID)))
+                bool result = false;
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    return configWeb.DoesUserHavePermissions(theWeb.CurrentUser.LoginName,
-                                                             SPBasePermissions.AddAndCustomizePages);
-                }
+                    using (SPSite site = new SPSite(SPContext.Current.Site.ID))
+                    {
+                        using (SPWeb theWeb = site.OpenWeb(SPContext.Current.Web.ID))
+                        {
+
+                            Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
+
+                            using (SPWeb configWeb = (theWeb.ID != lockedWeb
+                            ? theWeb.Site.OpenWeb(lockedWeb)
+                            : theWeb.Site.OpenWeb(theWeb.ID)))
+                            {
+                                result = configWeb.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser.LoginName,
+                                    SPBasePermissions.AddAndCustomizePages);
+                            }
+                        }
+                    }
+                });
+                return result;
             }
         }
 
