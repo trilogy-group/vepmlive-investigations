@@ -12,7 +12,7 @@ pipeline {
 		cron('@midnight')
 	}
     parameters {
-        string(name: 'Version', defaultValue: '7.1.3.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'Version', defaultValue: '7.1.4.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
 		
 		string(name: 'StagingTargetHost', defaultValue: '10.25.1.149,10.25.1.146,10.25.1.135', description: 'Staging Target hosts to deploy to')
 		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
