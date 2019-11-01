@@ -239,7 +239,7 @@ namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
             _siteId = Guid.NewGuid();
             _listId = Guid.NewGuid();
 
-            ShimSPContext.CurrentGet = () => new ShimSPContext { WebGet = () => new ShimSPWeb() };
+            ShimSPContext.CurrentGet = () => new ShimSPContext { WebGet = () => new ShimSPWeb() , SiteGet = () => new ShimSPSite()};
             ShimSPContext.AllInstances.WebGet = _ => new ShimSPWeb();
             ShimSPContext.AllInstances.RegionalSettingsGet = _ => new ShimSPRegionalSettings();
 
@@ -287,6 +287,11 @@ namespace EPMLiveWebParts.Tests.ControlTemplates.MyWork
                     default:
                         return $"{DummyString},{OtherDummyString}";
                 }
+            };
+
+            ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
+            {
+                w();
             };
         }
 
