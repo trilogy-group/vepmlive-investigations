@@ -235,7 +235,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     {
                         int pageSize = 0;
                         int.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "epmliverepotingrefreshbatchpagesize"), out pageSize);
-                        bErrorRefreshTimesheet = epmdata.RefreshTimesheetBatch(out err, base.JobUid, pageSize);
+                        bErrorRefreshTimesheet = epmdata.RefreshTimesheetBatch(out err, base.JobUid, pageSize);                        
                     }
                     else
                     {

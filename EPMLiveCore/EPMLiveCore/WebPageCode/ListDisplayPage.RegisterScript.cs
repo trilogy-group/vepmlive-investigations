@@ -4,6 +4,7 @@ namespace EPMLiveCore
     {
         private const string OptionChangeScript = @"function OptionChange(senderPartialId) 
                                         {
+                                            ComputeField(senderPartialId);
                                             var control = document.getElementById('Option' + senderPartialId);
                                             var selectedValue = control.options[control.selectedIndex].value;
                                             var controlToChange = document.getElementById('RowOptionPanel' + senderPartialId);
