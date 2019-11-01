@@ -71,7 +71,7 @@ namespace EPMLiveCore.Tests.Jobs.Upgrades.Steps
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(result);
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
