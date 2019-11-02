@@ -159,18 +159,18 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                 }
                 else
                 {
-                    int upper = (int)Order;
-                    int lower = (int)((Order * 100.0) - (upper * 100));
+                    long upper = (long)Order;
+                    long lower = (long)((Order * 100.0) - (upper * 100L));
                     splitSequence = new string[] { upper.ToString(), lower.ToString() };
                 }
-                int multiplier = 1;
+                long multiplier = 1;
                 for (int i = splitSequence.Length - 1; i >= 0; i--)
                 {
-                    int part = int.Parse(splitSequence[i]);
+                    long part = int.Parse(splitSequence[i]);
                     if (part < 10)
                         part = part * 10;
                     sequence += multiplier * part;
-                    multiplier *= 100;
+                    multiplier *= 100L;
                 }
                 return sequence;
             }

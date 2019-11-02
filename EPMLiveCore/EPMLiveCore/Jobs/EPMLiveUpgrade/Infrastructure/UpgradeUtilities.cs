@@ -48,7 +48,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                     }
                     else
                     {
-                        if (attribute.IsOptIn && attribute.Name.StartsWith(version)) add = true;
+                        if (!attribute.IsOptIn && attribute.Name.StartsWith(version)) add = true;
                     }
 
                     if (add) versionedSteps.Add(attribute.SequenceOrder, type);

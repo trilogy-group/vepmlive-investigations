@@ -8,7 +8,55 @@ using System.Collections.Generic;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V713, Order = 0.1, Description = "Update SSRS Resouces Capacity Heat Map Report")]
+
+    [UpgradeStep(Version = EPMLiveVersion.V713, Order = 1.0, Description = "Updating timesheet administrator label.")]
+    internal class UpdateTimesheetLabel : UpgradeStep
+    {
+        private readonly SPWeb _spWeb = null;
+        private readonly string NewTitle = "To view all the timesheets, you should add yourself into the timesheet manager field explicitly for all the desired resources.";
+        public UpdateTimesheetLabel(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
+        {
+            if (spWeb == null)
+            {
+                throw new ArgumentNullException(nameof(spWeb));
+            }
+
+            _spWeb = spWeb;
+        }
+
+        public override bool Perform()
+        {
+            bool result = true;
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    SPList list = _spWeb.Lists["Resources"];
+
+                    var field = list.Fields.GetFieldByInternalName("TimesheetAdministrator");
+
+                    if (!field.Description.Contains(NewTitle))
+                    {
+                        field.Description += "\r\n" + NewTitle;
+                        field.Update();
+
+                        LogMessage("Timesheet field description updated.", 2);
+                    }
+                    else
+                    {
+                        LogMessage("Timesheet field description is up-to-date.", 2);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                    result = false;
+                }
+            });
+            return result;
+        }
+    }
+    [UpgradeStep(Version = EPMLiveVersion.V713, Order = 2.0, Description = "Update SSRS Resouces Capacity Heat Map Report")]
     internal class Update_EPG_SP_ReadCBAttribs : UpgradeStep
     {
         private SPWeb _spWeb;
@@ -52,7 +100,7 @@ END
                 {
                     SPSecurity.RunWithElevatedPrivileges(UpgradePfeDatabase);
                 }
-                
+
             }
             catch (Exception e)
             {
@@ -78,7 +126,7 @@ END
             {
                 UpdateStoredProcedure(connection, "EPG_SP_ReadCBAttribs", EPG_SP_ReadCBAttribs_UpdateQuery);
 
-                
+
                 LogMessage("EPG_SP_ReadCBAttribs updated.", MessageKind.SUCCESS, 1);
             }
         }

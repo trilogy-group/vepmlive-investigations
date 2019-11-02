@@ -290,51 +290,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V711, Order = 9.1, Description = "Updating timesheet administrator label.")]
-    internal class UpdateTimesheetLabel : UpgradeStep
-    {
-        private readonly SPWeb _spWeb = null;
-        private readonly string NewTitle = "To view all the timesheets, you should add yourself into the timesheet manager field explicitly for all the desired resources.";
-        public UpdateTimesheetLabel(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
-        {
-            if (spWeb == null)
-            {
-                throw new ArgumentNullException(nameof(spWeb));
-            }
-
-            _spWeb = spWeb;
-        }
-
-        public override bool Perform()
-        {
-            bool result = true;
-            SPSecurity.RunWithElevatedPrivileges(() =>
-            {
-                try
-                {
-                    SPList list = _spWeb.Lists["Resources"];
-
-                    var field = list.Fields.GetFieldByInternalName("TimesheetAdministrator");
-
-                    if (!field.Description.Contains(NewTitle))
-                    {
-                        field.Description += "\r\n" + NewTitle;
-                        field.Update();
-
-                        LogMessage("Timesheet field description updated.", 2);
-                    }
-                    else
-                    {
-                        LogMessage("Timesheet field description is up-to-date.", 2);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
-                    result = false;
-                }
-            });
-            return result;
-        }
-    }
+   
+    
 }
