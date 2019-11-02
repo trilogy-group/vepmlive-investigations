@@ -36,7 +36,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
                 if (attribute.Version == EPMLiveVersion.GENERIC)
                 {
-                    versionedSteps.Add(0 - attribute.SequenceOrder, type);
+                    if (string.IsNullOrEmpty(version))
+                    {
+                        versionedSteps.Add(0 - attribute.SequenceOrder, type);
+                    } 
                 }
                 else
                 {

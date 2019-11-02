@@ -139,7 +139,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                         break;
                 }
 
-                return version + "." + Order;
+                return version + "." + Order.ToString("N");
             }
         }
 
