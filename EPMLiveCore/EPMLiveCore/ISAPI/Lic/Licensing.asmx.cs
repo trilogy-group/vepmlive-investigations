@@ -2,14 +2,10 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Reflection;
+using System.Linq;
 using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
-using System.Xml;
-using EPMLiveCore.API;
-using EPMLiveCore.API.ResourceManagement;
-using EPMLiveCore.API.SPAdmin;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using static EPMLiveCore.Helpers.WebServicesHelper;
@@ -89,13 +85,9 @@ namespace EPMLiveCore
 
             var actType = 0;
             var availableLevels = Act.GetAllAvailableLevels(out actType);
-            var userInfos = username.Replace("i:0#.w|", "").Split(':');
+            NormalizeUsername(ref username);
+            var userInfos = username.Split(':');
             var newFeatureId = int.Parse(userInfos[1]);
-
-            if(userInfos.Length > 2 || userInfos[0].Contains(",") || userInfos[0].Contains("#"))
-            {
-                throw new InvalidOperationException("Username contains invalid characters.");
-            }
 
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
             {
@@ -120,6 +112,25 @@ namespace EPMLiveCore
                 retVal = 2;
             }
             return retVal;
+        }
+
+        private static void NormalizeUsername(ref string username)
+        {
+            var splittedByType = username
+                .Replace("i:0#.w|", "")
+                .Split(
+                    new string[] { ",#" },
+                    StringSplitOptions.None)
+                .ToList();
+            var realUsername = splittedByType
+                .First()
+                .Split(':')
+                .First();
+            var featureId = splittedByType
+                .Last()
+                .Split(':')
+                .Last();
+            username = $"{realUsername}:{featureId}";
         }
 
         private static void ProcessUsers(
