@@ -92,14 +92,14 @@ namespace EPMLiveCore
                 LoggingService.Categories.EPMLiveCore.Event,
                 TraceSeverity.Medium,
                 $"Before normalization of username: {username}");
-            username = NormalizeUsername(username);
+            var normalizedUsername = NormalizeUsername(username);
             LoggingService.WriteTrace(
                 LoggingService.Area.EPMLiveCore,
                 LoggingService.Categories.EPMLiveCore.Event,
                 TraceSeverity.Medium,
-                $"After normalization of username: {username}");
+                $"After normalization of username: {normalizedUsername}");
 
-            var userInfos = username.Split(':');
+            var userInfos = normalizedUsername.Split(':');
             var newFeatureId = int.Parse(userInfos[1]);
 
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
@@ -115,9 +115,24 @@ namespace EPMLiveCore
 
                     var already = false;
 
-                    ProcessUsers(username, lstUsers, newFeatureId, ref counter, userInfos, newUsers, ref already);
+                    ProcessUsers(
+                        normalizedUsername,
+                        lstUsers,
+                        newFeatureId,
+                        ref counter,
+                        userInfos,
+                        newUsers,
+                        ref already);
 
-                    retVal = UpdateFarm(username, farm, counter, max, newFeatureId, already, newUsers, _chrono);
+                    retVal = UpdateFarm(
+                        normalizedUsername,
+                        farm,
+                        counter,
+                        max,
+                        newFeatureId,
+                        already,
+                        newUsers,
+                        _chrono);
                 }
             }
             else
