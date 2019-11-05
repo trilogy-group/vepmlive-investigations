@@ -20,11 +20,13 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
         private const int Id = 1;
         private const string One = "1";
         private const string DummyString = "DummyString";
+        private const string Username = "Username:1";
         private const string LongUsername = @"i:0#.w|np3\mpritchard,#i:0#.w|np3\mpritchard,#mpritchard@frbnp3.com,#,#Protchard, Marsha,#,#Project Management Office,#Project Services:1";
         private const string ShortFormOfLongUsername = @"np3\mpritchard:1";
         private const string Unlimited = "Unlimited";
         private const string ExampleUrl = "http://example.com";
         private const string NormalizeUsernameMethodName = "NormalizeUsername";
+        private const int FeatureId = 1000;
         private Licensing _testObject;
         private PrivateObject _privateObject;
         private IDisposable _shimsContext;
@@ -167,7 +169,7 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
             };
 
             // Act
-            var result = _testObject.SetUserLevel(LongUsername, 1000);
+            var result = _testObject.SetUserLevel(LongUsername, FeatureId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -212,7 +214,7 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
             };
 
             // Act
-            var result = _testObject.SetUserLevel(LongUsername, 1000);
+            var result = _testObject.SetUserLevel(LongUsername, FeatureId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -270,29 +272,32 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
         public void NormalizeUsername_WithStandardUsername_ReturnsTheSame()
         {
             // Arrange
-            var username = "Username:1";
-            var paramsToPass = new object[] { username };
-            var normalizeUsernameMethod = typeof(Licensing).GetMethod(NormalizeUsernameMethodName, BindingFlags.Static | BindingFlags.NonPublic);
+            var normalizeUsernameMethod = typeof(Licensing)
+                .GetMethod(
+                    NormalizeUsernameMethodName,
+                    BindingFlags.Static | BindingFlags.NonPublic);
 
             // Act
-            normalizeUsernameMethod.Invoke(null, paramsToPass);
+            var result = normalizeUsernameMethod.Invoke(null, new object[] { Username });
 
             // Assert
-            Assert.AreEqual(username, paramsToPass[0]);
+            Assert.AreEqual(Username, result);
         }
 
         [TestMethod]
-        public void NormalizeUsername_WithLongUsername_ReturnsTheSame()
+        public void NormalizeUsername_WithLongUsername_ReturnsStripped()
         {
             // Arrange
-            var paramsToPass = new object[] { LongUsername };
-            var normalizeUsernameMethod = typeof(Licensing).GetMethod(NormalizeUsernameMethodName, BindingFlags.Static | BindingFlags.NonPublic);
+            var normalizeUsernameMethod = typeof(Licensing)
+                .GetMethod(
+                    NormalizeUsernameMethodName,
+                    BindingFlags.Static | BindingFlags.NonPublic);
 
             // Act
-            normalizeUsernameMethod.Invoke(null, paramsToPass);
+            var result = normalizeUsernameMethod.Invoke(null, new object[] { LongUsername });
 
             // Assert
-            Assert.AreEqual(ShortFormOfLongUsername, paramsToPass[0]);
+            Assert.AreEqual(ShortFormOfLongUsername, result);
         }
     }
 }

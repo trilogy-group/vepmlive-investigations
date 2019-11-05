@@ -8,6 +8,7 @@ using System.Web.Script.Services;
 using System.Web.Services;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Helpers.WebServicesHelper;
 
 namespace EPMLiveCore
@@ -85,7 +86,19 @@ namespace EPMLiveCore
 
             var actType = 0;
             var availableLevels = Act.GetAllAvailableLevels(out actType);
-            NormalizeUsername(ref username);
+
+            LoggingService.WriteTrace(
+                LoggingService.Area.EPMLiveCore,
+                LoggingService.Categories.EPMLiveCore.Event,
+                TraceSeverity.Medium,
+                $"Before normalization of username: {username}");
+            username = NormalizeUsername(username);
+            LoggingService.WriteTrace(
+                LoggingService.Area.EPMLiveCore,
+                LoggingService.Categories.EPMLiveCore.Event,
+                TraceSeverity.Medium,
+                $"After normalization of username: {username}");
+
             var userInfos = username.Split(':');
             var newFeatureId = int.Parse(userInfos[1]);
 
@@ -114,23 +127,23 @@ namespace EPMLiveCore
             return retVal;
         }
 
-        private static void NormalizeUsername(ref string username)
+        private static string NormalizeUsername(string username)
         {
-            var splittedByType = username
-                .Replace("i:0#.w|", "")
+            var splitByType = username
+                .Replace("i:0#.w|", string.Empty)
                 .Split(
                     new string[] { ",#" },
                     StringSplitOptions.None)
                 .ToList();
-            var realUsername = splittedByType
+            var realUsername = splitByType
                 .First()
                 .Split(':')
                 .First();
-            var featureId = splittedByType
+            var featureId = splitByType
                 .Last()
                 .Split(':')
                 .Last();
-            username = $"{realUsername}:{featureId}";
+            return $"{realUsername}:{featureId}";
         }
 
         private static void ProcessUsers(
