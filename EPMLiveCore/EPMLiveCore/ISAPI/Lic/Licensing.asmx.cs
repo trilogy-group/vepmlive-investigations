@@ -2,16 +2,13 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Reflection;
+using System.Linq;
 using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
-using System.Xml;
-using EPMLiveCore.API;
-using EPMLiveCore.API.ResourceManagement;
-using EPMLiveCore.API.SPAdmin;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using EPMLiveCore.Infrastructure.Logging;
 using static EPMLiveCore.Helpers.WebServicesHelper;
 
 namespace EPMLiveCore
@@ -89,13 +86,21 @@ namespace EPMLiveCore
 
             var actType = 0;
             var availableLevels = Act.GetAllAvailableLevels(out actType);
-            var userInfos = username.Replace("i:0#.w|", "").Split(':');
-            var newFeatureId = int.Parse(userInfos[1]);
 
-            if(userInfos.Length > 2 || userInfos[0].Contains(",") || userInfos[0].Contains("#"))
-            {
-                throw new InvalidOperationException("Username contains invalid characters.");
-            }
+            LoggingService.WriteTrace(
+                LoggingService.Area.EPMLiveCore,
+                LoggingService.Categories.EPMLiveCore.Event,
+                TraceSeverity.Medium,
+                $"Before normalization of username: {username}");
+            var normalizedUsername = NormalizeUsername(username);
+            LoggingService.WriteTrace(
+                LoggingService.Area.EPMLiveCore,
+                LoggingService.Categories.EPMLiveCore.Event,
+                TraceSeverity.Medium,
+                $"After normalization of username: {normalizedUsername}");
+
+            var userInfos = normalizedUsername.Split(':');
+            var newFeatureId = int.Parse(userInfos[1]);
 
             if (availableLevels.Contains(newFeatureId) || newFeatureId == 0)
             {
@@ -110,9 +115,24 @@ namespace EPMLiveCore
 
                     var already = false;
 
-                    ProcessUsers(username, lstUsers, newFeatureId, ref counter, userInfos, newUsers, ref already);
+                    ProcessUsers(
+                        normalizedUsername,
+                        lstUsers,
+                        newFeatureId,
+                        ref counter,
+                        userInfos,
+                        newUsers,
+                        ref already);
 
-                    retVal = UpdateFarm(username, farm, counter, max, newFeatureId, already, newUsers, _chrono);
+                    retVal = UpdateFarm(
+                        normalizedUsername,
+                        farm,
+                        counter,
+                        max,
+                        newFeatureId,
+                        already,
+                        newUsers,
+                        _chrono);
                 }
             }
             else
@@ -120,6 +140,25 @@ namespace EPMLiveCore
                 retVal = 2;
             }
             return retVal;
+        }
+
+        private static string NormalizeUsername(string username)
+        {
+            var splitByType = username
+                .Replace("i:0#.w|", string.Empty)
+                .Split(
+                    new string[] { ",#" },
+                    StringSplitOptions.None)
+                .ToList();
+            var realUsername = splitByType
+                .First()
+                .Split(':')
+                .First();
+            var featureId = splitByType
+                .Last()
+                .Split(':')
+                .Last();
+            return $"{realUsername}:{featureId}";
         }
 
         private static void ProcessUsers(

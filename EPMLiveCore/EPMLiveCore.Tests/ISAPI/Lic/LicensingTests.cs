@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Web;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Helpers.Fakes;
@@ -23,8 +20,13 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
         private const int Id = 1;
         private const string One = "1";
         private const string DummyString = "DummyString";
+        private const string Username = "Username:1";
+        private const string LongUsername = @"i:0#.w|np3\mpritchard,#i:0#.w|np3\mpritchard,#mpritchard@frbnp3.com,#,#Protchard, Marsha,#,#Project Management Office,#Project Services:1";
+        private const string ShortFormOfLongUsername = @"np3\mpritchard:1";
         private const string Unlimited = "Unlimited";
         private const string ExampleUrl = "http://example.com";
+        private const string NormalizeUsernameMethodName = "NormalizeUsername";
+        private const int FeatureId = 1000;
         private Licensing _testObject;
         private PrivateObject _privateObject;
         private IDisposable _shimsContext;
@@ -155,6 +157,29 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
         }
 
         [TestMethod]
+        public void SetUserLevel_Feature1000AlreadyExistsWithLongUsername_ReturnsZero()
+        {
+            // Arrange
+            ShimUserManager.AllInstances.UserListGet = _ => new ArrayList { LongUsername };
+            ShimCoreFunctions.GetRealUserNameString = _ => LongUsername;
+            ShimAct.GetAllAvailableLevelsInt32Out = (out int actType) =>
+            {
+                actType = Id;
+                return new SortedList { { Id, Id } };
+            };
+
+            // Act
+            var result = _testObject.SetUserLevel(LongUsername, FeatureId);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(0),
+                () => _didUpdateUserManager.ShouldBeTrue(),
+                () => _didUpdateFarm.ShouldBeTrue(),
+                () => HttpContext.Current.Items["FormDigestValidated"].ShouldBe(true));
+        }
+
+        [TestMethod]
         public void SetUserLevel_Feature1000NewUser_ReturnsZero()
         {
             // Arrange
@@ -167,6 +192,29 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
 
             // Act
             var result = _testObject.SetUserLevel(DummyString, 1000);
+
+            // Assert
+            this.ShouldSatisfyAllConditions(
+                () => result.ShouldBe(0),
+                () => _didUpdateUserManager.ShouldBeTrue(),
+                () => _didUpdateFarm.ShouldBeTrue(),
+                () => HttpContext.Current.Items["FormDigestValidated"].ShouldBe(true));
+        }
+
+        [TestMethod]
+        public void SetUserLevel_Feature1000NewUserWithLongUsername_ReturnsZero()
+        {
+            // Arrange
+            ShimUserManager.AllInstances.UserListGet = _ => new ArrayList { LongUsername };
+            ShimCoreFunctions.GetRealUserNameString = _ => LongUsername;
+            ShimAct.GetAllAvailableLevelsInt32Out = (out int actType) =>
+            {
+                actType = Id;
+                return new SortedList { { Id, Id } };
+            };
+
+            // Act
+            var result = _testObject.SetUserLevel(LongUsername, FeatureId);
 
             // Assert
             this.ShouldSatisfyAllConditions(
@@ -218,6 +266,38 @@ namespace EPMLiveCore.Tests.ISAPI.Lic
                 () => _didUpdateUserManager.ShouldBeTrue(),
                 () => _didUpdateFarm.ShouldBeTrue(),
                 () => HttpContext.Current.Items["FormDigestValidated"].ShouldBe(true));
+        }
+
+        [TestMethod]
+        public void NormalizeUsername_WithStandardUsername_ReturnsTheSame()
+        {
+            // Arrange
+            var normalizeUsernameMethod = typeof(Licensing)
+                .GetMethod(
+                    NormalizeUsernameMethodName,
+                    BindingFlags.Static | BindingFlags.NonPublic);
+
+            // Act
+            var result = normalizeUsernameMethod.Invoke(null, new object[] { Username });
+
+            // Assert
+            Assert.AreEqual(Username, result);
+        }
+
+        [TestMethod]
+        public void NormalizeUsername_WithLongUsername_ReturnsStripped()
+        {
+            // Arrange
+            var normalizeUsernameMethod = typeof(Licensing)
+                .GetMethod(
+                    NormalizeUsernameMethodName,
+                    BindingFlags.Static | BindingFlags.NonPublic);
+
+            // Act
+            var result = normalizeUsernameMethod.Invoke(null, new object[] { LongUsername });
+
+            // Assert
+            Assert.AreEqual(ShortFormOfLongUsername, result);
         }
     }
 }
