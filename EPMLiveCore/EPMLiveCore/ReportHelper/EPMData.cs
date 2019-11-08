@@ -2542,11 +2542,17 @@ namespace EPMLiveCore.ReportHelper
 			return objType?.ToString();
 		}
 
-		public bool IsLookUpField(string listName, string columnName)
+		public bool IsLookUpField(string listName, string columnName, string matchingListName, string matchingSharePointType)
 		{
-			var objType = GetSharepointType(listName, columnName);
-			return objType != null & (objType.ToLower().Equals("lookup") || objType.ToLower().Equals("user") ||
-				   objType.ToLower().Equals("flookup"));
+            var sharePointType = !string.IsNullOrWhiteSpace(matchingListName) &&
+                            !string.IsNullOrWhiteSpace(matchingSharePointType) &&
+                            listName.Equals(matchingListName) ?
+                            matchingSharePointType :
+                            GetSharepointType(listName, columnName);
+
+            return sharePointType != null && 
+                new List<string> { "lookup", "user", "flookup" }.
+                    Any(sptype => sptype.Equals(sharePointType, StringComparison.InvariantCultureIgnoreCase));
 		}
 
 		#region HELPER METHODS

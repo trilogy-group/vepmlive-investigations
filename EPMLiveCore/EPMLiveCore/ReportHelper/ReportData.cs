@@ -1371,9 +1371,9 @@ namespace EPMLiveCore.ReportHelper
         }
 
 
-		protected virtual bool IsLookUpField(string sListName, string sColumnName)
+		protected virtual bool IsLookUpField(string sListName, string sColumnName, string matchingListName, string matchingSharePointType)
 		{
-			return _DAO.IsLookUpField(sListName, sColumnName);
+			return _DAO.IsLookUpField(sListName, sColumnName, matchingListName, matchingSharePointType);
 		}
 
         public static string AddLookUpFieldValues(string sValue, string sValueType)
@@ -1506,6 +1506,8 @@ namespace EPMLiveCore.ReportHelper
 
             try
             {
+                var containsSharpointInfo = dtColumns.Columns.Contains("ListName") && dtColumns.Columns.Contains("SharepointType");
+
                 //Create and add parameters for each table column.
                 foreach (DataRow row in dtColumns.Rows)
                 {
@@ -1530,8 +1532,11 @@ namespace EPMLiveCore.ReportHelper
                         //Check for field on list
                         if (li.Fields.ContainsField(sInternalName))
                         {
+                            var listName = containsSharpointInfo ? row["ListName"]?.ToString() : string.Empty;
+                            var sharepointType = containsSharpointInfo ? row["SharepointType"]?.ToString() : string.Empty;
+
                             //Check for lookupfield type
-                            if (!IsLookUpField(li.ParentList.Title, sColumnName))
+                            if (!IsLookUpField(li.ParentList.Title, sColumnName, listName, sharepointType))
                             {
                                 //Init. item field
                                 field = li.Fields.GetFieldByInternalName(sInternalName);

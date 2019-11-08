@@ -1447,14 +1447,14 @@ namespace EPMLiveCore.ReportHelper.Tests
         {
 			// Arrange
 			var epmData =  new ShimEPMData();
-			epmData.IsLookUpFieldStringString = (s1, s2) => true;
+			epmData.IsLookUpFieldStringStringStringString = (s1, s2, s3, s4) => true;
 			PrivateObject.SetField("_DAO", epmData.Instance);
             ShimEPMData.AllInstances.GetClientReportingConnectionGet = _ => new SqlConnection();
             ShimEPMData.AllInstances.ExecuteScalarSqlConnection = (_, _2) => "lookup";
             ShimEPMData.AllInstances.SqlErrorOccurredGet = _ => true;
 
             // Act
-            var actualResult = PrivateObject.Invoke("IsLookUpField", DummyString, DummyString) as bool?;
+            var actualResult = PrivateObject.Invoke("IsLookUpField", DummyString, DummyString, DummyString, DummyString) as bool?;
 
             // Assert
             actualResult.ShouldSatisfyAllConditions(
@@ -2384,7 +2384,7 @@ namespace EPMLiveCore.ReportHelper.Tests
             {
                 SqlDbType = SqlDbType.Float
             };
-            ShimReportData.AllInstances.IsLookUpFieldStringString = (_, _2, _3) => isLookUpField;
+            ShimReportData.AllInstances.IsLookUpFieldStringStringStringString = (_, _2, _3, _4, _5) => isLookUpField;
             ShimReportData.AddMultiChoiceValuesStringString = (_, _2) => DummyString;
             ShimReportData.AddLookUpFieldValuesStringString = (_, _2) => DummyString;
 

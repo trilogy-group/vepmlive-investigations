@@ -243,7 +243,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             var hiddenFields = new ArrayList { ColumnName };
             ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
             ShimSPField.AllInstances.TypeAsStringGet = _ => TypeLookup;
-            ShimEPMData.AllInstances.IsLookUpFieldStringString = (a, b, c) => true;
+            ShimEPMData.AllInstances.IsLookUpFieldStringStringStringString = (a, b, c, d, e) => true;
 
             // Act
             var result = _testObj.InsertSQL("Table", "List", dataTable, _sharepointShims.ListItemShim, defaultColumns, hiddenFields);
@@ -261,7 +261,7 @@ namespace EPMLiveCore.Tests.ReportHelper
 
             ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
             ShimSPField.AllInstances.TypeAsStringGet = _ => TypeLookup;
-            ShimEPMData.AllInstances.IsLookUpFieldStringString = (a, b, c) => true;
+            ShimEPMData.AllInstances.IsLookUpFieldStringStringStringString = (a, b, c, d, e) => true;
             ShimSPListItem.AllInstances.ItemGetString = (_, __) => DummyString;
 
             var defaultColumns = new ArrayList { ColumnName };
@@ -285,7 +285,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             var hiddenFields = new ArrayList { ColumnName };
             ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
             ShimSPField.AllInstances.TypeAsStringGet = _ => TypeLookup;
-            ShimEPMData.AllInstances.IsLookUpFieldStringString = (a, b, c) => true;
+            ShimEPMData.AllInstances.IsLookUpFieldStringStringStringString = (a, b, c, d, e) => true;
             ShimSPListItem.AllInstances.ItemGetString = (_, __) => 1;
 
             var list = new List<SPFieldUserValue> { _sharepointShims.FieldUserValueShim };
@@ -313,7 +313,7 @@ namespace EPMLiveCore.Tests.ReportHelper
             ShimSPFieldCollection.AllInstances.ContainsFieldString = (_, __) => true;
             ShimSPField.AllInstances.TypeAsStringGet = _ => TypeLookup;
             ShimSPListItem.AllInstances.ItemGetString = (_, __) => null;
-            ShimEPMData.AllInstances.IsLookUpFieldStringString = (a, b, c) => true;
+            ShimEPMData.AllInstances.IsLookUpFieldStringStringStringString = (a, b, c, d, e) => true;
 
             // Act
             var result = _testObj.InsertSQL("Table", "List", dataTable, _sharepointShims.ListItemShim, defaultColumns, hiddenFields);
