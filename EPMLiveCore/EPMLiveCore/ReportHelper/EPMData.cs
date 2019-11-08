@@ -2544,6 +2544,11 @@ namespace EPMLiveCore.ReportHelper
 
 		public bool IsLookUpField(string listName, string columnName, string matchingListName, string matchingSharePointType)
 		{
+            if (listName == null)
+            {
+                throw new ArgumentNullException(nameof(listName));
+            }
+
             var sharePointType = !string.IsNullOrWhiteSpace(matchingListName) &&
                             !string.IsNullOrWhiteSpace(matchingSharePointType) &&
                             listName.Equals(matchingListName) ?
