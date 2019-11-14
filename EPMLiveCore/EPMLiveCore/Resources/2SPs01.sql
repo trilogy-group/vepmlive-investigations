@@ -1228,6 +1228,7 @@ UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_
 (
 SELECT top (CASE WHEN @MaxThreads_type_1 > @Running_Type_1 THEN (@MaxThreads_type_1 - @Running_Type_1) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
+INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
 WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
 )
@@ -1236,6 +1237,7 @@ UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_
 (
 SELECT TOP (CASE WHEN @MaxThreads_type_2 > @Running_Type_2 THEN (@MaxThreads_type_2 - @Running_Type_2) ELSE 0 END) TSQUEUE_ID
 FROM TSQUEUE 
+INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
 WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
 )
