@@ -540,7 +540,7 @@ namespace EPMLiveCore.ReportHelper
 		/// <returns>
 		///     <c>true</c> if [is look up field] [the specified list name]; otherwise, <c>false</c>.
 		/// </returns>
-		protected override bool IsLookUpField(string listName, string columnName, string matchingListName, string matchingSharePointType)
+		protected override bool IsLookUpField(string listName, string columnName, string matchingListName = null, string matchingSharePointType = null)
 		{
 			return _DAO.IsLookUpField("My Work", columnName, matchingListName, matchingSharePointType);
 		}

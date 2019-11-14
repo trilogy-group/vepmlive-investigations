@@ -2544,7 +2544,7 @@ namespace EPMLiveCore.ReportHelper
 			return objType?.ToString();
 		}
 
-		public bool IsLookUpField(string listName, string columnName, string matchingListName, string matchingSharePointType)
+		public bool IsLookUpField(string listName, string columnName, string matchingListName = null, string matchingSharePointType = null)
 		{
             if (listName == null)
             {

@@ -1371,7 +1371,7 @@ namespace EPMLiveCore.ReportHelper
         }
 
 
-		protected virtual bool IsLookUpField(string sListName, string sColumnName, string matchingListName, string matchingSharePointType)
+		protected virtual bool IsLookUpField(string sListName, string sColumnName, string matchingListName = null, string matchingSharePointType = null)
 		{
 			return _DAO.IsLookUpField(sListName, sColumnName, matchingListName, matchingSharePointType);
 		}
