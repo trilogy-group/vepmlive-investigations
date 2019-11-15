@@ -71,6 +71,8 @@ namespace EPMLiveCore.ReportHelper
         private string _sqlError;
         private bool _sqlErrorOccurred;
 
+        private readonly static IList<string> LookUpFields = new List<string> { "lookup", "user", "flookup" };
+
         public EPMData(Guid siteID)
         {
             SiteId = siteID;
@@ -2542,11 +2544,21 @@ namespace EPMLiveCore.ReportHelper
 			return objType?.ToString();
 		}
 
-		public bool IsLookUpField(string listName, string columnName)
+		public bool IsLookUpField(string listName, string columnName, string matchingListName = null, string matchingSharePointType = null)
 		{
-			var objType = GetSharepointType(listName, columnName);
-			return objType != null & (objType.ToLower().Equals("lookup") || objType.ToLower().Equals("user") ||
-				   objType.ToLower().Equals("flookup"));
+            if (listName == null)
+            {
+                throw new ArgumentNullException(nameof(listName));
+            }
+
+            var sharePointType = !string.IsNullOrWhiteSpace(matchingListName) &&
+                            !string.IsNullOrWhiteSpace(matchingSharePointType) &&
+                            listName.Equals(matchingListName) ?
+                            matchingSharePointType :
+                            GetSharepointType(listName, columnName);
+
+            return sharePointType != null &&
+                LookUpFields.Any(sptype => sptype.Equals(sharePointType, StringComparison.InvariantCultureIgnoreCase));
 		}
 
 		#region HELPER METHODS

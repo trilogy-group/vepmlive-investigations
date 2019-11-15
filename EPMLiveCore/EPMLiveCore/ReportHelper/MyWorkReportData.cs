@@ -287,6 +287,8 @@ namespace EPMLiveCore.ReportHelper
 
             try
             {
+                var containsSharpointInfo = columns.Columns.Contains("ListName") && columns.Columns.Contains("SharepointType");
+
                 foreach (DataRow row in columns.Rows)
                 {
                     columnName = row["ColumnName"].ToString().Replace("'", string.Empty);
@@ -306,7 +308,10 @@ namespace EPMLiveCore.ReportHelper
                         if (spListItem.Fields.ContainsField(internalName))
                         {
                             SPField field;
-                            if (!IsLookUpField(spListItem.ParentList.Title, columnName))
+                            var listName = containsSharpointInfo ? row["ListName"]?.ToString() : string.Empty;
+                            var sharepointType = containsSharpointInfo ? row["SharepointType"]?.ToString() : string.Empty;
+
+                            if (!IsLookUpField(spListItem.ParentList.Title, columnName, listName, sharepointType))
                             {
                                 field = spListItem.Fields.GetFieldByInternalName(internalName);
 
@@ -535,9 +540,9 @@ namespace EPMLiveCore.ReportHelper
 		/// <returns>
 		///     <c>true</c> if [is look up field] [the specified list name]; otherwise, <c>false</c>.
 		/// </returns>
-		protected override bool IsLookUpField(string listName, string columnName)
+		protected override bool IsLookUpField(string listName, string columnName, string matchingListName = null, string matchingSharePointType = null)
 		{
-			return _DAO.IsLookUpField("My Work", columnName);
+			return _DAO.IsLookUpField("My Work", columnName, matchingListName, matchingSharePointType);
 		}
 
         /// <summary>
