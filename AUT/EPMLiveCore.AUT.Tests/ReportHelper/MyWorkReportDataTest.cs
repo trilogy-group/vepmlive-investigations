@@ -1465,8 +1465,8 @@ namespace EPMLiveCore.ReportHelper
             // Arrange
             var listName = CreateType<string>();
             var columnName = CreateType<string>();
-            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            object[] parametersOfIsLookUpField = { listName, columnName };
+            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) };
+            object[] parametersOfIsLookUpField = { listName, columnName, string.Empty, string.Empty };
             Exception exception, exception1;
             var methodInfo = GetMethodInfo(MethodIsLookUpField, methodIsLookUpFieldPrametersTypes, out exception);
 
@@ -1481,8 +1481,8 @@ namespace EPMLiveCore.ReportHelper
             result2.ShouldNotBeNull();
             result1.ShouldBe(result2);
             parametersOfIsLookUpField.ShouldNotBeNull();
-            parametersOfIsLookUpField.Length.ShouldBe(2);
-            methodIsLookUpFieldPrametersTypes.Length.ShouldBe(2);
+            parametersOfIsLookUpField.Length.ShouldBe(4);
+            methodIsLookUpFieldPrametersTypes.Length.ShouldBe(4);
         }
 
         #endregion
@@ -1497,8 +1497,8 @@ namespace EPMLiveCore.ReportHelper
             // Arrange
             var listName = CreateType<string>();
             var columnName = CreateType<string>();
-            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            object[] parametersOfIsLookUpField = { listName, columnName };
+            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) };
+            object[] parametersOfIsLookUpField = { listName, columnName, string.Empty, string.Empty };
             Exception exception, exception1;
             var methodInfo = GetMethodInfo(MethodIsLookUpField, methodIsLookUpFieldPrametersTypes, out exception);
 
@@ -1513,8 +1513,8 @@ namespace EPMLiveCore.ReportHelper
             result2.ShouldNotBeNull();
             result1.ShouldBe(result2);
             parametersOfIsLookUpField.ShouldNotBeNull();
-            parametersOfIsLookUpField.Length.ShouldBe(2);
-            methodIsLookUpFieldPrametersTypes.Length.ShouldBe(2);
+            parametersOfIsLookUpField.Length.ShouldBe(4);
+            methodIsLookUpFieldPrametersTypes.Length.ShouldBe(4);
         }
 
         #endregion
@@ -1529,16 +1529,16 @@ namespace EPMLiveCore.ReportHelper
             // Arrange
             var listName = CreateType<string>();
             var columnName = CreateType<string>();
-            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            object[] parametersOfIsLookUpField = { listName, columnName };
+            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) };
+            object[] parametersOfIsLookUpField = { listName, columnName, string.Empty, string.Empty };
 
             // Act
             Action currentAction = () => ReflectionAnalyzer.GetResultOfMethod<MyWorkReportData, bool>(_myWorkReportDataInstance, MethodIsLookUpField, parametersOfIsLookUpField, methodIsLookUpFieldPrametersTypes);
 
             // Assert
             parametersOfIsLookUpField.ShouldNotBeNull();
-            parametersOfIsLookUpField.Length.ShouldBe(2);
-            methodIsLookUpFieldPrametersTypes.Length.ShouldBe(2);
+            parametersOfIsLookUpField.Length.ShouldBe(4);
+            methodIsLookUpFieldPrametersTypes.Length.ShouldBe(4);
             Should.NotThrow(currentAction);
         }
 
@@ -1552,8 +1552,8 @@ namespace EPMLiveCore.ReportHelper
         public void AUT_MyWorkReportData_IsLookUpField_Method_Call_Dynamic_Invoking_Should_Not_Throw_Test()
         {
             // Arrange
-            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string) };
-            const int parametersCount = 2;
+            var methodIsLookUpFieldPrametersTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string) };
+            const int parametersCount = 4;
 
             // Act
             Action currentAction = () => ReflectionAnalyzer.InvokeNonStaticMethodWithDynamicParameters(_myWorkReportDataInstance, MethodIsLookUpField, Fixture, methodIsLookUpFieldPrametersTypes);
@@ -1595,7 +1595,7 @@ namespace EPMLiveCore.ReportHelper
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodIsLookUpField, 0);
-            const int parametersCount = 2;
+            const int parametersCount = 4;
 
             // Act
             var parameters = methodInfo.GetParameters();

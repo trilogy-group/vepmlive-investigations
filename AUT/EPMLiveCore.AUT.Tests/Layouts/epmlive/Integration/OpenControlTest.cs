@@ -356,7 +356,9 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         public void AUT_OpenControl_RedirectTo_Method_Call_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var methodInfo = GetMethodInfo(MethodRedirectTo, 0);
+            var methodRedirectToPrametersTypes = new Type[] {typeof(string)};
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodRedirectTo, methodRedirectToPrametersTypes, out exception);
             const int parametersCount = 1;
 
             // Act
@@ -484,7 +486,9 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
         public void AUT_OpenControl_RedirectTo_Method_Call_Overloading_Of_1_Parameters_Count_Verification_Test()
         {
             // Arrange
-            var methodInfo = GetMethodInfo(MethodRedirectTo, 1);
+            var methodRedirectToPrametersTypes = new Type[] { typeof(SPListItem), typeof(string) };
+            Exception exception;
+            var methodInfo = GetMethodInfo(MethodRedirectTo, methodRedirectToPrametersTypes, out exception);
             const int parametersCount = 2;
 
             // Act
