@@ -70,7 +70,6 @@ for ($serverIndex=$serverIPs.count - 1; $serverIndex -ge 0; $serverIndex--) {
 		}
 	}
 	Write-Host "Run complete $serverIP"
-	$serverIndex = $serverIndex + 1;
 }
 
 
