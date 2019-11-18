@@ -17,9 +17,10 @@ Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force
 $passwd = convertto-securestring -AsPlainText -Force -String $password
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $passwd
 
-$serverIndex = 0;
-foreach ($serverIP in $serverIPs)
-{
+
+for ($serverIndex=$serverIPs.count - 1; $serverIndex -ge 0; $serverIndex--) {
+	$serverIP=$serverIPs[$serverIndex]
+
 		
 	Write-Host "Connecting to $serverIP, $webAppName, $buildNumber"
 	$session = New-PSSession -ComputerName $serverIP -Credential $cred 
