@@ -92,14 +92,14 @@ namespace EPMLiveWebParts.WorkSpaceCenter
                     "          \'text\': \'All Items\',\r\n                                        \'events\'" +
                     ": [\r\n                                            {\r\n                            " +
                     "                    \'eventName\': \'click\',\r\n                                     " +
-                    "           \'function\': function () { changeView(\"AllItems\", \"All Items\"); }\r\n                " +
+					"           \'function\': function () { changeView(\"AllItems\", \"All Items\"); $('.dropdown-menu').css('display', 'none');}\r\n                " +
                     "                            }\r\n                                        ]\r\n\r\n    " +
                     "                                },\r\n                                    {\r\n     " +
                     "                                   \'iconClass\': \'none\',\r\n                       " +
                     "                 \'text\': \'My Workspace\',\r\n                                      " +
                     "  \'events\': [\r\n                                            {\r\n                  " +
                     "                              \'eventName\': \'click\',\r\n                           " +
-                    "                     \'function\': function () { changeView(\"MyWorkspace\", \"My Workspace\"); }\r\n   " +
+					"                     \'function\': function () { changeView(\"MyWorkspace\", \"My Workspace\" ); $('.dropdown-menu').css('display', 'none');}\r\n   " +
                     "                                         }\r\n                                    " +
                     "    ]\r\n                                    },\r\n                                 " +
                     "   {\r\n                                        \'iconClass\': \'none\',\r\n            " +
@@ -107,7 +107,7 @@ namespace EPMLiveWebParts.WorkSpaceCenter
                     "            \'events\': [\r\n                                            {\r\n        " +
                     "                                        \'eventName\': \'click\',\r\n                 " +
                     "                               \'function\': function () { changeView(\"MyFavorite\"" +
-                    ", \"My Favorite\"); }\r\n                                            }\r\n                           " +
+					", \"My Favorite\");  $('.dropdown-menu').css('display', 'none');}\r\n                                            }\r\n                           " +
                     "             ]\r\n                                    }\r\n\r\n                       " +
                     "         ]\r\n                            }\r\n                        ]\r\n          " +
                     "          }\r\n                    ]\r\n                }\r\n            ];\r\n         " +
