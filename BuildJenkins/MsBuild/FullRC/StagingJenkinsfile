@@ -103,23 +103,6 @@ pipeline {
 								}
 							}
 						}
-						stage('TS-Client Tests') {
-							when {
-								expression { params.RunTSClient == 'true' }
-							}
-							steps {
-								timestamps {
-									script {
-										echo 'Triggering TS-Client tests job...'
-										env.TS_BRANCH = currentBuild.getProjectName()
-										build(
-											job: "../EPML-TS/${env.TS_BRANCH}", 
-											wait: true
-										)
-									}
-								}		
-							}
-						}
 					}
 				}
 			}
@@ -182,7 +165,23 @@ pipeline {
 						}		
 					}
 				}
-				
+				stage('TS-Client Tests') {
+					when {
+						expression { params.RunTSClient == 'true' }
+					}
+					steps {
+						timestamps {
+							script {
+								echo 'Triggering TS-Client tests job...'
+								env.TS_BRANCH = currentBuild.getProjectName()
+								build(
+									job: "../EPML-TS/${env.TS_BRANCH}", 
+									wait: true
+								)
+							}
+						}		
+					}
+				}
 			}
 		}
     }
