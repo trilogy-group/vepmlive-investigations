@@ -41,7 +41,7 @@ namespace EPMLiveCore.ActLicensing
         private const string FieldSetUserLevelOperationCompleted = "SetUserLevelOperationCompleted";
         private const string FielduseDefaultCredentialsSetExplicitly = "useDefaultCredentialsSetExplicitly";
         private Type _licensingInstanceType;
-        private const int TestsTimeOut = TestContants.TimeOutFiveSeconds;
+        private const int TestsTimeOut = TestContants.TimeOutSevenSeconds;
         private Licensing _licensingInstance;
         private Licensing _licensingInstanceFixture;
 
