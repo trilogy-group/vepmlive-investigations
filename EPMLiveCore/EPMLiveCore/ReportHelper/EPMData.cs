@@ -954,21 +954,17 @@ namespace EPMLiveCore.ReportHelper
 
                 if (command.Parameters.Count > 2000 || isDocumenttypeProcessing)
                 {
-                    var parameters = new List<SqlParameter>();
-                    foreach (object parameter in command.Parameters)
+					string addedParams = "";
+                    foreach (SqlParameter sqlParameter in command.Parameters)
                     {
-                        parameters.Add((SqlParameter)parameter);
-                    }
-
-                    foreach (SqlParameter sqlParameter in parameters)
-                    {
-                        if (sql.Contains(sqlParameter.ParameterName))
+                        if (sql.Contains(sqlParameter.ParameterName) && !addedParams.Contains(sqlParameter.ParameterName))
                         {
-                            sqlCommand.Parameters.Add(new SqlParameter(sqlParameter.ParameterName, sqlParameter.Value));
-                        }
+							addedParams += sqlParameter.ParameterName + ",";
+							sqlCommand.Parameters.Add(new SqlParameter(sqlParameter.ParameterName, sqlParameter.Value));
+						}
                     }
 
-                    sqlCommand.CommandTimeout = 3600; // 1hour
+					sqlCommand.CommandTimeout = 3600; // 1hour
                     sqlCommand.Connection = con;
                     sqlCommand.ExecuteNonQuery();
                 }
@@ -977,7 +973,7 @@ namespace EPMLiveCore.ReportHelper
                     command.CommandTimeout = 3600; // 1hour
                     command.Connection = con;
                     command.ExecuteNonQuery();
-                }
+				}
             }
             catch (SqlException ex)
             {
@@ -989,7 +985,6 @@ namespace EPMLiveCore.ReportHelper
 
                     using (var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery"))
                     {
-                        myLog.MaximumKilobytes = 32768;
                         var cmdDetails = new StringBuilder($"Command: {sql}");
                         var cmdParams = new StringBuilder(" Params: ");
 
@@ -1004,8 +999,12 @@ namespace EPMLiveCore.ReportHelper
                                 cmdParams.Append($"[Name:{param.ParameterName} Value: Null],");
                             }
                         }
+						var cmdMessage = cmdDetails.ToString();
+						cmdMessage = cmdMessage.Substring(0, Math.Min(1000, cmdMessage.Length));
+						var paramMessage = cmdParams.ToString();
+						paramMessage = paramMessage.Substring(0, Math.Min(1000, paramMessage.Length));
 
-                        myLog.WriteEntry($"Name: {_siteName} Url: {_siteUrl} ID: {SiteId} : {ex.Message}{cmdDetails}{cmdParams}",
+                        myLog.WriteEntry($"Name: {_siteName} Url: {_siteUrl} ID: {SiteId} : {ex.Message}{cmdMessage}{paramMessage}",
                                          EventLogEntryType.Error, 2050);
                     }
                 });
@@ -1015,7 +1014,7 @@ namespace EPMLiveCore.ReportHelper
             }
             finally
             {
-                command.Dispose();
+                
                 sqlCommand.Dispose();
             }
 

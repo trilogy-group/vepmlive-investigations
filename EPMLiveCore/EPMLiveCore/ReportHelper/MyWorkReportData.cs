@@ -237,17 +237,21 @@ namespace EPMLiveCore.ReportHelper
 
             if (_params.Count > 2000)
             {
-                var stringBuilder = new StringBuilder();
-
                 string[] stmts = sql.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                int totalParams = 0;
+				var divider = Math.Ceiling(_params.Count / (decimal)1900);
+				var itemsPerBatch = stmts.Length/ divider;
+				int indexer = 0;
+				var stringBuilder = new StringBuilder();
+				for (int j = 0; j < divider; j++)
+				{
+					for (int i = 0; i < itemsPerBatch && indexer < stmts.Length; i++)
+					{
+						stringBuilder.AppendLine(stmts[indexer]);
+						indexer++;
 
-                foreach (string stmt in stmts)
-                {
-                    stringBuilder.AppendLine(stmt);
-                    stringBuilder.AppendLine("!-x-x-x-x-x-!");
-                }
-
+					}
+					stringBuilder.AppendLine("!-x-x-x-x-x-!");
+				}
                 return stringBuilder.ToString();
             }
 
