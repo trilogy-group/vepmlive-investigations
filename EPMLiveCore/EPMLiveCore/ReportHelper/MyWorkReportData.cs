@@ -246,11 +246,17 @@ namespace EPMLiveCore.ReportHelper
 				{
 					for (int i = 0; i < itemsPerBatch && indexer < stmts.Length; i++)
 					{
-						stringBuilder.AppendLine(stmts[indexer]);
+						var stmt = stmts[indexer];
+						if (!string.IsNullOrWhiteSpace(stmt))
+						{
+							stringBuilder.AppendLine(stmt);
+						}
 						indexer++;
-
 					}
-					stringBuilder.AppendLine("!-x-x-x-x-x-!");
+					if (j < divider - 1)
+					{
+						stringBuilder.AppendLine("!-x-x-x-x-x-!");
+					}
 				}
                 return stringBuilder.ToString();
             }
