@@ -957,8 +957,7 @@ namespace EPMLiveCore.ReportHelper
                     var addedParams = new List<string>();
                     foreach (SqlParameter sqlParameter in command.Parameters)
                     {
-                        if (sql.Contains(sqlParameter.ParameterName) &&
-						    !addedParams.Contains(sqlParameter.ParameterName))
+                        if (sql.Contains(sqlParameter.ParameterName) && !addedParams.Contains(sqlParameter.ParameterName))
                         {
                             addedParams.Add(sqlParameter.ParameterName);
                             sqlCommand.Parameters.Add(new SqlParameter(sqlParameter.ParameterName, sqlParameter.Value));
@@ -966,7 +965,7 @@ namespace EPMLiveCore.ReportHelper
                     }
                     addedParams = null;
 
-					sqlCommand.CommandTimeout = 3600; // 1hour
+                    sqlCommand.CommandTimeout = 3600; // 1hour
                     sqlCommand.Connection = con;
                     sqlCommand.ExecuteNonQuery();
                 }

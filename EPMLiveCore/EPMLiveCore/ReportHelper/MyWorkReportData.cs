@@ -252,7 +252,7 @@ namespace EPMLiveCore.ReportHelper
                             stringBuilder.AppendLine(statement);
                         }
                         indexer++;
-					}
+                    }
                     if (j < divider - 1)
                     {
                         stringBuilder.AppendLine("!-x-x-x-x-x-!");
