@@ -954,15 +954,17 @@ namespace EPMLiveCore.ReportHelper
 
                 if (command.Parameters.Count > 2000 || isDocumenttypeProcessing)
                 {
-					string addedParams = "";
+                    var addedParams = new List<string>();
                     foreach (SqlParameter sqlParameter in command.Parameters)
                     {
-                        if (sql.Contains(sqlParameter.ParameterName) && !addedParams.Contains(sqlParameter.ParameterName))
+                        if (sql.Contains(sqlParameter.ParameterName) &&
+						    !addedParams.Contains(sqlParameter.ParameterName))
                         {
-							addedParams += sqlParameter.ParameterName + ",";
-							sqlCommand.Parameters.Add(new SqlParameter(sqlParameter.ParameterName, sqlParameter.Value));
-						}
+                            addedParams.Add(sqlParameter.ParameterName);
+                            sqlCommand.Parameters.Add(new SqlParameter(sqlParameter.ParameterName, sqlParameter.Value));
+                        }
                     }
+                    addedParams = null;
 
 					sqlCommand.CommandTimeout = 3600; // 1hour
                     sqlCommand.Connection = con;
@@ -973,7 +975,7 @@ namespace EPMLiveCore.ReportHelper
                     command.CommandTimeout = 3600; // 1hour
                     command.Connection = con;
                     command.ExecuteNonQuery();
-				}
+                }
             }
             catch (SqlException ex)
             {
@@ -999,12 +1001,11 @@ namespace EPMLiveCore.ReportHelper
                                 cmdParams.Append($"[Name:{param.ParameterName} Value: Null],");
                             }
                         }
-						var cmdMessage = cmdDetails.ToString();
-						cmdMessage = cmdMessage.Substring(0, Math.Min(1000, cmdMessage.Length));
-						var paramMessage = cmdParams.ToString();
-						paramMessage = paramMessage.Substring(0, Math.Min(1000, paramMessage.Length));
-
-                        myLog.WriteEntry($"Name: {_siteName} Url: {_siteUrl} ID: {SiteId} : {ex.Message}{cmdMessage}{paramMessage}",
+                        var cmdMessage = cmdDetails.ToString();
+                        cmdMessage = cmdMessage.Substring(0, Math.Min(1000, cmdMessage.Length));
+                        var paramMessage = cmdParams.ToString();
+                        paramMessage = paramMessage.Substring(0, Math.Min(1000, paramMessage.Length));
+                        myLog.WriteEntry($"Name: {_siteName} Url: {_siteUrl} ID: {SiteId} : {ex.Message}{cmdMessage}{paramMessage}{ex}",
                                          EventLogEntryType.Error, 2050);
                     }
                 });

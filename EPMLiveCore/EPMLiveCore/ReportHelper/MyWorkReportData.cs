@@ -238,26 +238,26 @@ namespace EPMLiveCore.ReportHelper
             if (_params.Count > 2000)
             {
                 string[] stmts = sql.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-				var divider = Math.Ceiling(_params.Count / (decimal)1900);
-				var itemsPerBatch = stmts.Length/ divider;
-				int indexer = 0;
-				var stringBuilder = new StringBuilder();
-				for (int j = 0; j < divider; j++)
-				{
-					for (int i = 0; i < itemsPerBatch && indexer < stmts.Length; i++)
-					{
-						var stmt = stmts[indexer];
-						if (!string.IsNullOrWhiteSpace(stmt))
-						{
-							stringBuilder.AppendLine(stmt);
-						}
-						indexer++;
+                var divider = Math.Ceiling(_params.Count / (decimal)1900);
+                var itemsPerBatch = stmts.Length / divider;
+                int indexer = 0;
+                var stringBuilder = new StringBuilder();
+                for (int j = 0; j < divider; j++)
+                {
+                    for (int i = 0; i < itemsPerBatch && indexer < stmts.Length; i++)
+                    {
+                        var statement = stmts[indexer];
+                        if (!string.IsNullOrWhiteSpace(statement))
+                        {
+                            stringBuilder.AppendLine(statement);
+                        }
+                        indexer++;
 					}
-					if (j < divider - 1)
-					{
-						stringBuilder.AppendLine("!-x-x-x-x-x-!");
-					}
-				}
+                    if (j < divider - 1)
+                    {
+                        stringBuilder.AppendLine("!-x-x-x-x-x-!");
+                    }
+                }
                 return stringBuilder.ToString();
             }
 
@@ -289,7 +289,7 @@ namespace EPMLiveCore.ReportHelper
             _params = _cmdWithParams.Parameters;
 
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-
+            System.Threading.Thread.Sleep(1);
             if (operation == "insert")
             {
                 colValues = " VALUES(";
@@ -564,7 +564,7 @@ namespace EPMLiveCore.ReportHelper
         protected override SqlParameter PopulateDefaultColumnValue(string sColumn, SPListItem li)
         {
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-
+            System.Threading.Thread.Sleep(1);
             var param = new SqlParameter();
             switch (sColumn)
             {
@@ -611,6 +611,7 @@ namespace EPMLiveCore.ReportHelper
         protected override SqlParameter PopulateMandatoryHiddenFldsColumnValue(string sColumn, SPListItem li)
         {
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+            System.Threading.Thread.Sleep(1);
             var param = new SqlParameter();
             string val = string.Empty;
             switch (sColumn)
@@ -693,7 +694,7 @@ namespace EPMLiveCore.ReportHelper
         private void AddMetaInfoCols(string listName, SPListItem spListItem, ref string cols, ref string values)
         {
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-
+            System.Threading.Thread.Sleep(1);
             cols = cols.Replace(")", ",[WorkType],[DataSource])");
             values = values.Replace(")",
                 string.Format(
