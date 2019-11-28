@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.SqlClient;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
@@ -13,10 +13,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     {
         private SPWeb _spWeb;
 
-        #region Constructors (1) 
+        #region Constructors (1) 
         public UpdateWorkspaceCenterQuery(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
 
-        #endregion Constructors 
+        #endregion Constructors 
 
         #region Overrides of UpgradeStep
 
@@ -118,17 +118,12 @@ END
     internal class AddDuplicateJobsTrigger : UpgradeStep
     {
         private SPWeb _spWeb;
-        private const string TriggerScript = @"
+        private const string TriggerDropScript = @"
 IF EXISTS (SELECT * FROM sys.triggers WHERE object_id = OBJECT_ID(N'[dbo].[EPG_JOBS_Cancel_PCV_Job_Insert]'))
 DROP TRIGGER [dbo].[EPG_JOBS_Cancel_PCV_Job_Insert]
-
+";
+        private const string TriggerCreateScript = @"
 /****** Object:  Trigger [dbo].[EPG_JOBS_Cancel_PCV_Job_Insert]    Script Date: 11/18/2019 10:30:30 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
 CREATE TRIGGER [dbo].[EPG_JOBS_Cancel_PCV_Job_Insert]
    ON  [dbo].[EPG_JOBS]
    INSTEAD OF INSERT
@@ -164,10 +159,10 @@ GO
 ALTER TABLE [dbo].[EPG_JOBS] ENABLE TRIGGER [EPG_JOBS_Cancel_PCV_Job_Insert]
 GO
 ";
-        #region Constructors (1) 
+        #region Constructors (1) 
         public AddDuplicateJobsTrigger(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
 
-        #endregion Constructors 
+        #endregion Constructors 
 
         #region Overrides of UpgradeStep
 
@@ -198,7 +193,9 @@ GO
             LogMessage("Connecting to the database.", 2);
             using (var connection = connectionProvider.CreateConnection(Web))
             {
-                connection.ExecuteNonQuery(TriggerScript);
+                connection.ExecuteNonQuery(TriggerDropScript);
+                LogMessage("Trigger dropped.", MessageKind.SUCCESS, 1);
+                connection.ExecuteNonQuery(TriggerCreateScript);
                 LogMessage("Trigger created.", MessageKind.SUCCESS, 1);
             }
         }
