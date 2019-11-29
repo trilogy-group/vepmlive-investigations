@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.SqlClient;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
@@ -13,10 +13,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     {
         private SPWeb _spWeb;
 
-        #region Constructors (1) 
+        #region Constructors (1) 
         public UpdateWorkspaceCenterQuery(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
 
-        #endregion Constructors 
+        #endregion Constructors 
 
         #region Overrides of UpgradeStep
 
@@ -157,10 +157,10 @@ END
 ALTER TABLE [dbo].[EPG_JOBS] ENABLE TRIGGER [EPG_JOBS_Cancel_PCV_Job_Insert]
 
 ";
-        #region Constructors (1) 
+        #region Constructors (1) 
         public AddDuplicateJobsTrigger(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
 
-        #endregion Constructors 
+        #endregion Constructors 
 
         #region Overrides of UpgradeStep
 
