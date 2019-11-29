@@ -154,10 +154,8 @@ BEGIN
 	
 END
 
-GO
-
 ALTER TABLE [dbo].[EPG_JOBS] ENABLE TRIGGER [EPG_JOBS_Cancel_PCV_Job_Insert]
-GO
+
 ";
         #region Constructors (1) 
         public AddDuplicateJobsTrigger(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
