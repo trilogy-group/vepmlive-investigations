@@ -46,20 +46,26 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             if (byteArrayFileContentsBefore.Length > 0)
                             {
                                 string strReportContentsBefore = enc.GetString(byteArrayFileContentsBefore);
-
-                                string strReportContentsAfter = strReportContentsBefore.Replace("union", "union all");
-
-                                byte[] byteArrayFileContentsAfter = null;
-                                if (!strReportContentsAfter.Equals(string.Empty))
+                                if (strReportContentsBefore.IndexOf("union all") < 0)
                                 {
-                                    _spWeb.AllowUnsafeUpdates = true;
-                                    byteArrayFileContentsAfter = enc.GetBytes(strReportContentsAfter);
-                                    spfile.SaveBinary(byteArrayFileContentsAfter); //save to the file.
-                                    LogMessage("Resource Capacity Heat Map report updated succesfully", 2);
+                                    string strReportContentsAfter = strReportContentsBefore.Replace("union", "union all");
+
+                                    byte[] byteArrayFileContentsAfter = null;
+                                    if (!strReportContentsAfter.Equals(string.Empty))
+                                    {
+                                        _spWeb.AllowUnsafeUpdates = true;
+                                        byteArrayFileContentsAfter = enc.GetBytes(strReportContentsAfter);
+                                        spfile.SaveBinary(byteArrayFileContentsAfter); //save to the file.
+                                        LogMessage("Resource Capacity Heat Map report updated succesfully", 2);
+                                    }
+                                    else
+                                    {
+                                        LogMessage("Resource Capacity Heat Map report is empty", MessageKind.FAILURE, 4);
+                                    }
                                 }
                                 else
                                 {
-                                    LogMessage("Resource Capacity Heat Map report is empty", MessageKind.FAILURE, 4);
+                                    LogMessage("Resource Capacity Heat Map report is already patched", MessageKind.SKIPPED, 4);
                                 }
                             }
                         }
