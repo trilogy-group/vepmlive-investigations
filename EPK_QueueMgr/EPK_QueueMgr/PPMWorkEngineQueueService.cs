@@ -28,18 +28,20 @@ namespace WE_QueueMgr
         private long m_lExceptionCount = 0;
 
         private List<QMSite> m_sites;
+        private string m_basepaths;
         object sitesLock = new object();
-        private List<QMSite> Sites
+        private List<QMSite> GetSites(out string basepaths)
         {
-            get
+            lock (sitesLock)
             {
-                lock (sitesLock)
-                {
-                    return m_sites;
-                }
+                List<QMSite> res = new List<QMSite>();
+                res.AddRange(m_sites);
+                basepaths = m_basepaths;
+                return res;
             }
         }
-        private string BuildSitesList()
+
+        private void BuildSitesList()
         {
 
             try
@@ -124,24 +126,24 @@ namespace WE_QueueMgr
                 lock (sitesLock)
                 {
                     m_sites = newSites;
+                    m_basepaths = basepaths;
                 }
-                return basepaths;
             }
             catch (Exception ex)
             {
                 ExceptionHandler("BuildSitesList", ex);
-                return "";
             }
 
         }
 
         public void QueueNotification(Notification notification)
         {
-            List<QMSite> sites = Sites;
+            string basepaths;
+            List<QMSite> sites = GetSites(out basepaths);
             if (sites != null)
             {
                 var site = sites.Where(i => i.basePath.Equals(notification.BasePath, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
-                if (ManageQueueJobs(site))
+                if (ManageQueueJobs(site, true))
                     kickOffLongWorkEvent.Set();
             }
         }
@@ -193,8 +195,9 @@ namespace WE_QueueMgr
                         jobMaxTimeout = new TimeSpan(0, timeoutMins, 0);
                     }
                 }
-
-                string basepaths = BuildSitesList();
+                BuildSitesList();
+                string basepaths;
+                List<QMSite> sites = GetSites(out basepaths);
                 _cts = new CancellationTokenSource();
                 token = _cts.Token;
 
@@ -202,7 +205,7 @@ namespace WE_QueueMgr
                 {
                     MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
                     m_lExceptionCount = 0;
-                    List<QMSite> sites = Sites;
+                    
                     if (sites != null)
                     {
                         foreach (QMSite site in sites)
@@ -270,7 +273,8 @@ namespace WE_QueueMgr
                 {
                     firstBeat = true;
                     lastCheck = newCheck;
-                    List<QMSite> sites = Sites;
+                    string basepaths;
+                    List<QMSite> sites = GetSites(out basepaths);
                     if (sites != null)
                     {
                         foreach (QMSite site in sites)
@@ -322,9 +326,9 @@ namespace WE_QueueMgr
         }
 
         object longRunQueueLock = new object();
-        List<Tuple<QMSite, Guid, String>> longRunQueue = new List<Tuple<QMSite, Guid, String>>();
+        List<Tuple<QMSite, Guid, String, DateTime, bool>> longRunQueue = new List<Tuple<QMSite, Guid, String, DateTime, bool>>();
 
-        void EnqueueSite(QMSite site, Guid jobId, string contextData)
+        void EnqueueSite(QMSite site, Guid jobId, string contextData, DateTime submitted, bool prioritize)
         {
             lock (longRunQueueLock)
             {
@@ -335,7 +339,7 @@ namespace WE_QueueMgr
                 }
                 if (index < 0)
                 {
-                    longRunQueue.Add(new Tuple<QMSite, Guid, String>(site, jobId, contextData));
+                    longRunQueue.Add(new Tuple<QMSite, Guid, String, DateTime, bool>(site, jobId, contextData, submitted, prioritize));
                 }
 
             }
@@ -357,23 +361,44 @@ namespace WE_QueueMgr
             return exclusion;
         }
         //Loop once every:
-        TimeSpan longRunPeriod = new TimeSpan(0, 1, 0);
+        TimeSpan mainLoopPeriod = new TimeSpan(0, 1, 0);
         TimeSpan jobMaxTimeout = new TimeSpan(1, 0, 0);
         TimeSpan completionPollPeriod = new TimeSpan(0, 1, 0);
+
         //Backup queue jobs processing call every:
         TimeSpan queueJobsPeriod = new TimeSpan(0, 10, 0);
         //check for timed jobs every:
         TimeSpan timedJobsPeriod = new TimeSpan(0, 1, 0);
+        //Build sites every:
+        TimeSpan buildSitesPeriod = new TimeSpan(0, 30, 0);
+
         int maxThreadCount = 4;
         int reserveSeats = 2;
         AutoResetEvent kickOffLongWorkEvent = new AutoResetEvent(false);
         void DoLongRun()
         {
             List<Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>> processingJobs = new List<Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>>();
+            DateTime sitesLastCheck = DateTime.Now;
             DateTime queuedLastCheck = DateTime.Now;
             DateTime timedLastCheck = DateTime.Now;
             while (!token.IsCancellationRequested)
             {
+
+                //BUILD SITES
+                try
+                {
+                    DateTime sitesNewCheck = DateTime.Now;
+                    if (sitesNewCheck - sitesLastCheck > buildSitesPeriod)
+                    {
+                        sitesLastCheck = sitesNewCheck;
+                        BuildSitesList();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExceptionHandler("BuildingSites", ex);
+                }
+
                 //QUEUING
                 try
                 {
@@ -381,11 +406,11 @@ namespace WE_QueueMgr
                     if (queuedNewCheck - queuedLastCheck > queueJobsPeriod)
                     {
                         queuedLastCheck = queuedNewCheck;
-                        string basepaths = BuildSitesList();
+                        string basepaths;
+                        List<QMSite> sites = GetSites(out basepaths);
                         if (!string.IsNullOrEmpty(basepaths))
                             MessageHandler("Refresh", "Refresh site list",
                                             "active basePaths :\n" + basepaths.Replace(',', '\n'));
-                        List<QMSite> sites = Sites;
                         if (sites != null)
                         {
                             foreach (QMSite site in sites)
@@ -397,7 +422,7 @@ namespace WE_QueueMgr
                 }
                 catch (Exception ex)
                 {
-                    ExceptionHandler("ProcessTimerJobs", ex);
+                    ExceptionHandler("QueuingJobs", ex);
                 }
                 try
                 {
@@ -405,7 +430,8 @@ namespace WE_QueueMgr
                     if (timedNewCheck - timedLastCheck > timedJobsPeriod)
                     {
                         timedLastCheck = timedNewCheck;
-                        List<QMSite> sites = Sites;
+                        string basepaths;
+                        List<QMSite> sites = GetSites(out basepaths);
                         if (sites != null)
                         {
                             foreach (QMSite site in sites)
@@ -419,11 +445,19 @@ namespace WE_QueueMgr
                 }
                 catch (Exception ex)
                 {
-                    ExceptionHandler("ProcessTimerJobs", ex);
+                    ExceptionHandler("TimingJobs", ex);
                 }
 
 
-                kickOffLongWorkEvent.WaitOne(longRunPeriod);
+                kickOffLongWorkEvent.WaitOne(mainLoopPeriod);
+
+                //REORDER
+                lock (longRunQueueLock)
+                {
+                    List<Tuple<QMSite, Guid, String, DateTime, bool>> newList = longRunQueue.GetRange(processingJobs.Count, longRunQueue.Count - processingJobs.Count);
+                    longRunQueue.RemoveRange(processingJobs.Count, newList.Count);
+                    longRunQueue.AddRange(newList.OrderByDescending(x => x.Item5).ThenBy(x => x.Item4).ToArray());
+                }
 
                 //PROCESSING
                 while (processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
@@ -533,7 +567,7 @@ namespace WE_QueueMgr
 
         private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
 
-        private bool ManageQueueJobs(QMSite site)
+        private bool ManageQueueJobs(QMSite site, bool prioritize = false)
         {
             bool enqueued = false;
             if (site != null)
@@ -563,7 +597,7 @@ namespace WE_QueueMgr
                                             ErrorHandler("ManageQueueJobs Case 200", 98765);
                                             break;
                                         default:
-                                            EnqueueSite(site, qm.guidJob, qm.ContextData);
+                                            EnqueueSite(site, qm.guidJob, qm.ContextData,qm.Submitted, prioritize);
                                             enqueued = true;
                                             break;
                                     }
