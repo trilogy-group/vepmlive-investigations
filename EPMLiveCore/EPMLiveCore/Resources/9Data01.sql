@@ -511,3 +511,37 @@ begin
     UPDATE EMAILTEMPLATES SET subject='Performance Publish Job {Publish_Status}.', body='<table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial"><table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Performance Publish Job {Publish_DetailedStatus}.</td></tr></tbody></table>' where emailid=15
 end
 
+if not exists (select * from VERSIONS where "Version" = '7.1.5.0')
+begin
+    
+delete from tsuser 
+from tsuser a 
+inner join 
+(
+select username ,count(distinct tsuseruid) cont
+from tsuser 
+group by username 
+having count(distinct tsuseruid) > 1
+) b
+on a.username = b.username
+
+insert into tsuser
+select max(a.tsuser_uid), max(a.site_uid), null, a.username, max(a.ResourceName) 
+from tstimesheet a
+left outer join tsuser b
+on a.username = b.username
+where b.tsuseruid is null
+and a.tsuser_uid is not null
+group by a.username
+
+update tstimesheet set tsuser_uid = b.tsuseruid
+from
+tstimesheet a
+left outer join 
+tsuser b
+on a.username = b.username 
+and a.tsuser_uid <> b.tsuseruid
+where b.tsuseruid is not null
+
+insert into VERSIONS VALUES ('7.1.5.0', GETDATE())
+end
