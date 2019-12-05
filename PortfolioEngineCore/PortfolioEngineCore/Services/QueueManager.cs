@@ -78,6 +78,14 @@ namespace PortfolioEngineCore
             }
         }
 
+        DateTime m_dtSubmitted = DateTime.Now;
+        public DateTime Submitted
+        {
+            get
+            {
+                return m_dtSubmitted;
+            }
+        }
         public bool ReadNextQueuedItem(string exclusion = null)
         {
             bool bItemToProcess = false;
@@ -107,6 +115,7 @@ namespace PortfolioEngineCore
                     m_sSession = DBAccess.ReadStringValue(reader["JOB_SESSION"]);
                     m_sComment = DBAccess.ReadStringValue(reader["JOB_COMMENT"]);
                     m_lWResID = DBAccess.ReadIntValue(reader["WRES_ID"]);
+                    m_dtSubmitted = DBAccess.ReadDateValue(reader["JOB_SUBMITTED"]);
                     bItemToProcess = true;
                 }
                 reader.Close();
