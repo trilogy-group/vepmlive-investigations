@@ -122,8 +122,9 @@ foreach ($component in $config.Components)
 		
 		
     }
+	
 }
- 
+&reg import freePfeComApartmentThreading.reg *>&1 | out-null
 #### Install WSP ####
 if ($deploySolutions)
 {

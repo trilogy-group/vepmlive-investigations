@@ -54,6 +54,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
                     else
                     {
                         long lastVersionedSequence = web.AllProperties.ContainsKey("LastVersionedUpgrade") ? long.Parse((string)web.AllProperties["LastVersionedUpgrade"]) : 0;
+                        if (lastVersionedSequence < 1000000000L)
+                            lastVersionedSequence = lastVersionedSequence * 100;
                         long lastGenericSequence = web.AllProperties.ContainsKey("LastGenericUpgrade") ? long.Parse((string)web.AllProperties["LastGenericUpgrade"]) : 0;
 
                         steps = upgradeSteps.Where(item => item.Key > lastVersionedSequence).OrderBy(item => item.Key).ToList();

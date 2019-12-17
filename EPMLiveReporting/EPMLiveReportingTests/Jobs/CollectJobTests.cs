@@ -271,6 +271,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => RefreshTimeSheetWasCalled.ShouldBeTrue());
         }
 
+
         [TestMethod]
         public void Execute_WithExceptions_LogErrorMessages()
         {
@@ -431,7 +432,6 @@ namespace EPMLiveReporting.Tests.Jobs
                 {
 
                 };
-            
             ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRefFalse;
 
             ShimDataSet.AllInstances.TablesGet = _ => null;
@@ -732,7 +732,6 @@ namespace EPMLiveReporting.Tests.Jobs
             return ReturnValue;
         }
 
-
         /// <summary>
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
@@ -758,7 +757,7 @@ namespace EPMLiveReporting.Tests.Jobs
         {
             throw new Exception();
         }
-
+        
         /// <summary>
         /// This is a fake method. All the parameters are required, even though not all of them are used
         /// </summary>
