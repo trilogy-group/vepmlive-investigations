@@ -511,7 +511,7 @@ begin
     UPDATE EMAILTEMPLATES SET subject='Performance Publish Job {Publish_Status}.', body='<table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial"><table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Performance Publish Job {Publish_DetailedStatus}.</td></tr></tbody></table>' where emailid=15
 end
 
-if not exists (select * from VERSIONS where "Version" = '7.1.5.0')
+if not exists (select * from VERSIONS where "Version" = '7.1.6.0')
 begin
     
 delete from tsuser 
@@ -543,5 +543,5 @@ on a.username = b.username
 and a.tsuser_uid <> b.tsuseruid
 where b.tsuseruid is not null
 
-insert into VERSIONS VALUES ('7.1.5.0', GETDATE())
+insert into VERSIONS VALUES ('7.1.6.0', GETDATE())
 end
