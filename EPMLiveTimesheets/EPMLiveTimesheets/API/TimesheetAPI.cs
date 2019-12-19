@@ -4008,10 +4008,9 @@ namespace TimeSheets
             }
 
             var userId = Guid.Empty;
-            using (var cmd = new SqlCommand("SELECT TSUSERUID FROM TSUSER WHERE USER_ID=@uid", connection))
+            using (var cmd = new SqlCommand("SELECT TSUSERUID FROM TSUSER WHERE username=@username", connection))
             {
-                cmd.Parameters.AddWithValue("@uid", user.ID);
-
+                cmd.Parameters.AddWithValue("@username", user.LoginName);
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
