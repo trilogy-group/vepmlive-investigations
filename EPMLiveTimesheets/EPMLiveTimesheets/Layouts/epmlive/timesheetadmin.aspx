@@ -833,8 +833,6 @@
 
 	            var lastDate = mygrid.cells(mygrid.getRowsNum(), 1).getValue();
 	            PeriodAutomation.setMinDate(DateHelper.addDays(DateHelper.convertToUtcDate(lastDate), 1));
-	            availFields.options.length = 0;
-	            selectedFields.options.length = 0;
 
 	        });
 	        function clearSelections()
