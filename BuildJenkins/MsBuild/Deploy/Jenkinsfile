@@ -11,7 +11,7 @@ pipeline {
 		timeout(time: 2, unit: 'HOURS') 
 	}
 	parameters {
-		string(name: 'TargetHost', defaultValue: '10.25.2.82', description: 'Target host to deploy to')
+		string(name: 'TargetHost', defaultValue: '10.137.18.88', description: 'Target host to deploy to')
 		string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
 		string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
 		string(name: 'PackageTarget', defaultValue: 'c:\\SilentInstaller', description: 'Folder on the target host to copy packages to')
