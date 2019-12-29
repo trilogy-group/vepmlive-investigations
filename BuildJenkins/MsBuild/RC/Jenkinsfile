@@ -1,7 +1,7 @@
 pipeline {
     agent {
         node {
-            label 'skyvera-non-docker-jenkins-win-build'
+            label 'epmlive-win-full'
             customWorkspace "c:\\jenkins\\build"
         }
     }
@@ -11,7 +11,7 @@ pipeline {
 	
     }
     parameters {
-        string(name: 'Version', defaultValue: '7.1.5.x', description: 'Version to set (x is replaced with current build number)')
+        string(name: 'Version', defaultValue: '7.1.6.x', description: 'Version to set (x is replaced with current build number)')
     }
     stages {
         stage('Prepare for build') {

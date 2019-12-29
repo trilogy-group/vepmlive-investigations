@@ -544,7 +544,7 @@
 	        <wssuc:ButtonSection runat="server">
 		        <Template_Buttons>
 			        <asp:PlaceHolder ID="PlaceHolder1" runat="server">
-				        <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button1" accesskey="" Width="150"/>
+				        <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button1" accesskey="" Width="150" OnClientClick="clearSelections()"/>
 			        </asp:PlaceHolder>
 		        </Template_Buttons>
 	        </wssuc:ButtonSection>    
@@ -833,8 +833,19 @@
 
 	            var lastDate = mygrid.cells(mygrid.getRowsNum(), 1).getValue();
 	            PeriodAutomation.setMinDate(DateHelper.addDays(DateHelper.convertToUtcDate(lastDate), 1));
-	        });
 
+	        });
+	        function clearSelections()
+	        {
+                var availFields = document.getElementById("<%=ddlListAvailableFields.ClientID %>");
+	            var selectedFields = document.getElementById("<%=ddlListSelectedFields.ClientID %>");
+	            availFields.options.length = 0;
+	            selectedFields.options.length = 0;
+                var sList = document.getElementById("<%=ddlTSFieldsA.ClientID %>");
+	            var tList = document.getElementById("<%=ddlTSFieldsS.ClientID %>");
+	            sList.options.length = 0;
+	            tList.options.length = 0;
+	        }
 	        function switchList() {
 	            var lst = document.getElementById("<%=ddlFieldLists.ClientID%>").value;
 	            var allFields = document.getElementById("lst" + lst.replace(/ /g, "_")).value.split(',');
