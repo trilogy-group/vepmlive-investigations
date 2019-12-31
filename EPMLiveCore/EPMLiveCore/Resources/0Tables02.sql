@@ -581,3 +581,8 @@ if not exists(select * from sys.indexes where name = 'IX_TSMETA_TS_ITEM_UID')
 begin
 	CREATE INDEX [IX_TSMETA_TS_ITEM_UID] ON [dbo].[TSMETA] ([TS_ITEM_UID])
 end
+
+if not exists(select * from sys.indexes where name = 'IX_PERSONALIZATIONS_Key')
+begin
+	CREATE NONCLUSTERED INDEX [IX_PERSONALIZATIONS_Key] ON [dbo].[PERSONALIZATIONS] ([Key], [SiteId], [WebId], [ListId]) INCLUDE ([UserID], [Value], [ItemId], [FK])
+end
