@@ -598,3 +598,11 @@ begin
 		[Type] ASC
 	)
 end 
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype')
+begin
+	CREATE NONCLUSTERED INDEX [IX_TIMERJOBS_scheduletype] ON [dbo].[TIMERJOBS] 
+	(	
+		[scheduletype] ASC
+	) INCLUDE ([timerjobuid], [lastqueuecheck])
+end 
