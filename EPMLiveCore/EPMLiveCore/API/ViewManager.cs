@@ -178,8 +178,9 @@ namespace EPMLiveCore.API
 
                 RemoveandAddView(newname, defaultView, viewDecoded);
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
+                Trace.TraceError("KeyNotFoundException suppressed: {0}", ex);
                 // SKYVERA-4235: Case when there're existing Views with Encoded names
                 try
                 {
