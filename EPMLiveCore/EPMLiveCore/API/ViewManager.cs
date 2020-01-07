@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using Microsoft.SharePoint;
 using System.Xml;
+using System.Diagnostics;
+using System.Web;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
@@ -73,7 +75,7 @@ namespace EPMLiveCore.API
 
             if(Name != "")
             {
-                Name = System.Web.HttpUtility.UrlDecode(Name);
+                Name = HttpUtility.UrlDecode(Name);
                 bool found = false;
                 bool foundDefault = false;
 
@@ -165,7 +167,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                var viewDecoded = System.Web.HttpUtility.UrlDecode(view);
+                var viewDecoded = HttpUtility.UrlDecode(view);
                 if (defaultView.ToLower() == "true")
                 {
                     foreach (KeyValuePair<string, Dictionary<string, string>> key in Views)
@@ -176,10 +178,21 @@ namespace EPMLiveCore.API
 
                 RemoveandAddView(newname, defaultView, viewDecoded);
             }
-            catch (Exception ex)
+            catch (KeyNotFoundException)
             {
                 // SKYVERA-4235: Case when there're existing Views with Encoded names
-                RemoveandAddView(newname, defaultView, view);
+                try
+                {
+                    RemoveandAddView(newname, defaultView, view);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("Exception suppressed: {0}", e);
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Exception suppressed: {0}", e);
             }
         }
 
@@ -191,7 +204,7 @@ namespace EPMLiveCore.API
                 d["Default"] = defaultView;
             }
             Views.Remove(viewName);
-            Views.Add(System.Web.HttpUtility.UrlDecode(newName), d);
+            Views.Add(HttpUtility.UrlDecode(newName), d);
         }
 
         public override string ToString()
