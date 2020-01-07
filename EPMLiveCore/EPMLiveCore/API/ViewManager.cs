@@ -164,7 +164,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                view = System.Web.HttpUtility.UrlDecode(view);
+                var viewDecoded = System.Web.HttpUtility.UrlDecode(view);
                 if (defaultView.ToLower() == "true")
                 {
                     foreach (KeyValuePair<string, Dictionary<string, string>> key in Views)
@@ -173,15 +173,24 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                Dictionary<string, string> d = Views[view];
-                if (d.ContainsKey("Default"))
-                {                    
-                    d["Default"] = defaultView;
-                }
-                Views.Remove(view);
-                Views.Add(System.Web.HttpUtility.UrlDecode(newname), d);
+                RemoveandAddView(newname, defaultView, viewDecoded);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // SKYVERA-4235: Case when there're existing Views with Encoded names
+                RemoveandAddView(newname, defaultView, view);
+            }
+        }
+
+        private void RemoveandAddView(string newName, string defaultView, string viewName)
+        {
+            Dictionary<string, string> d = Views[viewName];
+            if (d.ContainsKey("Default"))
+            {
+                d["Default"] = defaultView;
+            }
+            Views.Remove(viewName);
+            Views.Add(System.Web.HttpUtility.UrlDecode(newName), d);
         }
 
         public override string ToString()
