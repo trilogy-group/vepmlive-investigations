@@ -198,13 +198,13 @@ namespace EPMLiveCore.API
 
         private void RemoveandAddView(string newName, string defaultView, string viewName)
         {
-            Dictionary<string, string> d = Views[viewName];
-            if (d.ContainsKey("Default"))
+            var view = Views[viewName];
+            if (view.ContainsKey("Default"))
             {
-                d["Default"] = defaultView;
+                view["Default"] = defaultView;
             }
             Views.Remove(viewName);
-            Views.Add(HttpUtility.UrlDecode(newName), d);
+            Views.Add(HttpUtility.UrlDecode(newName), view);
         }
 
         public override string ToString()

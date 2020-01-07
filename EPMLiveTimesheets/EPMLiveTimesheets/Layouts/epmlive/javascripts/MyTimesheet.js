@@ -1207,7 +1207,7 @@ function RenameView(grid, view, retval) {
             for (var view in newobj.Views) {
                 var oView = newobj.Views[view];
 
-                if (unescape(oView.Name) == unescape(retval[0])) {
+                if (unescape(oView.Name) === unescape(retval[0])) {
                     newobj.CurrentView = unescape(retval[0]);
                     newobj.CurrentViewId = view;
                     break;
