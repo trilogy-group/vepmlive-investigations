@@ -73,6 +73,7 @@ namespace EPMLiveCore.API
 
             if(Name != "")
             {
+                Name = System.Web.HttpUtility.UrlDecode(Name);
                 bool found = false;
                 bool foundDefault = false;
 
