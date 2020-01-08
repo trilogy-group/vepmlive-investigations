@@ -684,6 +684,60 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
+        public void DeleteCostDetailsWithDT_OnSccess_ReturnsStatusSuccess()
+        {
+            // Arrange
+            var dt = new DataTable();
+            dt.Columns.Add("BC_UID", typeof(Int32));
+            dt.Rows.Add(new object[] { 1 });
+            dt.Rows.Add();
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+
+            // Act
+            var result = dbaEditCosts.DeleteCostDetails(dbaAccess, 1, 1, 1, dt);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSuccess, result);
+        }
+
+        [TestMethod]
+        public void DeleteCostDetails_WithNullDT_ReturnsStatusSuccess()
+        {
+            // Arrange
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ => 1;
+
+            // Act
+            var result = dbaEditCosts.DeleteCostDetails(dbaAccess, 1, 1, 1, null);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsSuccess, result);
+        }
+
+        [TestMethod]
+        public void DeleteCostDetailsWithDT_OnException_ReturnsStatusError()
+        {
+            // Arrange
+            var dt = new DataTable();
+            dt.Columns.Add("BC_UID", typeof(Int32));
+            dt.Rows.Add(new object[] {1});
+            ShimSqlCommand.AllInstances.ExecuteNonQuery = _ =>
+            {
+                throw new Exception();
+            };
+            ShimSqlDb.AllInstances.HandleStatusErrorSeverityEnumStringStatusEnumStringBoolean =
+                (_, severity, sFunction, status, text, skipLog) => StatusEnum.rsServerError;
+
+            // Act
+            var result = dbaEditCosts.DeleteCostDetails(dbaAccess, 1, 1, 1, dt);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(StatusEnum.rsServerError, result);
+        }
+
+        [TestMethod]
         public void DeleteCostDetailsValues_OnSccess_ReturnsStatusSuccess()
         {
             // Arrange
