@@ -116,6 +116,11 @@ namespace EPMLiveCore
 
         public override void ItemAdding(SPItemEventProperties properties)
         {
+            if (properties?.ListItemId > 0) // This will be true if item recovered from recycle otherwise it will be 0
+            {
+                return;
+            }
+
             loadData(properties.List, properties.SiteId);
 
             processItem(properties, true);
