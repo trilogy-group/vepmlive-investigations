@@ -684,7 +684,7 @@ namespace PortfolioEngineCore.Tests.Base
         }
 
         [TestMethod]
-        public void DeleteCostDetailsWithDT_OnSccess_ReturnsStatusSuccess()
+        public void DeleteCostDetailsWithDT_OnSuccess_ReturnsStatusSuccess()
         {
             // Arrange
             var dt = new DataTable();
