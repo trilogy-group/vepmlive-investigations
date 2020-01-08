@@ -586,3 +586,15 @@ if not exists(select * from sys.indexes where name = 'IX_PERSONALIZATIONS_Key')
 begin
 	CREATE NONCLUSTERED INDEX [IX_PERSONALIZATIONS_Key] ON [dbo].[PERSONALIZATIONS] ([Key], [SiteId], [WebId], [ListId]) INCLUDE ([UserID], [Value], [ItemId], [FK])
 end
+
+if not exists(select 1 from sys.indexes where name = 'IX_FRF_SITE_ID')
+begin
+	CREATE NONCLUSTERED INDEX [IX_FRF_SITE_ID] ON [dbo].[FRF] 
+	(
+		[SITE_ID] ASC, 
+		[WEB_ID] ASC, 
+		[LIST_ID] ASC, 
+		[USER_ID] ASC, 
+		[Type] ASC
+	)
+end 
