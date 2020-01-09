@@ -291,6 +291,7 @@ namespace EPMLiveCore
             }
             catch (Exception ex)
             {
+                Trace.TraceError("Exception suppressed: {0}", ex);
                 return Response.Failure(1000, string.Format("Error executing function: {0}", ex.Message));
             }
         }

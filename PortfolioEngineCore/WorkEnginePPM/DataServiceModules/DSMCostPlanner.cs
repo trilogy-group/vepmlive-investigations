@@ -445,9 +445,6 @@ namespace WorkEnginePPM.DataServiceModules
                                                             row["costtypeid"].Equals(costTypeId) &&
                                                             row["bc_uid"].Equals(dataRowView["bc_uid"])
                                                             select row).Count();
-                                if (costCategoryRowCount == 0)
-                                    _dtInsertCostData.Rows.Add(new object[] { calendarId, calendarValue, projectId, projectValue, costTypeId, costTypeValue, dataRowView["bc_uid"], dataRowView["bc_name"], 0, 0, 0, 0, 0, 0, 0, "", "", "", "", "", 0, "", 0, 0, false, false, "", true });
-
                             }
 
                             DataTable dtInsertCostDetails = new DataTable();
@@ -602,11 +599,10 @@ namespace WorkEnginePPM.DataServiceModules
             Boolean returnValue = false;
             try
             {
-                Int32 rowsAffected;
                 String sResult;
                 _dba.Open();
                 _dba.BeginTransaction();
-                if (dbaEditCosts.DeleteCostDetails(_dba, calendarId, costTypeId, projectId, out rowsAffected) == StatusEnum.rsSuccess)
+                if (dbaEditCosts.DeleteCostDetails(_dba, calendarId, costTypeId, projectId, dtInsertCostDetails) == StatusEnum.rsSuccess)
                 {
                     if (dbaEditCosts.DeleteCostDetailValues(_dba, calendarId, costTypeId, projectId, dtInsertCostDetailValues) == StatusEnum.rsSuccess)
                     {
