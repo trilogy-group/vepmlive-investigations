@@ -77,7 +77,7 @@
           </elementProp>
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">${__P(envURL,10.25.1.146)}</stringProp>
+            <stringProp name="Argument.value">${__P(envURL,10.137.18.48)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -132,7 +132,7 @@
           </elementProp>
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">${__P(envURL,10.25.1.146)}</stringProp>
+            <stringProp name="Argument.value">${__P(envURL,10.137.18.48)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>

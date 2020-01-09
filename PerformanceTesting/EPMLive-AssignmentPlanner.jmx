@@ -60,7 +60,7 @@
           </elementProp>
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">${__P(envURL,10.25.1.146)}</stringProp>
+            <stringProp name="Argument.value">${__P(envURL,10.137.18.48)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -115,7 +115,7 @@
           </elementProp>
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">${__P(envURL,10.25.1.146)}</stringProp>
+            <stringProp name="Argument.value">${__P(envURL,10.137.18.48)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -159,7 +159,7 @@
         <collectionProp name="DNSCacheManager.hosts">
           <elementProp name="apps22.epmlive.com" elementType="StaticHost">
             <stringProp name="StaticHost.Name">apps22.epmlive.com</stringProp>
-            <stringProp name="StaticHost.Address">10.25.1.146</stringProp>
+            <stringProp name="StaticHost.Address">10.137.18.48</stringProp>
           </elementProp>
           <elementProp name="tenant02.epmldev.com" elementType="StaticHost">
             <stringProp name="StaticHost.Name">tenant02.epmldev.com</stringProp>
