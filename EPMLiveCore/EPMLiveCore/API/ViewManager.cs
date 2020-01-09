@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using Microsoft.SharePoint;
 using System.Xml;
+using System.Diagnostics;
+using System.Web;
+using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API
 {
@@ -73,6 +75,7 @@ namespace EPMLiveCore.API
 
             if(Name != "")
             {
+                Name = HttpUtility.UrlDecode(Name);
                 bool found = false;
                 bool foundDefault = false;
 
@@ -164,7 +167,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                view = System.Web.HttpUtility.UrlDecode(view);
+                var viewDecoded = HttpUtility.UrlDecode(view);
                 if (defaultView.ToLower() == "true")
                 {
                     foreach (KeyValuePair<string, Dictionary<string, string>> key in Views)
@@ -173,15 +176,36 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                Dictionary<string, string> d = Views[view];
-                if (d.ContainsKey("Default"))
-                {                    
-                    d["Default"] = defaultView;
-                }
-                Views.Remove(view);
-                Views.Add(System.Web.HttpUtility.UrlDecode(newname), d);
+                RemoveandAddView(newname, defaultView, viewDecoded);
             }
-            catch { }
+            catch (KeyNotFoundException ex)
+            {
+                Trace.TraceError("KeyNotFoundException suppressed: {0}", ex);
+                // SKYVERA-4235: Case when there're existing Views with Encoded names
+                try
+                {
+                    RemoveandAddView(newname, defaultView, view);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("Exception suppressed: {0}", e);
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Exception suppressed: {0}", e);
+            }
+        }
+
+        private void RemoveandAddView(string newName, string defaultView, string viewName)
+        {
+            var view = Views[viewName];
+            if (view.ContainsKey("Default"))
+            {
+                view["Default"] = defaultView;
+            }
+            Views.Remove(viewName);
+            Views.Add(HttpUtility.UrlDecode(newName), view);
         }
 
         public override string ToString()
