@@ -581,3 +581,28 @@ if not exists(select * from sys.indexes where name = 'IX_TSMETA_TS_ITEM_UID')
 begin
 	CREATE INDEX [IX_TSMETA_TS_ITEM_UID] ON [dbo].[TSMETA] ([TS_ITEM_UID])
 end
+
+if not exists(select * from sys.indexes where name = 'IX_PERSONALIZATIONS_Key')
+begin
+	CREATE NONCLUSTERED INDEX [IX_PERSONALIZATIONS_Key] ON [dbo].[PERSONALIZATIONS] ([Key], [SiteId], [WebId], [ListId]) INCLUDE ([UserID], [Value], [ItemId], [FK])
+end
+
+if not exists(select 1 from sys.indexes where name = 'IX_FRF_SITE_ID')
+begin
+	CREATE NONCLUSTERED INDEX [IX_FRF_SITE_ID] ON [dbo].[FRF] 
+	(
+		[SITE_ID] ASC, 
+		[WEB_ID] ASC, 
+		[LIST_ID] ASC, 
+		[USER_ID] ASC, 
+		[Type] ASC
+	)
+end 
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype')
+begin
+	CREATE NONCLUSTERED INDEX [IX_TIMERJOBS_scheduletype] ON [dbo].[TIMERJOBS] 
+	(	
+		[scheduletype] ASC
+	) INCLUDE ([timerjobuid], [lastqueuecheck])
+end 
