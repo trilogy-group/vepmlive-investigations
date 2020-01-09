@@ -652,6 +652,47 @@ namespace PortfolioEngineCore
             return eStatus;
         }
 
+        public static StatusEnum DeleteCostDetails(DBAccess dba, int nCalendarID, int nCostTypeID, int nProjectID, DataTable dt)
+        {
+            var eStatus = StatusEnum.rsSuccess;
+            try
+            {
+                if (dt?.Rows?.Count > 0)
+                {
+                    var cmdText =
+                        "DELETE FROM EPGP_COST_DETAILS WHERE PROJECT_ID = @PROJECT_ID AND CT_ID = @CT_ID AND CB_ID = @CB_ID AND BC_UID = @BC_UID";
+                    var cmd = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                    var pBC_UID = cmd.Parameters.Add("@BC_UID", SqlDbType.Int);
+                    cmd.Parameters.AddWithValue("@PROJECT_ID", nProjectID);
+                    cmd.Parameters.AddWithValue("@CT_ID", nCostTypeID);
+                    cmd.Parameters.AddWithValue("@CB_ID", nCalendarID);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        pBC_UID.Value = row["BC_UID"];
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    cmdText =
+                        "DELETE FROM EPGP_PROJECT_CT_STATUS WHERE PROJECT_ID = @PROJECT_ID AND CT_ID = @CT_ID AND CB_ID = @CB_ID AND BC_UID = @BC_UID";
+                    cmd = new SqlCommand(cmdText, dba.Connection, dba.Transaction);
+                    pBC_UID = cmd.Parameters.Add("@BC_UID", SqlDbType.Int);
+                    cmd.Parameters.AddWithValue("@PROJECT_ID", nProjectID);
+                    cmd.Parameters.AddWithValue("@CT_ID", nCostTypeID);
+                    cmd.Parameters.AddWithValue("@CB_ID", nCalendarID);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        pBC_UID.Value = row["BC_UID"];
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "DeleteCostDetails", (StatusEnum)99961, ex.Message.ToString());
+            }
+            return eStatus;
+        }
+
         public static StatusEnum DeleteCostDetailsValues(DBAccess dba, int nCalendarID, int nCostTypeID, int nProjectID, out int lRowsAffected)
         {
             StatusEnum eStatus = StatusEnum.rsSuccess;
