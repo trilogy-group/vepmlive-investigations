@@ -432,7 +432,7 @@ namespace TimeSheets
                                 SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(resWeb, li["TimesheetDelegates"].ToString());
                                 foreach (SPFieldUserValue uv in uvc)
                                 {
-                                    if (uv.User.LoginName == user.LoginName)
+                                    if (uv.User?.LoginName == user.LoginName)
                                     {
                                         if (li["SharePointAccount"] != null)
                                         {
