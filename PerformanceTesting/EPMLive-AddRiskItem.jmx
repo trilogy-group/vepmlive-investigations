@@ -380,7 +380,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
                 <elementProp name="__EVENTVALIDATION" elementType="HTTPArgument">
@@ -399,7 +399,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">EPMLiveForms/DefaultCust.aspx</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -442,20 +442,20 @@
             </ConstantTimer>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/Authenticate.aspx?Source=%2Fepm" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/Authenticate.aspx?Source=%2Fsites%2FNYISO" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_layouts/15/Authenticate.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -503,7 +503,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/initstrings.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -543,7 +543,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/init.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -583,7 +583,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/strings.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -623,7 +623,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/clienttemplates.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -663,7 +663,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/masterpages/uplandv5.master.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -703,7 +703,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/ie55up.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -743,7 +743,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/dhtml/xgrid/dhtmlxcommon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -783,7 +783,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/resourcetools.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -829,7 +829,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -869,7 +869,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/blank.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -915,7 +915,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -961,7 +961,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1007,7 +1007,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1053,7 +1053,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1099,7 +1099,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1145,7 +1145,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1191,7 +1191,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1237,7 +1237,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1277,7 +1277,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.listsearchboxbootstrap.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1317,7 +1317,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.templateversoning.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1357,7 +1357,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/handlebars-v1.3.0.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1397,7 +1397,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/amplify.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1437,7 +1437,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/bundles/moment.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1477,7 +1477,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.socialstream.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1517,7 +1517,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.notifications.v2.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1557,7 +1557,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/slimscroll.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1597,7 +1597,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.navigation.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1637,7 +1637,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/jquery.tmpl.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1677,7 +1677,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/xml2json.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1717,7 +1717,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/md5.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1757,7 +1757,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/jquery.multiselect.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1797,7 +1797,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.analytics.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1837,7 +1837,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/notifications.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1870,7 +1870,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/IE55UP.JS</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1916,7 +1916,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">WebResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1962,7 +1962,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2002,7 +2002,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/ng/script/lib/l.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2036,7 +2036,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/jquery/jquery-1.10.2.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2076,7 +2076,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/jquery/jquery-noconflict.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2109,7 +2109,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/jquery/jquery-migrate-1.2.1.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2149,7 +2149,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/sharepointajaxlibrary/sharepointajax.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2189,7 +2189,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/ng/script/chromefix.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2229,7 +2229,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/blank.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2269,7 +2269,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/core.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2309,7 +2309,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.init.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2349,7 +2349,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/sp.res.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2389,7 +2389,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/cui.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2429,7 +2429,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/clientrenderer.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2469,7 +2469,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/srch.resources.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2509,7 +2509,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/profilebrowserscriptres.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2549,7 +2549,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/dragdrop.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2589,7 +2589,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2636,7 +2636,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/javascripts/epmlive.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2684,7 +2684,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.runtime.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2724,7 +2724,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.dialog.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2764,7 +2764,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -2824,7 +2824,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -2877,7 +2877,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/epmlive/javascripts/libraries/jquery.timeago.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2925,7 +2925,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -2978,7 +2978,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3026,7 +3026,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3059,7 +3059,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/epmlive/javascripts/libraries/slimScroll.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3107,7 +3107,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/socialdata.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3147,7 +3147,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/mylinks.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3187,7 +3187,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -3240,7 +3240,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3288,7 +3288,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/mquery.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3328,7 +3328,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.core.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3368,7 +3368,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/search.clientcontrols.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3408,7 +3408,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/sp.jsgrid.res.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3448,7 +3448,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.datetimeutil.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3488,7 +3488,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/inplview.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3528,7 +3528,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ribbon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3568,7 +3568,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/jsgrid.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3601,7 +3601,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3645,7 +3645,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.mylinksribbon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3685,7 +3685,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.socialribbon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3725,7 +3725,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/jsgrid.gantt.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3765,7 +3765,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/spgantt.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3805,7 +3805,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/callout.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3845,7 +3845,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sharing.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3885,7 +3885,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.listsearchbox.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3918,7 +3918,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3962,7 +3962,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -4028,7 +4028,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -4036,7 +4036,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4116,7 +4116,7 @@
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -4193,9 +4193,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4241,7 +4241,7 @@
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -4318,9 +4318,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4407,7 +4407,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -4415,7 +4415,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/epm/_layouts/15/Authenticate.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4465,7 +4465,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/epm</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4515,7 +4515,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/epm/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4560,7 +4560,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4620,7 +4620,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4704,7 +4704,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">_layouts/15/epmlive/treegrid/Defaults.xml</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4752,7 +4752,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/getganttitems.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4789,7 +4789,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4830,7 +4830,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/_layouts/epmlive/gridlistribbon.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4877,7 +4877,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/Lists/Risks/NewForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4992,7 +4992,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -5045,7 +5045,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -5101,7 +5101,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/getGeneralSetting.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -5597,7 +5597,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/Lists/Risks/NewForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -5673,7 +5673,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/Lists/Risks/DispForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -5729,7 +5729,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">epm/Lists/Risks/DispForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -5777,7 +5777,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">epm/_layouts/15/SignOut.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
