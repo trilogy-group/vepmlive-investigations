@@ -566,7 +566,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm/_layouts/15/Authenticate.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/Authenticate.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -616,7 +616,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -666,7 +666,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm/_api/search/searchcenterurl</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -711,7 +711,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -771,7 +771,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/Lists/Project%20Center</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Project%20Center</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -826,7 +826,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/Lists/Project%20Center/Executive%20Summary.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Project%20Center/Executive%20Summary.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1085,7 +1085,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1149,7 +1149,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1206,7 +1206,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/commandui.ashx?ver=966699771&amp;id=Ribbon.Read&amp;lcid=1033&amp;qt=ribbonvisibletabdeep</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/commandui.ashx?ver=966699771&amp;id=Ribbon.Read&amp;lcid=1033&amp;qt=ribbonvisibletabdeep</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1266,7 +1266,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1323,7 +1323,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/epmlive/gridlistribbon.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/epmlive/gridlistribbon.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1376,7 +1376,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1433,7 +1433,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1489,7 +1489,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1561,7 +1561,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/getganttitems.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/getganttitems.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1606,7 +1606,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/gridlistribbon.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/gridlistribbon.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1658,7 +1658,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1727,7 +1727,7 @@
                 <stringProp name="HTTPSampler.port"></stringProp>
                 <stringProp name="HTTPSampler.protocol">https</stringProp>
                 <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-                <stringProp name="HTTPSampler.path">/epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+                <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
                 <stringProp name="HTTPSampler.method">POST</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1834,7 +1834,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/epmlive/gridaction.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/epmlive/gridaction.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1927,7 +1927,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/epmlive/gridaction.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/epmlive/gridaction.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2025,7 +2025,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/gridaction.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/gridaction.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2104,7 +2104,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/epmlive/buildteam.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/epmlive/buildteam.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2183,7 +2183,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/buildteam.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/buildteam.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2299,7 +2299,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/commandui.ashx?ver=966699771&amp;id=Ribbon.BuildTeam&amp;lcid=1033&amp;qt=ribbonvisibletabdeep</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/commandui.ashx?ver=966699771&amp;id=Ribbon.BuildTeam&amp;lcid=1033&amp;qt=ribbonvisibletabdeep</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2352,7 +2352,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2409,7 +2409,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/TreeGrid/Defaults.xml</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/TreeGrid/Defaults.xml</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2462,7 +2462,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/TreeGrid/Text.xml</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/TreeGrid/Text.xml</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2528,7 +2528,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/epmlive/AssignmentPlanner.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/AssignmentPlanner.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2755,7 +2755,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_layouts/15/commandui.ashx?ver=966699771&amp;id=Ribbon.AssignmentPlannerTab&amp;lcid=1033&amp;qt=ribbonvisibletabdeep</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/commandui.ashx?ver=966699771&amp;id=Ribbon.AssignmentPlannerTab&amp;lcid=1033&amp;qt=ribbonvisibletabdeep</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2808,7 +2808,7 @@
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-              <stringProp name="HTTPSampler.path">/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2973,7 +2973,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/SignOut.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/SignOut.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
