@@ -5407,7 +5407,7 @@
                   <elementProp name="ClientFormPostBackValue_b20ba724-839f-4b8d-a9a4-ee8a6137b818_Project" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">ClientFormPostBackValue_b20ba724-839f-4b8d-a9a4-ee8a6137b818_Project</stringProp>
-                    <stringProp name="Argument.value">2;#EPM Live App</stringProp>
+                    <stringProp name="Argument.value">1654;#A+NYISO+TEST+PROJECT</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
