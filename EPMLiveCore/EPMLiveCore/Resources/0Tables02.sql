@@ -624,3 +624,18 @@ begin
 	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
 	WITH (ONLINE=ON, DROP_EXISTING=ON)
 end
+
+if exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype')
+begin
+	DROP INDEX [IX_TIMERJOBS_scheduletype] ON [dbo].[TIMERJOBS]
+end
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype_runtime')
+begin
+	CREATE NONCLUSTERED INDEX [IX_TIMERJOBS_scheduletype_runtime] ON [dbo].[TIMERJOBS]	
+	(	
+		[scheduletype] ASC,
+		[runtime] ASC,
+		[days] ASC
+	) INCLUDE ([timerjobuid], [lastqueuecheck])	
+end 
