@@ -639,3 +639,13 @@ begin
 		[days] ASC
 	) INCLUDE ([timerjobuid], [lastqueuecheck])	
 end 
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TSQUEUE') AND [name] = 'IX_TSQUEUE_TS_UID_JOBTYPE_ID')
+begin
+	CREATE NONCLUSTERED INDEX [IX_TSQUEUE_TS_UID_JOBTYPE_ID] ON [dbo].[TSQUEUE] 
+	(
+		[TS_UID], 
+		[JOBTYPE_ID]
+	)
+	INCLUDE ([STATUS],[RESULTTEXT],[RESULT],[PERCENTCOMPLETE])
+end 
