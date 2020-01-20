@@ -59,7 +59,7 @@ END";
                     ? exception.InnerException.Message
                     : exception.Message;
 
-                LogMessage(message, MessageKind.FAILURE, 4);
+                LogMessage(message + exception, MessageKind.FAILURE, 4);
                 return false;
             }
             return true;
