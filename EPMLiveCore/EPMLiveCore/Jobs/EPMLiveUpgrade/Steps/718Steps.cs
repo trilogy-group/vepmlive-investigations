@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V716, Order = 1.0, Description = "Improve index on LSTMyWork")]
+    [UpgradeStep(Version = EPMLiveVersion.V718, Order = 1.0, Description = "Improve index on LSTMyWork")]
     internal class AlterLSTMyWorkIndex : UpgradeStep
     {
         private readonly SPWeb _spWeb;
