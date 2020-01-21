@@ -58,4 +58,87 @@ end
         }
         #endregion
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V717, Order = 2.0, Description = "Adding Missing Resources List Event")]
+    internal class AddEventHandlersToLocalResourcesList : UpgradeStep
+    {
+        private SPWeb _spWeb;
+
+        #region Constructors (1) 
+        public AddEventHandlersToLocalResourcesList(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    // get a local list called "Departments"
+                    SPList resourcesList = _spWeb.Lists.TryGetList("Resources");
+
+                    // if "Departments" exists locally, add 
+                    // ItemAdding, ItemUpdating, and ItemDeleted events
+                    if (resourcesList != null)
+                    {
+                        _spWeb.AllowUnsafeUpdates = true;
+                        string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                        string className = "EPMLiveCore.ResourcePoolEvent";
+
+
+                        var evts = CoreFunctions.GetListEvents(
+                            resourcesList,
+                            assemblyName,
+                            className,
+                            new[] {
+                                SPEventReceiverType.ItemAdded
+                            });
+
+                        if (evts.Count > 0)
+                        {
+                            LogMessage("Recevier already exists, return", MessageKind.SUCCESS, 4);
+                            return;
+                        }
+                        LogMessage("Resources Event Receiver Adding.", MessageKind.SUCCESS, 4);
+
+                        resourcesList.EventReceivers.Add(SPEventReceiverType.ItemAdded, assemblyName, className);
+                    
+                        var newEvts = CoreFunctions.GetListEvents(
+                            resourcesList,
+                            assemblyName,
+                            className,
+                            new[] {
+                                SPEventReceiverType.ItemAdded
+                            });
+
+                        foreach (SPEventReceiverDefinition e in newEvts)
+                        {
+                            e.SequenceNumber = 10000;
+                            e.Update();
+                        }
+
+                        resourcesList.Update();
+
+                        LogMessage("Resources Event Receiver Added Successfully.", MessageKind.SUCCESS, 4);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string message = ex.InnerException != null
+                        ? ex.InnerException.Message
+                        : ex.Message;
+
+                    LogMessage(message, MessageKind.FAILURE, 4);
+                }
+            });
+            _spWeb.AllowUnsafeUpdates = false;
+            return true;
+        }
+
+        #endregion
+    }
 }

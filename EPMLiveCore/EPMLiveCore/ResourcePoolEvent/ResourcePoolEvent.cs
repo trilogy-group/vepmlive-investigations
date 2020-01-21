@@ -142,6 +142,7 @@ namespace EPMLiveCore
             if (Utilities.IsItemRestored(properties.ListItem))
             {
                 DoAdding(properties);
+                ResourceGrid.ClearCache(properties.Web);
             }
         }
         private string GetProperty(SPItemEventProperties properties, string property)
