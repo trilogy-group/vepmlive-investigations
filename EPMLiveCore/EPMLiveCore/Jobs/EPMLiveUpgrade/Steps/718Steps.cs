@@ -123,4 +123,46 @@ end";
 
         #endregion
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V718, Order = 3.0, Description = "Add missing index on EPGP_COST_CATEGORIES")]
+    internal class AddIndex_EPGPCostCategories_IX_EPGP_COST_CATEGORIES_BC_ID : UpgradeStep
+    {
+        private readonly SPWeb _spWeb;
+        private readonly string CreateIndexScript = @"
+if not exists(select * from sys.indexes where object_id = OBJECT_ID('dbo.EPGP_COST_CATEGORIES') and name = 'IX_EPGP_COST_CATEGORIES_BC_ID')
+begin
+	CREATE INDEX [IX_EPGP_COST_CATEGORIES_BC_ID] ON [dbo].[EPGP_COST_CATEGORIES] ([BC_ID])
+end
+";
+        public AddIndex_EPGPCostCategories_IX_EPGP_COST_CATEGORIES_BC_ID(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
+
+        public override bool Perform()
+        {
+            try
+            {
+                LogTitle(GetWebInfo(Web), 1);
+                if (IsPfeSite)
+                {
+                    SPSecurity.RunWithElevatedPrivileges(UpgradePfeDatabase);
+                }
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.ToString(), MessageKind.FAILURE, 1);
+                return false;
+            }
+            return true;
+        }
+
+        private void UpgradePfeDatabase()
+        {
+            var connectionProvider = new PfeData.ConnectionProvider();
+            LogMessage("Connecting to the database.", 2);
+            using (var connection = connectionProvider.CreateConnection(Web))
+            {
+                connection.ExecuteNonQuery(CreateIndexScript);
+                LogMessage("Index IX_EPGP_COST_CATEGORIES_BC_ID ON EPGP_COST_CATEGORIES has been successfully created.", MessageKind.SUCCESS, 1);
+            }
+        }
+    }
 }
