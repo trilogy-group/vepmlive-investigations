@@ -120,7 +120,10 @@ namespace EPMLiveCore
             {
                 return;
             }
-
+            DoAdding(properties);
+        }
+        private void DoAdding(SPItemEventProperties properties)
+        {
             loadData(properties.List, properties.SiteId);
 
             processItem(properties, true);
@@ -134,7 +137,13 @@ namespace EPMLiveCore
             }
             catch { }
         }
-
+        public override void ItemAdded(SPItemEventProperties properties)
+        {
+            if (Utilities.IsItemRestored(properties.ListItem))
+            {
+                DoAdding(properties);
+            }
+        }
         private string GetProperty(SPItemEventProperties properties, string property)
         {
             try
@@ -1071,7 +1080,15 @@ namespace EPMLiveCore
                                     }
 
                                     SPFieldUserValue uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
-                                    oWeb.SiteUsers.RemoveByID(uv.LookupId);
+                                    //oWeb.SiteUsers.RemoveByID(uv.LookupId);
+                                   
+                                    
+                                    
+                                    foreach (SPGroup oGroup in uv.User.Groups)
+                                    {
+                                        oGroup.RemoveUser(uv.User);
+                                    }
+                                    
                                 }
                             }
                             catch { }

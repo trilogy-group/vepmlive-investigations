@@ -8,6 +8,13 @@
         <Class>EPMLiveCore.ResourcePoolEvent</Class>
         <SequenceNumber>10000</SequenceNumber>
       </Receiver>
+	  <Receiver>
+        <Name>ResourcePoolEventItemAdded</Name>
+        <Type>ItemAdded</Type>
+        <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+        <Class>EPMLiveCore.ResourcePoolEvent</Class>
+        <SequenceNumber>10000</SequenceNumber>
+      </Receiver>
       <Receiver>
         <Name>ResourcePoolEventItemUpdating</Name>
         <Type>ItemUpdating</Type>

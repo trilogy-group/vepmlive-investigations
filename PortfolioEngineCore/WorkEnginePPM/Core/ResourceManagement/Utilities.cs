@@ -223,13 +223,27 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
                         if (isNewResource)
                         {
-                            value = properties.AfterProperties[internalName] as string;
+                            try
+                            {
+                                value = properties.AfterProperties[internalName] as string;
+                            }
+                            catch
+                            {
+                                value = properties.AfterProperties[internalName].ToString();
+                            }
                         }
                         else
                         {
-                            value =
-                                (properties.AfterProperties[internalName] ?? properties.ListItem[internalName]) as
-                                    string;
+                            try
+                            {
+                                value =
+                                    (properties.AfterProperties[internalName] ?? properties.ListItem[internalName]) as
+                                        string;
+                            }
+                            catch
+                            {
+                                value = properties.AfterProperties[internalName] != null ? properties.AfterProperties[internalName].ToString() : properties.ListItem[internalName].ToString();
+                            }
                         }
 
                         value = value ?? string.Empty;

@@ -20,6 +20,14 @@ namespace EPMLiveCore
 
         #region Methods (2)
 
+        public static bool IsItemRestored(SPListItem item)
+        {
+            if ((DateTime.UtcNow - ((DateTime)item["Created"])) > new TimeSpan(0, 0, 5))
+            {
+                return true;
+            }
+            return false;
+        }
         // Public Methods (4) 
 
         /// <summary>

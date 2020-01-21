@@ -25,6 +25,11 @@ namespace WorkEnginePPM.Events
         public override void ItemAdded(SPItemEventProperties properties)
         {
             if (!ValidateRequest(properties)) return;
+            if (EPMLiveCore.Utilities.IsItemRestored(properties.ListItem))
+            {
+                DoAdding(properties, false);
+
+            }
 
             try
             {
@@ -52,17 +57,27 @@ namespace WorkEnginePPM.Events
         public override void ItemAdding(SPItemEventProperties properties)
         {
             if (!ValidateRequest(properties)) return;
-
+            if (properties?.ListItemId > 0) // This will be true if item recovered from recycle otherwise it will be 0
+            {
+                return;
+            }
+            DoAdding(properties, true);
+        }
+        private void DoAdding(SPItemEventProperties properties, bool isNew)
+        {
             try
             {
                 SPWeb spWeb = properties.Web;
 
                 decimal rate;
-                properties.AfterProperties["EXTID"] =
-                    Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, true), spWeb, properties.ListId,
-                                                out rate, true);
 
-                if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
+                int extId = Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, isNew), spWeb, properties.ListId,
+                                             out rate, true);
+                if (isNew)
+                {
+                    properties.AfterProperties["EXTID"] = extId;
+                    if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
+                }
             }
             catch (Exception exception)
             {
