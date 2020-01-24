@@ -5,12 +5,12 @@ public partial class rs : Izenda.AdHoc.ResponseServer
     protected override void OnPreInit(System.EventArgs e)
     {
         string sitecollectionid = string.Empty;
-        if (!string.IsNullOrEmpty(Request.QueryString["sitecollectionid"]))
+        if (Request != null && !string.IsNullOrEmpty(Request.QueryString["sitecollectionid"]))
         {
             sitecollectionid = Request.QueryString["sitecollectionid"];
 
         }
-        else if (Request.UrlReferrer.Query.Contains("sitecollectionid"))
+        else if (Request != null && Request.UrlReferrer != null && Request.UrlReferrer.Query != null && Request.UrlReferrer.Query.Contains("sitecollectionid"))
         {
             sitecollectionid = Request.UrlReferrer.Query.Substring(Request.UrlReferrer.Query.IndexOf("=") + 1);
             
