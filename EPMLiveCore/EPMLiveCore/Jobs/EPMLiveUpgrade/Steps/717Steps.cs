@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V716, Order = 1.0, Description = "Add missing index on EPG_WE_ACTUALHOURS")]
+    [UpgradeStep(Version = EPMLiveVersion.V717, Order = 1.0, Description = "Add missing index on EPG_WE_ACTUALHOURS")]
     internal class AddIndex_EPGWEActualHours_IX_EPG_WE_ACTUALHOURS_WEH_CHG_UID : UpgradeStep
     {
         private SPWeb _spWeb;
