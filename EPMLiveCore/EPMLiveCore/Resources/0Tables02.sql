@@ -622,5 +622,5 @@ begin
 		[TS_ITEM_UID], 
 		[ListName]
 	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
-	WITH (ONLINE=ON, DROP_EXISTING=ON)
+	WITH (ONLINE=OFF, DROP_EXISTING=ON)
 end
