@@ -606,3 +606,21 @@ begin
 		[scheduletype] ASC
 	) INCLUDE ([timerjobuid], [lastqueuecheck])
 end 
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TSMETA') AND [name] = 'IX_TSMETA_TS_ITEM_UID')
+begin
+	CREATE INDEX [IX_TSMETA_TS_ITEM_UID] ON [dbo].[TSMETA] 
+	(
+		[TS_ITEM_UID], 
+		[ListName]
+	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
+end
+else
+begin
+	CREATE INDEX [IX_TSMETA_TS_ITEM_UID] ON [dbo].[TSMETA] 
+	(
+		[TS_ITEM_UID], 
+		[ListName]
+	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
+	WITH (ONLINE=OFF, DROP_EXISTING=ON)
+end
