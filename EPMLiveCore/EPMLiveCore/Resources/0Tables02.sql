@@ -622,7 +622,7 @@ begin
 		[TS_ITEM_UID], 
 		[ListName]
 	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
-	WITH (ONLINE=ON, DROP_EXISTING=ON)
+	WITH (ONLINE=OFF, DROP_EXISTING=ON)
 end
 
 if exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype')
