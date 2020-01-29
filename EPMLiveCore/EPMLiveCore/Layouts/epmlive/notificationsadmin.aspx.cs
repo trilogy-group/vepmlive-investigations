@@ -718,37 +718,43 @@ namespace EPMLiveCore.Layouts.epmlive
                             using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id)))
                             {
                                 SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
-
+                                bool readerValid = false;
                                 using (var selectCommand = new SqlCommand(
                                     "select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=3",
                                     sqlConnection))
                                 {
                                     selectCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+                                    
                                     using (var dataReader = selectCommand.ExecuteReader())
                                     {
                                         if (dataReader.Read())
                                         {
-                                            using (var updateCommand = new SqlCommand(
-                                                "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=3",
-                                                sqlConnection))
-                                            {
-                                                updateCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
-                                                updateCommand.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
-                                                updateCommand.ExecuteNonQuery();
-                                            }
+                                            readerValid = true;
+                                            
                                         }
-                                        else
-                                        {
-                                            using (var insertCommand = new SqlCommand(
-                                                "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@siteguid, 3, 'Notifications', @runtime, 2, @webguid)",
-                                                sqlConnection))
-                                            {
-                                                insertCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
-                                                insertCommand.Parameters.AddWithValue("@webguid", currWeb.ID.ToString());
-                                                insertCommand.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
-                                                insertCommand.ExecuteNonQuery();
-                                            }
-                                        }
+                                    }
+                                }
+                                if (readerValid)
+                                {
+                                    using (var updateCommand = new SqlCommand(
+                                            "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=3",
+                                            sqlConnection))
+                                    {
+                                        updateCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+                                        updateCommand.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
+                                        updateCommand.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    using (var insertCommand = new SqlCommand(
+                                        "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@siteguid, 3, 'Notifications', @runtime, 2, @webguid)",
+                                        sqlConnection))
+                                    {
+                                        insertCommand.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
+                                        insertCommand.Parameters.AddWithValue("@webguid", currWeb.ID.ToString());
+                                        insertCommand.Parameters.AddWithValue("@runtime", ddlRunTime.SelectedValue);
+                                        insertCommand.ExecuteNonQuery();
                                     }
                                 }
                             }
