@@ -1396,14 +1396,14 @@
                                             removeLink(id, nId);
                                             SP.UI.Notify.removeNotification(nId);
                                             if (callBackFunction != '')
-                                                eval(callBackFunction + '(' + id + ')');
+                                                eval(callBackFunction + '(\'' + id + '\')');
                                         }
                                     });
                                 } else {
                                     removeLink(id, nId);
                                     SP.UI.Notify.removeNotification(nId);
                                     if (callBackFunction != '')
-                                        eval(callBackFunction + '(' + id + ')');
+                                        eval(callBackFunction + '(\'' + id + '\')');
                                 }
                             }
                             break;
