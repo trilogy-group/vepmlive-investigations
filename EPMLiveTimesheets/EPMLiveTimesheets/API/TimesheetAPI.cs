@@ -942,7 +942,7 @@ namespace TimeSheets
             int userIdInt;
             SPUser userAux;
 
-            if (listItem.Fields.OfType<SPField>().Where(x => x.Title == fieldName).Any())
+            if (listItem.Fields.OfType<SPField>().Where(x => x.InternalName == fieldName).Any())
             {
                 listItem[fieldName]?.ToString().Replace("#", "").Split(';').ToList()
                 .Where((item, index) => index % 2 == 0)?.ToList().ForEach(userID =>
@@ -988,8 +988,8 @@ namespace TimeSheets
 
             if (listItem != null)
             {
-                if (itemTypeName != PORTFLOIO_WORK_FIELD_NAME)
-                    isMember = listItem.DoesUserHavePermissions(SPBasePermissions.ViewListItems);
+                //if (itemTypeName != PORTFLOIO_WORK_FIELD_NAME)
+                //    isMember = listItem.DoesUserHavePermissions(SPBasePermissions.ViewListItems);
 
                 if (!isMember && listItem.Fields.OfType<SPField>().Where(x => x.InternalName == "AssignedTo").Any())
                 {

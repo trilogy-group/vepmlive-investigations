@@ -744,8 +744,8 @@ namespace EPMLiveCore.API
             string body = "";
             string subject = "";
 
-            Guid siteid = SPContext.Current.Site.ID;
-            Guid webid = SPContext.Current.Web.ID;
+            //Guid siteid = SPContext.Current.Site.ID;
+            //Guid webid = SPContext.Current.Web.ID;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
