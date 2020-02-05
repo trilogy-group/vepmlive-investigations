@@ -916,7 +916,7 @@ namespace TimeSheets
                         });
 
                         SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
-                            "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
+                            "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME, int.Parse(timeSheetItem.AssignedToID));
                     }
                     else if (timeSheetItem.AssignedToID == null || !timeSheetItem.AssignedToID.Split(',').ToList().Contains(oWeb.CurrentUser.ID.ToString()))
                     {
@@ -1112,12 +1112,18 @@ namespace TimeSheets
 
         private const int NON_TEAM_MEMBER_ALLOCATION_EMAIL = 16;
         private const int NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION = 17;
+
         public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
             string itemName, string outOrUnassigned, string reasonMessage, string urlCenter)
         {
+            SendNotifications(oWeb, emailToList, idToList, allocatedHours, itemName, outOrUnassigned, reasonMessage, urlCenter, null);
+        }
+        public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
+            string itemName, string outOrUnassigned, string reasonMessage, string urlCenter, int? assignedToId = null)
+        {
             emailToList = emailToList.Distinct().Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
             idToList = idToList.Distinct().Where(x => x != 0).ToList();
-
+            SPUser currentUser = assignedToId.HasValue ? oWeb.Users.GetByID(assignedToId.Value) : oWeb.CurrentUser;
             if (idToList.Count > 0 && allocatedHours > 0)
             {
                 var projecturl = string.Format("{0}?ID={1}", oWeb.Lists[CultureInfo.CurrentCulture.TextInfo.ToTitleCase(urlCenter.ToLower())].DefaultDisplayFormUrl, 1); // TODO remove the 1
@@ -1125,22 +1131,24 @@ namespace TimeSheets
                 hshProps.Add("Item_Name", itemName);
                 hshProps.Add("Hours", allocatedHours);
                 hshProps.Add("Project_Url", projecturl);
-                hshProps.Add("CurUser_Email", oWeb.CurrentUser.Email);
+                hshProps.Add("CurUser_Email", currentUser.Email);
                 hshProps.Add("Out_Unassigned", outOrUnassigned);
                 hshProps.Add("Reason_Message", reasonMessage);
 
                 APIEmail.QueueItemMessage(NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION, false, hshProps,
-                    idToList.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, oWeb.CurrentUser, true);
+                    idToList.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, currentUser, true);
             }
 
             if (emailToList.Count > 0)
+            {
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_EMAIL,
                     new Hashtable() { { "Item_Name", itemName },
-                                      { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) },
+                                      { "Resource_Email", GetEmailFromDB(currentUser.ID, oWeb) },
                                       { "Qty_Hours", allocatedHours },
                                       { "Out_Unassigned", outOrUnassigned },
                                       { "Reason_Message", reasonMessage } },
-                    emailToList, string.Empty, oWeb, true);
+                    emailToList, string.Empty, oWeb, true, currentUser);
+            }
         }
 
         private static string GetEmailFromDB(int iD, SPWeb oWeb)
@@ -1227,7 +1235,7 @@ namespace TimeSheets
                                 {
                                     command.Parameters.AddWithValue("@tsuid", tsuid);
                                     command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                    command.Parameters.AddWithValue("@JOBDATA", data);
+                                    command.Parameters.AddWithValue("@JOBDATA", data.Replace("AssignedToID=\"-99\"", "AssignedToID=\"" + oWeb.CurrentUser.ID  + "\"") );
                                     command.ExecuteNonQuery();
                                 }
                             }
