@@ -67,4 +67,60 @@ END";
 
         #endregion
     }
+
+    [UpgradeStep(Version = EPMLiveVersion.V718, Order = 2.0, Description = "Add missing index on RPTColumn")]
+    internal class AddIndex_RPTColumn_IX_RPTColumn_RPTListId : UpgradeStep
+    {
+        private readonly SPWeb _spWeb;
+        private const string UpgradeScript = @"
+if not exists(select * from sys.indexes where name = 'IX_RPTColumn_RPTListId')
+begin
+	CREATE INDEX [IX_RPTColumn_RPTListId] ON [dbo].[RPTColumn] ([RPTListId], [ColumnName]) INCLUDE ([SharePointType])
+end";
+
+        #region Constructors (1) 
+        public AddIndex_RPTColumn_IX_RPTColumn_RPTListId(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    LogMessage("Connecting to the database . . .", 2);
+                    Guid webAppId = Web.Site.WebApplication.Id;
+                    Guid siteId = Web.Site.ID;
+                    string rptCnStr = CoreFunctions.getReportingConnectionString(webAppId, siteId);
+                    using (var rptCn = new SqlConnection(rptCnStr))
+                    {
+                        rptCn.Open();
+
+                        #region Index Code
+
+                        rptCn.ExecuteNonQuery(UpgradeScript);
+
+                        #endregion
+
+                        LogMessage("Index IX_RPTColumn_RPTListId has been created on RPTColumn.", MessageKind.SUCCESS, 4);
+                    }
+                });
+            }
+            catch (Exception exception)
+            {
+                var message = exception.InnerException != null
+                    ? exception.InnerException.Message
+                    : exception.Message;
+
+                LogMessage(message + exception, MessageKind.FAILURE, 4);
+                return false;
+            }
+            return true;
+        }
+
+        #endregion
+    }
 }
