@@ -407,10 +407,7 @@ function GetGridId(grid) {
 
 function MyWorkOnGetHtmlValue(grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
-        if (col == "Title" && row.Def.Name == "R") {
-            return "<a href=\"javascript:MyWorkGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
-        }
-        else if (col === 'CommentCount' || col === 'Priority' || col === 'Flag' || col === 'Title' || col === 'WorkingOn') {
+        if (col === 'CommentCount' || col === 'Priority' || col === 'Flag' || col === 'Title' || col === 'WorkingOn') {
             if (row.Def.Name !== 'Header' && row.Def.Name !== 'Fixed' && row.Def.Name !== 'Group') {
                 var value = val;
 
@@ -461,6 +458,9 @@ function MyWorkOnGetHtmlValue(grid, row, col, val) {
 
                         break;
                     case 'Title':
+                        if (row.Def.Name == "R") {
+                            value = "<a href=\"javascript:MyWorkGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
+                        }
                         if (grid.Cols['CommentCount'].Visible == 0) {
                             if (row['CommentCount'] != '' && intRegex.test(row['CommentCount'])) {
                                 if (row['CommentCount'] != '0')
