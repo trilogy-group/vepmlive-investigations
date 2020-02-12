@@ -20,9 +20,12 @@ namespace TimerService
         {
             try
             {
-                SPWebApplicationCollection _webcolections = GetWebApplications();
-                foreach (SPWebApplication webApp in _webcolections)
+                SPWebApplicationCollection webApps = GetWebApplications();
+                foreach (SPWebApplication webApp in webApps)
                 {
+                    int maxThreads = MaxThreads;
+                    if (maxThreads <= 0)
+                        continue;
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
@@ -47,14 +50,15 @@ namespace TimerService
                                             rd.dr = dr;
                                             if (startProcess(rd))
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id and status=0", cn))
                                                 {
                                                     cmd1.Parameters.Clear();
                                                     cmd1.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                processed++;
+                                                
                                             }
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
                                         if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");

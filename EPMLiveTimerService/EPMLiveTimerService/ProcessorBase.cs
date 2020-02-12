@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace TimerService
 {
@@ -23,15 +24,30 @@ namespace TimerService
 
         private int _maxThreads;
         protected int MaxThreads {
-            get { return _maxThreads; }
+            get {
+                for (int i = taskList.Count - 1; i >= 0; i--)
+                {
+                    if (taskList[i].Status != TaskStatus.Running)
+                    {
+                        taskList.RemoveAt(i);
+                    }
+                }
+                return _maxThreads - taskList.Count;
+            }
         }
-  
+        List<Task> taskList = new List<Task>();
         protected bool startProcess(RunnerData rd)
         {
             try
             {
-                Task.Run(() => DoWork(rd));
-                return true;
+                Task newTask = Task.Run(() => DoWork(rd));
+                Thread.Sleep(500);
+                if (!newTask.IsCompleted)
+                {
+                    taskList.Add(newTask);
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {

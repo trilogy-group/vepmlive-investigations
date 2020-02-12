@@ -16,31 +16,7 @@ namespace TimeSheets
 
         public string sErrors = "";
         public bool bErrors = false;
-
-		private static int? maxFailedCount = null;
-        private static int MaxFailedCount
-		{
-			get
-			{
-				if (!maxFailedCount.HasValue)
-				{
-					try
-					{
-						maxFailedCount = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("Timesheet.MaxFailedCount"));
-						maxFailedCount = Math.Max(maxFailedCount.Value, 1);
-					}
-					catch
-					{
-						maxFailedCount = 2;
-					}
-				}
-				return maxFailedCount.Value;
-			}
-		}
-        private const int FINISHJOBSTATUS = 3;
-        private const int RESTARTJOBSTATUS = 0;
-        private static Dictionary<Guid, int> failedjobs = new Dictionary<Guid, int>();
-
+		
         public int userid;
         public Guid WebAppId = Guid.Empty;
         protected SqlConnection CreateConnection()
@@ -112,16 +88,13 @@ namespace TimeSheets
 
                     //if (!tempJob)
                     {
-                        using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  @status, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
+                        using (SqlCommand cmd = new SqlCommand("spTSSetQueue", cn))
                         {
-                            var param = getStatusParam(QueueUid, bErrors);
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             if (bErrors)
                                 cmd.Parameters.AddWithValue("@result", "Errors");
                             else
                                 cmd.Parameters.AddWithValue("@result", "No Errors");
-
-                            cmd.Parameters.AddWithValue("@status", param);
                             cmd.Parameters.AddWithValue("@resulttext", sErrors);
                             cmd.ExecuteNonQuery();
                         }
@@ -143,39 +116,6 @@ namespace TimeSheets
             }
 
         }
-
-        private static Object LockFailedIds = new Object();
-        private static int getStatusParam(Guid QueueUid, bool bErrors)
-        {
-            lock (LockFailedIds)
-            {
-                if (bErrors)
-                {
-                    if (failedjobs.ContainsKey(QueueUid))
-                    {
-                        if (failedjobs[QueueUid] <= MaxFailedCount)
-                        {
-                            failedjobs.Remove(QueueUid);
-                            return FINISHJOBSTATUS;
-                        }
-                        failedjobs[QueueUid] += 1;
-                        return RESTARTJOBSTATUS;
-                    }
-                    else
-                    {
-                        failedjobs.Add(QueueUid, 1);
-                        return RESTARTJOBSTATUS;
-                    }
-                }
-                else
-                {
-                    if (failedjobs.ContainsKey(QueueUid))
-                    {
-                        failedjobs.Remove(QueueUid);
-                    }
-                    return FINISHJOBSTATUS;
-                }
-            }
-        }
+        
     }
 }
