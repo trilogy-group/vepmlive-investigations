@@ -221,7 +221,7 @@ namespace TimeSheets
                                 try
                                 {
                                     System.Net.Mail.MailMessage mailMsg = new MailMessage();
-                                    mailMsg.From = new MailAddress(fromEmail);
+                                    mailMsg.From = new MailAddress(spWebAdmin.OutboundMailSenderAddress, web.CurrentUser.Name);
                                     mailMsg.To.Add(new MailAddress(semails[i]));
                                     mailMsg.Subject = txtSubject.Text;
                                     mailMsg.Body = body;

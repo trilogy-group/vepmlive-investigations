@@ -39,8 +39,8 @@ namespace EPMLiveCore.Tests
         private bool isRunWithElevatedPriveleges;
         private Guid DummyGuid = Guid.NewGuid();
         private string DummyUrl = "http://xyz.com";
-        private int DummyUserId = 4;
         private string DummyString = "DummyString";
+        private int DummyUserId = 4;
         private const string DummyStringWithSpecialCharacters = "Dummy-String!#$%^&()_{}~`-";
 
         [TestInitialize]
@@ -267,8 +267,6 @@ namespace EPMLiveCore.Tests
             // Arrange
             const string commandTextExpected = @"INSERT INTO QUEUE (timerjobuid, status, percentcomplete, userid) 
                                                                   VALUES (@timerjobuid, @status, 0, @userid) ";
-
-            DummyUserId = 0;
             var commandParametersExpected = new[] { "@timerjobuid", "@status", "@userid" };
             SetupSPWeb();
             ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
@@ -1075,9 +1073,11 @@ namespace EPMLiveCore.Tests
                 {
                     TopNavigationBarGet = () => null
                 },
-                AllowUnsafeUpdatesGet = () => false
+                AllowUnsafeUpdatesGet = () => false,
+                CurrentUserGet = () => { return new ShimSPUser() { IDGet = () => { return DummyUserId; } }; }
             };
-            ShimSPWebCollection.AllInstances.AddStringStringStringUInt32StringBooleanBoolean = (a, b, c, d, e, f, g, h) => spWeb;
+            ShimSPSite.AllInstances.OpenWeb = instance => spWeb;
+            ShimSPWebCollection.AllInstances.AddStringStringStringUInt32StringBooleanBoolean = (a, b, c, d, e, f, g, h) => spWeb;            
         }
     }
 }

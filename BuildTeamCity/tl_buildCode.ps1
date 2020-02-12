@@ -31,7 +31,7 @@ $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
 $ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 $env:EnableNuGetPackageRestore = "true"
-
+$env:MSBUILDDISABLENODEREUSE=1
 # ### Includes 
 
 # look-up of dependent libs

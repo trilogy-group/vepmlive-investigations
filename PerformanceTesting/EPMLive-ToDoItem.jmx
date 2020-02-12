@@ -170,7 +170,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -178,7 +178,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -258,7 +258,7 @@
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -335,9 +335,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -383,7 +383,7 @@
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -460,9 +460,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -549,7 +549,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -557,7 +557,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/sites/NYISO/_layouts/15/Authenticate.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -607,9 +607,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -657,7 +657,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/sites/NYISO/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -702,7 +702,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/sites/NYISO/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -762,7 +762,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/Lists/To%20Do</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -857,7 +857,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/Lists/To%20Do/My%20Active%20Items.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -914,7 +914,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/_layouts/15/epmlive/treegrid/Text.xml</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -967,7 +967,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/_layouts/15/epmlive/treegrid/Defaults.xml</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1027,7 +1027,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/_layouts/15/epmlive/getganttitems.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1072,7 +1072,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/_layouts/15/epmlive/gridlistribbon.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1131,7 +1131,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/Lists/To%20Do/NewForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1260,7 +1260,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/_layouts/15/epmlive/getGeneralSetting.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1324,7 +1324,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/_layouts/15/epmlive/getGeneralSetting.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1716,7 +1716,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/Lists/To%20Do/NewForm.aspx?GetLastID=true</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -2107,7 +2107,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/Lists/To%20Do/NewForm.aspx?GetLastID=true</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -2187,7 +2187,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/Lists/To%20Do/DispForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2236,7 +2236,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">/sites/NYISO/_vti_bin/Workengine.asmx/js</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2288,9 +2288,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/SignOut.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/SignOut.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
