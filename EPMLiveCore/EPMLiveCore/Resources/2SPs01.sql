@@ -1204,14 +1204,13 @@ end
 exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
 @servername varchar(255),
-@maxthreads varchar(2)
+@maxthreads varchar(2),
+@maxRetries int = 3
 
 AS
 BEGIN
 declare 
-@Running_Type_1 int
-, @Running_Type_2 int
-, @MaxThreads_type_1 int
+@MaxThreads_type_1 int
 , @MaxThreads_type_2 int
 , @divisor int
 
@@ -1220,25 +1219,21 @@ set @divisor  = 2
 set @MaxThreads_type_2 = @maxthreads / @divisor 
 set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
 
-set @Running_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
-set @Running_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 32))
-
-
-UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''00-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 2) AS INT) + 1) AS nvarchar(2)) + '-' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
 (
-SELECT top (CASE WHEN @MaxThreads_type_1 > @Running_Type_1 THEN (@MaxThreads_type_1 - @Running_Type_1) ELSE 0 END) TSQUEUE_ID
+SELECT top (@MaxThreads_type_1) TSQUEUE_ID
 FROM TSQUEUE 
 INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
-WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
+WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,2) as int) < @maxRetries) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
 )
 
-UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''00-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 2) AS INT) + 1) AS nvarchar(2)) + '-' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
 (
-SELECT TOP (CASE WHEN @MaxThreads_type_2 > @Running_Type_2 THEN (@MaxThreads_type_2 - @Running_Type_2) ELSE 0 END) TSQUEUE_ID
+SELECT TOP (@MaxThreads_type_2) TSQUEUE_ID
 FROM TSQUEUE 
 INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
-WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 32)
+WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,2) as int) < @maxRetries) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
 )
 
@@ -1254,6 +1249,33 @@ FROM         dbo.TSQUEUE INNER JOIN
                       dbo.TIMERJOBTYPES ON dbo.TSQUEUE.JOBTYPE_ID = dbo.TIMERJOBTYPES.JOBTYPE_ID
 WHERE QUEUE = @servername and STATUS = 1
 
+END
+')
+ 
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSSetQueue')
+begin
+    Print 'Creating Stored Procedure spTSSetQueue'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSSetQueue'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spTSSetQueue]
+@result varchar(10),
+@resulttext varchar(max),
+@queueuid uniqueidentifier,
+@maxRetries int = 3
+AS
+BEGIN
+update TSQUEUE set 
+status =  (case WHEN TRY_PARSE(SUBSTRING(QUEUE,1,2) as int) < @maxRetries then 0 else 3 end), 
+PERCENTCOMPLETE =(case WHEN TRY_PARSE(SUBSTRING(QUEUE,1,2) as int) < @maxRetries then 0 else 100 end), 
+dtfinished=GETDATE(),
+result=@result,
+resulttext=@resulttext 
+where TSQUEUE_ID=@queueuid
 END
 ')
  

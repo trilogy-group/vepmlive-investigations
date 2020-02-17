@@ -70,9 +70,12 @@ namespace TimerService
         {
             try
             {
-                SPWebApplicationCollection _webcolections = GetWebApplications();
-                foreach (SPWebApplication webApp in _webcolections)
+                SPWebApplicationCollection webApps = GetWebApplications();
+                foreach (SPWebApplication webApp in webApps)
                 {
+                    int maxThreads = MaxThreads;
+                    if (maxThreads <= 0)
+                        continue;
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
@@ -94,11 +97,12 @@ namespace TimerService
                                     }
                                     lastRun = newRun.AddHours(1).AddMinutes(-newRun.Minute - 1);
                                 }
+                                
                                 using (SqlCommand cmd = new SqlCommand("spTimerGetQueue", cn))
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
                                     cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", MaxThreads);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
                                     cmd.Parameters.AddWithValue("@minPriority", highPriority? 0:10);
                                     cmd.Parameters.AddWithValue("@maxPriority", highPriority? 10:99);
 
@@ -115,15 +119,14 @@ namespace TimerService
                                             
                                             if (startProcess(rd))
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id and status = 0", cn))
                                                 {
                                                     cmd1.Parameters.Clear();
                                                     cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                processed++;
                                             }
-                                            
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
                                         if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
