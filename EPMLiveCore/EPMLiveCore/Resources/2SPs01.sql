@@ -1219,7 +1219,7 @@ set @divisor  = 2
 set @MaxThreads_type_2 = @maxthreads / @divisor 
 set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
 
-UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''00-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 2) AS INT) + 1) AS nvarchar(2)) + '-' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''00-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 2) AS INT) + 1) AS nvarchar(2)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
 (
 SELECT top (@MaxThreads_type_1) TSQUEUE_ID
 FROM TSQUEUE 
@@ -1228,7 +1228,7 @@ WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,2) as int) < @maxRetries) an
 order by DTCREATED
 )
 
-UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''00-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 2) AS INT) + 1) AS nvarchar(2)) + '-' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''00-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 2) AS INT) + 1) AS nvarchar(2)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
 (
 SELECT TOP (@MaxThreads_type_2) TSQUEUE_ID
 FROM TSQUEUE 
