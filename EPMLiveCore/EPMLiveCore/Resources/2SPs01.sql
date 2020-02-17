@@ -1210,7 +1210,9 @@ exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 AS
 BEGIN
 declare 
-@MaxThreads_type_1 int
+@Waiting_Type_1 int
+, @Waiting_Type_2 int
+, @MaxThreads_type_1 int
 , @MaxThreads_type_2 int
 , @divisor int
 
@@ -1218,8 +1220,22 @@ set @divisor  = 2
 
 set @MaxThreads_type_2 = @maxthreads / @divisor 
 set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
+set @Waiting_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @MaxRetries) and status = 0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
+set @Waiting_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @MaxRetries) and status = 0 and (JOBTYPE_ID = 32))
 
-UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''0-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) + 1) AS nvarchar(1)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+IF @Waiting_Type_1 < @MaxThreads_type_1  
+begin
+	SET @MaxThreads_type_1 = @Waiting_Type_1
+	SET @MaxThreads_type_2 = @maxthreads - @Waiting_Type_1
+end
+
+IF @Waiting_Type_2 < @MaxThreads_type_2  
+begin
+	SET @MaxThreads_type_2 = @Waiting_Type_2
+	SET @MaxThreads_type_1 = @maxthreads - @Waiting_Type_2 
+end
+
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''0-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) + 1) AS nvarchar(1)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0, DTSTARTED=GETDATE() where TSQUEUE_ID in
 (
 SELECT top (@MaxThreads_type_1) TSQUEUE_ID
 FROM TSQUEUE 
@@ -1228,7 +1244,7 @@ WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries) an
 order by DTCREATED
 )
 
-UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''0-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) + 1) AS nvarchar(1)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''0-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) + 1) AS nvarchar(1)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0, DTSTARTED=GETDATE() where TSQUEUE_ID in
 (
 SELECT TOP (@MaxThreads_type_2) TSQUEUE_ID
 FROM TSQUEUE 
@@ -1236,7 +1252,6 @@ INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
 WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
 )
-
 
 SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.LOCKED, dbo.TSTIMESHEET.SITE_UID, 
                       dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, dbo.TSTIMESHEET.TSUSER_UID, dbo.TSTIMESHEET.APPROVAL_DATE, 
