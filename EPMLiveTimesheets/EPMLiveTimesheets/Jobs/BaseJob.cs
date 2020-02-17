@@ -90,6 +90,8 @@ namespace TimeSheets
                     {
                         using (SqlCommand cmd = new SqlCommand("spTSSetQueue", cn))
                         {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@bErrors", bErrors);
                             cmd.Parameters.AddWithValue("@queueuid", QueueUid);
                             if (bErrors)
                                 cmd.Parameters.AddWithValue("@result", "Errors");
