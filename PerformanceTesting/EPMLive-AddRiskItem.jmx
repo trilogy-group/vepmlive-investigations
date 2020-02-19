@@ -5632,10 +5632,6 @@
                 </collectionProp>
               </HeaderManager>
               <hashTree/>
-              <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
-                <stringProp name="ConstantTimer.delay">0</stringProp>
-              </ConstantTimer>
-              <hashTree/>
               <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
                 <stringProp name="ConstantTimer.delay">3000</stringProp>
                 <stringProp name="RandomTimer.range">2000</stringProp>

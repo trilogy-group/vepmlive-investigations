@@ -4939,6 +4939,7 @@
                 <stringProp name="RegexExtractor.match_number">1</stringProp>
                 <stringProp name="Sample.scope">all</stringProp>
               </RegexExtractor>
+			  <hashTree/>
             </hashTree>
             <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Time%20Off/DispForm.aspx" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
