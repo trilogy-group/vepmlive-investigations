@@ -35,7 +35,7 @@ namespace TimerService
                             {
                                 cmd.ExecuteNonQuery();
                             }
-                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where queue=@servername and (status = 1 OR STATUS = 2)", cn))
+                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where (queue=@servername OR QUEUE like '%-'  + @servername) and (status = 1 OR STATUS = 2)", cn))
                             {
                                 cmd1.Parameters.Clear();
                                 cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
