@@ -1,17 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
-using System.ComponentModel;
-using System.Data.SqlClient;
-using Microsoft.SharePoint.Administration;
-using System.IO;
-using System.Data;
-using Microsoft.SharePoint;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Configuration;
-using System.Runtime.Caching;
 
 namespace TimerService
 {
