@@ -25,13 +25,13 @@ namespace TimerService
 			this.queueJobs = queueJobs;
         }
 
-
-        public override bool InitializeTask()
+        
+        public override bool InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask())
+            if (!base.InitializeTask(token))
                 return false;
 
-            logMessage("INIT", "STMR", "Clearing Queue");
+            LogMessage("INIT", "STMR", "Clearing Queue");
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
             {
@@ -66,7 +66,7 @@ namespace TimerService
             return true;
         }
         DateTime lastRun = DateTime.Now;
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
@@ -129,14 +129,14 @@ namespace TimerService
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
                                 }
 
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.ToString());
+                                LogMessage("ERR", "RUNT", ex.ToString());
 
                             }
                         }
@@ -148,7 +148,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUNT", ex.ToString());
+                LogMessage("ERR", "RUNT", ex.ToString());
             }
         }
 
@@ -241,13 +241,13 @@ namespace TimerService
                         }
                         catch (Exception exe)
                         {
-                            logMessage("ERR", "PROC", exe.Message);
+                            LogMessage("ERR", "PROC", exe.Message);
                         }
                     }
                 }
                 else
                 {
-                    logMessage("ERR", "PROC", ex.Message);
+                    LogMessage("ERR", "PROC", ex.Message);
                 }
             }
         }

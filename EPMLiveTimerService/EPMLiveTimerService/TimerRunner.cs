@@ -11,68 +11,80 @@ using Microsoft.SharePoint;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Configuration;
+using System.Runtime.Caching;
 
 namespace TimerService
 {
     public class TimerRunner
     {
-        protected class FaultItem
+        protected class ClassItem
         {
-            public DateTime FaultTime;
-            public int FaultCount;
-            public bool Recovered = false;
+            public ProcessorBase Processor;
+            public IProgress<int> Progress;
+            public string PollingProperty = "PollingInterval";
+            public bool Initialized = false;
         }
-        protected Task[] tasks;
-        protected IProgress<int>[] progress;
-        protected ManualResetEvent[] events;
-        protected List<FaultItem> faultHistory;
-        protected Task monitoringWorker;
+        protected ClassItem[] classes;
+        protected Task mainWorker;
 
         protected CancellationTokenSource _cts;
         protected CancellationToken token;
+
+        const int HEART_BEAT_MINUTES = 5;
 
         public virtual bool startTimer()
         {
             try
             {
+                bool queueJobs = ConfigurationManager.AppSettings["SecondaryTimer"] == null || ConfigurationManager.AppSettings["SecondaryTimer"].ToLower() != "true";
+                classes = new ClassItem[7];
+
+                classes[0] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new TimerClass(false, false)
+                };
+
+                classes[1] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new TimerClass(true, queueJobs)
+                };
+
+                classes[2] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new TimesheetTimerClass()
+                };
+
+                classes[3] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new SecurityClass()
+                };
+
+                classes[4] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new NotificationClass(),
+                    PollingProperty = "NotificationInterval"
+                };
+
+                classes[5] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new RollupClass()
+                };
+
+                classes[6] = new ClassItem
+                {
+                    Progress = new Progress<int>(value => { }),
+                    Processor = new IntegrationClass()
+                };
                 _cts = new CancellationTokenSource();
                 token = _cts.Token;
-                tasks = new Task[7];
-                progress = new IProgress<int>[7];
-                events = new ManualResetEvent[7];
-                faultHistory = new List<FaultItem> { null, null, null, null, null, null, null };
-
-                //=========================Run Main Queue
-                events[0] = new ManualResetEvent(false);
-                progress[0] = new Progress<int>(value => { });
-                tasks[0] = GetTask(0);
-                //=========================Run High Priority Queue
-                events[1] = new ManualResetEvent(false);
-                progress[1] = new Progress<int>(value => { });
-                tasks[1] = GetTask(1);
-                //=========================Run TS Queue
-                events[2] = new ManualResetEvent(false);
-                progress[2] = new Progress<int>(value => { });
-                tasks[2] = GetTask(2);
-                //=========================Run Sec Queue
-                events[3] = new ManualResetEvent(false);
-                progress[3] = new Progress<int>(value => { });
-                tasks[3] = GetTask(3);
-                //================Run Notifications
-                events[4] = new ManualResetEvent(false);
-                progress[4] = new Progress<int>(value => { });
-                tasks[4] = GetTask(4);
-                //=========================Run Rollup Queue
-                events[5] = new ManualResetEvent(false);
-                progress[5] = new Progress<int>(value => { });
-                tasks[5] = GetTask(5);
-                //================Run Integrations
-                events[6] = new ManualResetEvent(false);
-                progress[6] = new Progress<int>(value => { });
-                tasks[6] = GetTask(6);
-
-                monitoringWorker = Task.Run(() => DoMonitoring(), token);
-
+                mainWorker = new Task(DoWork, token);
+                mainWorker.Start();
                 return true;
             }
             catch (Exception)
@@ -80,130 +92,98 @@ namespace TimerService
                 return false;
             }
         }
-        
-        protected virtual Task GetTask(int taskNumber)
-        {
-			bool queueJobs = ConfigurationManager.AppSettings["SecondaryTimer"] == null || ConfigurationManager.AppSettings["SecondaryTimer"].ToLower() != "true";
 
-			switch (taskNumber)
-            {
-                case 0:
-                    return Task.Run(() => DoWork(new TimerClass(false, false), progress[0], events[0]), token);
-                case 1:
-                    return Task.Run(() => DoWork(new TimerClass(true, queueJobs), progress[1], events[1]), token);
-                case 2:
-                    return Task.Run(() => DoWork(new TimesheetTimerClass(), progress[2], events[2]), token);
-                case 3:
-                    return Task.Run(() => DoWork(new SecurityClass(), progress[3], events[3]), token);
-                case 4:
-                    return Task.Run(() => DoWork(new NotificationClass(), progress[4], events[4], "NotificationInterval"), token);
-                case 5:
-                    return Task.Run(() => DoWork(new RollupClass(), progress[5], events[5]), token);
-                case 6:
-                    return Task.Run(() => DoWork(new IntegrationClass(), progress[6], events[6]), token);
-            }
-            return null;
-        }
 
-        const int RETRIES = 5;
         const int WAIT = 20;
-        protected void DoMonitoring()
-        {
-            while (true)
-            {
-                int taskIndex = ManualResetEvent.WaitAny(events, new TimeSpan(0, 0, WAIT));
-                if (token.IsCancellationRequested)
-                    break;
-                RelaunchFaultedTasks();
-                if (taskIndex == WaitHandle.WaitTimeout)
-                {
-                    continue;
-                }
-                events[taskIndex].Reset();
-                if (faultHistory[taskIndex] == null)
-                {
-                    faultHistory[taskIndex] = new FaultItem { FaultTime = DateTime.Now, FaultCount = 1 };
-                }
-                else
-                {
-                    DateTime newFaultTime = DateTime.Now;
-                    DateTime oldFaultTime = faultHistory[taskIndex].FaultTime;
-                    TimeSpan sinceLastFault = newFaultTime - oldFaultTime;
-                    faultHistory[taskIndex].FaultTime = newFaultTime;
-                    if (sinceLastFault > new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, RETRIES)) * 10))
-                    {
-                        faultHistory[taskIndex].FaultCount = 1;
-                    }
-                    else
-                    {
-                        faultHistory[taskIndex].FaultCount++;
-                    }
-                }
-                faultHistory[taskIndex].Recovered = false;
-            }
-        }
-        void RelaunchFaultedTasks()
-        {
-            DateTime checkTime = DateTime.Now;
-            for (int i = 0; i < faultHistory.Count; i++)
-            {
-                if (faultHistory[i] == null || faultHistory[i].Recovered)
-                    continue;
-                if (checkTime >  faultHistory[i].FaultTime + new TimeSpan(0, 0, Convert.ToInt16(Math.Pow(2, faultHistory[i].FaultCount)) * 10))
-                {
-                    tasks[i] = GetTask(i);
-                    faultHistory[i].Recovered = true;
-                }
-            }
-        }
-
-        const int HEART_BEAT_MINUTES = 5;
-        protected void DoWork(ProcessorBase mc, IProgress<int> progress, ManualResetEvent faultEvent, string pollingProperty = "PollingInterval")
+        protected void DoWork()
         {
             try
             {
-                if (mc.InitializeTask())
+                DateTime lastHeartBeat = DateTime.Now;
+                List<TimeSpan> pollPeriods = new List<TimeSpan>();
+                List<DateTime> lastTimeExecutions = new List<DateTime>();
+                foreach (ClassItem currentClass in classes)
                 {
-                    DateTime lastHeartBeat = DateTime.Now;
-                    while (true)
+                    int waitPeriod = WAIT;
+                    try
                     {
-                        DateTime newHeartBeat = DateTime.Now;
-                        if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEART_BEAT_MINUTES, 0))
-                        {
-                            mc.HeartBeat();
-                            lastHeartBeat = newHeartBeat;
-                        }
+                        waitPeriod = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting(currentClass.PollingProperty));
+                    }
+                    catch { }
+                    pollPeriods.Add(new TimeSpan(0, 0, waitPeriod));
+                    lastTimeExecutions.Add(lastHeartBeat);
+                }
+                
+                while (true)
+                {
+                    DateTime newHeartBeat = DateTime.Now;
+                    bool beatNow = false;
+                    if ((newHeartBeat - lastHeartBeat) >= new TimeSpan(0, HEART_BEAT_MINUTES, 0))
+                    {
+                        beatNow = true;
+                        lastHeartBeat = newHeartBeat;
+                    }
+                    TimeSpan minimumSleep = TimeSpan.MaxValue;
+                    for (int index = 0; index < classes.Length; index++)
+                    {
                         token.ThrowIfCancellationRequested();
-                        mc.RunTask(token);
-                        int waitPeriod = WAIT;
+                        TimeSpan pollPeriod = pollPeriods[index];
+                        DateTime lastExecution = lastTimeExecutions[index];
+                        TimeSpan expectedSleep = pollPeriod - new TimeSpan(((newHeartBeat - lastExecution).Ticks % pollPeriod.Ticks));
+                        if (expectedSleep < minimumSleep)
+                        {
+                            minimumSleep = expectedSleep;
+                        }
+                        ClassItem currentClass = classes[index];
                         try
                         {
-                            waitPeriod = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting(pollingProperty));
+                            if (!currentClass.Initialized)
+                            {
+                                currentClass.Initialized = currentClass.Processor.InitializeTask(token);
+
+                            }
+                            if (beatNow)
+                                currentClass.Processor.HeartBeat();
+
+                            if (newHeartBeat - lastExecution < pollPeriod)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                lastTimeExecutions[index] = newHeartBeat;
+                            }
+                            if (currentClass.Initialized)
+                            {
+                                currentClass.Processor.RunTask();
+                            }
                         }
-                        catch { }
-                        Thread.Sleep(new TimeSpan(0, 0, waitPeriod));
+                        catch(Exception ex) when (!(ex is OperationCanceledException))
+                        {
+                            currentClass.Processor.LogMessage("ERR", "RUNT", ex.ToString());
+                        }
                     }
-                }
-                else
-                {
-                    throw new Exception("Could not start timer");
+                    if (minimumSleep < TimeSpan.MaxValue)
+                    {
+                        Thread.Sleep(minimumSleep);
+                    }
                 }
             }
             catch (OperationCanceledException)
             {
-                mc.StopTimer();
-            }
-            catch (Exception)
-            {
-                faultEvent.Set();
+                foreach (ClassItem currentClass in classes)
+                {
+                    currentClass.Processor.Cancel();
+                }
                 throw;
             }
         }
 
 
+
         public bool timerRunning()
         {
-            return tasks[0] != null && !tasks[0].IsCompleted;
+            return mainWorker != null && !mainWorker.IsCompleted;
         }
 
         public bool stopTimer()
@@ -211,9 +191,9 @@ namespace TimerService
             try
             {
                 _cts.Cancel();
-                monitoringWorker.Wait();
-                Task.WaitAll(tasks);
-                
+
+                mainWorker.Wait();
+
                 return true;
             }
             catch

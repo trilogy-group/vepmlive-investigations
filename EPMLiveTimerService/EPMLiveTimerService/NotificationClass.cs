@@ -15,11 +15,11 @@ namespace TimerService
 {
     public class NotificationClass : ProcessorBase
     {
-        public override bool InitializeTask()
+        public override bool InitializeTask(CancellationToken token)
         {
-            return base.InitializeTask(false);
+            return base.InitializeTask(false, token);
         }
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
@@ -93,7 +93,7 @@ namespace TimerService
                                             }
                                             catch (Exception ex)
                                             {
-                                                logMessage("ERR", "NOTIFICATIONS", ex.Message);
+                                                LogMessage("ERR", "NOTIFICATIONS", ex.Message);
                                             }
 
                                             using (SqlCommand cmd3 = new SqlCommand("spNSetBit", cn))
@@ -108,14 +108,14 @@ namespace TimerService
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
 
                                 }
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.Message);
+                                LogMessage("ERR", "RUNT", ex.Message);
                             }
                             finally
                             {
@@ -132,7 +132,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUNT", ex.Message);
+                LogMessage("ERR", "RUNT", ex.Message);
             }
         }
 

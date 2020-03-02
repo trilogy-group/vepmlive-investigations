@@ -9,13 +9,13 @@ namespace TimerService
 {
     public class InitFaultyClass: ProcessorBase
     {
-        public override bool InitializeTask()
+        public override bool InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask(false))
+            if (!base.InitializeTask(false, token))
                 return false;
             throw new Exception("InitFaultyClass: deliberate failure");
         }
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             token.ThrowIfCancellationRequested();
             Thread.Sleep(new TimeSpan(0, 0, 5));

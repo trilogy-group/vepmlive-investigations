@@ -40,7 +40,7 @@ namespace TimerService
         {
             try
             {
-                Task newTask = Task.Run(() => DoWork(rd));
+                Task newTask = Task.Run(() => DoWork(rd), token);
                 Thread.Sleep(500);
                 if (!newTask.IsCompleted)
                 {
@@ -51,12 +51,12 @@ namespace TimerService
             }
             catch (Exception ex)
             {
-                logMessage("ERR", "STPR", ex.Message);
+                LogMessage("ERR", "STPR", ex.Message);
                 return false;
             }
         }
 
-        protected void logMessage(string type, string module, string message)
+        public void LogMessage(string type, string module, string message)
         {
             lock (thisLock)
             {
@@ -71,20 +71,22 @@ namespace TimerService
             }
         }
 
-        public virtual bool InitializeTask()
+        protected CancellationToken token;
+        public virtual bool InitializeTask(CancellationToken token)
         {
-            return InitializeTask(true);
+            return InitializeTask(true, token);
         }
 
-        public virtual bool InitializeTask(bool initializeThreads)
+        public virtual bool InitializeTask(bool initializeThreads, CancellationToken token)
         {
+            this.token = token;
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS");
             }
             catch { }
 
-            logMessage("INIT", "STMR", "Starting Timer Service");
+            LogMessage("INIT", "STMR", "Starting Timer Service");
             if (!initializeThreads)
                 return true;
             int maxThreads = 0;
@@ -94,28 +96,29 @@ namespace TimerService
             }
             catch (Exception e)
             {
-                logMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
+                LogMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
             }
             if (maxThreads < 1)
                 return false;
 
-            logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
+            LogMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
             _maxThreads = maxThreads;
             return true;
         }
         public void HeartBeat()
         {
-            logMessage("HTBT", "MNTH", "Dispatcher alive");
+            LogMessage("HTBT", "MNTH", "Dispatcher alive");
         }
-        public virtual void StopTimer()
+        public virtual void Cancel()
         {
-            logMessage("STOP", "STMR", "Stopped Timer Service");
+            Task.WaitAll(taskList.ToArray(), new TimeSpan(0, 0, 5)); 
+            LogMessage("STOP", "STMR", "Stopped Timer Service");
         }
         protected abstract string LogName {
             get;
         }
 
-        public abstract void RunTask(CancellationToken token);
+        public abstract void RunTask();
 
         protected abstract void DoWork(RunnerData rd);
 

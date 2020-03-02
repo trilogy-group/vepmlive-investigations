@@ -17,13 +17,13 @@ namespace TimerService
     {
 
 
-        public override bool InitializeTask()
+        public override bool InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask())
+            if (!base.InitializeTask(token))
                 return false;
 
             //EPML-5787
-            logMessage("INIT", "STMR", "Clearing Queue");
+            LogMessage("INIT", "STMR", "Clearing Queue");
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
@@ -48,7 +48,7 @@ namespace TimerService
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "Starttimer", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "Starttimer", exe.Message); }
                     }
                 }
             }
@@ -56,7 +56,7 @@ namespace TimerService
         }
 
 
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
@@ -106,14 +106,14 @@ namespace TimerService
                                                 processed++;
                                                 token.ThrowIfCancellationRequested();
                                             }
-                                            if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                            if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                         }
 
                                     }
                                 }
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
-                            { logMessage("ERR", "RUN", ex.Message); }
+                            { LogMessage("ERR", "RUN", ex.Message); }
 
 
 
@@ -124,7 +124,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUN", ex.Message);
+                LogMessage("ERR", "RUN", ex.Message);
             }
         }
 
@@ -160,7 +160,7 @@ namespace TimerService
                             cmd.ExecuteNonQuery();
                         }
                     }
-                    catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+                    catch (Exception exe) { LogMessage("ERR", "RUN", exe.Message); }
 
 
                 }
@@ -179,7 +179,7 @@ namespace TimerService
                             cmd.ExecuteNonQuery();
                         }
                     }
-                    catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+                    catch (Exception exe) { LogMessage("ERR", "RUN", exe.Message); }
                 }
             }
 

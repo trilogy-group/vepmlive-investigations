@@ -16,7 +16,7 @@ namespace TimerService
     public class IntegrationClass : ProcessorBase
     {
         
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
@@ -61,7 +61,7 @@ namespace TimerService
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
 
                                         using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
                                         {
@@ -72,7 +72,7 @@ namespace TimerService
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.Message);
+                                LogMessage("ERR", "RUNT", ex.Message);
                             }
                         }
 
@@ -83,7 +83,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUNT", ex.Message);
+                LogMessage("ERR", "RUNT", ex.Message);
             }
         }
         
@@ -108,7 +108,7 @@ namespace TimerService
                         }
                         //TODO: Remove line comment above
                     }
-                    catch (Exception ex) { logMessage("ERR", "PROCINT", ex.Message); }
+                    catch (Exception ex) { LogMessage("ERR", "PROCINT", ex.Message); }
 
 
                 }
@@ -128,12 +128,12 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "PROCINT", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "PROCINT", exe.Message); }
                     }
                 }
                 else
                 {
-                    logMessage("ERR", "PROCINT", ex.Message);
+                    LogMessage("ERR", "PROCINT", ex.Message);
                 }
             }
         }

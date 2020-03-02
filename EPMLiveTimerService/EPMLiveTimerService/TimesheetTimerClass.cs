@@ -15,9 +15,9 @@ namespace TimerService
 {
     class TimesheetTimerClass : ProcessorBase
     {
-        public override bool InitializeTask()
+        public override bool InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask())
+            if (!base.InitializeTask(token))
                 return false;
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
@@ -42,7 +42,7 @@ namespace TimerService
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "RUN", exe.Message); }
                     }
                 }
             }
@@ -50,7 +50,7 @@ namespace TimerService
             return true;
         }
 
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
@@ -97,7 +97,7 @@ namespace TimerService
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
 
                                     using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
@@ -108,7 +108,7 @@ namespace TimerService
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.ToString());
+                                LogMessage("ERR", "RUNT", ex.ToString());
                             }
                         }
                     }
@@ -117,7 +117,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUN", ex.Message);
+                LogMessage("ERR", "RUN", ex.Message);
             }
         }
 
@@ -164,7 +164,7 @@ namespace TimerService
 					if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
 					{
 						string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
-						logMessage("ERR", "PROC", error);
+						LogMessage("ERR", "PROC", error);
 					}
 
 					m = thisClass.GetMethod("finishJob");
@@ -187,12 +187,12 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "PROC", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "PROC", exe.Message); }
                     }
                 }
                 else
                 {
-                    logMessage("ERR", "PROC", ex.Message);
+                    LogMessage("ERR", "PROC", ex.Message);
                 }
             }
 
