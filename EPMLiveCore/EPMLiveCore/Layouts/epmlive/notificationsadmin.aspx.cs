@@ -715,7 +715,12 @@ namespace EPMLiveCore.Layouts.epmlive
 
                             string sTime = ddlRunTime.SelectedValue;
 
-                            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id)))
+                            var connectionString = CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id);
+                            if (!connectionString.Contains("MultipleActiveResultSets"))
+                            {
+                                connectionString += ";MultipleActiveResultSets=true;";
+                            }
+                            using (var sqlConnection = new SqlConnection(connectionString))
                             {
                                 SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
