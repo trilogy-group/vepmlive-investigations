@@ -4340,7 +4340,7 @@ namespace EPMLiveWorkPlanner
                         {
                             oTempProjectCenter.Fields.Add(sPlanner + "BD", SPFieldType.DateTime, false);
                             SPField fld = oTempProjectCenter.Fields[sPlanner + "BD"];
-                            fld.Title = sPlanner + " Baseline Date";
+                            fld.Title = sPlanner + "BD";
                             fld.Hidden = false;
                             fld.Sealed = true;
                             fld.Update();
