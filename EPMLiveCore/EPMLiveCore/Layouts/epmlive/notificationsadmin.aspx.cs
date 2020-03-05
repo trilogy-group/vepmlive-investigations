@@ -42,6 +42,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected Label lblNotEnabled;
         //protected CheckBox chkAllUsers;           --EPML 1901
         protected Label lblStatus;
+        private const string MultipleActiveResultSetConfig = "MultipleActiveResultSets";
 
 
         protected void Page_Load(object sender, EventArgs e)
@@ -715,7 +716,15 @@ namespace EPMLiveCore.Layouts.epmlive
 
                             string sTime = ddlRunTime.SelectedValue;
 
-                            using (var sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id)))
+                            var connectionString = CoreFunctions.getConnectionString(currWeb.Site.WebApplication.Id);
+                            if (!connectionString.Contains(MultipleActiveResultSetConfig))
+                            {
+                                connectionString = string.Format("{0}{1}{2}=true;",
+                                    connectionString,
+                                    connectionString.EndsWith(";") ? string.Empty : ";",
+                                    MultipleActiveResultSetConfig);
+                            }
+                            using (var sqlConnection = new SqlConnection(connectionString))
                             {
                                 SPSecurity.RunWithElevatedPrivileges(delegate { sqlConnection.Open(); });
 
