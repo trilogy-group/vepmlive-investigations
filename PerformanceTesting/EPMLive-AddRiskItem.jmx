@@ -5648,7 +5648,7 @@
               </RegexExtractor>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/DispForm.aspx?ID=27&amp;Source=/sites/nyiso/Lists/Risks/All%20Risks.aspx" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/DispForm.aspx?ID=361&amp;Source=/sites/nyiso/Lists/Risks/All%20Risks.aspx" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="Source" elementType="HTTPArgument">
@@ -5661,7 +5661,7 @@
                   <elementProp name="ID" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">ID</stringProp>
-                    <stringProp name="Argument.value">${d_ItemId}</stringProp>
+                    <stringProp name="Argument.value">361</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
