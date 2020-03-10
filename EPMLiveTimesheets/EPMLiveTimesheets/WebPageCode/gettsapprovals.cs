@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 
 namespace TimeSheets
 {
@@ -614,8 +615,8 @@ namespace TimeSheets
                 string[] strworktypes = worktypes.Split('|');
 
                 int rowCounter = 1;
-
-                foreach (XmlNode nd in docXml.SelectNodes("//row"))
+            List<string> resetResources = new List<string>();
+            foreach (XmlNode nd in docXml.SelectNodes("//row"))
                 {
                     double hours = 0;
                     XmlNode ndListId = nd.SelectSingleNode("userdata[@name='listid']");
@@ -772,7 +773,32 @@ namespace TimeSheets
                                     else
                                         ndList[i].InnerText = colval;
 
+                                if (colid == "Work")
+                                {
+
+                                    double savedWork = 0;
+                                    XmlNode ndWorkTotal = nd.ParentNode.SelectSingleNode("cell[@id='Work']");
+                                    if (resetResources.IndexOf(curUser) >= 0)
+                                    {
+                                        double.TryParse(ndWorkTotal.InnerText, out savedWork);
+                                    }
+                                    else
+                                    {
+                                        resetResources.Add(curUser);
+                                    }
+                                    double newWork;
+                                    if (double.TryParse(colval, out newWork))
+                                    {
+                                        savedWork += newWork;
+                                    }
+                                    else if (double.TryParse(ndList[i].InnerText, out newWork))
+                                    {
+                                        savedWork += newWork;
+                                    }
+                                    ndWorkTotal.InnerText = savedWork.ToString("F2");
+
                                 }
+                            }
 
                             }
                         }
