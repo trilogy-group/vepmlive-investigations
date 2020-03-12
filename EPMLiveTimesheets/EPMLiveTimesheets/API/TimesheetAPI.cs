@@ -899,7 +899,10 @@ namespace TimeSheets
                     //var task = IsResourceTeamMember(oWeb, timeSheetItem, TASK_WORK_FIELD_NAME);
                     projectItem = webSysAdmin.Lists[PROJECT_WORK_FIELD_NAME].Items.OfType<SPListItem>()
                 .Where(x => x.Name == timeSheetItem.ProjectName).FirstOrDefault();
-
+                    if (projectItem == null)
+                    {
+                        return;
+                    }
                     var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID }, PROJECT_WORK_FIELD_NAME);
 
                     var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };

@@ -439,7 +439,7 @@ namespace TimeSheets
                                                 {
                                                 var liProject = SaveDataJobExecuteCache.Cache.GetListItem(iWeb.ServerRelativeUrl, lGuid, int.Parse(project));
                                                 var newHours = drProject["Hours"].ToString();
-                                                if (liProject["TimesheetHours"]?.ToString() != newHours)
+                                                if (liProject?["TimesheetHours"]?.ToString() != newHours)
                                                 {
                                                     liProject["TimesheetHours"] = newHours;
                                                         liProject.Update();
