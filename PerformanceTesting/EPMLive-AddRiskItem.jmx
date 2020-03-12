@@ -5654,7 +5654,7 @@
                   <elementProp name="ID" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">ID</stringProp>
-                    <stringProp name="Argument.value">362</stringProp>
+                    <stringProp name="Argument.value">${d_ItemId}</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
@@ -5720,7 +5720,7 @@
 				  <elementProp name="ID" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">ID</stringProp>
-                    <stringProp name="Argument.value">362</stringProp>
+                    <stringProp name="Argument.value">${d_ItemId}</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
