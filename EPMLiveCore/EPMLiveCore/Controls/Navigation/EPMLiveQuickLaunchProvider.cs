@@ -240,10 +240,11 @@ namespace EPMLiveCore.Controls.Navigation
                                                         communityLinks[quickLaunchOrder + ";" + communityName].Add(id);
                                                     }
 
-                                                    if (linkNodes.ContainsKey(id)) continue;
+                                                   
 
                                                     lock (locker)
                                                     {
+                                                        if (linkNodes.ContainsKey(id)) continue;
                                                         linkNodes.Add(id, null);
                                                     }
                                                 }
