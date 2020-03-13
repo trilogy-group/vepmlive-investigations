@@ -763,6 +763,7 @@ namespace TimeSheets
                         {
                             // This will throw error if task is deleted
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
+
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
                         catch (ArgumentException ex)
@@ -3611,7 +3612,7 @@ namespace TimeSheets
 
                 if (isValidMyWorkColumn(GoodFieldname))
                 {
-                    DataRow[] drTS = dsTS.Tables[5].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "' AND ListName='MYTS' AND ColumnName='" + tsField + "'");
+                    DataRow[] drTS = dsTS.Tables[5].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "' AND ColumnName='" + tsField + "'");
 
                     if (drTS.Length > 0)
                     {
@@ -3983,7 +3984,6 @@ namespace TimeSheets
         private static DataSet GetTSDataSet(SqlConnection connection, SPWeb web, SPUser user, string period)
         {
             var rptData = new CoreReportHelper.MyWorkReportData(web.Site.ID);
-
             var timesheetId = Guid.Empty;
             using (var command = new SqlCommand(
                 @"select TOP 1 TS_UID from TSTIMESHEET 
