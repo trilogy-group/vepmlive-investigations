@@ -5,7 +5,6 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.Win32;
 using System.Collections.Generic;
-using System.Transactions;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
