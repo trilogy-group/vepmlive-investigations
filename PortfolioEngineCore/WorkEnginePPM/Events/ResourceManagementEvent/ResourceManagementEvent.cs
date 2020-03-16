@@ -8,7 +8,6 @@ using Utilities = WorkEnginePPM.Core.ResourceManagement.Utilities;
 using WorkEnginePPM.WebServices.Core;
 using System.Threading;
 using System.Threading.Tasks;
-using EPMLiveCore.API;
 
 namespace WorkEnginePPM.Events
 {
@@ -38,7 +37,6 @@ namespace WorkEnginePPM.Events
 
                 CalculateResourceAvailabilities(properties.ListItem["EXTID"].ToString(), spWeb);
                 UpdateUser(properties);
-                ResourceGrid.ClearCache(properties.Web);
             }
             catch (Exception exception)
             {
