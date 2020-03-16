@@ -57,7 +57,7 @@ namespace EPMLiveCore.Layouts.epmlive.applications
                 HandleNAcase();
             }
         }
-
+        
         private void CheckForQuickLaunchField(SPWeb spWeb)
         {
             spWeb.AllowUnsafeUpdates = true;
@@ -206,6 +206,9 @@ namespace EPMLiveCore.Layouts.epmlive.applications
 
             SPSite data = new SPSite(SPContext.Current.Site.ID);
             CacheStore.Current.RemoveSafely(Web.Url, new Infrastructure.CacheStoreCategory(oWeb).Navigation);
+
+           
+            Response.Redirect(SPContext.Current.Web.Url + Request.Url.LocalPath, true);
         }
 
         protected void GridView_PreRender(object sender, EventArgs e)

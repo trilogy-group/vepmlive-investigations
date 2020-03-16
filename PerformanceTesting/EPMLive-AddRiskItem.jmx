@@ -248,7 +248,7 @@
             <boolProp name="Cookie.domain_specified">true</boolProp>
           </elementProp>
           <elementProp name="epmnav-selected-link-u-1" elementType="Cookie" testname="epmnav-selected-link-u-1">
-            <stringProp name="Cookie.value">{&quot;index&quot;:-1,&quot;uri&quot;:&quot;/epm/Lists/Risks/All%20My%20Risks.aspx&quot;}</stringProp>
+            <stringProp name="Cookie.value">{&quot;index&quot;:-1,&quot;uri&quot;:&quot;/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx&quot;}</stringProp>
             <stringProp name="Cookie.domain"></stringProp>
             <stringProp name="Cookie.path"></stringProp>
             <boolProp name="Cookie.secure">false</boolProp>
@@ -380,7 +380,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
                 <elementProp name="__EVENTVALIDATION" elementType="HTTPArgument">
@@ -399,9 +399,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">EPMLiveForms/DefaultCust.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -442,22 +442,22 @@
             </ConstantTimer>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/Authenticate.aspx?Source=%2Fepm" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/15/Authenticate.aspx?Source=%2Fsites%2FNYISO" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/Authenticate.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/Authenticate.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -503,7 +503,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/initstrings.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -524,7 +524,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -543,7 +543,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/init.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -564,7 +564,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -583,7 +583,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/strings.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -604,7 +604,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -623,7 +623,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/clienttemplates.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -644,7 +644,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -663,7 +663,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/masterpages/uplandv5.master.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -684,7 +684,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -703,7 +703,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/ie55up.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -724,7 +724,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -743,7 +743,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/dhtml/xgrid/dhtmlxcommon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -764,7 +764,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -783,7 +783,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/resourcetools.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -804,7 +804,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -829,7 +829,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -850,7 +850,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -869,7 +869,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/blank.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -890,7 +890,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -915,7 +915,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -936,7 +936,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -961,7 +961,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -982,7 +982,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1007,7 +1007,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1028,7 +1028,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1053,7 +1053,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1074,7 +1074,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1099,7 +1099,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1120,7 +1120,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1145,7 +1145,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1166,7 +1166,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1191,7 +1191,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1212,7 +1212,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1237,7 +1237,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1258,7 +1258,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1277,7 +1277,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.listsearchboxbootstrap.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1298,7 +1298,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1317,7 +1317,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.templateversoning.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1338,7 +1338,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1357,7 +1357,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/handlebars-v1.3.0.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1378,7 +1378,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1397,7 +1397,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/amplify.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1418,7 +1418,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1437,7 +1437,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/bundles/moment.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1458,7 +1458,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1477,7 +1477,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.socialstream.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1498,7 +1498,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1517,7 +1517,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.notifications.v2.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1538,7 +1538,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1557,7 +1557,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/slimscroll.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1578,7 +1578,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1597,7 +1597,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.navigation.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1618,7 +1618,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1637,7 +1637,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/libraries/jquery.tmpl.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1658,7 +1658,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1677,7 +1677,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/xml2json.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1698,7 +1698,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1717,7 +1717,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/md5.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1738,7 +1738,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1757,7 +1757,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/jquery.multiselect.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1778,7 +1778,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1797,7 +1797,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/epmlive.analytics.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1818,7 +1818,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1837,7 +1837,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/epmlive/javascripts/notifications.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1858,7 +1858,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1870,7 +1870,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/IE55UP.JS</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1891,7 +1891,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1916,7 +1916,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">WebResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1937,7 +1937,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -1962,7 +1962,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">ScriptResource.axd</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -1983,7 +1983,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2002,7 +2002,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/ng/script/lib/l.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2023,7 +2023,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2036,7 +2036,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/jquery/jquery-1.10.2.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2057,7 +2057,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2076,7 +2076,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/jquery/jquery-noconflict.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2097,7 +2097,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2109,7 +2109,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/jquery/jquery-migrate-1.2.1.min.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2130,7 +2130,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2149,7 +2149,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/sharepointajaxlibrary/sharepointajax.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2170,7 +2170,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2189,7 +2189,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/ng/script/chromefix.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2210,7 +2210,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2229,7 +2229,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/blank.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2250,7 +2250,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2269,7 +2269,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/core.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2290,7 +2290,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2309,7 +2309,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.init.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2330,7 +2330,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2349,7 +2349,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/sp.res.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2370,7 +2370,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2389,7 +2389,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/cui.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2410,7 +2410,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2429,7 +2429,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/clientrenderer.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2450,7 +2450,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2469,7 +2469,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/srch.resources.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2490,7 +2490,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2509,7 +2509,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/profilebrowserscriptres.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2530,7 +2530,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2549,7 +2549,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/dragdrop.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2570,13 +2570,13 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js?v=7.0.0.5" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js?v=7.0.0.5" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="v" elementType="HTTPArgument">
@@ -2589,9 +2589,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2614,7 +2614,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2623,7 +2623,7 @@
           
          
           
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/epmlive/javascripts/epmlive.js?v=7.0.0.5" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/15/epmlive/javascripts/epmlive.js?v=7.0.0.5" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="v" elementType="HTTPArgument">
@@ -2636,9 +2636,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/javascripts/epmlive.js</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/javascripts/epmlive.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2665,7 +2665,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2684,7 +2684,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.runtime.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2705,7 +2705,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2724,7 +2724,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.dialog.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2745,13 +2745,13 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
               <collectionProp name="Arguments.arguments">
@@ -2764,9 +2764,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2801,7 +2801,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2811,22 +2811,22 @@
             </ConstantTimer>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="{ Function: &apos;LoadFavoriteStatus&apos;, Dataxml: &apos;&lt;Data&gt;&lt;Param key" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
                   <stringProp name="Argument.name">{ Function: &apos;LoadFavoriteStatus&apos;, Dataxml: &apos;&lt;Data&gt;&lt;Param key</stringProp>
-                  <stringProp name="Argument.value">&quot;SiteId&quot;&gt;3608a9c5-b010-4fe1-b072-e460ce12ec36&lt;/Param&gt;&lt;Param key=&quot;WebId&quot;&gt;5ea26264-729b-4a33-89aa-69d9440b5eda&lt;/Param&gt;&lt;Param key=&quot;ListId&quot;&gt;8d393cbd-51bd-46bd-bde4-4e695f7f0e84&lt;/Param&gt;&lt;Param key=&quot;ListIconClass&quot;&gt;icon-square&lt;/Param&gt;&lt;Param key=&quot;ListView&quot;&gt;&lt;/Param&gt;&lt;Param key=&quot;ItemId&quot;&gt;1&lt;/Param&gt;&lt;Param key=&quot;FileIsNull&quot;&gt;False&lt;/Param&gt;&lt;Param key=&quot;FString&quot;&gt;https://${BASE_URL_1}/epm/SitePages/Home.aspx&lt;/Param&gt;&lt;Param key=&quot;Type&quot;&gt;1&lt;/Param&gt;&lt;Param key=&quot;UserId&quot;&gt;1&lt;/Param&gt;&lt;Param key=&quot;PageTitle&quot;&gt;undefined&lt;/Param&gt;&lt;Param key=&quot;IsItem&quot;&gt;false&lt;/Param&gt;&lt;/Data&gt;&apos; }</stringProp>
+                  <stringProp name="Argument.value">&quot;SiteId&quot;&gt;3608a9c5-b010-4fe1-b072-e460ce12ec36&lt;/Param&gt;&lt;Param key=&quot;WebId&quot;&gt;5ea26264-729b-4a33-89aa-69d9440b5eda&lt;/Param&gt;&lt;Param key=&quot;ListId&quot;&gt;8d393cbd-51bd-46bd-bde4-4e695f7f0e84&lt;/Param&gt;&lt;Param key=&quot;ListIconClass&quot;&gt;icon-square&lt;/Param&gt;&lt;Param key=&quot;ListView&quot;&gt;&lt;/Param&gt;&lt;Param key=&quot;ItemId&quot;&gt;1&lt;/Param&gt;&lt;Param key=&quot;FileIsNull&quot;&gt;False&lt;/Param&gt;&lt;Param key=&quot;FString&quot;&gt;https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx&lt;/Param&gt;&lt;Param key=&quot;Type&quot;&gt;1&lt;/Param&gt;&lt;Param key=&quot;UserId&quot;&gt;1&lt;/Param&gt;&lt;Param key=&quot;PageTitle&quot;&gt;undefined&lt;/Param&gt;&lt;Param key=&quot;IsItem&quot;&gt;false&lt;/Param&gt;&lt;/Data&gt;&apos; }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2861,7 +2861,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2877,7 +2877,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/epmlive/javascripts/libraries/jquery.timeago.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -2906,13 +2906,13 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
               <collectionProp name="Arguments.arguments">
@@ -2925,9 +2925,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2962,7 +2962,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -2978,7 +2978,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/epmlive/javascripts/libraries/jquery.endless-scroll.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3007,7 +3007,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3026,7 +3026,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3047,7 +3047,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3059,7 +3059,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/epmlive/javascripts/libraries/slimScroll.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3088,7 +3088,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3107,7 +3107,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/socialdata.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3128,7 +3128,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3147,7 +3147,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/mylinks.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3168,13 +3168,13 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="{ Function: &apos;GetNotifications&apos;, Dataxml: &apos;&lt;Notifications Status" elementType="HTTPArgument">
@@ -3187,9 +3187,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -3224,7 +3224,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3234,15 +3234,15 @@
             </ConstantTimer>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -3265,7 +3265,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3288,7 +3288,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/mquery.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3309,7 +3309,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3328,7 +3328,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.core.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3349,7 +3349,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3368,7 +3368,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/search.clientcontrols.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3389,7 +3389,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3408,7 +3408,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/1033/sp.jsgrid.res.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3429,7 +3429,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3448,7 +3448,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.datetimeutil.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3469,7 +3469,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3488,7 +3488,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/inplview.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3509,7 +3509,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3528,7 +3528,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ribbon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3549,7 +3549,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3568,7 +3568,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/jsgrid.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3589,21 +3589,21 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_api/search/searchcenterurl" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_api/search/searchcenterurl" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_api/search/searchcenterurl</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -3622,7 +3622,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3645,7 +3645,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.mylinksribbon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3666,7 +3666,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3685,7 +3685,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.socialribbon.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3706,7 +3706,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3725,7 +3725,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/jsgrid.gantt.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3746,7 +3746,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3765,7 +3765,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/spgantt.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3786,7 +3786,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3805,7 +3805,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/callout.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3826,7 +3826,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3845,7 +3845,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sharing.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3866,7 +3866,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3885,7 +3885,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">_layouts/15/sp.ui.listsearchbox.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -3906,21 +3906,21 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_api/search/searchcenterurl" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_api/search/searchcenterurl" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_api/search/searchcenterurl</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -3939,7 +3939,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -3949,7 +3949,7 @@
             </ConstantTimer>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="{ Function: &apos;GetNotifications&apos;, Dataxml: &apos;&lt;Notifications Status" elementType="HTTPArgument">
@@ -3962,9 +3962,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_vti_bin/WorkEngine.asmx/Execute</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_vti_bin/WorkEngine.asmx/Execute</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -3999,7 +3999,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>
@@ -4028,7 +4028,7 @@
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -4036,7 +4036,7 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4116,7 +4116,7 @@
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -4193,9 +4193,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4241,7 +4241,7 @@
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="8 /EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="__LASTFOCUS" elementType="HTTPArgument">
@@ -4318,9 +4318,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
-            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2fepm</stringProp>
+            <stringProp name="HTTPSampler.path">/EPMLiveForms/DefaultCust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252FNYISO&amp;Source=%2Fsites%2FNYISO&amp;Source=%2Fsites%2FNYISO</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4401,13 +4401,13 @@
             </GaussianRandomTimer>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="9 /epm/_layouts/15/Authenticate.aspx" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="9 /sites/nyiso/_layouts/15/Authenticate.aspx" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="Source" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.name">Source</stringProp>
-                  <stringProp name="Argument.value">%2Fepm</stringProp>
+                  <stringProp name="Argument.value">%2Fsites%2FNYISO</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
@@ -4415,9 +4415,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm/_layouts/15/Authenticate.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/Authenticate.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4465,9 +4465,9 @@
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4509,15 +4509,15 @@
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="39 /epm/_api/search/searchcenterurl" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="39 /sites/nyiso/_api/search/searchcenterurl" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm/_api/search/searchcenterurl</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/search/searchcenterurl</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4532,7 +4532,7 @@
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
                 <elementProp name="Accept-Language" elementType="Header">
                   <stringProp name="Header.name">Accept-Language</stringProp>
@@ -4554,15 +4554,15 @@
             </HeaderManager>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="36 /epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="false">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="36 /sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4577,7 +4577,7 @@
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
                 <elementProp name="Accept-Language" elementType="Header">
                   <stringProp name="Header.name">Accept-Language</stringProp>
@@ -4614,15 +4614,15 @@
             <boolProp name="TransactionController.parent">true</boolProp>
           </TransactionController>
           <hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/Lists/Risks/All%20My%20Risks.aspx" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4645,7 +4645,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/SitePages/Home.aspx</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/SitePages/Home.aspx</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -4704,7 +4704,7 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">_layouts/15/epmlive/treegrid/Defaults.xml</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -4725,13 +4725,13 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/epmlive/getganttitems.aspx?data=TGlzdAlMaXN0cy9SaXNrcy9EaXNwRm9ybS5hc3B4ClZpZXcJQWxsIE15IFJpc2tzCkZpbHRlckZpZWxkCQpGaWx0ZXJWYWx1ZQkKTG9va3VwRmllbGQJCkxvb2t1cEZpZWxkTGlzdAkKR3JpZE5hbWUJME1haW4KQUdyb3Vwcwl8CkV4cGFuZAkKU3RhcnQJU3RhcnREYXRlCkZpbmlzaAlEdWVEYXRlClBlcmNlbnQJUGVyY2VudENvbXBsZXRlCldCUwkKTWlsZXN0b25lCQpFeGVjdXRpdmUJCkluZm8JUGVyY2VudENvbXBsZXRlCkxUeXBlCQpSTGlzdHMJClJTaXRlcwkKSGlkZU5ldwlGYWxzZQpVc2VQZXJmCWZhbHNlCkFsbG93RWRpdAlUcnVlCkVkaXREZWZhdWx0CUZhbHNlClNob3dJbnNlcnQJRmFsc2UKRGlzYWJsZU5ldwlUcnVlClVzZU5ldwlGYWxzZQpOZXdOYW1lCVJpc2sKVXNlUG9wdXAJRmFsc2UKUmVxdWVzdHMJRmFsc2UKVXNlUmVwb3J0aW5nCVRydWUKVXNlUGFyZW50CWZhbHNlClNob3dDaGVja2JveGVzCVRydWUKUGFnZVNpemUJMzAKV1BJRAlnX2E1Mjc0NGZiXzllOWVfNDZmZl85ODg1X2NiMTRkMjM4ZTdkNg==&amp;tgc=81234810" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/15/epmlive/getganttitems.aspx?data=TGlzdAlMaXN0cy9SaXNrcy9EaXNwRm9ybS5hc3B4ClZpZXcJQWxsIE15IFJpc2tzCkZpbHRlckZpZWxkCQpGaWx0ZXJWYWx1ZQkKTG9va3VwRmllbGQJCkxvb2t1cEZpZWxkTGlzdAkKR3JpZE5hbWUJME1haW4KQUdyb3Vwcwl8CkV4cGFuZAkKU3RhcnQJU3RhcnREYXRlCkZpbmlzaAlEdWVEYXRlClBlcmNlbnQJUGVyY2VudENvbXBsZXRlCldCUwkKTWlsZXN0b25lCQpFeGVjdXRpdmUJCkluZm8JUGVyY2VudENvbXBsZXRlCkxUeXBlCQpSTGlzdHMJClJTaXRlcwkKSGlkZU5ldwlGYWxzZQpVc2VQZXJmCWZhbHNlCkFsbG93RWRpdAlUcnVlCkVkaXREZWZhdWx0CUZhbHNlClNob3dJbnNlcnQJRmFsc2UKRGlzYWJsZU5ldwlUcnVlClVzZU5ldwlGYWxzZQpOZXdOYW1lCVJpc2sKVXNlUG9wdXAJRmFsc2UKUmVxdWVzdHMJRmFsc2UKVXNlUmVwb3J0aW5nCVRydWUKVXNlUGFyZW50CWZhbHNlClNob3dDaGVja2JveGVzCVRydWUKUGFnZVNpemUJMzAKV1BJRAlnX2E1Mjc0NGZiXzllOWVfNDZmZl85ODg1X2NiMTRkMjM4ZTdkNg==&amp;tgc=81234810" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="data" elementType="HTTPArgument">
@@ -4752,9 +4752,9 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/getganttitems.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/getganttitems.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4773,7 +4773,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -4783,15 +4783,15 @@
               </ConstantTimer>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="false">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="false">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4814,7 +4814,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -4824,15 +4824,15 @@
               </ConstantTimer>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/epmlive/gridlistribbon.aspx" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/epmlive/gridlistribbon.aspx" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/_layouts/epmlive/gridlistribbon.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/epmlive/gridlistribbon.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4851,7 +4851,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -4863,7 +4863,7 @@
             <boolProp name="TransactionController.parent">true</boolProp>
           </TransactionController>
           <hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/Lists/Risks/NewForm.aspx?GetLastID=true" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="GetLastID" elementType="HTTPArgument">
@@ -4877,9 +4877,9 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/Lists/Risks/NewForm.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Risks/NewForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -4902,7 +4902,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/All%20My%20Risks.aspx</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/All%20My%20Risks.aspx</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -4957,7 +4957,7 @@
               </GaussianRandomTimer>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="listid" elementType="HTTPArgument">
@@ -4992,9 +4992,9 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -5029,7 +5029,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -5039,15 +5039,15 @@
               </ConstantTimer>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="false">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks" enabled="false">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_api/Microsoft.SharePoint.Portal.UserProfiles.MySiteLinks.GetMySiteLinks</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -5070,7 +5070,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -5080,7 +5080,7 @@
               </ConstantTimer>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/epmlive/getGeneralSetting.aspx?listid={b20ba724-839f-4b8d-a9a4-ee8a6137b818}&amp;setting=EnableResourcePlan" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/15/epmlive/getGeneralSetting.aspx?listid={b20ba724-839f-4b8d-a9a4-ee8a6137b818}&amp;setting=EnableResourcePlan" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="listid" elementType="HTTPArgument">
@@ -5101,9 +5101,9 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/_layouts/15/epmlive/getGeneralSetting.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/epmlive/getGeneralSetting.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -5126,7 +5126,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -5142,7 +5142,7 @@
             <boolProp name="TransactionController.parent">true</boolProp>
           </TransactionController>
           <hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/Lists/Risks/NewForm.aspx?GetLastID=true" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="MSOLayout_LayoutChanges" elementType="HTTPArgument">
@@ -5400,14 +5400,14 @@
                   <elementProp name="ctl00_ctl75_WorkspacesNavTree_ClientState" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">ctl00_ctl75_WorkspacesNavTree_ClientState</stringProp>
-                    <stringProp name="Argument.value">{&quot;expandedNodes&quot;:[&quot;0&quot;],&quot;collapsedNodes&quot;:[],&quot;logEntries&quot;:[{&quot;Type&quot;:1,&quot;Index&quot;:&quot;0&quot;,&quot;Data&quot;:{&quot;text&quot;:&quot;EPM&quot;,&quot;value&quot;:&quot;5ea26264-729b-4a33-89aa-69d9440b5eda&quot;,&quot;navigateUrl&quot;:&quot;https://${BASE_URL_1}/epm&quot;,&quot;target&quot;:&quot;&quot;}},{&quot;Type&quot;:1,&quot;Index&quot;:&quot;0:0&quot;,&quot;Data&quot;:{&quot;text&quot;:&quot;EPM Live E2E WorkSpace&quot;,&quot;value&quot;:&quot;1f3f1922-71bf-4562-88a5-114d648edcb7&quot;,&quot;navigateUrl&quot;:&quot;https://${BASE_URL_1}/epm/EPM%20Live%20E2E%20WorkSpace&quot;,&quot;target&quot;:&quot;&quot;}},{&quot;Type&quot;:1,&quot;Index&quot;:&quot;0:1&quot;,&quot;Data&quot;:{&quot;text&quot;:&quot;EPM Live E2E WorkSpace1&quot;,&quot;value&quot;:&quot;7db33760-1044-401d-b5d0-05ca907f690b&quot;,&quot;navigateUrl&quot;:&quot;https://${BASE_URL_1}/epm/EPM%20Live%20E2E%20WorkSpace1&quot;,&quot;target&quot;:&quot;&quot;}}],&quot;selectedNodes&quot;:[&quot;0&quot;],&quot;checkedNodes&quot;:[],&quot;scrollPosition&quot;:0}</stringProp>
+                    <stringProp name="Argument.value">{&quot;expandedNodes&quot;:[&quot;0&quot;],&quot;collapsedNodes&quot;:[],&quot;logEntries&quot;:[{&quot;Type&quot;:1,&quot;Index&quot;:&quot;0&quot;,&quot;Data&quot;:{&quot;text&quot;:&quot;EPM&quot;,&quot;value&quot;:&quot;5ea26264-729b-4a33-89aa-69d9440b5eda&quot;,&quot;navigateUrl&quot;:&quot;https://${BASE_URL_1}/epm&quot;,&quot;target&quot;:&quot;&quot;}},{&quot;Type&quot;:1,&quot;Index&quot;:&quot;0:0&quot;,&quot;Data&quot;:{&quot;text&quot;:&quot;EPM Live E2E WorkSpace&quot;,&quot;value&quot;:&quot;1f3f1922-71bf-4562-88a5-114d648edcb7&quot;,&quot;navigateUrl&quot;:&quot;https://${BASE_URL_1}/sites/nyiso/EPM%20Live%20E2E%20WorkSpace&quot;,&quot;target&quot;:&quot;&quot;}},{&quot;Type&quot;:1,&quot;Index&quot;:&quot;0:1&quot;,&quot;Data&quot;:{&quot;text&quot;:&quot;EPM Live E2E WorkSpace1&quot;,&quot;value&quot;:&quot;7db33760-1044-401d-b5d0-05ca907f690b&quot;,&quot;navigateUrl&quot;:&quot;https://${BASE_URL_1}/sites/nyiso/EPM%20Live%20E2E%20WorkSpace1&quot;,&quot;target&quot;:&quot;&quot;}}],&quot;selectedNodes&quot;:[&quot;0&quot;],&quot;checkedNodes&quot;:[],&quot;scrollPosition&quot;:0}</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
                   <elementProp name="ClientFormPostBackValue_b20ba724-839f-4b8d-a9a4-ee8a6137b818_Project" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">ClientFormPostBackValue_b20ba724-839f-4b8d-a9a4-ee8a6137b818_Project</stringProp>
-                    <stringProp name="Argument.value">2;#EPM Live App</stringProp>
+                    <stringProp name="Argument.value">1654;#A+NYISO+TEST+PROJECT</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
@@ -5597,9 +5597,9 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/Lists/Risks/NewForm.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Risks/NewForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -5627,7 +5627,7 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -5652,69 +5652,13 @@
               </RegexExtractor>
               <hashTree/>
             </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/Lists/Risks/DispForm.aspx?ID=27&amp;Source=/epm/Lists/Risks/All%20Risks.aspx" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/DispForm.aspx?ID=27&amp;Source=/sites/nyiso/Lists/Risks/All%20Risks.aspx" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments">
                   <elementProp name="Source" elementType="HTTPArgument">
                     <boolProp name="HTTPArgument.always_encode">true</boolProp>
                     <stringProp name="Argument.name">Source</stringProp>
-                    <stringProp name="Argument.value">/epm/Lists/Risks/All Risks.aspx</stringProp>
-                    <stringProp name="Argument.metadata">=</stringProp>
-                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  </elementProp>
-                  <elementProp name="ID" elementType="HTTPArgument">
-                    <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                    <stringProp name="Argument.name">ID</stringProp>
-                    <stringProp name="Argument.value">1</stringProp>
-                    <stringProp name="Argument.metadata">=</stringProp>
-                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  </elementProp>
-                </collectionProp>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
-              <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/Lists/Risks/DispForm.aspx</stringProp>
-              <stringProp name="HTTPSampler.method">GET</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            </HTTPSamplerProxy>
-            <hashTree>
-              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header manager" enabled="true">
-                <collectionProp name="HeaderManager.headers">
-                  <elementProp name="Upgrade-Insecure-Requests" elementType="Header">
-                    <stringProp name="Header.name">Upgrade-Insecure-Requests</stringProp>
-                    <stringProp name="Header.value">1</stringProp>
-                  </elementProp>
-                  <elementProp name="Accept" elementType="Header">
-                    <stringProp name="Header.name">Accept</stringProp>
-                    <stringProp name="Header.value">text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</stringProp>
-                  </elementProp>
-                  <elementProp name="Referer" elementType="Header">
-                    <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
-                  </elementProp>
-                </collectionProp>
-              </HeaderManager>
-              <hashTree/>
-              <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
-                <stringProp name="ConstantTimer.delay">0</stringProp>
-              </ConstantTimer>
-              <hashTree/>
-            </hashTree>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/Lists/Risks/DispForm.aspx?ID=27&amp;Source=/epm/Lists/Risks/All%20Risks.aspx" enabled="false">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-                <collectionProp name="Arguments.arguments">
-                  <elementProp name="Source" elementType="HTTPArgument">
-                    <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                    <stringProp name="Argument.name">Source</stringProp>
-                    <stringProp name="Argument.value">/epm/Lists/Risks/All Risks.aspx</stringProp>
+                    <stringProp name="Argument.value">/sites/nyiso/Lists/Risks/All Risks.aspx</stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
                     <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   </elementProp>
@@ -5729,9 +5673,9 @@
               </elementProp>
               <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">epm/Lists/Risks/DispForm.aspx</stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Risks/DispForm.aspx</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -5754,7 +5698,63 @@
                   </elementProp>
                   <elementProp name="Referer" elementType="Header">
                     <stringProp name="Header.name">Referer</stringProp>
-                    <stringProp name="Header.value">https://${BASE_URL_1}/epm/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </HeaderManager>
+              <hashTree/>
+              <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
+                <stringProp name="ConstantTimer.delay">0</stringProp>
+              </ConstantTimer>
+              <hashTree/>
+            </hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/Lists/Risks/DispForm.aspx?ID=27&amp;Source=/sites/nyiso/Lists/Risks/All%20Risks.aspx" enabled="false">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="Source" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                    <stringProp name="Argument.name">Source</stringProp>
+                    <stringProp name="Argument.value">/sites/nyiso/Lists/Risks/All Risks.aspx</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  </elementProp>
+                  <elementProp name="ID" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                    <stringProp name="Argument.name">ID</stringProp>
+                    <stringProp name="Argument.value">${d_ItemId}</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
+              <stringProp name="HTTPSampler.port"></stringProp>
+              <stringProp name="HTTPSampler.protocol">https</stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">/sites/nyiso/Lists/Risks/DispForm.aspx</stringProp>
+              <stringProp name="HTTPSampler.method">GET</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            </HTTPSamplerProxy>
+            <hashTree>
+              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header manager" enabled="true">
+                <collectionProp name="HeaderManager.headers">
+                  <elementProp name="Upgrade-Insecure-Requests" elementType="Header">
+                    <stringProp name="Header.name">Upgrade-Insecure-Requests</stringProp>
+                    <stringProp name="Header.value">1</stringProp>
+                  </elementProp>
+                  <elementProp name="Accept" elementType="Header">
+                    <stringProp name="Header.name">Accept</stringProp>
+                    <stringProp name="Header.value">text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</stringProp>
+                  </elementProp>
+                  <elementProp name="Referer" elementType="Header">
+                    <stringProp name="Header.name">Referer</stringProp>
+                    <stringProp name="Header.value">https://${BASE_URL_1}/sites/nyiso/Lists/Risks/NewForm.aspx?GetLastID=true</stringProp>
                   </elementProp>
                 </collectionProp>
               </HeaderManager>
@@ -5771,15 +5771,15 @@
           <boolProp name="TransactionController.parent">true</boolProp>
         </TransactionController>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/epm/_layouts/15/SignOut.aspx" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="https://apps22.epmlive.com/sites/nyiso/_layouts/15/SignOut.aspx" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${BASE_URL_1}</stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">epm/_layouts/15/SignOut.aspx</stringProp>
+            <stringProp name="HTTPSampler.path">/sites/nyiso/_layouts/15/SignOut.aspx</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -5802,7 +5802,7 @@
                 </elementProp>
                 <elementProp name="Referer" elementType="Header">
                   <stringProp name="Header.name">Referer</stringProp>
-                  <stringProp name="Header.value">https://apps22.epmlive.com/epm/SitePages/Home.aspx</stringProp>
+                  <stringProp name="Header.value">https://apps22.epmlive.com/sites/nyiso/SitePages/Home.aspx</stringProp>
                 </elementProp>
               </collectionProp>
             </HeaderManager>

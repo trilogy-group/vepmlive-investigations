@@ -5,5 +5,11 @@
       "Layouts/epmlive/javascripts/GanttGrid.js"
     ],
     "sourceMap": true
+  },
+  {
+    "outputFileName": "Layouts/epmlive/MyWorkWebPart.min.js",
+    "inputFiles": [
+      "Layouts/epmlive/MyWorkWebPart.js"
+    ]
   }
 ]

@@ -1,0 +1,8 @@
+library('qa-integration')
+
+qa {
+    ui {
+        projectKey = "vepmlive-epmlive2013release"
+        executionCommand = "npm run e2e:pr-ci"
+    }
+}

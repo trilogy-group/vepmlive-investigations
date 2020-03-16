@@ -606,3 +606,46 @@ begin
 		[scheduletype] ASC
 	) INCLUDE ([timerjobuid], [lastqueuecheck])
 end 
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TSMETA') AND [name] = 'IX_TSMETA_TS_ITEM_UID')
+begin
+	CREATE INDEX [IX_TSMETA_TS_ITEM_UID] ON [dbo].[TSMETA] 
+	(
+		[TS_ITEM_UID], 
+		[ListName]
+	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
+end
+else
+begin
+	CREATE INDEX [IX_TSMETA_TS_ITEM_UID] ON [dbo].[TSMETA] 
+	(
+		[TS_ITEM_UID], 
+		[ListName]
+	) INCLUDE ([ColumnName], [DisplayName], [ColumnValue]) 
+	WITH (ONLINE=OFF, DROP_EXISTING=ON)
+end
+
+if exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype')
+begin
+	DROP INDEX [IX_TIMERJOBS_scheduletype] ON [dbo].[TIMERJOBS]
+end
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TIMERJOBS') AND [name] = 'IX_TIMERJOBS_scheduletype_runtime')
+begin
+	CREATE NONCLUSTERED INDEX [IX_TIMERJOBS_scheduletype_runtime] ON [dbo].[TIMERJOBS]	
+	(	
+		[scheduletype] ASC,
+		[runtime] ASC,
+		[days] ASC
+	) INCLUDE ([timerjobuid], [lastqueuecheck])	
+end 
+
+if not exists(select 1 from sys.indexes where [object_id] = OBJECT_ID('dbo.TSQUEUE') AND [name] = 'IX_TSQUEUE_TS_UID_JOBTYPE_ID')
+begin
+	CREATE NONCLUSTERED INDEX [IX_TSQUEUE_TS_UID_JOBTYPE_ID] ON [dbo].[TSQUEUE] 
+	(
+		[TS_UID], 
+		[JOBTYPE_ID]
+	)
+	INCLUDE ([STATUS],[RESULTTEXT],[RESULT],[PERCENTCOMPLETE])
+end 
