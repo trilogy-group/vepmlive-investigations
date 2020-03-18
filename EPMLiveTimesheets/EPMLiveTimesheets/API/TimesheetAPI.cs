@@ -3612,7 +3612,7 @@ namespace TimeSheets
 
                 if (isValidMyWorkColumn(GoodFieldname))
                 {
-                    DataRow[] drTS = dsTS.Tables[5].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "' AND ColumnName='" + tsField + "'");
+                    DataRow[] drTS = dsTS.Tables[5].Select("TS_ITEM_UID='" + dr["TS_ITEM_UID"].ToString() + "' AND ListName='MYTS' AND ColumnName='" + tsField + "'");
 
                     if (drTS.Length > 0)
                     {
