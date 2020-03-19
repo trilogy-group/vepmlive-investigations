@@ -12,7 +12,7 @@ pipeline {
 		cron(env.BRANCH_NAME == 'develop' ? '@midnight' : '')
 	}
     parameters {
-        string(name: 'Version', defaultValue: '7.2.0.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'Version', defaultValue: '7.2.1.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
         string(name: 'TargetHost', defaultValue: '10.137.18.88', description: 'Target host to deploy to')
         string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
         string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
