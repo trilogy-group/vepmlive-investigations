@@ -28,6 +28,13 @@ FROM         dbo.EPGP_CAPACITY_VALUES INNER JOIN
                       dbo.EPG_VW_RPT_ListDepartments ON dbo.EPG_RESOURCES.WRES_RP_DEPT = dbo.EPG_VW_RPT_ListDepartments.LV_UID
 ORDER BY Resource
 ";
+        private readonly string DropProcedure_EPG_SP_RPT_GetCostCategories = @"
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.ROUTINES 
+           WHERE ROUTINE_NAME = 'EPG_SP_RPT_GetCostCategories' 
+             AND ROUTINE_SCHEMA = 'dbo' 
+             AND ROUTINE_TYPE = 'PROCEDURE')
+EXEC ('DROP PROCEDURE dbo.EPG_SP_RPT_GetCostCategories')
+";
         private readonly string CreateProcedure_EPG_SP_RPT_GetCostCategories = @"
 CREATE PROCEDURE [dbo].[EPG_SP_RPT_GetCostCategories]
 AS
@@ -181,6 +188,8 @@ AS
             {
                 connection.ExecuteNonQuery(AlterView_EPG_VW_RPT_Availability);
                 LogMessage("Alter View EPG_VW_RPT_Availability.", MessageKind.SUCCESS, 1);
+                connection.ExecuteNonQuery(DropProcedure_EPG_SP_RPT_GetCostCategories);
+                LogMessage("Drop Procedure EPG_SP_RPT_GetCostCategories.", MessageKind.SUCCESS, 1);
                 connection.ExecuteNonQuery(CreateProcedure_EPG_SP_RPT_GetCostCategories);
                 LogMessage("Create Procedure EPG_SP_RPT_GetCostCategories.", MessageKind.SUCCESS, 1);
                 connection.ExecuteNonQuery(AlterProcedure_EPG_SP_RPT_GetCost);
