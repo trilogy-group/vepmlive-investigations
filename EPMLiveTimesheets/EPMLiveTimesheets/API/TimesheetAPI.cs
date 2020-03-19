@@ -763,6 +763,7 @@ namespace TimeSheets
                         {
                             // This will throw error if task is deleted
                             SPListItem li = iList.GetItemById(int.Parse(dataRow["ITEM_ID"].ToString()));
+
                             SharedFunctions.processMeta(iWeb, iList, li, new Guid(dataRow["ts_item_uid"].ToString()), dataRow["project"].ToString(), cn, pList);
                         }
                         catch (ArgumentException ex)
@@ -786,12 +787,12 @@ namespace TimeSheets
         {
             List<TimeSheetItem> timeSheetItems;
             double qtdAllocatedHours = 0;
-
-            timeSheetItems = GetTimeSheetItems(data, cn);
+            int? timesheetOwnerId = null;
+            timeSheetItems = GetTimeSheetItems(data, cn, out timesheetOwnerId);
             qtdAllocatedHours = CalculateAllocatedHours(timeSheetItems, cn);
 
-            if (qtdAllocatedHours > 0)
-                RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb);
+            if (timesheetOwnerId.HasValue && qtdAllocatedHours > 0)
+                RunPermissionsChecks(timeSheetItems, qtdAllocatedHours, oWeb, timesheetOwnerId.Value);
 
         }
 
@@ -799,7 +800,7 @@ namespace TimeSheets
         private const string TASK_WORK_FIELD_NAME = "Task Center";
         private const string PORTFLOIO_WORK_FIELD_NAME = "Project Portfolios";
         private const string PROGRAM_WORK_FIELD_NAME = "Project Programs";
-        private static void RunPermissionsChecks(List<TimeSheetItem> timeSheetItems, double allocatedHours, SPWeb oWeb)
+        private static void RunPermissionsChecks(List<TimeSheetItem> timeSheetItems, double allocatedHours, SPWeb oWeb, int timesheetOwnerId)
         {
             timeSheetItems.ForEach(timeSheetItem =>
             {
@@ -808,25 +809,25 @@ namespace TimeSheets
                     switch (timeSheetItem.WorkTypeField)
                     {
                         case TASK_WORK_FIELD_NAME:
-                            CheckTaskTimeAllocation(oWeb, timeSheetItem, allocatedHours);
+                            CheckTaskTimeAllocation(oWeb, timeSheetItem, allocatedHours, timesheetOwnerId);
                             break;
                         case PROGRAM_WORK_FIELD_NAME:
-                            CheckProgramTimeAllocation(oWeb, timeSheetItem, allocatedHours);
+                            CheckProgramTimeAllocation(oWeb, timeSheetItem, allocatedHours, timesheetOwnerId);
                             break;
                         case PROJECT_WORK_FIELD_NAME:
-                            CheckProjectTimeAllocation(oWeb, timeSheetItem, allocatedHours);
+                            CheckProjectTimeAllocation(oWeb, timeSheetItem, allocatedHours, timesheetOwnerId);
                             break;
                         case PORTFLOIO_WORK_FIELD_NAME:
-                            CheckPortfloioTimeAllocation(oWeb, timeSheetItem, allocatedHours);
+                            CheckPortfloioTimeAllocation(oWeb, timeSheetItem, allocatedHours, timesheetOwnerId);
                             break;
                     }
                 }
 
             });
         }
-        private static void CheckPortfloioTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
+        private static void CheckPortfloioTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours, int timesheetOwnerId)
         {
-            var user = IsResourceTeamMember(oWeb, timeSheetItem, PORTFLOIO_WORK_FIELD_NAME);
+            var user = IsResourceTeamMember(oWeb, timeSheetItem, PORTFLOIO_WORK_FIELD_NAME, timesheetOwnerId);
             var emailToList = new List<string>();
             var idToList = new List<int>();
             var userList = new List<SPUser>();
@@ -849,7 +850,7 @@ namespace TimeSheets
                 }
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } portfolio",
-                    "an outside", "is not currently assigned to the Portfolio Team", PORTFLOIO_WORK_FIELD_NAME);
+                    "an outside", "is not currently assigned to the Portfolio Team", PORTFLOIO_WORK_FIELD_NAME, timesheetOwnerId);
             }
         }
 
@@ -867,9 +868,9 @@ namespace TimeSheets
                 return string.Empty;
         }
 
-        private static void CheckProjectTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
+        private static void CheckProjectTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours, int timesheetOwnerId)
         {
-            var user = IsResourceTeamMember(oWeb, timeSheetItem, PROJECT_WORK_FIELD_NAME);
+            var user = IsResourceTeamMember(oWeb, timeSheetItem, PROJECT_WORK_FIELD_NAME, timesheetOwnerId);
             var emailToList = new List<string>();
             var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
             var idToList = new List<int>();
@@ -884,11 +885,11 @@ namespace TimeSheets
                 });
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } project",
-                    "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
+                    "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME, timesheetOwnerId);
             }
         }
 
-        private static void CheckTaskTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
+        private static void CheckTaskTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours, int timesheetOwnerId)
         {
             SPUserToken systoken = oWeb.Site.SystemAccount.UserToken;
             SPListItem projectItem = null;
@@ -899,8 +900,11 @@ namespace TimeSheets
                     //var task = IsResourceTeamMember(oWeb, timeSheetItem, TASK_WORK_FIELD_NAME);
                     projectItem = webSysAdmin.Lists[PROJECT_WORK_FIELD_NAME].Items.OfType<SPListItem>()
                 .Where(x => x.Name == timeSheetItem.ProjectName).FirstOrDefault();
-
-                    var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID }, PROJECT_WORK_FIELD_NAME);
+                    if (projectItem == null)
+                    {
+                        return;
+                    }
+                    var project = IsResourceTeamMember(oWeb, new TimeSheetItem() { ItemID = projectItem.ID}, PROJECT_WORK_FIELD_NAME, timesheetOwnerId);
 
                     var userTypesTosend = new List<string>() { "Owner", "Planners", "ProjectManagers" };
                     var emailToList = new List<string>();
@@ -916,9 +920,9 @@ namespace TimeSheets
                         });
 
                         SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
-                            "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME);
+                            "an outside", "is not currently assigned to the Project Team", PROJECT_WORK_FIELD_NAME, timesheetOwnerId);
                     }
-                    else if (timeSheetItem.AssignedToID == null || !timeSheetItem.AssignedToID.Split(',').ToList().Contains(oWeb.CurrentUser.ID.ToString()))
+                    else if (timeSheetItem.AssignedToID == null || !timeSheetItem.AssignedToID.Split(',').ToList().Contains(timesheetOwnerId.ToString()))
                     {
                         userTypesTosend.ForEach(userType =>
                         {
@@ -929,7 +933,7 @@ namespace TimeSheets
 
                         SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{timeSheetItem.ProjectName} - {timeSheetItem.ItemTitle}",
                             "unassigned", "is currently assigned to the project team but has not been assigned to the task where time has been allocated",
-                            PROJECT_WORK_FIELD_NAME);
+                            PROJECT_WORK_FIELD_NAME, timesheetOwnerId);
                     }
                 }
             }
@@ -942,7 +946,7 @@ namespace TimeSheets
             int userIdInt;
             SPUser userAux;
 
-            if (listItem.Fields.OfType<SPField>().Where(x => x.Title == fieldName).Any())
+            if (listItem.Fields.OfType<SPField>().Where(x => x.InternalName == fieldName).Any())
             {
                 listItem[fieldName]?.ToString().Replace("#", "").Split(';').ToList()
                 .Where((item, index) => index % 2 == 0)?.ToList().ForEach(userID =>
@@ -958,9 +962,9 @@ namespace TimeSheets
             return new Tuple<List<string>, List<int>>(emailList, idList);
         }
 
-        private static void CheckProgramTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours)
+        private static void CheckProgramTimeAllocation(SPWeb oWeb, TimeSheetItem timeSheetItem, double allocatedHours, int timesheetOwnerId)
         {
-            var user = IsResourceTeamMember(oWeb, timeSheetItem, PROGRAM_WORK_FIELD_NAME);
+            var user = IsResourceTeamMember(oWeb, timeSheetItem, PROGRAM_WORK_FIELD_NAME, timesheetOwnerId);
             var emailToList = new List<string>();
             var userTypesTosend = new List<string>() { "Owner" };
             var idToList = new List<int>();
@@ -975,11 +979,11 @@ namespace TimeSheets
                 });
 
                 SendNotifications(oWeb, emailToList, idToList, allocatedHours, $"{ timeSheetItem.ItemTitle } programme",
-                    "an outside", "is not currently assigned to the Programme Team", PROGRAM_WORK_FIELD_NAME);
+                    "an outside", "is not currently assigned to the Programme Team", PROGRAM_WORK_FIELD_NAME, timesheetOwnerId);
             }
         }
 
-        private static Tuple<SPListItem, bool> IsResourceTeamMember(SPWeb oWeb, TimeSheetItem timeSheetItem, string itemTypeName)
+        private static Tuple<SPListItem, bool> IsResourceTeamMember(SPWeb oWeb, TimeSheetItem timeSheetItem, string itemTypeName, int timesheetOwnerId)
         {
             bool isMember = false;
             var userList = new List<SPUser>();
@@ -988,8 +992,8 @@ namespace TimeSheets
 
             if (listItem != null)
             {
-                if (itemTypeName != PORTFLOIO_WORK_FIELD_NAME)
-                    isMember = listItem.DoesUserHavePermissions(SPBasePermissions.ViewListItems);
+                //if (itemTypeName != PORTFLOIO_WORK_FIELD_NAME)
+                //    isMember = listItem.DoesUserHavePermissions(SPBasePermissions.ViewListItems);
 
                 if (!isMember && listItem.Fields.OfType<SPField>().Where(x => x.InternalName == "AssignedTo").Any())
                 {
@@ -997,7 +1001,7 @@ namespace TimeSheets
                     assignedToField?.Where((item, index) => index % 2 == 0)?.ToList().ForEach(userGroupID =>
                     {
                         userList = GetUserFromField(userGroupID, oWeb);
-                        userList.ForEach(user => isMember = isMember || user.ID == oWeb.CurrentUser.ID);
+                        userList.ForEach(user => isMember = isMember || user.ID  == timesheetOwnerId);
                     });
                 }
 
@@ -1007,7 +1011,7 @@ namespace TimeSheets
                     ownersField?.Where((item, index) => index % 2 == 0)?.ToList().ForEach(userGroupID =>
                     {
                         userList = GetUserFromField(userGroupID, oWeb);
-                        userList.ForEach(user => isMember = isMember || user.ID == oWeb.CurrentUser.ID);
+                        userList.ForEach(user => isMember = isMember || user.ID == timesheetOwnerId);
                     });
                 }
             }
@@ -1040,12 +1044,14 @@ namespace TimeSheets
             return returnList;
         }
 
-        private static List<TimeSheetItem> GetTimeSheetItems(string data, string connectionString)
+        
+        private static List<TimeSheetItem> GetTimeSheetItems(string data, string connectionString, out int? timesheetOwnerId)
         {
             XDocument doc = XDocument.Parse(data);
 
             var items = doc.Element("Timesheet")?.Elements("Item").ToList();
-
+            var ownerAttribute = doc.Element("Timesheet").Attribute("TimesheetOwnerID");
+            timesheetOwnerId = ownerAttribute == null && ownerAttribute.Value !=null ?(int?)null:int.Parse(ownerAttribute.Value.ToString());
             var timeSheetItems = (from item in items
                                   select new TimeSheetItem()
                                   {
@@ -1112,12 +1118,23 @@ namespace TimeSheets
 
         private const int NON_TEAM_MEMBER_ALLOCATION_EMAIL = 16;
         private const int NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION = 17;
+
         public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
             string itemName, string outOrUnassigned, string reasonMessage, string urlCenter)
         {
+            SendNotifications(oWeb, emailToList, idToList, allocatedHours, itemName, outOrUnassigned, reasonMessage, urlCenter, null);
+        }
+        public static void SendNotifications(SPWeb oWeb, List<string> emailToList, List<int> idToList, double allocatedHours,
+            string itemName, string outOrUnassigned, string reasonMessage, string urlCenter, int? timesheetOwnerId = null)
+        {
             emailToList = emailToList.Distinct().Where(i => !string.IsNullOrWhiteSpace(i)).ToList();
             idToList = idToList.Distinct().Where(x => x != 0).ToList();
+            SPUser currentUser = oWeb.CurrentUser;
+            if (timesheetOwnerId.HasValue)
+            {
+                currentUser = oWeb.SiteUsers.GetByID(timesheetOwnerId.Value);
 
+            }
             if (idToList.Count > 0 && allocatedHours > 0)
             {
                 var projecturl = string.Format("{0}?ID={1}", oWeb.Lists[CultureInfo.CurrentCulture.TextInfo.ToTitleCase(urlCenter.ToLower())].DefaultDisplayFormUrl, 1); // TODO remove the 1
@@ -1125,22 +1142,24 @@ namespace TimeSheets
                 hshProps.Add("Item_Name", itemName);
                 hshProps.Add("Hours", allocatedHours);
                 hshProps.Add("Project_Url", projecturl);
-                hshProps.Add("CurUser_Email", oWeb.CurrentUser.Email);
+                hshProps.Add("CurUser_Email", currentUser.Email);
                 hshProps.Add("Out_Unassigned", outOrUnassigned);
                 hshProps.Add("Reason_Message", reasonMessage);
 
                 APIEmail.QueueItemMessage(NON_TEAM_MEMBER_ALLOCATION_GENERAL_NOTIFICATION, false, hshProps,
-                    idToList.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, oWeb.CurrentUser, true);
+                    idToList.Select(x => x.ToString()).ToArray(), null, true, true, oWeb, currentUser, true);
             }
 
             if (emailToList.Count > 0)
+            {
                 APIEmail.sendEmail(NON_TEAM_MEMBER_ALLOCATION_EMAIL,
                     new Hashtable() { { "Item_Name", itemName },
-                                      { "Resource_Email", GetEmailFromDB(oWeb.CurrentUser.ID, oWeb) },
+                                      { "Resource_Email", GetEmailFromDB(currentUser.ID, oWeb) },
                                       { "Qty_Hours", allocatedHours },
                                       { "Out_Unassigned", outOrUnassigned },
                                       { "Reason_Message", reasonMessage } },
-                    emailToList, string.Empty, oWeb, true);
+                    emailToList, string.Empty, oWeb, true, currentUser);
+            }
         }
 
         private static string GetEmailFromDB(int iD, SPWeb oWeb)
@@ -1227,7 +1246,7 @@ namespace TimeSheets
                                 {
                                     command.Parameters.AddWithValue("@tsuid", tsuid);
                                     command.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                    command.Parameters.AddWithValue("@JOBDATA", data);
+                                    command.Parameters.AddWithValue("@JOBDATA", data.Replace("AssignedToID=\"-99\"", "AssignedToID=\"" + oWeb.CurrentUser.ID  + "\"") );
                                     command.ExecuteNonQuery();
                                 }
                             }
@@ -3972,7 +3991,6 @@ namespace TimeSheets
         private static DataSet GetTSDataSet(SqlConnection connection, SPWeb web, SPUser user, string period)
         {
             var rptData = new CoreReportHelper.MyWorkReportData(web.Site.ID);
-
             var timesheetId = Guid.Empty;
             using (var command = new SqlCommand(
                 @"select TOP 1 TS_UID from TSTIMESHEET 

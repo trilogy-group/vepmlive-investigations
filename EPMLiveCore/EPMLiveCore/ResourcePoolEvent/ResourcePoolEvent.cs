@@ -124,7 +124,7 @@ namespace EPMLiveCore
             loadData(properties.List, properties.SiteId);
 
             processItem(properties, true);
-
+            ResourceGrid.ClearCache(properties.Web);
             try
             {
                 if (isOnline)

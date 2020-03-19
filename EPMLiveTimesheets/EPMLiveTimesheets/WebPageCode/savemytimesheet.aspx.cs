@@ -41,7 +41,16 @@ namespace TimeSheets
             XmlNodeList ndListItems = doc.FirstChild.SelectNodes("//B/I");
 
             XmlDocument docTimesheet = new XmlDocument();
-            docTimesheet.LoadXml("<Timesheet TSUID=\"" + tsuid + "\" Editable=\"0\" SaveAndSubmit=\"" + submit.ToString() + "\"/>");
+
+            int userId = SPContext.Current.Web.CurrentUser.ID;
+
+            if (!string.IsNullOrEmpty(Page.Request["Delegate"]))
+            {
+                SPUser user = TimesheetAPI.GetUser(SPContext.Current.Web, Page.Request["Delegate"]);
+                userId = user.ID;
+            }
+
+            docTimesheet.LoadXml("<Timesheet TSUID=\"" + tsuid + "\" Editable=\"0\" SaveAndSubmit=\"" + submit.ToString() + "\" TimesheetOwnerID=\"" + userId + "\"/>");
 
             try
             {

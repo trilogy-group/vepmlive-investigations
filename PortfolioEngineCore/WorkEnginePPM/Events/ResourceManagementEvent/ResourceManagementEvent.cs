@@ -8,6 +8,7 @@ using Utilities = WorkEnginePPM.Core.ResourceManagement.Utilities;
 using WorkEnginePPM.WebServices.Core;
 using System.Threading;
 using System.Threading.Tasks;
+
 namespace WorkEnginePPM.Events
 {
     /// <summary>
