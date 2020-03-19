@@ -1286,6 +1286,7 @@ exec(@createoralter + ' PROCEDURE [dbo].[spTSSetQueue]
 AS
 BEGIN
 update TSQUEUE set 
+dtstarted = (case when dtstarted is not null then dtstarted else GETDATE() end),
 status =  (case when @bErrors = 1 then (case when TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries then 0 else 3 end) else 3 end), 
 PERCENTCOMPLETE =(case when @bErrors = 1 then (case when TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries then 0 else 100 end) else 100 end), 
 dtfinished=GETDATE(),
