@@ -8,9 +8,6 @@ pipeline {
     options {
         skipDefaultCheckout true
     }
-	triggers {
-		cron('@midnight')
-	}
     parameters {
         string(name: 'Version', defaultValue: '7.2.1.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
 		
