@@ -21,6 +21,7 @@ pipeline {
 		
 		string(name: 'RunProtractor', defaultValue: 'false', description: 'Execute protractor tests')
 		string(name: 'RunTSClient', defaultValue: 'false', description: 'Execute legacy TS-Client tests')
+		string(name: 'RunPerformance', defaultValue: 'false', description: 'Execute performance tests')
 		
 		string(name: 'ForceStage', defaultValue: 'false', description: 'Force staging deployment')
     }
@@ -98,6 +99,9 @@ pipeline {
 							}
 						}
 						stage('Performance Tests') {
+							when {
+								expression { params.RunPerformance == 'true' }
+							}
 							steps {
 								timestamps {
 									script {
