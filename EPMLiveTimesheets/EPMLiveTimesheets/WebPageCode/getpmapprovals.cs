@@ -4,6 +4,7 @@ using System.Collections;
 using Microsoft.SharePoint;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 
 namespace TimeSheets
 {
@@ -324,34 +325,36 @@ namespace TimeSheets
                 }
                 strColumns = strColumns.Substring(1);
             }
+            
 
-            XmlNode newColWork = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
-            newColWork.InnerXml = "<![CDATA[% Work Spent]]>";
-            XmlAttribute attrTypeWork = docXml.CreateAttribute("type");
-            attrTypeWork.Value = "percentwork";
-            XmlAttribute attrWidthWork = docXml.CreateAttribute("width");
-            attrWidthWork.Value = "125";
-            XmlAttribute attrAlignWork = docXml.CreateAttribute("align");
-            attrAlignWork.Value = "left";
-            XmlAttribute attrColorWork = docXml.CreateAttribute("color");
-            attrColorWork.Value = "#F0F0F0";
-            XmlAttribute attrIdWork = docXml.CreateAttribute("id");
-            attrIdWork.Value = "_PercentWork_";
+            {
+                XmlNode newColWork = docXml.CreateNode(XmlNodeType.Element, "column", docXml.NamespaceURI);
+                newColWork.InnerXml = "<![CDATA[% Work Spent]]>";
+                XmlAttribute attrTypeWork = docXml.CreateAttribute("type");
+                attrTypeWork.Value = "percentwork";
+                XmlAttribute attrWidthWork = docXml.CreateAttribute("width");
+                attrWidthWork.Value = "125";
+                XmlAttribute attrAlignWork = docXml.CreateAttribute("align");
+                attrAlignWork.Value = "left";
+                XmlAttribute attrColorWork = docXml.CreateAttribute("color");
+                attrColorWork.Value = "#F0F0F0";
+                XmlAttribute attrIdWork = docXml.CreateAttribute("id");
+                attrIdWork.Value = "_PercentWork_";
 
-            newColWork.Attributes.Append(attrTypeWork);
-            newColWork.Attributes.Append(attrWidthWork);
-            newColWork.Attributes.Append(attrAlignWork);
-            newColWork.Attributes.Append(attrColorWork);
-            newColWork.Attributes.Append(attrIdWork);
+                newColWork.Attributes.Append(attrTypeWork);
+                newColWork.Attributes.Append(attrWidthWork);
+                newColWork.Attributes.Append(attrAlignWork);
+                newColWork.Attributes.Append(attrColorWork);
+                newColWork.Attributes.Append(attrIdWork);
 
-            ndHead.AppendChild(newColWork);
-
+                ndHead.AppendChild(newColWork);
+            }
             ndHead.RemoveChild(ndHead.SelectSingleNode("settings"));
 
             string[] strworktypes = worktypes.Split('|');
 
             int rowCounter = 1;
-
+            List<string> resetResources = new List<string>();
             foreach (XmlNode nd in docXml.SelectNodes("//row"))
             {
                
@@ -365,6 +368,7 @@ namespace TimeSheets
                     string curUser = "";
                     int firstDot = rowId.IndexOf(".", 75);
                     curUser = rowId.Substring(firstDot + 1, rowId.LastIndexOf(".") - firstDot - 1);
+                    
                     using (cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                     {
                         DataSet dsTotalHours = new DataSet();
@@ -516,6 +520,31 @@ namespace TimeSheets
                                                 ndList[i].InnerText = "<img src=\"/_layouts/images/" + colval + "\">";
                                             else
                                                 ndList[i].InnerText = colval;
+                                            if (colid == "Work")
+                                            {
+
+                                                double savedWork = 0;
+                                                XmlNode ndWorkTotal = nd.ParentNode.SelectSingleNode("cell[@id='Work']");
+                                                if (resetResources.IndexOf(curUser) >= 0)
+                                                {
+                                                    double.TryParse(ndWorkTotal.InnerText, out savedWork);
+                                                }
+                                                else
+                                                {
+                                                    resetResources.Add(curUser);
+                                                }
+                                                double newWork;
+                                                if (double.TryParse(colval, out newWork))
+                                                {
+                                                    savedWork += newWork;
+                                                }
+                                                else if (double.TryParse(ndList[i].InnerText, out newWork))
+                                                {
+                                                    savedWork += newWork;
+                                                }
+                                                ndWorkTotal.InnerText = savedWork.ToString("F2");
+                                                
+                                            }
                                         }
 
                                     }
@@ -655,7 +684,7 @@ namespace TimeSheets
                 nd.Attributes["id"].Value = rowCounter.ToString();
                 rowCounter++;
             }
-
+            
             XmlNode ndFilter = docXml.SelectSingleNode("//head/beforeInit/call[@command='attachHeader']");
             if (ndFilter != null)
             {

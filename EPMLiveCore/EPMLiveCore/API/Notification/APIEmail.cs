@@ -738,21 +738,24 @@ namespace EPMLiveCore.API
             }
             catch (Exception Exception) { throw new Exception(Exception.Message); }
         }
-
         public static void sendEmail(int templateID, Hashtable additionalParams, List<String> emailTo, string emailFrom, SPWeb oWeb, bool hideFrom)
+        {
+            sendEmail(templateID, additionalParams, emailTo, emailFrom, oWeb, hideFrom, oWeb.CurrentUser);
+        }
+        public static void sendEmail(int templateID, Hashtable additionalParams, List<String> emailTo, string emailFrom, SPWeb oWeb, bool hideFrom, SPUser currentUser = null)
         {
             string body = "";
             string subject = "";
 
-            Guid siteid = SPContext.Current.Site.ID;
-            Guid webid = SPContext.Current.Web.ID;
+            //Guid siteid = SPContext.Current.Site.ID;
+            //Guid webid = SPContext.Current.Web.ID;
             SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id)))
                 {
                     cn.Open();
 
-                    GetCoreInformation(cn, templateID, out body, out subject, oWeb, oWeb.CurrentUser);
+                    GetCoreInformation(cn, templateID, out body, out subject, oWeb, currentUser == null ? oWeb.CurrentUser:currentUser);
 
                     foreach (string s in additionalParams.Keys)
                     {
