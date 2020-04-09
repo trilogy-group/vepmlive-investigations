@@ -347,7 +347,7 @@ BEGIN
 					) SS_Threads
 					INNER JOIN dbo.RPTWeb ON SS_Threads.WebId = dbo.RPTWeb.WebId ON dbo.RPTList.RPTListId = SS_Threads.ListId
 			WHERE   (SS_Threads.Deleted = 0) AND (SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
-					AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + '/%', '//', '/'))
+					AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + ''/%'', ''//'', ''/''))
 					ORDER BY SS_Threads.LastActivityDateTime DESC
 					) AS DT1
 	WHERE RowNum > @Start AND RowNum < @End
