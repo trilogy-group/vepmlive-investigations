@@ -112,17 +112,8 @@ namespace EPMLiveCore.WorkEngineSolutionStoreListSvc {
 
         protected override System.Net.WebRequest GetWebRequest(Uri uri)
         {
-            System.Net.WebRequest wr = null;
-            try
-            {
-                wr = base.GetWebRequest(uri);
-                wr.Headers.Add(FBAHeader, FBAValue);
-            }
-            catch (Exception ex)
-            {
-                // There is no need to do anything with this exception
-            }
-
+            var wr = base.GetWebRequest(uri);
+            wr.Headers.Add(FBAHeader, FBAValue);
             return wr;
         }        
         public new string Url {

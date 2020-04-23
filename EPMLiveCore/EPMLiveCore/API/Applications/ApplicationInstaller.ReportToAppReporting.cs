@@ -264,6 +264,9 @@ namespace EPMLiveCore.API
             }
         }
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         private void iProcessLI(XmlNode ndApp)
         {
             try
@@ -293,6 +296,7 @@ namespace EPMLiveCore.API
                 {
                     using (var webClient = new WebClient())
                     {
+                        webClient.Headers.Add(FBAHeader, FBAValue);
                         ServicePointManager.ServerCertificateValidationCallback +=
                             delegate { return true; };
 
@@ -548,6 +552,7 @@ namespace EPMLiveCore.API
 
                     using (var webClient = new WebClient())
                     {
+                        webClient.Headers.Add(FBAHeader, FBAValue);
                         ServicePointManager.ServerCertificateValidationCallback +=
                             delegate { return true; };
 
@@ -632,6 +637,7 @@ namespace EPMLiveCore.API
                     {
                         using (var webClient = new WebClient())
                         {
+                            webClient.Headers.Add(FBAHeader, FBAValue);
                             ServicePointManager.ServerCertificateValidationCallback +=
                                 delegate { return true; };
 
