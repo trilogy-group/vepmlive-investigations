@@ -18,6 +18,9 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
         protected string sMessage = "";
         protected string sResult = "";
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -42,6 +45,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
 
                     };
 
+                    webClient.Headers.Add(FBAHeader, FBAValue);
                     webClient.Credentials = CoreFunctions.GetStoreCreds();
                     byte[] fileBytes = null;
                     fileBytes = webClient.DownloadData(storeurl + "/43Upgrade/UpgradeText" + Request["V"] + ".txt");
