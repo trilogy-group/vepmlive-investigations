@@ -425,6 +425,9 @@ namespace EPMLiveCore.API
             }
         }
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         public void InstallFileByFileNode(XElement file, string rootFilePath, SPSite cESite, SPWeb cEWeb)
         {
             string tempSolGuid = Guid.NewGuid().ToString("N");
@@ -433,6 +436,7 @@ namespace EPMLiveCore.API
 
             using (var client = new WebClient())
             {
+                client.Headers.Add(FBAHeader, FBAValue);
                 client.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
 
                 switch (file.Attribute("Type").Value)
@@ -1573,6 +1577,9 @@ namespace EPMLiveCore.API
 
         #region helper methods
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         private void GrabOnlineFiles(SPSite cESite, SPWeb cEWeb)
         {
             //string rootFilePath = EPMLiveCore.CoreFunctions.getFarmSetting("WorkEngineStore") + "/Solutions/" + dataMgr.GetPropVal("SolutionName");
@@ -1587,6 +1594,7 @@ namespace EPMLiveCore.API
             {
                 using (var webClient = new WebClient())
                 {
+                    webClient.Headers.Add(FBAHeader, FBAValue);
                     webClient.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
                     byte[] fileBytes = null;
                     fileBytes = webClient.DownloadData(address);

@@ -49,6 +49,9 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             return true;
         }
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         private void AddFile(string filename, string remotefile)
         {
             using(WebClient webClient = new WebClient())
@@ -64,6 +67,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                 };
 
+                webClient.Headers.Add(FBAHeader, FBAValue);
                 webClient.Credentials = CoreFunctions.GetStoreCreds();
                 byte[] fileBytes = null;
                 fileBytes = webClient.DownloadData(storeurl + "/43Upgrade/" + remotefile);

@@ -462,6 +462,9 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             return true;
         }
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         private void DownloadAndInstallList(string listname, string template, string displayname)
         {
             LogMessage(listname);
@@ -471,6 +474,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 LogMessage("\tDownloading");
                 using(WebClient webClient = new WebClient())
                 {
+                    webClient.Headers.Add(FBAHeader, FBAValue);
                     ServicePointManager.ServerCertificateValidationCallback +=
                     delegate(
                         object sender,

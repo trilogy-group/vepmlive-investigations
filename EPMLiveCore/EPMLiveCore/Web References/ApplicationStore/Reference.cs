@@ -44,7 +44,17 @@ namespace EPMLiveCore.ApplicationStore {
                 this.useDefaultCredentialsSetExplicitly = true;
             }
         }
-        
+
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
+        protected override System.Net.WebRequest GetWebRequest(Uri uri)
+        {
+            var wr = base.GetWebRequest(uri);
+            wr.Headers.Add(FBAHeader, FBAValue);
+            return wr;
+        }
+
         public new string Url {
             get {
                 return base.Url;
