@@ -8,11 +8,8 @@ pipeline {
     options {
         skipDefaultCheckout true
     }
-	triggers {
-		cron('@midnight')
-	}
     parameters {
-        string(name: 'Version', defaultValue: '7.2.0.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'Version', defaultValue: '7.2.1.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
 		
 		string(name: 'StagingTargetHost', defaultValue: '10.137.18.11,10.137.18.115,10.137.18.48', description: 'Staging Target hosts to deploy to')
 		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
@@ -22,7 +19,9 @@ pipeline {
         string(name: 'ProtractorBranch', defaultValue: 'develop', description: 'Protractor UI tests branch to trigger (leave empty to use the same branch name as this build, replace "/" with "%2F")')
     	string(name: 'ProtractorTargetHost', defaultValue: '10.137.18.48', description: 'Target host for protractor')
 		
-		string(name: 'RunTSClient', defaultValue: 'true', description: 'Execute legacy TS-Client tests')
+		string(name: 'RunProtractor', defaultValue: 'false', description: 'Execute protractor tests')
+		string(name: 'RunTSClient', defaultValue: 'false', description: 'Execute legacy TS-Client tests')
+		string(name: 'RunPerformance', defaultValue: 'false', description: 'Execute performance tests')
 		
 		string(name: 'ForceStage', defaultValue: 'false', description: 'Force staging deployment')
     }
@@ -79,6 +78,9 @@ pipeline {
 				stage('Automated Tests') {
 					stages {
 						stage('Protractor Tests') {
+							when {
+								expression { params.RunProtractor == 'true' }
+							}
 							steps {
 								timestamps {
 									script {
@@ -97,6 +99,9 @@ pipeline {
 							}
 						}
 						stage('Performance Tests') {
+							when {
+								expression { params.RunPerformance == 'true' }
+							}
 							steps {
 								timestamps {
 									script {

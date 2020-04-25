@@ -295,36 +295,63 @@ CREATE PROCEDURE [dbo].[SS_GetLatestThreads]
 AS
 BEGIN
 	SET NOCOUNT ON;
-
 	DECLARE @Start INT, @End INT
 	
 	SET @Start = (@Page - 1) * @Limit
 	SET @End =   (@Page * @Limit + 1)
 	
 	IF @Limit > 1000000 SET @Limit = 1000000;
-	
-	SELECT TOP (@End - 1) ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, 
+	 
+	SELECT ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, 
 				WebUrl, ListId, ListName, ListIcon, ItemId, TotalActivities, TotalComments
 	FROM (
-		SELECT ROW_NUMBER() OVER (ORDER BY ThreadLastActivityOn DESC) AS RowNum,
-			ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, WebUrl, ListId, 
-			ListName, ListIcon, ItemId, TotalActivities, TotalComments
-			FROM    (SELECT	DISTINCT dbo.SS_Threads.Id AS ThreadId, dbo.SS_Threads.Title AS ThreadTitle, dbo.SS_Threads.URL AS ThreadUrl, 
-							dbo.SS_Threads.Kind AS ThreadKind, dbo.SS_Threads.LastActivityDateTime AS ThreadLastActivityOn, 
-							dbo.SS_Threads.FirstActivityDateTime AS ThreadFirstActivityOn, dbo.SS_Threads.WebId, dbo.RPTWeb.WebTitle, 
-							dbo.RPTWeb.WebUrl, dbo.SS_Threads.ListId, dbo.RPTList.ListName, dbo.ReportListIds.ListIcon AS ListIcon, 
-							dbo.SS_Threads.ItemId, 
-							(SELECT	COUNT(Id) FROM dbo.SS_Activities WHERE ((ThreadId = dbo.SS_Threads.Id) AND (MassOperation = 0) AND (Kind <> 3 AND Kind <> 4))) AS TotalActivities,
-                            (SELECT COUNT(Id) FROM dbo.SS_Activities WHERE (Kind = 4) AND (ThreadId = dbo.SS_Threads.Id)) AS TotalComments, 
-							1 AS HasAccess
-					FROM	dbo.ReportListIds INNER JOIN dbo.RPTList ON dbo.ReportListIds.Id = dbo.RPTList.RPTListId RIGHT OUTER JOIN 
-							dbo.SS_Threads INNER JOIN dbo.RPTWeb ON dbo.SS_Threads.WebId = dbo.RPTWeb.WebId ON dbo.RPTList.RPTListId = dbo.SS_Threads.ListId
-					WHERE   (dbo.SS_Threads.Deleted = 0) AND (dbo.SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
-							AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + ''/%'', ''//'', ''/''))) AS DT1
-			WHERE   ((HasAccess = 1) OR (HasAccess = 0 AND ThreadKind = 3)) AND (TotalActivities > 0 OR TotalComments > 0)
-	) AS Result 
+			SELECT	TOP (@End - 1)
+					ROW_NUMBER() OVER (ORDER BY SS_Threads.LastActivityDateTime DESC) AS RowNum,
+					SS_Threads.Id AS ThreadId, SS_Threads.Title AS ThreadTitle, SS_Threads.URL AS ThreadUrl, 
+					SS_Threads.Kind AS ThreadKind, SS_Threads.LastActivityDateTime AS ThreadLastActivityOn, 
+					SS_Threads.FirstActivityDateTime AS ThreadFirstActivityOn, SS_Threads.WebId, dbo.RPTWeb.WebTitle, 
+					dbo.RPTWeb.WebUrl, SS_Threads.ListId, dbo.RPTList.ListName, dbo.ReportListIds.ListIcon AS ListIcon, 
+					SS_Threads.ItemId, 
+					SS_Threads.TotalActivities,
+                    SS_Threads.TotalComments, 
+					1 AS HasAccess
+							 
+			FROM	dbo.ReportListIds INNER JOIN dbo.RPTList ON dbo.ReportListIds.Id = dbo.RPTList.RPTListId RIGHT OUTER JOIN 
+							
+					(	SELECT ISNULL(SS_Threads1.TotalActivities, 0) TotalActivities, ISNULL(SS_Threads2.TotalComments, 0) TotalComments, SS_Threads3.*
+						FROM
+							(	SELECT SS_Threads.Id, COUNT(A1.ID) TotalActivities 
+								FROM (SELECT * FROM SS_Threads  WHERE 
+								(SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) AND 
+								Deleted = 0) SS_Threads
+								LEFT OUTER JOIN
+								(select * from dbo.SS_Activities where (MassOperation = 0) AND (Kind <> 3 AND Kind <> 4)) a1 
+								ON (A1.ThreadId = SS_Threads.Id)
+								GROUP BY SS_Threads.Id
+								HAVING COUNT(A1.ID) > 0
+							) SS_Threads1
+							full outer join 
+							(	SELECT SS_Threads.Id, COUNT(A2.ID) TotalComments
+								FROM (SELECT * FROM SS_Threads  WHERE 
+								(SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) AND 
+								Deleted = 0) SS_Threads
+								left outer join 
+								(select * from dbo.SS_Activities where (Kind = 4)) a2 
+								ON (A2.ThreadId = SS_Threads.Id)
+								GROUP BY SS_Threads.Id
+								HAVING COUNT(A2.ID) > 0
+							)SS_Threads2
+							ON SS_Threads1.ID = SS_Threads2.ID
+							INNER JOIN SS_Threads SS_Threads3
+							ON SS_Threads1.ID = SS_Threads3.ID OR SS_Threads2.ID = SS_Threads3.ID
+					) SS_Threads
+					INNER JOIN dbo.RPTWeb ON SS_Threads.WebId = dbo.RPTWeb.WebId ON dbo.RPTList.RPTListId = SS_Threads.ListId
+			WHERE   (SS_Threads.Deleted = 0) AND (SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
+					AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + ''/%'', ''//'', ''/''))
+					ORDER BY SS_Threads.LastActivityDateTime DESC
+					) AS DT1
 	WHERE RowNum > @Start AND RowNum < @End
-	ORDER BY ThreadLastActivityOn DESC
+
 END'
 
 ---------------SP: SS_GetLatestActivities----------------------
