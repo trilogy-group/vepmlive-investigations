@@ -11,7 +11,7 @@ pipeline {
 		timeout(time: 1, unit: 'HOURS') 
     }
     parameters {
-        string(name: 'Version', defaultValue: '7.2.1.x', description: 'Version to set (x is replaced with current build number)')
+        string(name: 'Version', defaultValue: '7.2.2.x', description: 'Version to set (x is replaced with current build number)')
     }
     stages {
         stage('Prepare for build') {
