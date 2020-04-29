@@ -18,7 +18,7 @@ namespace EPMLiveEnterprise
         private const string CmdTextDeleteQueue = "DELETE FROM QUEUE where timerjobuid = @timerjobuid ";
         private const string CmdTextInsertQueue = "INSERT INTO QUEUE (timerjobuid, status, percentcomplete, dtstarted) VALUES (@timerjobuid, @status, 0, getdate()) ";
         private const string CmdTextInsertLogTemplate = "insert into epmlive_log (timerjobuid,result,resulttext) VALUES (@timerjobuid,'{0}',@resulttext)";
-        private const string CmdTextUpdateQueue = "UPDATE queue set percentComplete=0,status=2,dtfinished=GETDATE() where timerjobuid=@timerjobuid";
+        private const string CmdTextUpdateQueue = "UPDATE queue set percentComplete=0,status=2,dtstarted=ISNULL(dtstarted, GETDATE()),dtfinished=GETDATE() where timerjobuid=@timerjobuid";
         private const string CmdTextUpdatePercentageTemplate = "UPDATE queue set percentComplete={0} where timerjobuid='{1}'";
         private const string SqlParamSiteGuid = "@siteguid";
         private const string SqlParamWebGuid = "@webguid";

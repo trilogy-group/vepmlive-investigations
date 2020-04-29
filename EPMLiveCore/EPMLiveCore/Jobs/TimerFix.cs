@@ -197,7 +197,7 @@ namespace EPMLiveCore.Jobs
                         if (ResJobUid != Guid.Empty)
                         {
                             //cmd.ExecuteNonQuery();
-                            using (SqlCommand cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn))
+                            using (SqlCommand cmd = new SqlCommand("update queue set status = 2, dtstarted=ISNULL(dtstarted,getdate()), dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn))
                             {
                                 cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
                                 cmd.ExecuteNonQuery();

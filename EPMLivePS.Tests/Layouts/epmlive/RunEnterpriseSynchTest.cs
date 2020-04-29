@@ -28,7 +28,7 @@ namespace EPMLivePS.Tests.Layouts.epmlive
         private const string InsertQueueCommand = "INSERT INTO QUEUE (timerjobuid, status, percentcomplete, dtstarted) VALUES (@timerjobuid, @status, 0, getdate()) ";
         private const string QueryReadConfigValueFromEConfig = "select config_value from econfig where config_name='ConnectedURLs'";
         private const string UpdateQueueByTimerJobGuidTemplate = "UPDATE queue set percentComplete={0} where timerjobuid='{1}'";
-        private const string UpdateQueueFinally = "UPDATE queue set percentComplete=0,status=2,dtfinished=GETDATE() where timerjobuid=@timerjobuid";
+        private const string UpdateQueueFinally = "UPDATE queue set percentComplete=0,status=2,dtstarted=ISNULL(dtstarted, GETDATE()),dtfinished=GETDATE() where timerjobuid=@timerjobuid";
         private const string InsertTimerJobs = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 9, 'Project Server Field Synch', 5, @webguid)";
         private const string SqlParamSiteGuid = "@siteguid";
         private const string SqlParamWebGuid = "@webguid";
