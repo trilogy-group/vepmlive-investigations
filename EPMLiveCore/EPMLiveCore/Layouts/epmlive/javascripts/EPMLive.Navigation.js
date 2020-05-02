@@ -3229,10 +3229,29 @@
         ExecuteOrDelayUntilScriptLoaded(initializeNavigation, 'EPMLiveNavigation');
     }
     window.showModalDialog = window.showModalDialog || function (url, arg, opt) {
+
         if (typeof arg == 'undefined') {
             window.open(url, '', opt);
         }
         else {
+            var options = SP.UI.$create_DialogOptions(); 
+
+            options.title = arg;
+            var domElement = opt.split(';');
+            for (var i = 0; i < domElement.length; i++) {
+                if (domElement[i].indexOf('Height') !== -1) {
+                    options.height = domElement[i].split(":")[1];
+                }
+                else if (domElement[i].indexOf('Width') !== -1) {
+                    options.width = domElement[i].split(":")[1];
+                }
+            }
+
+            options.url = url;
+
+            SP.UI.ModalDialog.showModalDialog(options);
+            return arg.value;
+
             document.body.innerHTML += "<dialog id='myDialog'><div id='myDialogBody'><textarea id='myDialogtxtarea' rows='4' cols='50'></textarea></div><div style='float: right;margin: 20px;'><button id='myDialogOk'>Ok</button><button id='myDialogClose'>Close</button></div></dialog>";
             var dialog = document.getElementById('myDialog');
             var width = 430;
@@ -3247,7 +3266,7 @@
                     width = domElement[i].split(":")[1];
                 }
             }
-            dialog.showModal();
+            dialog.show();
             $('textarea#myDialogtxtarea').val(arg.value);
             document.getElementById('myDialogClose').onclick = function () {
                 dialog.close();
