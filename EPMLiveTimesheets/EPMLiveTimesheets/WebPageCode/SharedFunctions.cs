@@ -18,7 +18,7 @@ namespace TimeSheets
         private const string DefaultDateFormat = "yyyy-MM-dd";
         private const string PfeProjectSQL = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @projectID";
         private const string ResourceSQL = "Select EXTID from LSTResourcepool where SharePointAccountID = @UID";
-        private const string PeriodSQL = "Select TP.PERIOD_START, TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID= TP.PERIOD_ID where TS.TS_UID= @TS_UID";
+        private const string PeriodSQL = "Select TP.PERIOD_START, TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID= TP.PERIOD_ID where TS.TS_UID= @TS_UID and tp.Site_ID = @TP_Site_ID";
         public static bool canUserImpersonate(string curuser, string iuser, SPWeb web, out string resName)
         {
             resName = "";
@@ -341,7 +341,7 @@ namespace TimeSheets
                 }
             }
         }
-        static void GetPeriodDates(SqlConnection cn, string tsuid, out string prdStart, out string prdEnd)
+        static void GetPeriodDates(SqlConnection cn, string tsuid, Guid Site_ID, out string prdStart, out string prdEnd)
         {
             try
             {
@@ -350,6 +350,7 @@ namespace TimeSheets
                 using (SqlCommand cmd = new SqlCommand(PeriodSQL, cn))
                 {
                     cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                    cmd.Parameters.AddWithValue("@TP_Site_ID", Site_ID);
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         if (dr.Read())
@@ -467,7 +468,7 @@ namespace TimeSheets
                 }
                 if (string.IsNullOrEmpty(rate))
                 {
-                    GetPeriodDates(cn, tsuid, out prdStart, out prdEnd);
+                    GetPeriodDates(cn, tsuid, web.Site.ID, out prdStart, out prdEnd);
 
 
                     if (!string.IsNullOrEmpty(prdStart) && !string.IsNullOrEmpty(prdEnd) && !string.IsNullOrEmpty(extid))
