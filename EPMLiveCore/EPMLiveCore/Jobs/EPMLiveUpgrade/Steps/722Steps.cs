@@ -4,7 +4,7 @@ using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V721, Order = 1.0, Description = "Fix Rate Ranges returned by EPG_SP_GetResourceRates")]
+    [UpgradeStep(Version = EPMLiveVersion.V722, Order = 1.0, Description = "Fix Rate Ranges returned by EPG_SP_GetResourceRates")]
     internal class Fix_RateRanges_For_EPG_SP_GetResourceRates : UpgradeStep
     {
         private readonly SPWeb _spWeb;
