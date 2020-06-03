@@ -18,7 +18,7 @@ namespace TimeSheets
         private const string DefaultDateFormat = "yyyy-MM-dd";
         private const string PfeProjectSQL = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_EXT_UID = @projectID";
         private const string ResourceSQL = "Select EXTID from LSTResourcepool where SharePointAccountID = @UID";
-        private const string PeriodSQL = "Select TP.PERIOD_START, TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID= TP.PERIOD_ID where TS.TS_UID= @TS_UID";
+        private const string PeriodSQL = "Select TP.PERIOD_START, TP.PERIOD_END from TSTIMESHEET TS left join TSPERIOD TP on TS.PERIOD_ID= TP.PERIOD_ID and ts.Site_UID = tp.Site_ID where TS.TS_UID= @TS_UID";
         public static bool canUserImpersonate(string curuser, string iuser, SPWeb web, out string resName)
         {
             resName = "";
