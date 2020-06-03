@@ -9419,17 +9419,20 @@ exec(@createoralter + ' PROCEDURE [dbo].[EPG_SP_GetResourceRates]
 AS
 BEgin
 Declare @BC_UID int=0
-set @BC_UID =(Select top 1  BC_UID From EPGP_COST_XREF  Where WRES_ID=@ResourceEXTID)
-SELECT distinct A.BC_UID,A.BC_EFFECTIVE_DATE as StartDate,(case when B.BC_EFFECTIVE_DATE>A.BC_EFFECTIVE_DATE then B.BC_EFFECTIVE_DATE else DATEADD(DAY, DATEDIFF(day, B.BC_EFFECTIVE_DATE, A.BC_EFFECTIVE_DATE)-1, A.BC_EFFECTIVE_DATE) end) as EndDate
-,A.BC_RATE into #Rates FROM EPG_COST_CATEGORY_RATE_VALUES A,EPG_COST_CATEGORY_RATE_VALUES B  Where A.BC_EFFECTIVE_DATE <> B.BC_EFFECTIVE_DATE
-AND A.BC_UID = B.BC_UID 
-ORDER BY A.BC_UID
+set @BC_UID =(Select top 1  BC_UID From EPGP_COST_XREF  Where WRES_ID=@ResourceEXTID);
 
-Select  *,rn = row_number()  over(PARTITION BY BC_UID,StartDate  order by BC_UID)  into #SegregatedData  from  #Rates
-		  
-Select cast((BC_RATE) as  decimal(16,2)) as BC_RATE from #SegregatedData where rn=1 and StartDate < @PRD_Start and EndDate > @PRD_End and BC_UID=@BC_UID
-Drop table #Rates 
-Drop table #SegregatedData 
+with rates as (
+	SELECT
+		ROW_NUMBER() OVER(ORDER BY BC_EFFECTIVE_DATE) AS RN,
+		BC_EFFECTIVE_DATE as StartDate,
+		isnull(LEAD(BC_EFFECTIVE_DATE,1) OVER (ORDER BY BC_EFFECTIVE_DATE),dateadd(year,99,BC_EFFECTIVE_DATE)) AS NextEndDate,
+		bc_rate
+	FROM
+		EPG_COST_CATEGORY_RATE_VALUES where BC_UID = @BC_UID
+) select cast((BC_RATE) as  decimal(16,2)) as BC_RATE
+from rates
+where isnull(StartDate,dateadd(day,-1,@PRD_Start)) < @PRD_Start and isnull(NextEndDate,dateadd(day,1,@PRD_End)) > @PRD_End
+order by rn
 End
 ')
 
