@@ -211,7 +211,7 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
-            var listTitle = GetDataString(data, "ListTitle");
+            var listTitle = (string)data["ListTitle"];
 
             if (!Core.Utilities.IsIgnoredList(listTitle, args.ContextWeb))
             {
@@ -259,40 +259,11 @@ namespace EPMLiveCore.SocialEngine.Modules
             out Guid listId,
             out int id)
         {
-            var webIdStr = GetDataString(data, "WebId");
-            webId = ParseGuid(webIdStr);
 
-            var listIdStr = GetDataString(data, "ListId");
-            listId = ParseGuid(listIdStr);
-
-            var idStr = GetDataString(data, "Id");
-            id = ParseInt(idStr);
+            webId = (Guid)data["WebId"];
+            listId = (Guid)data["ListId"];
+            id = (int)data["Id"];
         }
-
-        private static string GetDataString(Dictionary<string, object> data, string dataKey)
-        {
-            object dataValue;
-            if (!data.TryGetValue(dataKey, out dataValue))
-            {
-                throw new InvalidOperationException($"{nameof(data)} doesn't contain key '{dataKey}'.");
-            }
-
-            var valueString = dataValue as string;
-            return valueString;
-        }
-
-        private static Guid ParseGuid(string guidStr)
-        {
-            Guid guid;
-            Guid.TryParse(guidStr, out guid);
-            return guid;
-        }
-
-        private static int ParseInt(string intStr)
-        {
-            int number;
-            int.TryParse(intStr, out number);
-            return number;
-        }
+        
     }
 }
