@@ -152,15 +152,15 @@ namespace WE_QueueMgr
         private IMessageQueue messageQueue;
         public PPMWorkEngineQueueService()
         {
+            System.Diagnostics.Debugger.Launch();
             try
             {
                 InitializeComponent();
 
                 messageQueue = new Msmq();
-
-
                 var msmqAddress = new ServiceHost(this).Description.Endpoints.Where(i => i.Address.Uri.Scheme == "net.msmq").First().Address.Uri.ToString();
                 messageQueue.CreateQueue(@".\Private$\" + msmqAddress.Split('/').Last());
+
             }
             catch (Exception ex)
             {
@@ -205,7 +205,7 @@ namespace WE_QueueMgr
                 {
                     MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
                     m_lExceptionCount = 0;
-                    
+
                     if (sites != null)
                     {
                         foreach (QMSite site in sites)
@@ -363,7 +363,6 @@ namespace WE_QueueMgr
         //Loop once every:
         TimeSpan mainLoopPeriod = new TimeSpan(0, 1, 0);
         TimeSpan jobMaxTimeout = new TimeSpan(1, 0, 0);
-        TimeSpan completionPollPeriod = new TimeSpan(0, 1, 0);
 
         //Backup queue jobs processing call every:
         TimeSpan queueJobsPeriod = new TimeSpan(0, 10, 0);
@@ -377,6 +376,7 @@ namespace WE_QueueMgr
         AutoResetEvent kickOffLongWorkEvent = new AutoResetEvent(false);
         void DoLongRun()
         {
+
             List<Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>> processingJobs = new List<Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>>();
             DateTime sitesLastCheck = DateTime.Now;
             DateTime queuedLastCheck = DateTime.Now;
@@ -448,8 +448,12 @@ namespace WE_QueueMgr
                     ExceptionHandler("TimingJobs", ex);
                 }
 
-
-                kickOffLongWorkEvent.WaitOne(mainLoopPeriod);
+                if (!(processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
+                    && !(processingJobs.Count > 0 && Task.WaitAny(processingJobs.Select(x => x.Item5).ToArray(), 0) >= 0)
+                    )
+                {
+                    kickOffLongWorkEvent.WaitOne(mainLoopPeriod);
+                }
 
                 //REORDER
                 lock (longRunQueueLock)
@@ -482,22 +486,22 @@ namespace WE_QueueMgr
                     }
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
                     Task newJob = Task.Factory.StartNew((object obj) =>
-                     {
-                         try
-                         {
-                             var data = (dynamic)obj;
-                             using (tokenSource.Token.Register(Thread.CurrentThread.Abort))
-                             {
-                                 WSSAdmin wssadmin = new WSSAdmin();
-                                 var result = wssadmin.RSVPRequest("ManageQueue", data.basePath, data.jobId.ToString());
-                                 return true;
-                             }
-                         }
-                         catch (ThreadAbortException)
-                         {
-                             return false;
-                         }
-                     }, new { basePath = site.basePath, jobId = jobId }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    {
+                        try
+                        {
+                            var data = (dynamic)obj;
+                            using (tokenSource.Token.Register(Thread.CurrentThread.Abort))
+                            {
+                                WSSAdmin wssadmin = new WSSAdmin();
+                                var result = wssadmin.RSVPRequest("ManageQueue", data.basePath, data.jobId.ToString());
+                                return true;
+                            }
+                        }
+                        catch (ThreadAbortException)
+                        {
+                            return false;
+                        }
+                    }, new { basePath = site.basePath, jobId = jobId }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                     processingJobs.Add(new Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>(site, jobId, DateTime.Now, tokenSource, newJob, processingJobs.Count));
                 }
 
@@ -518,15 +522,14 @@ namespace WE_QueueMgr
                 }
 
                 //Check completion
-                List<Task> jobs = processingJobs.Select(x => x.Item5).ToList();
-                List<int> completedJobsIndex = new List<int>();
-                int completedJobIndex = Task.WaitAny(jobs.ToArray(), completionPollPeriod);
-                if (completedJobIndex >= 0)
+                int completedJobProcessingIndex = Task.WaitAny(processingJobs.Select(x => x.Item5).ToArray(), 0);
+                int completedJobQueueIndex = -1;
+                if (completedJobProcessingIndex >= 0)
                 {
-                    completedJobsIndex.Add(processingJobs[completedJobIndex].Item6);
-                    processingJobs.RemoveAt(completedJobIndex);
+                    completedJobQueueIndex = processingJobs[completedJobProcessingIndex].Item6;
+                    processingJobs.RemoveAt(completedJobProcessingIndex);
 
-                    for (int i = completedJobIndex; i < processingJobs.Count; i++)
+                    for (int i = completedJobProcessingIndex; i < processingJobs.Count; i++)
                     {
                         processingJobs[i] = new Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>(processingJobs[i].Item1, processingJobs[i].Item2, processingJobs[i].Item3, processingJobs[i].Item4, processingJobs[i].Item5, processingJobs[i].Item6 - 1);
                     }
@@ -539,7 +542,7 @@ namespace WE_QueueMgr
                     {
                         qm.RequeueJob(processingJobs[0].Item2);
                     }
-                    completedJobsIndex.Add(processingJobs[0].Item6);
+                    completedJobQueueIndex = processingJobs[0].Item6;
                     processingJobs.RemoveAt(0);
                     for (int i = 0; i < processingJobs.Count; i++)
                     {
@@ -548,15 +551,11 @@ namespace WE_QueueMgr
                 }
 
                 //remove completions from queue
-                if (completedJobsIndex.Any())
+                if (completedJobQueueIndex >= 0)
                 {
-                    completedJobsIndex.Sort();
                     lock (longRunQueueLock)
                     {
-                        for (int i = completedJobsIndex.Count - 1; i >= 0; i--)
-                        {
-                            longRunQueue.RemoveAt(completedJobsIndex[i]);
-                        }
+                        longRunQueue.RemoveAt(completedJobQueueIndex);
                     }
                 }
 
@@ -597,7 +596,7 @@ namespace WE_QueueMgr
                                             ErrorHandler("ManageQueueJobs Case 200", 98765);
                                             break;
                                         default:
-                                            EnqueueSite(site, qm.guidJob, qm.ContextData,qm.Submitted, prioritize);
+                                            EnqueueSite(site, qm.guidJob, qm.ContextData, qm.Submitted, prioritize);
                                             enqueued = true;
                                             break;
                                     }
