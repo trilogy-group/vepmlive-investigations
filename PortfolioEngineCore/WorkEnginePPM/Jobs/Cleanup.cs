@@ -340,7 +340,7 @@ namespace WorkEnginePPM.Jobs
                         sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">Error Posting Timesheet Data: " + ex.Message + "</font><br>");
                     }
 
-                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPKTSLastTSApprove", nextApproved.ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPKTSLastTSApprove", DateTime.Now.ToString());
                     we.AddDebugMessage("EPK Sync Done until:" + nextApproved.ToString("YYYYMMdd"));
                     nextApproved = nextApproved.AddDays(7);
                     anyProcessed = true;
