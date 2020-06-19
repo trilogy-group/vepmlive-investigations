@@ -28,13 +28,17 @@ Write-Host 'Collecting test assemblies...'
 $assmsToRun = (CollectTestAssemblies)
 
 $asmsToSendToVsTest = ""
+$asmsToSendToReport = ""
 foreach ($asmToCover in $assembliesToCover) {
-    $asmToCover = Join-Path $sourcesRoot $asmToCover
+    $asmsToSendToReport = "+" + $asmsToSendToReport + ";"
+	$asmToCover = Join-Path $sourcesRoot $asmToCover
     if(![System.IO.File]::Exists($asmToCover)){
         throw "Cannot find assembly $asmToCover"
     }
     $asmsToSendToVsTest = $asmsToSendToVsTest + '"' + $asmToCover + '" '
+	
 }
+$asmsToSendToReport.trimend(';')
 
 Write-Host $assmsToRun.Count "assemblies found:"
 for ($i=0; $i -lt $assmsToRun.Count; $i++) {
@@ -80,13 +84,13 @@ Write-Host "CoverageXml file (output): $coverageXmlFile"
 $setupProcess = Start-Process -PassThru -Wait -NoNewWindow -FilePath $codeCoveragePath  -ArgumentList "analyze /output:$coverageXmlFile $coverageFile"
 If($setupProcess.Exitcode -ne 0) {      Throw "Errorlevel $($setupProcess.ExitCode)" } 
 
-
+$fullReportFilter = "-*tests*;-*moq*;-*autofixture*;-*newtonsoft*;-*.test*;-*tests;-*.Test.Commons;-*.TestCommons;-*.aut.*;-*.resources;-*NUnit*;" + $asmsToSendToReport 
 
 Write-Host 'Generating coverage report'
 .$reportGeneratorPath `
     -reports:"$coverageXmlFile"  `
     -targetdir:(Join-Path $testResultDir CoverageReport) `
     -reportTypes:"HtmlSummary;XMLSummary" `
-    -assemblyfilters:"-*tests*;-*moq*;-*autofixture*;-*newtonsoft*;-*.test*;-*tests;-*.Test.Commons;-*.TestCommons;-*.aut.*;-*.resources;-*NUnit*" `
+    -assemblyfilters: $fullReportFilter `
     -classfilters:"-Moq.*;*nunit*"
 

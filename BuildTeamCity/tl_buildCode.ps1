@@ -183,6 +183,7 @@ If ($CleanBuild -eq $true) {
 
 Log-Section "Downloading Nuget . . ."
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $nugetPath = $SourcesDirectory + "\nuget.exe"
 $NUVersion = '3.5.0'
 Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/v$NUVersion/nuget.exe" -OutFile $nugetPath
