@@ -25,47 +25,47 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
            @PRD_End varchar(20)
         AS
     BEGIN
-	Declare @Rate decimal(16,2)
+    Declare @Rate decimal(16,2)
 
-	-- first check for Named Rates
-	Declare @RT_UID int=0
-	set @RT_UID =(select top 1 rt_uid from EPGP_COST_RATES where wres_id = @ResourceEXTID);
+    -- first check for Named Rates
+    Declare @RT_UID int=0
+    set @RT_UID =(select top 1 rt_uid from EPGP_COST_RATES where wres_id = @ResourceEXTID);
 
-	if (@RT_UID is not null)
-	begin
-	    with rates as (
-        	SELECT
-        		ROW_NUMBER() OVER(ORDER BY RT_EFFECTIVE_DATE) AS RN,
-        		RT_EFFECTIVE_DATE as StartDate,
-        		isnull(LEAD(RT_EFFECTIVE_DATE,1) OVER (ORDER BY RT_EFFECTIVE_DATE),dateadd(year,99,RT_EFFECTIVE_DATE)) AS NextEndDate,
-        		rt_rate
-        	FROM
-        		EPG_RATE_VALUES where RT_UID = @RT_UID
+    if (@RT_UID is not null)
+    begin
+        with rates as (
+            SELECT
+                ROW_NUMBER() OVER(ORDER BY RT_EFFECTIVE_DATE) AS RN,
+                RT_EFFECTIVE_DATE as StartDate,
+                isnull(LEAD(RT_EFFECTIVE_DATE,1) OVER (ORDER BY RT_EFFECTIVE_DATE),dateadd(year,99,RT_EFFECTIVE_DATE)) AS NextEndDate,
+                rt_rate
+            FROM
+                EPG_RATE_VALUES where RT_UID = @RT_UID
         ) select @Rate= cast((RT_RATE) as  decimal(16,2))
         from rates
         where isnull(StartDate,dateadd(day,-1,@PRD_Start)) < @PRD_Start and isnull(NextEndDate,dateadd(day,1,@PRD_End)) > @PRD_End
         order by rn;
 
-		-- if Named Rate defined, break
-		if (@Rate is not null)
-		begin
-			select @Rate as RT_RATE
-			return
-		end
-	end
+        -- if Named Rate defined, break
+        if (@Rate is not null)
+        begin
+            select @Rate as RT_RATE
+            return
+        end
+    end
 
-	-- if no Named Rate, get the Role Rate
+    -- if no Named Rate, get the Role Rate
     Declare @BC_UID int=0
     set @BC_UID =(Select top 1  BC_UID From EPGP_COST_XREF  Where WRES_ID=@ResourceEXTID);
         
     with rates as (
         SELECT
-        	ROW_NUMBER() OVER(ORDER BY BC_EFFECTIVE_DATE) AS RN,
-        	BC_EFFECTIVE_DATE as StartDate,
-        	isnull(LEAD(BC_EFFECTIVE_DATE,1) OVER (ORDER BY BC_EFFECTIVE_DATE),dateadd(year,99,BC_EFFECTIVE_DATE)) AS NextEndDate,
-        	bc_rate
+            ROW_NUMBER() OVER(ORDER BY BC_EFFECTIVE_DATE) AS RN,
+            BC_EFFECTIVE_DATE as StartDate,
+            isnull(LEAD(BC_EFFECTIVE_DATE,1) OVER (ORDER BY BC_EFFECTIVE_DATE),dateadd(year,99,BC_EFFECTIVE_DATE)) AS NextEndDate,
+            bc_rate
         FROM
-        	EPG_COST_CATEGORY_RATE_VALUES where BC_UID = @BC_UID
+            EPG_COST_CATEGORY_RATE_VALUES where BC_UID = @BC_UID
     ) select cast((BC_RATE) as  decimal(16,2)) as BC_RATE
     from rates
     where isnull(StartDate,dateadd(day,-1,@PRD_Start)) < @PRD_Start and isnull(NextEndDate,dateadd(day,1,@PRD_End)) > @PRD_End
