@@ -190,9 +190,9 @@ namespace WorkEnginePPM.Jobs.Tests
                         .getConfigSetting(
                             web, 
                             "EPKTSLastTSApprove"))
-                            .ToString("MM/dd/yyyy hh:mm"),
+                            .ToString("MM/dd/yyyy hh"),
                     DateTime.Now
-                    .ToString("MM/dd/yyyy hh:mm"));
+                    .ToString("MM/dd/yyyy hh"));
 
                 //when project_list_uid is null
                 //Act
@@ -207,9 +207,9 @@ namespace WorkEnginePPM.Jobs.Tests
                         .getConfigSetting(
                             web,
                             "EPKTSLastTSApprove"))
-                            .ToString("MM/dd/yyyy hh:mm"),
+                            .ToString("MM/dd/yyyy hh"),
                     DateTime.Now
-                    .ToString("MM/dd/yyyy hh:mm"));
+                    .ToString("MM/dd/yyyy hh"));
             }
 
         }
