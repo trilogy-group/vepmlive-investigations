@@ -267,7 +267,6 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\718Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\717Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\722Steps.cs" />
-    <Compile Include="Jobs\EPMLiveUpgrade\Steps\723Steps.cs" />
     <Compile Include="JsonUtilHelper.cs" />
     <Compile Include="Layouts\epmlive\LayoutsHelper.cs" />
     <Compile Include="Layouts\epmlive\sitepermissions.Helpers.aspx.cs">
