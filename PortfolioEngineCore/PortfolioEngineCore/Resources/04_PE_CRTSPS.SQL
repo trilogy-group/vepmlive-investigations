@@ -9442,7 +9442,7 @@ BEGIN
 		-- if Named Rate defined, break
 		if (@Rate is not null)
 		begin
-			select @Rate as RT_RATE
+			select @Rate as BC_RATE
 			return
 		end
 	end
