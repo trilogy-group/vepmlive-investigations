@@ -9,7 +9,7 @@ pipeline {
         skipDefaultCheckout true
     }
     parameters {
-        string(name: 'Version', defaultValue: '7.2.2.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
+        string(name: 'Version', defaultValue: '7.2.3.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
 		
 		string(name: 'StagingTargetHost', defaultValue: '10.137.18.11,10.137.18.115,10.137.18.48', description: 'Staging Target hosts to deploy to')
 		string(name: 'StagingUserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
