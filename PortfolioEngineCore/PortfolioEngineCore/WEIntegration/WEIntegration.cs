@@ -157,7 +157,6 @@ namespace PortfolioEngineCore.WEIntegration
             Dictionary<int, DateTime> actualhours = new Dictionary<int, DateTime>();
             Dictionary<string, PfEResource> resourceIDs = new Dictionary<string, PfEResource>();
             PfEResource oResource;
-            List<PfECharge> pfeCharges = new List<PfECharge>();
             CStruct xResult = new CStruct();
             xResult.Initialize("Result");
 
@@ -200,43 +199,6 @@ namespace PortfolioEngineCore.WEIntegration
                     {
                         projectIDs.Add(PROJECT_EXT_UID, PROJECT_ID);
                     }
-                }
-            }
-
-
-            // Pfe Charge
-            sCommand = "Select WEC_CHG_UID,WRES_ID,PROJECT_ID,WEC_MAJORCATEGORY,WEC_CATEGORY,WEC_DEPT_NAME,WEC_DEPT_UID From EPG_WE_CHARGES";
-            SqlCommand = new SqlCommand(sCommand, _PFECN);
-            using (SqlDataReader SqlReader = SqlCommand.ExecuteReader())
-            {
-                while (SqlReader.Read())
-                {
-                    PfECharge pfeCharge = new PfECharge();
-                    pfeCharge.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEC_CHG_UID"]);
-                    pfeCharge.PROJECT_ID = DBAccess.ReadIntValue(SqlReader["PROJECT_ID"]);
-                    pfeCharge.WresId = DBAccess.ReadIntValue(SqlReader["WRES_ID"]);
-                    pfeCharge.CATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_CATEGORY"]);
-                    pfeCharge.DEPT_NAME = DBAccess.ReadStringValue(SqlReader["WEC_DEPT_NAME"]);
-                    pfeCharge.DEPT_Id = DBAccess.ReadIntValue(SqlReader["WEC_DEPT_UID"]);
-                    pfeCharge.MAJORCATEGORY = DBAccess.ReadStringValue(SqlReader["WEC_MAJORCATEGORY"]);
-                    pfeCharges.Add(pfeCharge);
-                }
-            }
-
-
-
-            // Pfe Charge Date
-            List<PfEChargeDate> pfEChargeDates = new List<PfEChargeDate>();
-            sCommand = "Select WEH_CHG_UID,WEH_DATE From EPG_WE_ACTUALHOURS";
-            SqlCommand = new SqlCommand(sCommand, _PFECN);
-            using (SqlDataReader SqlReader = SqlCommand.ExecuteReader())
-            {
-                while (SqlReader.Read())
-                {
-                    PfEChargeDate pfEChargeDate = new PfEChargeDate();
-                    pfEChargeDate.CHG_UID = DBAccess.ReadIntValue(SqlReader["WEH_CHG_UID"]);
-                    pfEChargeDate.Date = DBAccess.ReadDateValue(SqlReader["WEH_DATE"]);
-                    pfEChargeDates.Add(pfEChargeDate);
                 }
             }
 
@@ -316,7 +278,7 @@ namespace PortfolioEngineCore.WEIntegration
                                 }
                                 else
                                 {
-                                    SetCharge(transaction, pfeCharges, pfEChargeDates, oCharge, oCurrentCharge, dWorkdate, dHours, lType, ref ChgId);
+                                    SetCharge(transaction, oCharge, oCurrentCharge, dWorkdate, dHours, lType, ref ChgId);
                                     oCurrentCharge = oCharge;
                                 }
                             }
@@ -405,7 +367,7 @@ namespace PortfolioEngineCore.WEIntegration
         }
 
 
-        private bool SetCharge(SqlTransaction transaction, List<PfECharge> pfeCharges, List<PfEChargeDate> pfEChargeDates, PfEChargeItem oCharge, PfEChargeItem oCurrentCharge, DateTime dWorkdate, double dHours, int lType, ref int ChgId)
+        private bool SetCharge(SqlTransaction transaction, PfEChargeItem oCharge, PfEChargeItem oCurrentCharge, DateTime dWorkdate, double dHours, int lType, ref int ChgId)
         {
             SqlCommand SqlCommand;
             SqlDataReader SqlReader;
@@ -420,23 +382,28 @@ namespace PortfolioEngineCore.WEIntegration
             }
             else
             {
-                // See if charge record we need already exists
-                try
-                {
-                    ChgId = pfeCharges.FirstOrDefault(a => a.WresId == oCharge.WresId && a.PROJECT_ID == oCharge.ProjectID && a.MAJORCATEGORY == oCharge.MajorCategory && a.CATEGORY == oCharge.Category && a.DEPT_NAME == oCharge.Dept && a.DEPT_Id == oCharge.DeptId).CHG_UID;
-                }
-                catch
-                { ChgId = 0; }
-
-
-                if (ChgId <= 0)
                 //  add new charge record
                 {
-                    sCommand = "SET NOCOUNT ON;"
-                                + "INSERT Into EPG_WE_CHARGES "
-                                + " (WRES_ID,PROJECT_ID,WEC_MAJORCATEGORY,WEC_CATEGORY,WEC_DEPT_NAME,WEC_DEPT_UID)"
-                                + " Values(@WresId,@ProjId,@MC,@Cat,@DeptName,@DeptId);"
-                                + "Select @@IDENTITY as NewID";
+                    sCommand = @"
+                    DECLARE @TheID int = null;
+                    SELECT @TheID = WEC_CHG_UID 
+                    FROM EPG_WE_CHARGES 
+                    WHERE WRES_ID = @WresId
+                    AND PROJECT_ID = @ProjId
+                    AND WEC_MAJORCATEGORY = @MC
+                    AND WEC_CATEGORY = @Cat
+                    AND WEC_DEPT_NAME = @DeptName
+                    AND WEC_DEPT_UID = @DeptId
+                    IF @TheID is null
+                    BEGIN
+                    SET NOCOUNT ON;
+                    INSERT Into EPG_WE_CHARGES
+                    (WRES_ID,PROJECT_ID,WEC_MAJORCATEGORY,WEC_CATEGORY,WEC_DEPT_NAME,WEC_DEPT_UID)
+                    Values(@WresId,@ProjId,@MC,@Cat,@DeptName,@DeptId);
+                    Select @TheID = @@IDENTITY
+                    END
+                    SELECT @TheID as NewID
+                    ";
                     SqlCommand = new SqlCommand(sCommand, _PFECN);
                     SqlCommand.Parameters.AddWithValue("@WresId", oCharge.WresId);
                     SqlCommand.Parameters.AddWithValue("@ProjId", oCharge.ProjectID);
@@ -456,48 +423,39 @@ namespace PortfolioEngineCore.WEIntegration
 
             if (ChgId > 0)
             {
-                // see if we already have an ActualHours record for this date, if so update it, otherwise insert a new one
-                int oldChgId = 0;
-                try
-                {
-                    oldChgId = pfEChargeDates.FirstOrDefault(a => a.Date == dWorkdate).CHG_UID;
-                }
-                catch { oldChgId = 0; }
+                sCommand =
+                 @"
+                    IF EXISTS (SELECT * FROM EPG_WE_ACTUALHOURS WHERE WEH_CHG_UID=@ChgId And WEH_DATE=@Date) 
+                    BEGIN
+                    Update EPG_WE_ACTUALHOURS " +
+                ((lType == 2) ? @"
+                    Set WEH_OVERTIMEHOURS = @Hours"
+                : @" 
+                    Set WEH_NORMALHOURS = @Hours") +
+                @" 
+                    Where WEH_CHG_UID = @ChgId And WEH_DATE = @Date
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT Into EPG_WE_ACTUALHOURS (WEH_CHG_UID,WEH_DATE,WEH_NORMALHOURS,WEH_OVERTIMEHOURS) Values (@ChgId,@Date,@NHours,@OHours)
+                    END
+                ";
+                SqlCommand = new SqlCommand(sCommand, _PFECN);
+                SqlCommand.Parameters.AddWithValue("@ChgId", ChgId);
+                SqlCommand.Parameters.AddWithValue("@Date", dWorkdate);
+                SqlCommand.Parameters.AddWithValue("@Hours", dHours);
 
-
-                if (ChgId == oldChgId)
-                {
-                    sCommand = "Update EPG_WE_ACTUALHOURS ";
-                    if (lType == 2)
-                        sCommand += " Set WEH_OVERTIMEHOURS = @Hours";
-                    else
-                        sCommand += " Set WEH_NORMALHOURS = @Hours";
-                    sCommand += " Where WEH_CHG_UID = @ChgId And WEH_DATE = @Date";
-
-                    SqlCommand = new SqlCommand(sCommand, _PFECN);
-                    SqlCommand.Parameters.AddWithValue("@ChgId", ChgId);
-                    SqlCommand.Parameters.AddWithValue("@Date", dWorkdate);
-                    SqlCommand.Parameters.AddWithValue("@Hours", dHours);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-                }
+                double dNormalhours = 0;
+                double dOvertimehours = 0;
+                if (lType == 2)
+                    dOvertimehours = dHours;
                 else
-                {
-                    double dNormalhours = 0;
-                    double dOvertimehours = 0;
-                    if (lType == 2)
-                        dOvertimehours = dHours;
-                    else
-                        dNormalhours = dHours;
-                    sCommand = "INSERT Into EPG_WE_ACTUALHOURS (WEH_CHG_UID,WEH_DATE,WEH_NORMALHOURS,WEH_OVERTIMEHOURS) Values (@ChgId,@Date,@NHours,@OHours)";
-                    SqlCommand = new SqlCommand(sCommand, _PFECN);
-                    SqlCommand.Parameters.AddWithValue("@ChgId", ChgId);
-                    SqlCommand.Parameters.AddWithValue("@Date", dWorkdate);
-                    SqlCommand.Parameters.AddWithValue("@NHours", dNormalhours);
-                    SqlCommand.Parameters.AddWithValue("@OHours", dOvertimehours);
-                    SqlCommand.Transaction = transaction;
-                    SqlCommand.ExecuteNonQuery();
-                }
+                    dNormalhours = dHours;
+                SqlCommand.Parameters.AddWithValue("@NHours", dNormalhours);
+                SqlCommand.Parameters.AddWithValue("@OHours", dOvertimehours);
+
+                SqlCommand.Transaction = transaction;
+                SqlCommand.ExecuteNonQuery();
             }
 
             return true;

@@ -183,18 +183,23 @@ namespace WorkEnginePPM.Jobs
                 DateTime lastApproved;
                 if (string.IsNullOrEmpty(lastApprovedString))
                 {
-                    lastApproved = new DateTime(DateTime.Now.AddYears(-2).Year - 2, 1, 1);
+                    lastApproved = new DateTime(DateTime.Now.Year, 1, 1);
                 }
                 else
                 {
                     lastApproved = DateTime.Parse(lastApprovedString);
 
                 }
+                DateTime upTo = DateTime.Now;
                 DateTime nextApproved = lastApproved.AddDays(7);
+                if(upTo < nextApproved)
+                {
+                    nextApproved = upTo;
+                }
                 arrLists = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKLists").Split(','));
-                DateTime upTo = DateTime.Now.AddDays(7);
+                
                 bool anyProcessed = false;
-                while (nextApproved < upTo)
+                while (nextApproved <= upTo)
                 {
                     using (SqlCommand cmd = new SqlCommand("spTSGetApprovedTimesheets", cn))
                     {
@@ -340,17 +345,17 @@ namespace WorkEnginePPM.Jobs
                         sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">Error Posting Timesheet Data: " + ex.Message + "</font><br>");
                     }
 
-                    var nextApprovalDate = new DateTime(
-                        Math.Min(
-                            nextApproved.Ticks,
-                            DateTime.Now.Ticks));
-
-                    EPMLiveCore.CoreFunctions.setConfigSetting(web
-                        , "EPKTSLastTSApprove"
-                        , nextApprovalDate.ToString());
-                    we.AddDebugMessage("EPK Sync Done until:" + nextApprovalDate.ToString("YYYYMMdd"));
-                    nextApproved = nextApprovalDate.AddDays(7);
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPKTSLastTSApprove", nextApproved.ToString());
+                    we.AddDebugMessage("EPK Sync Done until:" + nextApproved.ToString("YYYYMMdd"));
                     anyProcessed = true;
+                    if (nextApproved == upTo)
+                        break;
+                    nextApproved = nextApproved.AddDays(7);
+                    if (upTo < nextApproved)
+                    {
+                        nextApproved = upTo;
+                    }
+                    
                 }
                 if (anyProcessed)
                     we.PostCostValuesForTimesheetData();
