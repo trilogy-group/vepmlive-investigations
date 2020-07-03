@@ -152,7 +152,6 @@ namespace WE_QueueMgr
         private IMessageQueue messageQueue;
         public PPMWorkEngineQueueService()
         {
-            System.Diagnostics.Debugger.Launch();
             try
             {
                 InitializeComponent();
