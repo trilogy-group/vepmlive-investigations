@@ -1951,7 +1951,7 @@ namespace EPMLiveTimesheets.Tests.Jobs
                 "update TSQUEUE set percentcomplete=98 where TSQUEUE_ID=@QueueUid",
                 "DELETE FROM TSITEM where TS_ITEM_UID=@uid",
                 "update TSQUEUE set percentcomplete=99 where TSQUEUE_ID=@QueueUid",
-                "INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)"
+                "INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA, DTCREATED) VALUES (@tsuid, 0, 32, @userid, @jobdata, GETDATE())"
             };
             ShimTimesheetAPI.GetUserSPWebString = (web, name) => new ShimSPUser
             {

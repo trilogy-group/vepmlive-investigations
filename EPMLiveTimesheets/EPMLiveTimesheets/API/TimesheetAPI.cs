@@ -1240,8 +1240,8 @@ namespace TimeSheets
                                 }
 
                                 using (var command = new SqlCommand(
-                                   @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) 
-                              VALUES(@tsuid,0,33,@USERID,@JOBDATA)",
+                                   @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA, DTCREATED) 
+                              VALUES(@tsuid,0,33,@USERID,@JOBDATA, GETDATE())",
                                    connection))
                                 {
                                     command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -1260,8 +1260,8 @@ namespace TimeSheets
                             }
 
                             using (var command = new SqlCommand(
-                                @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) 
-                              VALUES(@tsuid,0,31,@USERID,@JOBDATA)",
+                                @"INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA, DTCREATED) 
+                              VALUES(@tsuid,0,31,@USERID,@JOBDATA,GETDATE())",
                                 connection))
                             {
                                 command.Parameters.AddWithValue("@tsuid", tsuid);
@@ -1820,7 +1820,7 @@ namespace TimeSheets
 
                                             using (var command =
                                                 new SqlCommand(
-                                                    "INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)",
+                                                    "INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA, DTCREATED) VALUES(@tsuid,0,30,@USERID,@JOBDATA, GETDATE())",
                                                     connection))
                                             {
                                                 command.Parameters.AddWithValue("@tsuid", timesheetNode.Attributes["id"].Value);

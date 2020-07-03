@@ -16,12 +16,12 @@ namespace TimerService
 {
     public class RollupClass : ProcessorBase
     {
-        public override bool InitializeTask()
+        public override bool InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask())
+            if (!base.InitializeTask(token))
                 return false;
 
-            logMessage("INIT", "STMR", "Clearing Queue");
+            LogMessage("INIT", "STMR", "Clearing Queue");
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
             {
@@ -53,14 +53,17 @@ namespace TimerService
         }
 
 
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
 
-                SPWebApplicationCollection _webcolections = GetWebApplications();
-                foreach (SPWebApplication webApp in _webcolections)
+                SPWebApplicationCollection webApps = GetWebApplications();
+                foreach (SPWebApplication webApp in webApps)
                 {
+                    int maxThreads = MaxThreads;
+                    if (maxThreads <= 0)
+                        continue;
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
@@ -75,7 +78,7 @@ namespace TimerService
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
                                     cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", MaxThreads);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
                                     DataSet ds = new DataSet();
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
@@ -89,23 +92,24 @@ namespace TimerService
                                             rd.dr = dr;
                                             if (startProcess(rd))
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id", cn))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id and status=1", cn))
                                                 {
                                                     cmd1.Parameters.Clear();
                                                     cmd1.Parameters.AddWithValue("@id", dr["eventid"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                processed++;
+                                                
                                             }
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
                                 }
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.ToString());
+                                LogMessage("ERR", "RUNT", ex.ToString());
                             }
 
                         }
@@ -117,7 +121,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUNT", ex.ToString());
+                LogMessage("ERR", "RUNT", ex.ToString());
             }
         }
 
@@ -150,7 +154,7 @@ namespace TimerService
                     }
                     catch (Exception ex)
                     {
-                        logMessage("ERR", "RUNT", ex.ToString());
+                        LogMessage("ERR", "RUNT", ex.ToString());
                     }
 
 
@@ -172,7 +176,7 @@ namespace TimerService
                     }
                     catch (Exception exe)
                     {
-                        logMessage("ERR", "RUNT", exe.ToString());
+                        LogMessage("ERR", "RUNT", exe.ToString());
                     }
                 }
             }

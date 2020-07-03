@@ -1204,13 +1204,14 @@ end
 exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
 @servername varchar(255),
-@maxthreads varchar(2)
+@maxthreads varchar(2),
+@maxRetries int = 3
 
 AS
 BEGIN
 declare 
-@Running_Type_1 int
-, @Running_Type_2 int
+@Waiting_Type_1 int
+, @Waiting_Type_2 int
 , @MaxThreads_type_1 int
 , @MaxThreads_type_2 int
 , @divisor int
@@ -1219,29 +1220,38 @@ set @divisor  = 2
 
 set @MaxThreads_type_2 = @maxthreads / @divisor 
 set @MaxThreads_type_1 = @maxthreads - @MaxThreads_type_2
+set @Waiting_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @MaxRetries) and status = 0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
+set @Waiting_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @MaxRetries) and status = 0 and (JOBTYPE_ID = 32))
 
-set @Running_Type_1 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33))
-set @Running_Type_2 = (select count(*) from TSQUEUE where (QUEUE is null or QUEUE=@servername) and status=1 and (JOBTYPE_ID = 32))
+IF @Waiting_Type_1 < @MaxThreads_type_1  
+begin
+	SET @MaxThreads_type_1 = @Waiting_Type_1
+	SET @MaxThreads_type_2 = @maxthreads - @Waiting_Type_1
+end
 
+IF @Waiting_Type_2 < @MaxThreads_type_2  
+begin
+	SET @MaxThreads_type_2 = @Waiting_Type_2
+	SET @MaxThreads_type_1 = @maxthreads - @Waiting_Type_2 
+end
 
-UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''0-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) + 1) AS nvarchar(1)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0, DTSTARTED=GETDATE() where TSQUEUE_ID in
 (
-SELECT top (CASE WHEN @MaxThreads_type_1 > @Running_Type_1 THEN (@MaxThreads_type_1 - @Running_Type_1) ELSE 0 END) TSQUEUE_ID
+SELECT top (@MaxThreads_type_1) TSQUEUE_ID
 FROM TSQUEUE 
 INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
-WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
+WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries) and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31 OR JOBTYPE_ID = 33)
 order by DTCREATED
 )
 
-UPDATE TSQUEUE SET QUEUE=@servername, status=1, PERCENTCOMPLETE=0 where TSQUEUE_ID in
+UPDATE TSQUEUE SET QUEUE=(case when QUEUE IS NULL THEN ''0-'' + @servername else CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) + 1) AS nvarchar(1)) + ''-'' +  @servername end), status=1, PERCENTCOMPLETE=0, DTSTARTED=GETDATE() where TSQUEUE_ID in
 (
-SELECT TOP (CASE WHEN @MaxThreads_type_2 > @Running_Type_2 THEN (@MaxThreads_type_2 - @Running_Type_2) ELSE 0 END) TSQUEUE_ID
+SELECT TOP (@MaxThreads_type_2) TSQUEUE_ID
 FROM TSQUEUE 
 INNER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
-WHERE (QUEUE is null or QUEUE=@servername) and status=0 and (JOBTYPE_ID = 32)
+WHERE (QUEUE is null or TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries) and status=0 and (JOBTYPE_ID = 32)
 order by DTCREATED
 )
-
 
 SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.LOCKED, dbo.TSTIMESHEET.SITE_UID, 
                       dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, dbo.TSTIMESHEET.TSUSER_UID, dbo.TSTIMESHEET.APPROVAL_DATE, 
@@ -1252,8 +1262,37 @@ SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHE
 FROM         dbo.TSQUEUE INNER JOIN
                       dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
                       dbo.TIMERJOBTYPES ON dbo.TSQUEUE.JOBTYPE_ID = dbo.TIMERJOBTYPES.JOBTYPE_ID
-WHERE QUEUE = @servername and STATUS = 1
+WHERE TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) is not null and SUBSTRING(QUEUE, 2, LEN(QUEUE) - 1) = ''-'' + @servername and STATUS = 1
 
+END
+')
+ 
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSSetQueue')
+begin
+    Print 'Creating Stored Procedure spTSSetQueue'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSSetQueue'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spTSSetQueue]
+@bErrors bit,
+@result varchar(10),
+@resulttext varchar(max),
+@queueuid uniqueidentifier,
+@maxRetries int = 3
+AS
+BEGIN
+update TSQUEUE set 
+dtstarted = (case when dtstarted is not null then dtstarted else GETDATE() end),
+status =  (case when @bErrors = 1 then (case when TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries then 0 else 3 end) else 3 end), 
+PERCENTCOMPLETE =(case when @bErrors = 1 then (case when TRY_PARSE(SUBSTRING(QUEUE,1,1) as int) < @maxRetries then 0 else 100 end) else 100 end), 
+dtfinished=GETDATE(),
+result=@result,
+resulttext=@resulttext 
+where TSQUEUE_ID=@queueuid
 END
 ')
  

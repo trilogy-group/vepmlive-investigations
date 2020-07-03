@@ -66,7 +66,7 @@ namespace EPMLiveCore.Tests.Jobs
             // Arrange
             var expectedCommands = new List<string>
             {
-                "update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid",
+                "update queue set status = 2, dtstarted=ISNULL(dtstarted,getdate()), dtfinished=GETDATE() where timerjobuid=@timerjobuid",
                 "DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid",
                 "INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)",
                 "DELETE FROM RESINFO where siteid=@siteid",

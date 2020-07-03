@@ -839,7 +839,7 @@ namespace TimeSheets
                             }
                             if (liveHours && !bErrors)
                             {
-                                using (SqlCommand cmd8 = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn))
+                                using (SqlCommand cmd8 = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA, DTCREATED) VALUES (@tsuid, 0, 32, @userid, @jobdata, GETDATE())", cn))
                                 {
                                     cmd8.Parameters.AddWithValue("@tsuid", TSUID);
                                     cmd8.Parameters.AddWithValue("@userid", userid);

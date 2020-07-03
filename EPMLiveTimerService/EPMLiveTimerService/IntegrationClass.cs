@@ -16,13 +16,16 @@ namespace TimerService
     public class IntegrationClass : ProcessorBase
     {
         
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
-                SPWebApplicationCollection _webcolections = GetWebApplications();
-                foreach (SPWebApplication webApp in _webcolections)
+                SPWebApplicationCollection webApps = GetWebApplications();
+                foreach (SPWebApplication webApp in webApps)
                 {
+                    int maxThreads = MaxThreads;
+                    if (maxThreads <= 0)
+                        continue;
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
@@ -47,17 +50,18 @@ namespace TimerService
                                             rd.dr = dr;
                                             if (startProcess(rd))
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id and status=0", cn))
                                                 {
                                                     cmd1.Parameters.Clear();
                                                     cmd1.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                processed++;
+                                                
                                             }
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
 
                                         using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
                                         {
@@ -68,7 +72,7 @@ namespace TimerService
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.Message);
+                                LogMessage("ERR", "RUNT", ex.Message);
                             }
                         }
 
@@ -79,7 +83,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUNT", ex.Message);
+                LogMessage("ERR", "RUNT", ex.Message);
             }
         }
         
@@ -104,7 +108,7 @@ namespace TimerService
                         }
                         //TODO: Remove line comment above
                     }
-                    catch (Exception ex) { logMessage("ERR", "PROCINT", ex.Message); }
+                    catch (Exception ex) { LogMessage("ERR", "PROCINT", ex.Message); }
 
 
                 }
@@ -124,12 +128,12 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "PROCINT", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "PROCINT", exe.Message); }
                     }
                 }
                 else
                 {
-                    logMessage("ERR", "PROCINT", ex.Message);
+                    LogMessage("ERR", "PROCINT", ex.Message);
                 }
             }
         }

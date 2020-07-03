@@ -15,9 +15,9 @@ namespace TimerService
 {
     class TimesheetTimerClass : ProcessorBase
     {
-        public override bool InitializeTask()
+        public override bool InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask())
+            if (!base.InitializeTask(token))
                 return false;
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
@@ -35,14 +35,14 @@ namespace TimerService
                             {
                                 cmd.ExecuteNonQuery();
                             }
-                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where queue=@servername and (status = 1 OR STATUS = 2)", cn))
+                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where (queue=@servername OR QUEUE like '%-'  + @servername) and (status = 1 OR STATUS = 2)", cn))
                             {
                                 cmd1.Parameters.Clear();
                                 cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "RUN", exe.Message); }
                     }
                 }
             }
@@ -50,13 +50,16 @@ namespace TimerService
             return true;
         }
 
-        public override void RunTask(CancellationToken token)
+        public override void RunTask()
         {
             try
             {
-                SPWebApplicationCollection _webcolections = GetWebApplications();
-                foreach (SPWebApplication webApp in _webcolections)
+                SPWebApplicationCollection webApps = GetWebApplications();
+                foreach (SPWebApplication webApp in webApps)
                 {
+                    int maxThreads = MaxThreads;
+                    if (maxThreads <= 0)
+                        continue;
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
@@ -70,7 +73,7 @@ namespace TimerService
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
                                     cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", MaxThreads);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
                                     DataSet ds = new DataSet();
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
@@ -84,17 +87,17 @@ namespace TimerService
                                             
                                             if (startProcess(rd))
                                             {
-                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id and status = 1", cn))
+                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2,DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                processed++;
+                                                
                                             }
-                                            
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
 
                                     using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
@@ -105,7 +108,7 @@ namespace TimerService
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
-                                logMessage("ERR", "RUNT", ex.ToString());
+                                LogMessage("ERR", "RUNT", ex.ToString());
                             }
                         }
                     }
@@ -114,7 +117,7 @@ namespace TimerService
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                logMessage("ERR", "RUN", ex.Message);
+                LogMessage("ERR", "RUN", ex.Message);
             }
         }
 
@@ -161,7 +164,7 @@ namespace TimerService
 					if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
 					{
 						string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
-						logMessage("ERR", "PROC", error);
+						LogMessage("ERR", "PROC", error);
 					}
 
 					m = thisClass.GetMethod("finishJob");
@@ -184,12 +187,12 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception exe) { logMessage("ERR", "PROC", exe.Message); }
+                        catch (Exception exe) { LogMessage("ERR", "PROC", exe.Message); }
                     }
                 }
                 else
                 {
-                    logMessage("ERR", "PROC", ex.Message);
+                    LogMessage("ERR", "PROC", ex.Message);
                 }
             }
 
