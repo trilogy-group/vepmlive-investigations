@@ -585,22 +585,10 @@ namespace WE_QueueMgr
                                 // we have a queued item - try to handle it in portfolioenginecore first
                                 if (!qm.ManageQueue()) // false means not handled
                                 {
-                                    switch (qm.Context)
-                                    {
-                                        case 200:
-                                            //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-                                            //////pFeAPI.Execute("RefreshRoles", "");
-                                            //////pFeAPI.Dispose();
-                                            qm.SetJobCompleted();
-                                            ErrorHandler("ManageQueueJobs Case 200", 98765);
-                                            break;
-                                        default:
-                                            EnqueueSite(site, qm.guidJob, qm.ContextData, qm.Submitted, prioritize);
-                                            enqueued = true;
-                                            break;
-                                    }
+                                    qm.MarkBoundryJob();
+                                    EnqueueSite(site, qm.guidJob, qm.ContextData, qm.Submitted, prioritize);
+                                    enqueued = true;
                                 }
-
                             }
                         }
                     }

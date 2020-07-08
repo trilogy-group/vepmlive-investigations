@@ -150,12 +150,9 @@ namespace WorkEnginePPM
                                     {
                                         try
                                         {
-                                            string basePath, username, pid, company, dbcnstring;
-                                            PortfolioEngineCore.SecurityLevels secLevel;
-                                            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
-
-                                            WSSAdmin wssadmin = new WSSAdmin();
-                                            s = wssadmin.RSVPRequest("ManageTimerJobs", basePath);
+                                            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                                            PortfolioEngineCore.QueueManager qm = new QueueManager(sBaseInfo);
+                                            qm.ManageTimedJobs();
                                         }
                                         catch (Exception ex)
                                         {

@@ -12,7 +12,7 @@ namespace PortfolioEngineCore.Services
     {
         
 
-        public string RSVPRequest(string sContexts, string sBasepath, string sTargetJobGuid = "")
+        public string RSVPRequest(string sContexts, string sBasepath, string sTargetJobGuid = "", DBAccess _dba = null)
         {
             RequestMgr oRequestMgr = new RequestMgr();
             string result = string.Empty;
@@ -23,7 +23,7 @@ namespace PortfolioEngineCore.Services
                     result = "<Reply><HRESULT>0</HRESULT><STATUS>0</STATUS></Reply>";
                     break;
                 case "ManageTimerJobs":
-                    int value = oRequestMgr.ManageTimedJobs(sBasepath);
+                    int value = AdminFunctions.ManageTimedJobs(_dba, sBasepath);
                     result = string.Format("<Reply><HRESULT>0</HRESULT><STATUS>{0}</STATUS></Reply>", value);
                     break;
                 default:

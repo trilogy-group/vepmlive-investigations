@@ -133,7 +133,7 @@ namespace PortfolioEngineCore
             try
             {
                 int lContext = m_lContext;
-                if (lContext >= 100 && lContext < 200)
+                if (lContext >= 100 && lContext <= 200)
                 {
                     _dba.UserWResID = m_lWResID;
                     switch (lContext)
@@ -171,6 +171,12 @@ namespace PortfolioEngineCore
                             bool bret2 = AdminFunctions.CalcAllDefaultFTEs(_dba);
                             bHandled = true;
                             break;
+                        case 200:
+                            //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+                            //////pFeAPI.Execute("RefreshRoles", "");
+                            //////pFeAPI.Dispose();
+                            SetJobCompleted();
+                            break;
                     }
                 }
                 if (bHandled && m_guidJob != Guid.Empty)
@@ -205,9 +211,12 @@ namespace PortfolioEngineCore
         public void AddHeartBeat()
         {
             AdminFunctions.AddHeartBeat(_dba);
-        }   
+        }
 
-
+        public void MarkBoundryJob()
+        {
+            _dba.WriteImmTrace("VBJobMark", "MarkVBJob", guidJob.ToString(), ContextData);
+        }
 
         public bool SetJobStarted()
         {
@@ -285,7 +294,7 @@ namespace PortfolioEngineCore
             {
                 string sXML = BuildProductInfoString(IntPtr.Zero);
                 WSSAdmin wssadmin = new WSSAdmin();
-                sReply = wssadmin.RSVPRequest(sContext, BasePath);
+                sReply = wssadmin.RSVPRequest(sContext, BasePath, "", _dba);
             }
             catch (Exception ex)
             {
