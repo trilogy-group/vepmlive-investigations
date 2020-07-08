@@ -325,20 +325,20 @@ namespace WE_QueueMgr
         }
 
         object longRunQueueLock = new object();
-        List<Tuple<QMSite, Guid, String, DateTime, bool>> longRunQueue = new List<Tuple<QMSite, Guid, String, DateTime, bool>>();
+        List<WaitingJob> longRunQueue = new List<WaitingJob>();
 
-        void EnqueueSite(QMSite site, Guid jobId, string contextData, DateTime submitted, bool prioritize)
+        void EnqueueSite(QueueManager qm, bool prioritize)
         {
             lock (longRunQueueLock)
             {
-                int index = longRunQueue.Select(x => x.Item1).ToList().IndexOf(site);
-                while (index >= 0 && !longRunQueue[index].Item2.Equals(jobId))
+                int index = longRunQueue.Select(x => x.QM.BasePath).ToList().IndexOf(qm.BasePath);
+                while (index >= 0 && !longRunQueue[index].QM.guidJob.Equals(qm.guidJob))
                 {
-                    index = longRunQueue.Select(x => x.Item1).ToList().IndexOf(site, index + 1);
+                    index = longRunQueue.Select(x => x.QM.BasePath).ToList().IndexOf(qm.BasePath, index + 1);
                 }
                 if (index < 0)
                 {
-                    longRunQueue.Add(new Tuple<QMSite, Guid, String, DateTime, bool>(site, jobId, contextData, submitted, prioritize));
+                    longRunQueue.Add(new WaitingJob { QM = qm, Prioritize = prioritize });
                 }
 
             }
@@ -351,8 +351,8 @@ namespace WE_QueueMgr
             {
                 for (int i = 0; i < longRunQueue.Count; i++)
                 {
-                    if (longRunQueue[i].Item1.basePath.Equals(matchSite.basePath, StringComparison.OrdinalIgnoreCase))
-                        exclusion += "'" + longRunQueue[i].Item2 + "',";
+                    if (longRunQueue[i].QM.BasePath.Equals(matchSite.basePath, StringComparison.OrdinalIgnoreCase))
+                        exclusion += "'" + longRunQueue[i].QM.guidJob + "',";
                 }
             }
             if (!string.IsNullOrWhiteSpace(exclusion))
@@ -376,7 +376,7 @@ namespace WE_QueueMgr
         void DoLongRun()
         {
 
-            List<Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>> processingJobs = new List<Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>>();
+            List<ProcessingJob> processingJobs = new List<ProcessingJob>();
             DateTime sitesLastCheck = DateTime.Now;
             DateTime queuedLastCheck = DateTime.Now;
             DateTime timedLastCheck = DateTime.Now;
@@ -448,7 +448,7 @@ namespace WE_QueueMgr
                 }
 
                 if (!(processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
-                    && !(processingJobs.Count > 0 && Task.WaitAny(processingJobs.Select(x => x.Item5).ToArray(), 0) >= 0)
+                    && !(processingJobs.Count > 0 && Task.WaitAny(processingJobs.Select(x => x.ExecTask).ToArray(), 0) >= 0)
                     )
                 {
                     kickOffLongWorkEvent.WaitOne(mainLoopPeriod);
@@ -457,25 +457,18 @@ namespace WE_QueueMgr
                 //REORDER
                 lock (longRunQueueLock)
                 {
-                    List<Tuple<QMSite, Guid, String, DateTime, bool>> newList = longRunQueue.GetRange(processingJobs.Count, longRunQueue.Count - processingJobs.Count);
+                    List<WaitingJob> newList = longRunQueue.GetRange(processingJobs.Count, longRunQueue.Count - processingJobs.Count);
                     longRunQueue.RemoveRange(processingJobs.Count, newList.Count);
-                    longRunQueue.AddRange(newList.OrderByDescending(x => x.Item5).ThenBy(x => x.Item4).ToArray());
+                    longRunQueue.AddRange(newList.OrderByDescending(x => x.Prioritize).ThenBy(x => x.QM.Submitted).ToArray());
                 }
 
                 //PROCESSING
                 while (processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
                 {
-                    QMSite site = longRunQueue[processingJobs.Count].Item1;
-                    Guid jobId = longRunQueue[processingJobs.Count].Item2;
-                    string contextData = longRunQueue[processingJobs.Count].Item3;
-                    if (contextData.Contains("<EPKProcess>") && processingJobs.Count >= maxThreadCount - reserveSeats)
+                    QueueManager qm = longRunQueue[processingJobs.Count].QM;
+                   
+                    if (qm.ContextData.Contains("<EPKProcess>") && processingJobs.Count >= maxThreadCount - reserveSeats)
                     {
-                        //string sXML = BuildProductInfoString(site);
-                        //using (var qm = new QueueManager(sXML))
-                        //{
-                        //	  qm.RequeueJob(jobId);
-
-                        //}
                         lock (longRunQueueLock)
                         {
                             longRunQueue.RemoveAt(processingJobs.Count);
@@ -488,11 +481,14 @@ namespace WE_QueueMgr
                     {
                         try
                         {
-                            var data = (dynamic)obj;
+                            var jobQM = (QueueManager)obj;
                             using (tokenSource.Token.Register(Thread.CurrentThread.Abort))
                             {
-                                WSSAdmin wssadmin = new WSSAdmin();
-                                var result = wssadmin.RSVPRequest("ManageQueue", data.basePath, data.jobId.ToString());
+                                if (!jobQM.ManageQueue())
+                                {
+                                    WSSAdmin wssadmin = new WSSAdmin();
+                                    var result = wssadmin.RSVPRequest("ManageQueue", jobQM.BasePath, jobQM.guidJob.ToString());
+                                }
                                 return true;
                             }
                         }
@@ -500,8 +496,8 @@ namespace WE_QueueMgr
                         {
                             return false;
                         }
-                    }, new { basePath = site.basePath, jobId = jobId }, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-                    processingJobs.Add(new Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>(site, jobId, DateTime.Now, tokenSource, newJob, processingJobs.Count));
+                    }, qm, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    processingJobs.Add(new ProcessingJob { QM = qm, EntryTime = DateTime.Now, CancelSource = tokenSource, ExecTask = newJob, QueueOrder = processingJobs.Count });
                 }
 
                 //service shutdown
@@ -509,43 +505,35 @@ namespace WE_QueueMgr
                 {
                     foreach (var job in processingJobs)
                     {
-                        job.Item4.Cancel();
-                        string sXML = BuildProductInfoString(job.Item1);
-                        using (var qm = new QueueManager(sXML))
-                        {
-                            qm.RequeueJob(job.Item2);
-                        }
+                        job.CancelSource.Cancel();
+                        job.QM.RequeueJob();
                     }
                     processingJobs.Clear();
                     break;
                 }
 
                 //Check completion
-                int completedJobProcessingIndex = Task.WaitAny(processingJobs.Select(x => x.Item5).ToArray(), 0);
+                int completedJobProcessingIndex = Task.WaitAny(processingJobs.Select(x => x.ExecTask).ToArray(), 0);
                 int completedJobQueueIndex = -1;
                 if (completedJobProcessingIndex >= 0)
                 {
-                    completedJobQueueIndex = processingJobs[completedJobProcessingIndex].Item6;
+                    completedJobQueueIndex = processingJobs[completedJobProcessingIndex].QueueOrder;
                     processingJobs.RemoveAt(completedJobProcessingIndex);
 
                     for (int i = completedJobProcessingIndex; i < processingJobs.Count; i++)
                     {
-                        processingJobs[i] = new Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>(processingJobs[i].Item1, processingJobs[i].Item2, processingJobs[i].Item3, processingJobs[i].Item4, processingJobs[i].Item5, processingJobs[i].Item6 - 1);
+                        processingJobs[i].QueueOrder = processingJobs[i].QueueOrder - 1;
                     }
                 }
-                else if (processingJobs.Count >= 1 && (DateTime.Now - processingJobs[0].Item3) > jobMaxTimeout && !processingJobs[0].Item5.IsCompleted && longRunQueue.Count > processingJobs.Count)
+                else if (processingJobs.Count >= 1 && (DateTime.Now - processingJobs[0].EntryTime) > jobMaxTimeout && !processingJobs[0].ExecTask.IsCompleted && longRunQueue.Count > processingJobs.Count)
                 {
-                    processingJobs[0].Item4.Cancel();
-                    string sXML = BuildProductInfoString(processingJobs[0].Item1);
-                    using (var qm = new QueueManager(sXML))
-                    {
-                        qm.RequeueJob(processingJobs[0].Item2);
-                    }
-                    completedJobQueueIndex = processingJobs[0].Item6;
+                    processingJobs[0].CancelSource.Cancel();
+                    processingJobs[0].QM.RequeueJob();
+                    completedJobQueueIndex = processingJobs[0].QueueOrder;
                     processingJobs.RemoveAt(0);
                     for (int i = 0; i < processingJobs.Count; i++)
                     {
-                        processingJobs[i] = new Tuple<QMSite, Guid, DateTime, CancellationTokenSource, Task, int>(processingJobs[i].Item1, processingJobs[i].Item2, processingJobs[i].Item3, processingJobs[i].Item4, processingJobs[i].Item5, processingJobs[i].Item6 - 1);
+                        processingJobs[i].QueueOrder = processingJobs[i].QueueOrder - 1;
                     }
                 }
 
@@ -576,19 +564,15 @@ namespace WE_QueueMgr
                     try
                     {
                         // check the queue for .net items before using RSVP
-                        using (var qm = new QueueManager(sXML))
+                        while (true)
                         {
-
-                            while (qm.ReadNextQueuedItem(GetExclusionList(site)))
+                            using (var qm = new QueueManager(sXML))
                             {
+                                if (!qm.ReadNextQueuedItem(GetExclusionList(site)))
+                                    break;
                                 new LogService(sXML).TraceLog("ManageQueueJobs", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
-                                // we have a queued item - try to handle it in portfolioenginecore first
-                                if (!qm.ManageQueue()) // false means not handled
-                                {
-                                    qm.MarkBoundryJob();
-                                    EnqueueSite(site, qm.guidJob, qm.ContextData, qm.Submitted, prioritize);
-                                    enqueued = true;
-                                }
+                                EnqueueSite(qm, prioritize);
+                                enqueued = true;
                             }
                         }
                     }
@@ -711,11 +695,19 @@ namespace WE_QueueMgr
         public bool Recovered = false;
     }
 
-    public class Item
+    public class ProcessingJob
     {
-        public Guid jobid;
-        private QMSite site;
-        public int Priority;
+        public QueueManager QM;
+        public DateTime EntryTime;
+        public CancellationTokenSource CancelSource;
+        public Task ExecTask;
+        public int QueueOrder;
+
+    }
+    public class WaitingJob
+    {
+        public QueueManager QM;
+        public bool Prioritize;
     }
 
 }

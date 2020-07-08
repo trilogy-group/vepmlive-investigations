@@ -264,18 +264,18 @@ namespace PortfolioEngineCore
             return bSuccess;
         }
 
-        public bool RequeueJob(Guid jobid)
+        public bool RequeueJob()
         {
             bool bSuccess = false;
             try
             {
-                if (jobid != Guid.Empty)
+                if (guidJob != Guid.Empty)
                 {
                     string sCommand =
 						"UPDATE EPG_JOBS SET JOB_SUBMITTED = @JOB_SUBMITTED, JOB_STATUS = 0, JOB_STARTED = null,  JOB_COMPLETED = null, JOB_COMMENT = (case when charindex('|Requeued', JOB_COMMENT) = 0 then JOB_COMMENT else substring(JOB_COMMENT, 0, charindex('|Requeued', JOB_COMMENT)) end) + N'|Requeued at ' + convert(varchar, getdate(), 20) WHERE JOB_GUID = @JOB_GUID";
                     SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
                     oCommand.Parameters.AddWithValue("@JOB_SUBMITTED", DateTime.Now);
-                    oCommand.Parameters.AddWithValue("@JOB_GUID", jobid);
+                    oCommand.Parameters.AddWithValue("@JOB_GUID", guidJob);
                     bSuccess = (oCommand.ExecuteNonQuery() != 0);
                 }
             }
