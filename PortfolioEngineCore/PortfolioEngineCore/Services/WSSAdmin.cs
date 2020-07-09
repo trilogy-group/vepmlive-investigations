@@ -10,7 +10,7 @@ namespace PortfolioEngineCore.Services
 {
     public class WSSAdmin
     {
-        
+
 
         public string RSVPRequest(string sContexts, string sBasepath, string sTargetJobGuid = "", DBAccess _dba = null)
         {
@@ -29,6 +29,7 @@ namespace PortfolioEngineCore.Services
                 default:
                     break;
             }
+            Marshal.FinalReleaseComObject(oRequestMgr);
             return result;
 
         }

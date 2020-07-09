@@ -465,8 +465,17 @@ namespace WE_QueueMgr
                 //PROCESSING
                 while (processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
                 {
+                    var nextJob = longRunQueue.Where(x => !processingJobs.Any(y => y.QM.BasePath == x.QM.BasePath)).FirstOrDefault();
+                    if (nextJob != null)
+                    {
+                        int nextIndex = longRunQueue.IndexOf(nextJob);
+                        var swapJob = longRunQueue[processingJobs.Count];
+                        longRunQueue[processingJobs.Count] = nextJob;
+                        longRunQueue[nextIndex] = swapJob;
+                    }
+                    
                     QueueManager qm = longRunQueue[processingJobs.Count].QM;
-                   
+
                     if (qm.ContextData.Contains("<EPKProcess>") && processingJobs.Count >= maxThreadCount - reserveSeats)
                     {
                         lock (longRunQueueLock)
