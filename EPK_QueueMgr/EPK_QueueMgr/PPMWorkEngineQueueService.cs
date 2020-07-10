@@ -500,7 +500,9 @@ namespace WE_QueueMgr
                                     {
                                         WSSAdmin wssadmin = new WSSAdmin();
                                         var result = wssadmin.RSVPRequest("ManageQueue", jobQM.BasePath, jobQM.guidJob.ToString());
+
                                     }
+                                    kickOffLongWorkEvent.Set();
                                     return true;
                                 }
                             }
