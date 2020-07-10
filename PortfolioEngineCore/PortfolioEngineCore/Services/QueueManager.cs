@@ -133,7 +133,7 @@ namespace PortfolioEngineCore
             try
             {
                 int lContext = m_lContext;
-                if (lContext >= 100 && lContext <= 200)
+                if (lContext >= 100 && lContext <= 200 || lContext == 100001)
                 {
                     _dba.UserWResID = m_lWResID;
                     switch (lContext)
@@ -175,7 +175,15 @@ namespace PortfolioEngineCore
                             //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
                             //////pFeAPI.Execute("RefreshRoles", "");
                             //////pFeAPI.Dispose();
+                            m_sComment = "Job context 200 encountered!";
                             SetJobCompleted();
+                            break;
+                        case 100001:
+                            SetJobStarted();
+                            m_sComment = "Job Queue Tested OK!";
+                            SetJobCompleted();
+                            AddJobMessage("Test handling");
+                            bHandled = true;
                             break;
                     }
                 }
@@ -223,7 +231,7 @@ namespace PortfolioEngineCore
             bool bSuccess = false;
             try
             {
-                if (m_guidJob != Guid.Empty)
+                if (m_guidJob != Guid.Empty && _dba.Open() == StatusEnum.rsSuccess)
                 {
                     const string sCommand =
                         "UPDATE EPG_JOBS SET JOB_STARTED = @JOB_STARTED, JOB_STATUS = 1 WHERE JOB_STARTED IS null AND JOB_GUID = @JOB_GUID";
@@ -240,19 +248,44 @@ namespace PortfolioEngineCore
             }
             return bSuccess;
         }
+        public bool AddJobMessage(string message)
+        {
+            bool bSuccess = false;
+            try
+            {
+                if (m_guidJob != Guid.Empty &&  _dba.Open() == StatusEnum.rsSuccess)
+                {
+                    string sCommand =
+                  "INSERT INTO EPG_JOB_MSGS (JOB_GUID,JMG_TIMESTAMP,JMG_MESSAGE) VALUES(@JOB_GUID,@JMG_TIMESTAMP,@JMG_MESSAGE)";
+                    SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
+                    oCommand.Parameters.AddWithValue("@JOB_GUID", m_guidJob);
+                    oCommand.Parameters.AddWithValue("@JMG_TIMESTAMP", DateTime.Now);
+                    oCommand.Parameters.AddWithValue("@JMG_MESSAGE", message);
 
+                    bSuccess = (oCommand.ExecuteNonQuery() != 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                _dba.HandleException("AddJobMessage", (StatusEnum)99999, ex);
+            }
+            return bSuccess;
+        }
         public bool SetJobCompleted()
         {
             bool bSuccess = false;
             try
             {
-                if (m_guidJob != Guid.Empty)
+                if (m_guidJob != Guid.Empty && _dba.Open() == StatusEnum.rsSuccess)
                 {
-                    const string sCommand =
-                        "UPDATE EPG_JOBS SET JOB_COMPLETED = @JOB_COMPLETED, JOB_STATUS = -1 WHERE JOB_COMPLETED IS null AND JOB_GUID = @JOB_GUID";
+                    string sCommand =
+                        "UPDATE EPG_JOBS SET JOB_COMPLETED = @JOB_COMPLETED, JOB_STATUS = -1" + (m_sComment == null? "":", JOB_COMMENT = @JOB_COMMENT") + " WHERE JOB_COMPLETED IS null AND JOB_GUID = @JOB_GUID";
                     SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
                     oCommand.Parameters.AddWithValue("@JOB_COMPLETED", DateTime.Now);
-                    //oCommand.Parameters.AddWithValue("JOB_COMMENT", "Job Completed by C# QM");
+                    if (m_sComment != null)
+                    {
+                        oCommand.Parameters.AddWithValue("@JOB_COMMENT", m_sComment);
+                    }
                     oCommand.Parameters.AddWithValue("@JOB_GUID", m_guidJob);
                     bSuccess = (oCommand.ExecuteNonQuery() != 0);
                 }

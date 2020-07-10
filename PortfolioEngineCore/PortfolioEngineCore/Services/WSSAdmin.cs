@@ -10,8 +10,6 @@ namespace PortfolioEngineCore.Services
 {
     public class WSSAdmin
     {
-
-
         public string RSVPRequest(string sContexts, string sBasepath, string sTargetJobGuid = "", DBAccess _dba = null)
         {
             RequestMgr oRequestMgr = new RequestMgr();

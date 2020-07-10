@@ -174,7 +174,6 @@ namespace WE_QueueMgr
         {
             try
             {
-                //System.Diagnostics.Debugger.Launch();
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
                 string timeoutString = System.Configuration.ConfigurationManager.AppSettings["jobmaxtimeout"];
@@ -462,99 +461,113 @@ namespace WE_QueueMgr
                     longRunQueue.AddRange(newList.OrderByDescending(x => x.Prioritize).ThenBy(x => x.QM.Submitted).ToArray());
                 }
 
-                //PROCESSING
-                while (processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
+                while (true)
                 {
-                    var nextJob = longRunQueue.Where(x => !processingJobs.Any(y => y.QM.BasePath == x.QM.BasePath)).FirstOrDefault();
-                    if (nextJob != null)
+                    //PROCESSING
+                    bool jobStarted = false;
+                    while (processingJobs.Count < maxThreadCount && processingJobs.Count < longRunQueue.Count)
                     {
-                        int nextIndex = longRunQueue.IndexOf(nextJob);
-                        var swapJob = longRunQueue[processingJobs.Count];
-                        longRunQueue[processingJobs.Count] = nextJob;
-                        longRunQueue[nextIndex] = swapJob;
-                    }
-                    
-                    QueueManager qm = longRunQueue[processingJobs.Count].QM;
-
-                    if (qm.ContextData.Contains("<EPKProcess>") && processingJobs.Count >= maxThreadCount - reserveSeats)
-                    {
-                        lock (longRunQueueLock)
+                        jobStarted = true;
+                        var nextJob = longRunQueue.Where(x => !processingJobs.Any(y => y.QM.BasePath == x.QM.BasePath)).FirstOrDefault();
+                        if (nextJob != null)
                         {
-                            longRunQueue.RemoveAt(processingJobs.Count);
+                            int nextIndex = longRunQueue.IndexOf(nextJob);
+                            var swapJob = longRunQueue[processingJobs.Count];
+                            longRunQueue[processingJobs.Count] = nextJob;
+                            longRunQueue[nextIndex] = swapJob;
                         }
-                        continue;
 
-                    }
-                    CancellationTokenSource tokenSource = new CancellationTokenSource();
-                    Task newJob = Task.Factory.StartNew((object obj) =>
-                    {
-                        try
+                        QueueManager qm = longRunQueue[processingJobs.Count].QM;
+
+                        if (qm.ContextData.Contains("<EPKProcess>") && processingJobs.Count >= maxThreadCount - reserveSeats)
                         {
-                            var jobQM = (QueueManager)obj;
-                            using (tokenSource.Token.Register(Thread.CurrentThread.Abort))
+                            lock (longRunQueueLock)
                             {
-                                if (!jobQM.ManageQueue())
+                                longRunQueue.RemoveAt(processingJobs.Count);
+                            }
+                            continue;
+
+                        }
+                        CancellationTokenSource tokenSource = new CancellationTokenSource();
+                        Task newJob = Task.Factory.StartNew((object obj) =>
+                        {
+                            try
+                            {
+                                var jobQM = (QueueManager)obj;
+                                using (tokenSource.Token.Register(Thread.CurrentThread.Abort))
                                 {
-                                    WSSAdmin wssadmin = new WSSAdmin();
-                                    var result = wssadmin.RSVPRequest("ManageQueue", jobQM.BasePath, jobQM.guidJob.ToString());
+                                    if (!jobQM.ManageQueue())
+                                    {
+                                        WSSAdmin wssadmin = new WSSAdmin();
+                                        var result = wssadmin.RSVPRequest("ManageQueue", jobQM.BasePath, jobQM.guidJob.ToString());
+                                    }
+                                    return true;
                                 }
-                                return true;
+                            }
+                            catch (ThreadAbortException)
+                            {
+                                return false;
+                            }
+                        }, qm, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                        processingJobs.Add(new ProcessingJob { QM = qm, EntryTime = DateTime.Now, CancelSource = tokenSource, ExecTask = newJob, QueueOrder = processingJobs.Count });
+                    }
+
+                    //service shutdown
+                    if (token.IsCancellationRequested)
+                    {
+                        foreach (var job in processingJobs)
+                        {
+                            job.CancelSource.Cancel();
+                            job.QM.RequeueJob();
+                        }
+                        processingJobs.Clear();
+                        break;
+                    }
+
+                    //Check completion
+                    int completedJobProcessingIndex = Task.WaitAny(processingJobs.Select(x => x.ExecTask).ToArray(), 0);
+                    bool jobFinished = false;
+                    while (completedJobProcessingIndex >= 0)
+                    {
+                        jobFinished = true;
+                        int completedJobQueueIndex = -1;
+                        if (completedJobProcessingIndex >= 0)
+                        {
+                            completedJobQueueIndex = processingJobs[completedJobProcessingIndex].QueueOrder;
+                            processingJobs.RemoveAt(completedJobProcessingIndex);
+
+                            for (int i = completedJobProcessingIndex; i < processingJobs.Count; i++)
+                            {
+                                processingJobs[i].QueueOrder = processingJobs[i].QueueOrder - 1;
                             }
                         }
-                        catch (ThreadAbortException)
+                        else if (processingJobs.Count >= 1 && (DateTime.Now - processingJobs[0].EntryTime) > jobMaxTimeout && !processingJobs[0].ExecTask.IsCompleted && longRunQueue.Count > processingJobs.Count)
                         {
-                            return false;
+                            processingJobs[0].CancelSource.Cancel();
+                            processingJobs[0].QM.RequeueJob();
+                            completedJobQueueIndex = processingJobs[0].QueueOrder;
+                            processingJobs.RemoveAt(0);
+                            for (int i = 0; i < processingJobs.Count; i++)
+                            {
+                                processingJobs[i].QueueOrder = processingJobs[i].QueueOrder - 1;
+                            }
                         }
-                    }, qm, tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-                    processingJobs.Add(new ProcessingJob { QM = qm, EntryTime = DateTime.Now, CancelSource = tokenSource, ExecTask = newJob, QueueOrder = processingJobs.Count });
-                }
 
-                //service shutdown
-                if (token.IsCancellationRequested)
-                {
-                    foreach (var job in processingJobs)
-                    {
-                        job.CancelSource.Cancel();
-                        job.QM.RequeueJob();
+                        //remove completions from queue
+                        if (completedJobQueueIndex >= 0)
+                        {
+                            lock (longRunQueueLock)
+                            {
+                                longRunQueue.RemoveAt(completedJobQueueIndex);
+                            }
+                        }
+                        completedJobProcessingIndex = Task.WaitAny(processingJobs.Select(x => x.ExecTask).ToArray(), 0);
                     }
-                    processingJobs.Clear();
-                    break;
-                }
-
-                //Check completion
-                int completedJobProcessingIndex = Task.WaitAny(processingJobs.Select(x => x.ExecTask).ToArray(), 0);
-                int completedJobQueueIndex = -1;
-                if (completedJobProcessingIndex >= 0)
-                {
-                    completedJobQueueIndex = processingJobs[completedJobProcessingIndex].QueueOrder;
-                    processingJobs.RemoveAt(completedJobProcessingIndex);
-
-                    for (int i = completedJobProcessingIndex; i < processingJobs.Count; i++)
+                    if (!jobFinished && !jobStarted)
                     {
-                        processingJobs[i].QueueOrder = processingJobs[i].QueueOrder - 1;
+                        break;
                     }
                 }
-                else if (processingJobs.Count >= 1 && (DateTime.Now - processingJobs[0].EntryTime) > jobMaxTimeout && !processingJobs[0].ExecTask.IsCompleted && longRunQueue.Count > processingJobs.Count)
-                {
-                    processingJobs[0].CancelSource.Cancel();
-                    processingJobs[0].QM.RequeueJob();
-                    completedJobQueueIndex = processingJobs[0].QueueOrder;
-                    processingJobs.RemoveAt(0);
-                    for (int i = 0; i < processingJobs.Count; i++)
-                    {
-                        processingJobs[i].QueueOrder = processingJobs[i].QueueOrder - 1;
-                    }
-                }
-
-                //remove completions from queue
-                if (completedJobQueueIndex >= 0)
-                {
-                    lock (longRunQueueLock)
-                    {
-                        longRunQueue.RemoveAt(completedJobQueueIndex);
-                    }
-                }
-
             }
         }
 
