@@ -499,6 +499,7 @@ namespace WE_QueueMgr
                                     if (!jobQM.ManageQueue())
                                     {
                                         WSSAdmin wssadmin = new WSSAdmin();
+                                        jobQM.MarkBoundryJob();
                                         var result = wssadmin.RSVPRequest("ManageQueue", jobQM.BasePath, jobQM.guidJob.ToString());
 
                                     }

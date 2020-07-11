@@ -178,13 +178,12 @@ namespace PortfolioEngineCore
                             m_sComment = "Job context 200 encountered!";
                             SetJobCompleted();
                             break;
-                        case 100001:
-                            SetJobStarted();
-                            m_sComment = "Job Queue Tested OK!";
-                            SetJobCompleted();
-                            AddJobMessage("Test handling");
-                            bHandled = true;
-                            break;
+                        //case 100001:
+                        //    SetJobStarted();
+                        //    m_sComment = "Job Queue Tested OK!";
+                        //    AddJobMessage("Test handling");
+                        //    bHandled = true;
+                        //    break;
                     }
                 }
                 if (bHandled && m_guidJob != Guid.Empty)
