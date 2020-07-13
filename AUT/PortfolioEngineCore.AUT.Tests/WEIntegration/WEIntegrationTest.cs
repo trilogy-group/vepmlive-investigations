@@ -987,7 +987,7 @@ namespace PortfolioEngineCore.WEIntegration
         {
             // Arrange
             var methodInfo = GetMethodInfo(MethodSetCharge, 0);
-            const int parametersCount = 9;
+            const int parametersCount = 8;
 
             // Act
             var parameters = methodInfo.GetParameters();
