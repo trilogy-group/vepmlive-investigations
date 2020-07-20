@@ -68,7 +68,7 @@ namespace EPMLiveReportsAdmin
             PopulateDefaultColumns();
         }
 
-        public void StartRefresh(Guid timerjobguid, out DataTable dtResults, bool refreshAll)
+        public void StartRefresh(Guid timerjobguid, out DataTable dtResults, bool refreshAll, EPMData epmdata = null)
         {
             DataTable dt = InitializeResultsDT(_sListNames, refreshAll);
             string _errorListName = string.Empty;
@@ -169,6 +169,7 @@ namespace EPMLiveReportsAdmin
 
                                 if (_dsLists.Tables.Count > 0)
                                 {
+                                    if (epmdata != null) epmdata.DeleteAllItemsDB("Work Hours", refreshAll);
                                     _DAO.InsertAllItemsDB(_dsLists, timerjobguid);
                                 }
                             }
@@ -256,6 +257,7 @@ namespace EPMLiveReportsAdmin
 
                                 if (_dsLists.Tables.Count > 0)
                                 {
+                                    if (epmdata != null) epmdata.DeleteAllItemsDB("Resources", refreshAll);
                                     _DAO.InsertAllItemsDB(_dsLists, timerjobguid);
                                 }
                             }
@@ -269,6 +271,7 @@ namespace EPMLiveReportsAdmin
                             var allSpLists = new List<SPList>();
                             foreach (string l in allLists)
                             {
+                               
                                 SPList list = _web.Lists.TryGetList(l);
 
                                 if (list != null)
@@ -282,6 +285,8 @@ namespace EPMLiveReportsAdmin
                                 {
                                     continue;
                                 }
+
+                                
 
                                 _errorListName = list.Title;
 
@@ -321,6 +326,7 @@ namespace EPMLiveReportsAdmin
 
                                     if (_dsMyWorkLists.Tables.Count > 0)
                                     {
+                                        if (epmdata != null) epmdata.DeleteAllItemsDB(l, refreshAll);
                                         _DAO.InsertAllItemsDB(_dsMyWorkLists, timerjobguid);
                                     }
                                 }
@@ -361,6 +367,7 @@ namespace EPMLiveReportsAdmin
 
                                     if (_dsLists.Tables.Count > 0)
                                     {
+                                        if (epmdata != null) epmdata.DeleteAllItemsDB(list.Title, refreshAll);
                                         _DAO.InsertAllItemsDB(_dsLists, timerjobguid);
                                     }
                                 }
@@ -404,8 +411,10 @@ namespace EPMLiveReportsAdmin
                             //loop thru all lists
                             foreach (string sListName in _ArrayListNames)
                             {
+                                
                                 try
                                 {
+                                    if (epmdata != null) epmdata.DeleteAllItemsDB(sListName, refreshAll);
                                     _errorListName = sListName;
 
                                     //set to null

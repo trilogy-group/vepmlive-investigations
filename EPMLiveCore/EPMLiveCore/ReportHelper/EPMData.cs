@@ -1847,20 +1847,15 @@ namespace EPMLiveCore.ReportHelper
                             continue;
                         }
 
-                        if (TableExists(sTableName, GetClientReportingConnection))
-                        {
-                            sSQL = sSQL + " DELETE [" + sTableName.Replace("'", "") + "] WHERE SiteId =@siteID";
-                            // - CAT.NET false-positive: All single quotes are escaped/removed.
-                        }
+                        sSQL = sSQL + @"
+                        IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" + sTableName + @"')) 
+                        BEGIN 
+                            DELETE [" + sTableName.Replace("'", "") + @"] WHERE SiteId =@siteID AND WebID = @webID
+                        END";
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }
-                AddParam("@siteID", SiteId);
-                Command = sSQL;
-                if (!string.IsNullOrEmpty(Command))
-                {
-                    ExecuteNonQuery(GetClientReportingConnection);
-                }
-
+                
                 //DELETE WORK -- START
                 listIds = new string[listNames.Length];
                 iListCounter = 0;
@@ -1871,8 +1866,8 @@ namespace EPMLiveCore.ReportHelper
                            listIds[iListCounter].Replace("'", "") + "'";
                     iListCounter++;
                 }
-
                 AddParam("@siteId", SiteId);
+                AddParam("@webID", _webId);
                 Command = sSQL;
                 return ExecuteNonQuery(GetClientReportingConnection);
                 // -- END

@@ -118,15 +118,15 @@ namespace EPMLiveReportsAdmin.Jobs
                 //    sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
                 //}
 
-                try
-                {
-                    epmdata.DeleteAllItemsDB(data, refreshAll);
-                }
-                catch (Exception ex)
-                {
-                    bErrors = true;
-                    sbErrors.Append("<font color=\"red\">Error Cleaning Up Tables: " + ex.Message + "</font><br>");
-                }
+                //try
+                //{
+                //    epmdata.DeleteAllItemsDB(data, refreshAll);
+                //}
+                //catch (Exception ex)
+                //{
+                //    bErrors = true;
+                //    sbErrors.Append("<font color=\"red\">Error Cleaning Up Tables: " + ex.Message + "</font><br>");
+                //}
 
                 foreach (string list in data.Split(','))
                 {
@@ -151,7 +151,7 @@ namespace EPMLiveReportsAdmin.Jobs
                         //Call Reporting Code
                         var rf = new RefreshLists(w, data);
 
-                        rf.StartRefresh(base.JobUid, out dt, refreshAll);
+                        rf.StartRefresh(base.JobUid, out dt, refreshAll, new EPMData(true, site.ID, w.ID));
                         rf.AppendStatus(w.Title, w.ServerRelativeUrl, dtListResults, dt);
 
                         //Process Logs
