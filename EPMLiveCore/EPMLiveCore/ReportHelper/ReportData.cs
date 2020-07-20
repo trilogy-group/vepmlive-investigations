@@ -285,12 +285,18 @@ namespace EPMLiveCore.ReportHelper
         {
             _DAO.WriteToFile(sText);
         }
-
         public bool DeleteExistingTSData()
         {
             return _DAO.DeleteExistingTSData();
         }
-
+        public bool DeleteExistingTSData(string name)
+        {
+            return _DAO.DeleteExistingTSData(name);
+        }
+        public void RenameTable (string sourceTable, string destinationTable)
+        {
+            _DAO.RenameTable(sourceTable, destinationTable);
+        }
         public DataRow GetSite()
         {
             DataTable dt;
@@ -1046,8 +1052,12 @@ namespace EPMLiveCore.ReportHelper
 
         public bool InsertTSAllData(DataTable table, out string message)
         {
+            return InsertTSAllData(table, out message, Resources.ReportingTimesheetTable);
+        }
+        public bool InsertTSAllData(DataTable table, out string message, string tableName)
+        {
             var ds = new DataSet();
-            table.TableName = Resources.ReportingTimesheetTable;
+            table.TableName =tableName;
             ds.Tables.Add(table);
             _DAO.BulkInsert(ds, false, out message);
             if (string.IsNullOrEmpty(message))

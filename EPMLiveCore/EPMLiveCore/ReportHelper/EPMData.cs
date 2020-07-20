@@ -715,16 +715,28 @@ namespace EPMLiveCore.ReportHelper
 
             return fields;
         }
-
         public bool DeleteExistingTSData()
         {
             var name = GetTableCount() == 0
                 ? "RPTTSData"
                 : $"RPTTSData{GetTableCount()}";
+            return DeleteExistingTSData(name);
+        }
+        public bool DeleteExistingTSData(string name)
+        {
 
             Command = string.Format(
                 @"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}]",
                 name.Replace(Apostrophe, DoubleApostrophe));
+
+            return ExecuteNonQuery(_conClientReporting);
+        }
+
+        public bool RenameTable(string sourceTable, string destinationTable)
+        {
+            Command = string.Format(
+                @"EXEC sp_rename '{0}', '{1}'",
+                sourceTable, destinationTable);
 
             return ExecuteNonQuery(_conClientReporting);
         }

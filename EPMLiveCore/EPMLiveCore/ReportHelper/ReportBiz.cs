@@ -195,21 +195,6 @@ namespace EPMLiveCore.ReportHelper
                         return hasErrors;
                     }
 
-                    //Delete Timesheetdata start 
-                    rd.LogStatus("",
-                        "TimeSheet",
-                        "Begin deleting existing time sheet data for web: " + WebTitle,
-                        "Begin deleting existing time sheet data for web: " + WebTitle,
-                        0, 1, jobUid.ToString());
-
-                    rd.DeleteExistingTSData();
-                    rd.LogStatus("",
-                        "TimeSheet",
-                        "Finished deleting existing time sheet data for web: " + WebTitle,
-                        "Finished deleting existing time sheet data for web: " + WebTitle,
-                        0, 1, jobUid.ToString());
-                    //End
-
                     //IF performance becomes an issue, change rpttsduid to int and auto-increment. 
                     //Thus eliminating the need for the population routine below. xjh
                     tblTSData.Columns.Add("rpttsduid", Type.GetType("System.Guid"));
@@ -223,13 +208,14 @@ namespace EPMLiveCore.ReportHelper
                     // -- End
 
                     var columns = new ColumnDefCollection(tblTSData.Columns);
-                    string sTableName = rd.GetSafeTableName("RPTTSData");
+                    string sTableName = rd.GetSafeTableName(RPTTSData_Temp);
 
                     rd.LogStatus("",
                         "TimeSheet",
                         "Recreating RPTTSData for web: " + WebTitle,
                         "Recreating RPTTSData for web: " + WebTitle,
                         0, 1, jobUid.ToString());
+                    rd.DeleteExistingTSData(sTableName);
                     if (!rd.CreateTable(sTableName, columns, true, out message))
                     {
                         hasErrors = true;
@@ -249,7 +235,7 @@ namespace EPMLiveCore.ReportHelper
                         "Inserting data to RPTTSData for web: " + WebTitle,
                         "Inserting data to RPTTSData for web: " + WebTitle,
                         0, 1, jobUid.ToString());
-                    if (!rd.InsertTSAllData(tblTSData, out message))
+                    if (!rd.InsertTSAllData(tblTSData, out message, sTableName))
                     {
                         hasErrors = true;
                         rd.LogStatus("",
@@ -257,10 +243,33 @@ namespace EPMLiveCore.ReportHelper
                             "Error occurred while inserting data into RPTTSData for web: " + WebTitle,
                             message, 0, 3, jobUid.ToString());
                     }
+
+
                     rd.LogStatus("", "TimeSheet",
                         "Finished inserting data to RPTTSData for web: " + WebTitle,
                         "Finished inserting data to RPTTSData for web: " + WebTitle,
                         0, 1, jobUid.ToString());
+
+
+                    //Delete Timesheetdata start 
+                    rd.LogStatus("",
+                        "TimeSheet",
+                        "Begin deleting existing time sheet data for web: " + WebTitle,
+                        "Begin deleting existing time sheet data for web: " + WebTitle,
+                        0, 1, jobUid.ToString());
+
+                    string sFinalTableName = rd.GetSafeTableName(RPTTSData);
+                    rd.DeleteExistingTSData(sFinalTableName);
+                    rd.RenameTable(sTableName, sFinalTableName);
+
+                    rd.LogStatus("",
+                        "TimeSheet",
+                        "Finished deleting existing time sheet data for web: " + WebTitle,
+                        "Finished deleting existing time sheet data for web: " + WebTitle,
+                        0, 1, jobUid.ToString());
+                    //End
+
+
                     //message = "Successfully refreshed timesheet data.";
                     rd.LogStatus("",
                         "TimeSheet",
@@ -309,6 +318,10 @@ namespace EPMLiveCore.ReportHelper
                 return hasErrors;
             }
         }
+
+        const string RPTTSData_Temp = "RPTTSData_Temp";
+        const string RPTTSData = "RPTTSData";
+
         public bool RefreshTimesheetBatch(out string message, Guid jobUid, int pageSize = 0)
         {
             using (var rd = new ReportData(_siteId))
@@ -327,24 +340,10 @@ namespace EPMLiveCore.ReportHelper
                         0, 1, jobUid.ToString());
 
                     DataSet dsTSData = rd.GetTSAllDataBatchWithSchema(pageNo, pageSize);
-
                     if (dsTSData != null && dsTSData.Tables.Count > 0)
                     {
                         DataTable tblTSData = dsTSData.Tables[0];
                         recCount = Convert.ToInt32(dsTSData.Tables[1].Rows[0][0]);
-                        //Delete Timesheetdata start 
-                        rd.LogStatus("",
-                            "TimeSheet",
-                            "Begin deleting existing time sheet data for web: " + WebTitle,
-                            "Begin deleting existing time sheet data for web: " + WebTitle,
-                            0, 1, jobUid.ToString());
-
-                        rd.DeleteExistingTSData();
-                        rd.LogStatus("",
-                            "TimeSheet",
-                            "Finished deleting existing time sheet data for web: " + WebTitle,
-                            "Finished deleting existing time sheet data for web: " + WebTitle,
-                            0, 1, jobUid.ToString());
 
                         if (tblTSData.Columns.Contains("SNO"))
                         {
@@ -352,29 +351,30 @@ namespace EPMLiveCore.ReportHelper
                         }
 
                         var columns = new ColumnDefCollection(tblTSData.Columns);
-                        string sTableName = rd.GetSafeTableName("RPTTSData");
+                        string sTableName = rd.GetSafeTableName(RPTTSData_Temp);
 
                         rd.LogStatus("",
                            "TimeSheet",
-                           "Recreating RPTTSData for web: " + WebTitle,
-                           "Recreating RPTTSData for web: " + WebTitle,
+                           "Recreating " + RPTTSData_Temp + " for web: " + WebTitle,
+                           "Recreating " + RPTTSData_Temp + " for web: " + WebTitle,
                            0, 1, jobUid.ToString());
+                        rd.DeleteExistingTSData(sTableName);
                         if (!rd.CreateTable(sTableName, columns, true, out message))
                         {
                             hasErrors = true;
                             rd.LogStatus("",
                                 "TimeSheet",
-                                "Error occured while recreating RPTTSData for web: " + WebTitle + ".",
+                                "Error occured while creating " + RPTTSData_Temp + " for web: " + WebTitle + ".",
                                 message,
                                 0, 1, jobUid.ToString());
                         }
                         rd.LogStatus("",
                             "TimeSheet",
-                            "Finished recreating RPTTSData for web: " + WebTitle,
-                            "Finished recreating RPTTSData for web: " + WebTitle,
+                            "Finished creating " + RPTTSData_Temp + " for web: " + WebTitle,
+                            "Finished creating " + RPTTSData_Temp + " for web: " + WebTitle,
                             0, 1, jobUid.ToString());
                         DataTable dtTabletoInsert = tblTSData.Copy();
-                        ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtTabletoInsert);
+                        ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtTabletoInsert, sTableName);
 
                         if (recCount > pageSize)
                         {
@@ -404,7 +404,7 @@ namespace EPMLiveCore.ReportHelper
                                         tblTSData.Columns.Remove("SNO");
                                     }
                                     dtTabletoInsert = tblTSData.Copy();
-                                    ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtTabletoInsert);
+                                    ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtTabletoInsert, sTableName);
                                 }
 
                                 rd.LogStatus("",
@@ -414,6 +414,26 @@ namespace EPMLiveCore.ReportHelper
                                0, 1, jobUid.ToString());
                             }
                         }
+                        
+                        //Delete Timesheetdata start 
+                        rd.LogStatus("",
+                            "TimeSheet",
+                            "Begin deleting existing time sheet data for web: " + WebTitle,
+                            "Begin deleting existing time sheet data for web: " + WebTitle,
+                            0, 1, jobUid.ToString());
+
+                        
+                        string sFinalTableName = rd.GetSafeTableName(RPTTSData);
+                        rd.DeleteExistingTSData(sFinalTableName);
+                        rd.RenameTable(sTableName, sFinalTableName);
+
+                        rd.LogStatus("",
+                            "TimeSheet",
+                            "Finished deleting existing time sheet data for web: " + WebTitle,
+                            "Finished deleting existing time sheet data for web: " + WebTitle,
+                            0, 1, jobUid.ToString());
+
+
                         //message = "Successfully refreshed timesheet data.";
                         rd.LogStatus("",
                             "TimeSheet",
@@ -442,16 +462,19 @@ namespace EPMLiveCore.ReportHelper
                 return hasErrors;
             }
         }
-
         private void ProcessRRInBatch(ref string message, ref Guid jobUid, ReportData rd, ref bool hasErrors, DataTable dtToInsert)
         {
+            ProcessRRInBatch(ref message, ref jobUid, rd, ref hasErrors, dtToInsert, "RPTTSData");
+        }
+        private void ProcessRRInBatch(ref string message, ref Guid jobUid, ReportData rd, ref bool hasErrors, DataTable dtToInsert, string tableName)
+        {
             rd.LogStatus("", "TimeSheet",
-                "Inserting data to RPTTSData for web: " + WebTitle,
-                "Inserting data to RPTTSData for web: " + WebTitle,
+                "Inserting data to " + tableName + " for web: " + WebTitle,
+                "Inserting data to " + tableName + " for web: " + WebTitle,
                 0, 1, jobUid.ToString());
             if (dtToInsert.Rows.Count > 0)
             {
-                if (!rd.InsertTSAllData(dtToInsert, out message))
+                if (!rd.InsertTSAllData(dtToInsert, out message, tableName))
                 {
                     hasErrors = true;
                     rd.LogStatus("",
@@ -462,8 +485,8 @@ namespace EPMLiveCore.ReportHelper
             }
 
             rd.LogStatus("", "TimeSheet",
-                  "Finished inserting data to RPTTSData for web: " + WebTitle,
-                  "Finished inserting data to RPTTSData for web: " + WebTitle,
+                  "Finished inserting data to " + tableName + " for web: " + WebTitle,
+                  "Finished inserting data to " + tableName + " for web: " + WebTitle,
                   0, 1, jobUid.ToString());
         }
         //Modules created by xjh -- START
