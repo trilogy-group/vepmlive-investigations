@@ -1837,7 +1837,18 @@ namespace EPMLiveCore.ReportHelper
                     tableNames[iListCounter] = GetTableName(lstId);
                     iListCounter++;
                 }
+                //DELETE WORK -- START
+                listIds = new string[listNames.Length];
+                iListCounter = 0;
+                while (iListCounter < listNames.Length)
+                {
+                    listIds[iListCounter] = GetListId(Convert.ToString(listNames[iListCounter]), _webId).ToString();
+                    sSQL = sSQL + @"
+                    DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" + listIds[iListCounter].Replace("'", "") + "'";
+                    iListCounter++;
+                }
 
+                iListCounter = 0;
                 foreach (string sTableName in tableNames)
                 {
                     if (sTableName != null)
@@ -1850,22 +1861,14 @@ namespace EPMLiveCore.ReportHelper
                         sSQL = sSQL + @"
                         IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" + sTableName + @"')) 
                         BEGIN 
-                            DELETE [" + sTableName.Replace("'", "") + @"] WHERE SiteId =@siteID AND WebID = @webID
+                            DELETE [" + sTableName.Replace("'", "") + @"] WHERE SiteId =@siteID AND ListId='" + listIds[iListCounter].Replace("'", "") + @"'
                         END";
+                        iListCounter++;
                         // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }
                 
-                //DELETE WORK -- START
-                listIds = new string[listNames.Length];
-                iListCounter = 0;
-                while (iListCounter < listNames.Length)
-                {
-                    listIds[iListCounter] = GetListId(Convert.ToString(listNames[iListCounter]), _webId).ToString();
-                    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
-                           listIds[iListCounter].Replace("'", "") + "'";
-                    iListCounter++;
-                }
+                
                 AddParam("@siteId", SiteId);
                 AddParam("@webID", _webId);
                 Command = sSQL;
