@@ -2,7 +2,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Reflection;
-
+using WE_PDSExt;
 
 namespace PortfolioEngineCore
 {
@@ -127,74 +127,115 @@ namespace PortfolioEngineCore
             return bItemToProcess;
         }
 
+        public enum QueuedJobContextEnum
+        {
+            qjcCustom = 0,
+            qjcImportProject = 1,
+            qjcImportLookup = 2,
+            qjcImportResources = 3,
+            qjcExecuteActiveX = 4,
+            qjcImportPIs = 5,
+            qjcImportData = 6,
+            qjcExportData = 7,
+            qjcMaintenance = 8,
+            qjcRefreshRoles = 200,
+            qjcCalcAvailability = 111,
+            qjcCalcDefaultFTEs = 112,
+            qjcReportToReportingDb  = 100,
+            qjcTest = 100001,
+            qjcNone = -1
+        }
+        private  string BuildCookie()
+        {
+            string sXML = "<EPKServer>";
+            sXML = sXML + "<BasePath>" + _basepath + "</BasePath>";
+            sXML = sXML + "<ConnectInfo>" + _dbcnstring + "</ConnectInfo>";
+            sXML = sXML + "<ResName>" + _username + "</ResName>";
+            sXML = sXML + "<WResID>" + m_lWResID + "</WResID>";
+            sXML = sXML + "<SessionInfo>" + m_sSession + "</SessionInfo>";
+            sXML = sXML + "</EPKServer>";
+            return sXML;
+        }
         public bool ManageQueue()
         {
-            bool bHandled = false;
+            bool bHandled = true;
             try
             {
-                int lContext = m_lContext;
-                if (lContext >= 100 && lContext <= 200 || lContext == 100001)
+                _dba.UserWResID = m_lWResID;
+                switch ((QueuedJobContextEnum)m_lContext)
                 {
-                    _dba.UserWResID = m_lWResID;
-                    switch (lContext)
-                    {
-                        case 100: // Report to Reporting DB
-                            SetJobStarted();
-                            CAdmin oAdmin = new CAdmin();
-                            if (oAdmin.GetAdminInfo(_dba) == StatusEnum.rsSuccess)
+                    case QueuedJobContextEnum.qjcReportToReportingDb: // Report to Reporting DB
+                        SetJobStarted();
+                        CAdmin oAdmin = new CAdmin();
+                        if (oAdmin.GetAdminInfo(_dba) == StatusEnum.rsSuccess)
+                        {
+                            if (oAdmin.WEReportingDBConnect != "")
                             {
-                                if (oAdmin.WEReportingDBConnect != "")
-                                {
-                                    string sBasePath = this._basepath;
-                                    string sPfEConnection = convertToSQL(this._dbcnstring);
-                                    PfEReporting.PfE_ReportingDB reporting = new PfEReporting.PfE_ReportingDB();
-                                    reporting.ReportingDB_Build(sPfEConnection, oAdmin.WEReportingDBConnect, sBasePath);
-                                }
+                                string sBasePath = this._basepath;
+                                string sPfEConnection = convertToSQL(this._dbcnstring);
+                                PfEReporting.PfE_ReportingDB reporting = new PfEReporting.PfE_ReportingDB();
+                                reporting.ReportingDB_Build(sPfEConnection, oAdmin.WEReportingDBConnect, sBasePath);
                             }
-                            bHandled = true;
-                            break;
-                        case 111: // Calculate all availabilities
-                            //SecurityLevels secLevel1 = SecurityLevels.AdminCalc;
-                            //AdminFunctions pec1 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
-                            //                                         secLevel1);
-                            //bool bret1 = pec1.CalcRPAllAvailabilities();
-                            SetJobStarted();
-                            bool bret1 = AdminFunctions.CalcRPAllAvailabilities(_dba);
-                           bHandled = true;
-                            break;
-                        case 112: // Calculate Default FTEs
-                            //SecurityLevels secLevel2 = SecurityLevels.AdminCalc;
-                            //AdminFunctions pec2 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
-                            //                                         secLevel2);
-                            //bool bret2 = pec2.CalcAllDefaultFTEs();
-                            SetJobStarted();
-                            bool bret2 = AdminFunctions.CalcAllDefaultFTEs(_dba);
-                            bHandled = true;
-                            break;
-                        case 200:
-                            //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-                            //////pFeAPI.Execute("RefreshRoles", "");
-                            //////pFeAPI.Dispose();
-                            m_sComment = "Job context 200 encountered!";
+                        }
+                       
                             SetJobCompleted();
-                            break;
-                        //case 100001:
-                        //    SetJobStarted();
-                        //    m_sComment = "Job Queue Tested OK!";
-                        //    AddJobMessage("Test handling");
-                        //    bHandled = true;
-                        //    break;
-                    }
+                        break;
+                    case QueuedJobContextEnum.qjcCalcAvailability: // Calculate all availabilities
+                                                                   //SecurityLevels secLevel1 = SecurityLevels.AdminCalc;
+                                                                   //AdminFunctions pec1 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
+                                                                   //                                         secLevel1);
+                                                                   //bool bret1 = pec1.CalcRPAllAvailabilities();
+                        SetJobStarted();
+                        bool bret1 = AdminFunctions.CalcRPAllAvailabilities(_dba);
+                        SetJobCompleted();
+                        break;
+                    case QueuedJobContextEnum.qjcCalcDefaultFTEs: // Calculate Default FTEs
+                                                                  //SecurityLevels secLevel2 = SecurityLevels.AdminCalc;
+                                                                  //AdminFunctions pec2 = new AdminFunctions(_basepath, _username, _pid, _company, _dbcnstring,
+                                                                  //                                         secLevel2);
+                                                                  //bool bret2 = pec2.CalcAllDefaultFTEs();
+                        SetJobStarted();
+                        bool bret2 = AdminFunctions.CalcAllDefaultFTEs(_dba);
+                        SetJobCompleted();
+                        break;
+                    case QueuedJobContextEnum.qjcRefreshRoles:
+                        //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+                        //////pFeAPI.Execute("RefreshRoles", "");
+                        //////pFeAPI.Dispose();
+                        m_sComment = "Job context 200 encountered!";
+                        SetJobCompleted();
+                        break;
+                    case QueuedJobContextEnum.qjcCustom:
+                        SetJobStarted();
+                        CMain oEPK = new CMain();
+                        string sReply = oEPK.SoapXMLRequest(BuildCookie(), m_sContextData, "-a");
+                        CStruct xReply = new CStruct();
+                        if (xReply.LoadXML(sReply))
+                        {
+                            StatusEnum eReplyStatus = (StatusEnum)xReply.GetInt("STATUS");
+                            if (eReplyStatus != StatusEnum.rsSuccess)
+                            {
+                                string sError = xReply.GetString("Error");
+                                AddJobMessage(sError);
+                               
+                            }
+                            SetJobCompleted(eReplyStatus, sReply);
+                        }
+                        break;
+                    case QueuedJobContextEnum.qjcTest:
+                        SetJobStarted();
+                        m_sComment = "Job Queue Tested OK!";
+                        AddJobMessage("Test handling");
+                        SetJobCompleted();
+                        break;
+                    default:
+                        bHandled = false;
+                        break;
                 }
-                if (bHandled && m_guidJob != Guid.Empty)
-                {
-                    SetJobCompleted();
-                }
-
             }
             catch (Exception ex)
             {
-                _dba.HandleException("ManageQueue", (StatusEnum) 99999, ex);
+                _dba.HandleException("ManageQueue", (StatusEnum)99999, ex);
             }
             return bHandled;
         }
@@ -272,15 +313,28 @@ namespace PortfolioEngineCore
         }
         public bool SetJobCompleted()
         {
+            return SetJobCompleted(StatusEnum.rsSuccess, null);
+        }
+        public bool SetJobCompleted(StatusEnum status, string result = null)
+        {
             bool bSuccess = false;
             try
             {
                 if (m_guidJob != Guid.Empty && _dba.Open() == StatusEnum.rsSuccess)
                 {
                     string sCommand =
-                        "UPDATE EPG_JOBS SET JOB_COMPLETED = @JOB_COMPLETED, JOB_STATUS = -1" + (m_sComment == null? "":", JOB_COMMENT = @JOB_COMMENT") + " WHERE JOB_COMPLETED IS null AND JOB_GUID = @JOB_GUID";
+                        "UPDATE EPG_JOBS SET JOB_COMPLETED = @JOB_COMPLETED, JOB_STATUS = "
+                        + (status == StatusEnum.rsSuccess? "-1" 
+                        + (result == null ? "" : ", JOB_CONTEXT_RESULT = @JOB_CONTEXT_RESULT") 
+                        : "-2, JOB_ERRORCODE = " + (int)status)
+                        + (m_sComment == null? "":", JOB_COMMENT = @JOB_COMMENT") 
+                        + " WHERE JOB_COMPLETED IS null AND JOB_GUID = @JOB_GUID";
                     SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
                     oCommand.Parameters.AddWithValue("@JOB_COMPLETED", DateTime.Now);
+                    if (result != null)
+                    {
+                        oCommand.Parameters.AddWithValue("@JOB_CONTEXT_RESULT", result);
+                    }
                     if (m_sComment != null)
                     {
                         oCommand.Parameters.AddWithValue("@JOB_COMMENT", m_sComment);
@@ -295,7 +349,7 @@ namespace PortfolioEngineCore
             }
             return bSuccess;
         }
-
+        
         public bool RequeueJob()
         {
             bool bSuccess = false;
