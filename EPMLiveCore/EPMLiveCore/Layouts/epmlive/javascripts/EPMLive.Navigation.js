@@ -1816,7 +1816,7 @@
                             }
                         } else {
                             var urlParts = url.split('?');
-                            var page = (webUrl + urlParts[0].split(escape(webUrl))[1]);
+                            var page = (webUrl + urlParts[0].toLowerCase().split(escape(webUrl.toLowerCase()))[1]);
                             page = escape(page);
 
                             url = rawUrl.replace(/{page}/g, page);
