@@ -105,7 +105,7 @@
             AdHocSettings.ShowModifyButton = true;
             AdHocSettings.ShowDesignLinks = true;
 
-            AdHocSettings.CurrentUserIsAdmin = false;
+            AdHocSettings.CurrentUserIsAdmin = true;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
 
 
@@ -121,7 +121,7 @@
             if (HttpContext.Current.Session[sitecollectionid+"webid"] != null)
                 AdHocSettings.CurrentUserTenantId = HttpContext.Current.Session[sitecollectionid+"webid"].ToString();
 
-            AdHocSettings.CurrentUserIsAdmin = false;
+            AdHocSettings.CurrentUserIsAdmin = true;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
 
             if (HttpContext.Current.Session[sitecollectionid+"ConnectionString"] != null)
@@ -134,10 +134,10 @@
             if (HttpContext.Current.Session["UserName"] != null)
                 AdHocSettings.CurrentUserName = HttpContext.Current.Session["UserName"].ToString();
 
-            AdHocSettings.CurrentUserIsAdmin = false;
+            AdHocSettings.CurrentUserIsAdmin = true;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
-            AdHocSettings.ShowModifyButton = false;
-            AdHocSettings.ShowDesignLinks = false;
+            AdHocSettings.ShowModifyButton = true;
+            AdHocSettings.ShowDesignLinks = true;
 
             string pagename = System.IO.Path.GetFileName(HttpContext.Current.Request.PhysicalPath).ToLower();
             if (pagename != "default" && pagename != "timeout")
@@ -159,7 +159,7 @@
             if (HttpContext.Current.Session[sitecollectionid+"webid"] != null)
                 AdHocSettings.CurrentUserTenantId = HttpContext.Current.Session[sitecollectionid+"webid"].ToString();
 
-            AdHocSettings.CurrentUserIsAdmin = false;
+            AdHocSettings.CurrentUserIsAdmin = true;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
 
             if (HttpContext.Current.Session["UserName"] != null)
@@ -171,10 +171,10 @@
             if (HttpContext.Current.Session[sitecollectionid+"StorageConnectionString"] != null)
                 SavedReportsDriver = new Izenda.AdHoc.Database.MSSQLDriver(HttpContext.Current.Session[sitecollectionid+"StorageConnectionString"].ToString());
 
-            AdHocSettings.CurrentUserIsAdmin = false;
+            AdHocSettings.CurrentUserIsAdmin = true;
             AdHocSettings.CurrentUserIsGlobalAdministrator = false;
-            AdHocSettings.ShowModifyButton = false;
-            AdHocSettings.ShowDesignLinks = false;
+            AdHocSettings.ShowModifyButton = true;
+            AdHocSettings.ShowDesignLinks = true;
         }
     }
 
