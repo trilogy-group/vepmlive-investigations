@@ -1672,7 +1672,7 @@ function CheckedUpdates() {
 
 Grids.OnIconClick = function (grid, row, col, x, y) {
     if (grid.id.substr(0, 2) == "TS") {
-        if (x < 16) {
+//        if (x < 16) {
             if (col == "StopWatch") {
                 if (StopWatchRow) {
                     if (StopWatchRow.UID == row.UID) {
@@ -1695,7 +1695,7 @@ Grids.OnIconClick = function (grid, row, col, x, y) {
                     StartStopWatch(grid, row);
                 }
             }
-        }
+//        }
     }
 }
 
