@@ -237,20 +237,18 @@ namespace EPMLiveCore
                 int userId = 0;
 
                 SPFieldUserValue uv = new SPFieldUserValue(properties.Web, GetPropertyBeforeOrAfter(properties, "SharePointAccount"));
-                if (uv.User != null)
-                {
-                    userId = uv.LookupId;
-                    Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, uv.User.ID.ToString(), "", 0, 99, "");
-                    API.Timer.Enqueue(tJob, 0, properties.Web.Site);
-                }
-                else if (uv.LookupId == -1)
+
+                if (uv.LookupId == -1)
                 {
                     SPUser u = properties.Web.EnsureUser(uv.LookupValue);
-                    Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, u.ID.ToString(), "", 0, 99, "");
-                    API.Timer.Enqueue(tJob, 0, properties.Web.Site);
                     userId = u.ID;
-
                 }
+                else
+                {
+                    userId = uv.LookupId;
+                }
+                Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, userId.ToString(), "", 0, 99, "");
+                API.Timer.Enqueue(tJob, 0, properties.Web.Site);
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
