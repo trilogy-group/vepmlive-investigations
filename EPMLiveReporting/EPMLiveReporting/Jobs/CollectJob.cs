@@ -313,40 +313,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 #endregion Process PFE Data
 
-                #region Database checks
-
-                try
-                {
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Started Database checks for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                    CheckReqSP(epmdata.GetClientReportingConnection);
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Completed Database checks for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                }
-                catch (Exception exReqSP)
-                {
-                    var message = exReqSP.InnerException != null ? exReqSP.InnerException.Message : exReqSP.Message;
-
-                    bErrors = true;
-                    sbErrors.Append("<font color=\"red\">Error while checking SPRequirement: " + message + "</font><br>");
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job Database checks", string.Format("Error while checking SPRequirement for site: {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
-                }
-
-                try
-                {
-
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job updating schema", string.Format("Started updating schema for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                    CheckSchema(epmdata.GetClientReportingConnection);
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job updating schema", string.Format("Completed updating schema for site: {0}", site.Url), 2, 3, Convert.ToString(JobUid));
-                }
-                catch (Exception exSchema)
-                {
-                    var message = exSchema.InnerException != null ? exSchema.InnerException.Message : exSchema.Message;
-
-                    bErrors = true;
-                    sbErrors.Append("<font color=\"red\">Error while updating schema: " + message + "</font><br>");
-                    epmdata.LogStatus("", "", "Reporting Refresh Collect Job updating schema", string.Format("Error while updating schema for site: {0} error {1}", site.Url, message), 2, 3, Convert.ToString(JobUid));
-                }
-
-                #endregion
+                
 
                 #region Clean Data
 
@@ -570,22 +537,5 @@ namespace EPMLiveReportsAdmin.Jobs
         }
 
 
-        private void CheckSchema(SqlConnection cn)
-        {
-            using (var cmd = new SqlCommand(Resources.CheckSchema, cn))
-            {
-                cmd.CommandType = CommandType.Text;
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        private void CheckReqSP(SqlConnection cn)
-        {
-            using (var cmd = new SqlCommand(Resources.CheckReqSP, cn))
-            {
-                cmd.CommandType = CommandType.Text;
-                cmd.ExecuteNonQuery();
-            }
-        }
     }
 }
