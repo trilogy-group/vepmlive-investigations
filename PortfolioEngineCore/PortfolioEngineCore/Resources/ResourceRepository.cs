@@ -992,8 +992,20 @@ namespace PortfolioEngineCore
             }
 
             _sqlConnection.Open();
+            if (checkLevel == 1)
+            {
+                using (
+                    var sqlCommand = new SqlCommand(string.Format("EPG_SP_DeleteUsedResource{0}", checkLevel), _sqlConnection)
+                    )
+                {
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlCommand.Parameters.Add(new SqlParameter("@WresID", SqlDbType.Int) { Value = resource.Id });
 
-            using (
+                    sqlCommand.ExecuteNonQuery();
+
+                }
+            }
+                using (
                 var sqlCommand = new SqlCommand(string.Format("EPG_SP_ReadUsedResource{0}", checkLevel), _sqlConnection)
                 )
             {

@@ -24,6 +24,8 @@
             }
         }
     </script>
+    <asp:HiddenField ID="hidRuntime" runat="server"></asp:HiddenField>
+    <asp:HiddenField ID="hidRunPeriod" runat="server"></asp:HiddenField>
     <table width="100%">
         <wssuc:InputFormSection ID="InputFormSection1" Title="Reporting Refresh:" Description=""
                                 runat="server">
