@@ -1465,6 +1465,12 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
         {
             var position = stacked ? BarColumnLabelsPosition.Center : BarColumnLabelsPosition.OutsideEnd;
             var bar = series as BarSeries;
+
+            if (!bar.Stacked.HasValue)
+            {
+                bar.Stacked = false;
+            }
+
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
@@ -1488,6 +1494,12 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
         private void AssertColumnSeries(SeriesBase series, string format)
         {
             var column = series as ColumnSeries;
+
+            if (!column.Stacked.HasValue)
+            {
+                column.Stacked = false;
+            }
+
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(DummyString),
                 () => series.Items.Count.ShouldBe(1),
@@ -1502,6 +1514,12 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
         {
             var position = stacked ? BarColumnLabelsPosition.InsideEnd : BarColumnLabelsPosition.OutsideEnd;
             var column = series as ColumnSeries;
+
+            if (!column.Stacked.HasValue)
+            {
+                column.Stacked = false;
+            }
+
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
