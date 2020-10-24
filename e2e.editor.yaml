@@ -1,0 +1,545 @@
+
+
+    environments
+        APPS22 Staging
+            description: staging environment for APPS22
+            type: Staging
+            automated: Yes
+            provision
+                job:N/A
+                playbook:N/A
+            endpoints
+                NYISO
+                    description: NYISO
+                    type: http
+                    URL: https://apps22-stag.epmlive.com/epmliveforms/defaultcust.aspx?ReturnUrl=%2fsites%2fnyiso%2f_layouts%2f15%2fAuthenticate.aspx%3fSource%3d%252Fsites%252Fnyiso&Source=%2Fsites%2Fnyiso
+                    URLCapitalized: https://apps22-stag.epmlive.com/sites/NYISO
+                    ReportRefreshURL: https://apps22-stag.epmlive.com/sites/nyiso/_layouts/15/epmlive/allschedules.aspx
+                    Host: 10.137.18.115
+                    Port: 80
+                IATInsurance
+                    description: IATInsurance
+                    type: http
+                    URL: https://apps22-stag.epmlive.com/sites/iatinsurance
+                    Host: 10.137.18.115
+                    Port: 80
+                EPM Live Main DB
+                    description: the central DB for all customers, key feature is timesheets
+                    type: sqlserver
+                    ConnectionURL: sqlserver://EPMLIVE_STAGE.CONS.COM:1212/pepm_apps22_epmlive
+                    credentialsId: RPTDB
+                IAT Insurance PPM DB:
+                    description: IAT Insurance PPM DB, key feature is costs and portfolio jobs
+                    type: sqlserver
+                    ConnectionURL: sqlserver://EPMLIVE_STAGE.CONS.COM:1212/pepm_apps22_PPMIATInsurance
+                    credentialsId: PPMDB
+                IAT Insurance RPT DB:
+                    description: IAT Insurance PPM DB, key feature is costs and portfolio jobs
+                    type: sqlserver
+                    ConnectionURL: sqlserver://EPMLIVE_STAGE.CONS.COM:1212/pepm_apps22_RPTIATInsurance_32216
+                    credentialsId: RPTDB
+                NYISO RPT DB:
+                    description: IAT Insurance PPM DB, key feature is costs and portfolio jobs
+                    type: sqlserver
+                    ConnectionURL: sqlserver://EPMLIVE_STAGE.CONS.COM:1212/PEPM_APPS22_NYISO_RPT
+                    credentialsId: RPTDB
+                    Port: 1212
+            variables
+                Hosts file entries:
+                10.137.18.115     apps22.epmlive.com
+                10.137.18.115     reports.epmlive.com
+                10.137.18.115     apps22api.epmlive.com
+                10.137.18.115     reports-nyiso.epmlive.com
+            selectors
+
+    credentials
+        Admin
+            type: basic
+            username: Servicedesk
+            password: A123456*
+        Team Member
+            type: basic
+            username: essam78
+            password: 3LXmHu3d
+        RPTDB
+            type: basic
+            username: rptadmin
+            password: HGk34^gasd
+        PPMDB
+            type: basic
+            username: PEDBUser
+            password: DJ@#iu@72djha
+
+    variables
+        NYISO URL: https://apps22-stag.epmlive.com/sites/nyiso
+        ORICA URL: https://apps22-stag.epmlive.com/sites/oricapmo
+        CONNECTION URL: https://apps22-stag.epmlive.com/sites/connection
+        CAMEO URL: https://apps22-stag.epmlive.com/sites/cameosolutions
+        NYISO ANALYTICS URL: https://apps22-stag.epmlive.com/Sites/nyiso/_layouts/pbs2013/ModifyPropertyBag.aspx?mod=edt&scope=web&guid=f2535af5-1161-4d65-9f9e-0898aaa69fcf&web=f2535af5-1161-4d65-9f9e-0898aaa69fcf&site=d27b9d5f-186b-4c79-a5a4-045a92c4d8d3&key=epmlivemsprojectdisabledfields&IsDlg=1
+        Upgrader URL: https://apps22-stag.epmlive.com/sites/nyiso/_layouts/15/epmlive/upgrade.aspx
+        Billing URL: https://billing.epmlive.com
+        AdminDisplayName: Service Desk
+        AdminEmail: servicedesk@uplandsoftware.com
+
+    selectors
+        Login
+            selectors
+                Username: //input[@id="ctl00_PlaceHolderMain_signInControl_UserName"]
+                Password: //input[@id="ctl00_PlaceHolderMain_signInControl_password"]
+                Sign In: //input[@id="ctl00_PlaceHolderMain_signInControl_login"]
+                Left Navigation>Favorites: //span[@title="Favorites"]
+                No access message: //a[@id="mainContent"]/parent::div[contains(normalize-space(.),"You are not currently part of this account. Please contact the administrator")]
+        My Work
+            selectors
+                My Work: //span[text()="My Work"]
+                My Work>Ribbon>New Item: //span[contains(@id,"Ribbon.MyWork.New.NewItem")]/a[2]/span
+                My Work>Ribbon>New Item>Changes Item: //a[contains(@id,"Ribbon.MyWork.NewItem.Changes")]
+                My Work> Changes - New Item popup: //h1[@title="Changes - New Item"]
+                My Work Item form>Title: ["//iframe[starts-with(@id, 'DlgFrame')]", '//nobr[contains(normalize-space(descendant-or-self::node()),"Title")]/parent::span/parent::td/following-sibling::td/span/input']
+                Project drop-down: ["//iframe[starts-with(@id, 'DlgFrame')]", '//img[@id="Project_ddlShowAll"]']
+                First Project: ["//iframe[starts-with(@id, 'DlgFrame')]", '//img[@id="Project_ddlShowAll"]/parent::td/parent::tr//table//td/div[2]/div[1]']
+                People Picker first item: ["//iframe[starts-with(@id, 'DlgFrame')]", '//a[@data-sp-optionposition="0"]/div']
+                Assigned To box:  ["//iframe[starts-with(@id, 'DlgFrame')]", '//input[starts-with(@id, "AssignedTo") and @Title="Assigned To"]']
+                Popup Save button: ["//iframe[starts-with(@id, 'DlgFrame')]", '//input[@type="button" and @value="Save"]']
+                Ribbon>HIDE tab: //li[starts-with(@id,"Ribbon.Read-title")]/a/span[1]
+                My Work>Find an item box: //input[@id="MWG_Search"]
+                Filtered item grid row: //tr[contains(@class,"GMDataRow") and position()=2]//*[text()=$varItemTitle]
+        Reports
+            selectors
+                Projects>Reports: //span[text()="Projects"]/ancestor::table[1]/following::a[text()="Reports"]
+                EPM Live Analytics Link: //h2[text()="EPM Live Analytics"]
+                UPDATE RESULTS button: ["//iframe[@id='frmReport']", '//span[text()="Update Results"]']
+                Categories>Timesheets: ["//iframe[@id='frmReport']", '//li/a[text()="Timesheets" and @onclick]']
+                Report Tiles>Timesheet List: ["//iframe[@id='frmReport']", '//div[text()="Timesheet List"]']
+                Timesheet List>Matching Period Name: ["//iframe[@id='frmReport']", '//nobr[contains(normalize-space(descendant-or-self::node()),$varReportPeriod)]/input']
+                Timesheet List>Matching Resource Name: ["//iframe[@id='frmReport']", '//input[@value=$varResourceDisplayName]']
+                Timesheet List>Sick Leave Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResultHeader]/parent::tr/following-sibling::tr[@class="ReportItem" or @class="AlternatingItem"]/td[text()="Sick Leave"]/following-sibling::td[3+$varWeekDay]']
+                Timesheet List>Task Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResultHeader]/parent::tr/following-sibling::tr[@class="ReportItem" or @class="AlternatingItem"]/td[text()=$varTaskName]/following-sibling::td[3+$varWeekDay]']
+                Report Tiles>Timesheet Productivity Details: ["//iframe[@id='frmReport']", '//div[text()="Timesheet Productivity Details"]']
+                Timesheet Productivity Details>Matching Period Start: ["//iframe[@id='frmReport']", '//nobr[contains(normalize-space(descendant-or-self::node()),$varDate1)]/input']
+                Timesheet Productivity Details>Time Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[2]']
+                Report Tiles>Timesheet Report by Task: ["//iframe[@id='frmReport']", '//div[text()="Timesheet Report by Task"]']
+                Timesheet Report by Task>Project list-box: ["//iframe[@id='frmReport']", '//select[@id="ndbfc0"]']
+                Timesheet Report by Task>Task Cell: ["//iframe[@id='frmReport']", '//td[text()=$varProjectName]/following-sibling::td[text()=$varTaskName]/following-sibling::td[text()=$varResourceDisplayName]/following-sibling::td[3]']
+                Report Tiles>Timesheet Details: ["//iframe[@id='frmReport']", '//div[text()="Timesheet Details"]']
+                Timesheet Details>Start Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_1"]']
+                Timesheet Details>End Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_2"]']
+                Timesheet Details>Matching Resource Name: ["//iframe[@id='frmReport']", '//input[@value=$varResourceDisplayName]']
+                Timesheet Details>Sick Leave Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[text()="Sick Leave"]/following-sibling::td[text()=$varDate1]/following-sibling::td[2]']
+                Timesheet Details>Task Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[text()=$varTaskName]/following-sibling::td[3]']
+                Report Tiles>Timesheet Awaiting Approval: ["//iframe[@id='frmReport']", '//div[text()="Timesheet Awaiting Approval"]']
+                Timesheet Awaiting Approval>Matching Resource Name: ["//iframe[@id='frmReport']", '//input[@value=$varResourceDisplayName]']
+                Timesheet Awaiting Approval>Task Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[text()=$varReportPeriod]/following-sibling::td[1]']
+                Report Tiles>Timesheet Details with Cost Category: ["//iframe[@id='frmReport']", '//div[text()="Timesheet Details with Cost Category"]']
+                Timesheet Details with Cost Category>Start Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_1"]']
+                Timesheet Details with Cost Category>End Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_2"]']
+                Timesheet Details with Cost Category>Matching Resource Name: ["//iframe[@id='frmReport']", '//input[@value=$varResourceDisplayName]']
+                Timesheet Details with Cost Category>Sick Leave Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[text()="Sick Leave"]/following-sibling::td[text()=$varDate1]/following-sibling::td[2]']
+                Timesheet Details with Cost Category>Task Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[text()=$varTaskName]/following-sibling::td[3]']
+                Report Tiles>Timesheet Audit Trail: ["//iframe[@id='frmReport']", '//div[text()="Timesheet Audit Trail"]']
+                Timesheet Audit Trail>Matching Period Name: ["//iframe[@id='frmReport']", '//nobr[contains(normalize-space(descendant-or-self::node()),$varReportPeriod)]/input']
+                Timesheet Audit Trail>Matching Resource Name: ["//iframe[@id='frmReport']", '//input[@value=$varResourceDisplayName]']
+                Timesheet Audit Trail> Period Pending Approval row: ["//iframe[@id='frmReport']", '//tr[@class="VisualGroup"]/td[text()=$varResourceDisplayName]/parent::tr//following-sibling::tr[2]/td[text()=$varReportPeriod]/following-sibling::td[text()="Pending"]/following-sibling::td[text()="Yes"]']
+                Categories>NYISO Admin: ["//iframe[@id='frmReport']", '//li/a[text()="NYISO Admin" and @onclick]']
+                Report Tiles>ADP Export: ["//iframe[@id='frmReport']", '//div[text()="ADP Export"]']
+                ADP Export>Start Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_1"]']
+                ADP Export>End Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_2"]']
+                ADP Export>Sick Leave Cell: ["//iframe[@id='frmReport']", '//td[text()=$varResourceDisplayName]/following-sibling::td[text()=$varDate1]/preceding-sibling::td[2]']
+                Report Tiles>ECM Dump: ["//iframe[@id='frmReport']", '//div[text()="ECM Dump"]']
+                ECM Dump>Start Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_1"]']
+                ECM Dump>End Date: ["//iframe[@id='frmReport']", '//input[@id="ndbfc0_2"]']
+                ECM Dump>Sick Leave Cell: ["//iframe[@id='frmReport']", '//td[text()=$varDate1]/following-sibling::td[text()=$varResourceDisplayName]/following-sibling::td[text()="Sick Leave"]/following-sibling::td[1]']
+                ECM Dump>Task Cell: ["//iframe[@id='frmReport']", '//td[text()=$varDate3]/following-sibling::td[text()=$varResourceDisplayName]/following-sibling::td[text()=$varTaskName]/following-sibling::td[1]']
+                Categories>Project Tasks: ["//iframe[@id='frmReport']", '//li/a[text()="Project Tasks" and @onclick]']
+                Report Tiles>Project Task Priority: ["//iframe[@id='frmReport']", '//div[text()="Project Task Priority"]']
+                Project Task Priority>Matching Project Title: ["//iframe[@id='frmReport']", '//nobr[contains(normalize-space(descendant-or-self::node()),$varProjectName)]/input']
+                Project Task Priority>Chart First Bar:  ["//iframe[@id='frmReport']", "//*[local-name()='g']/*[local-name()='rect' and not (./preceding-sibling::*[local-name()='text'])][1]"]
+                Project Task Priority>Project Tasks bar with value 1: ["//iframe[@id='frmReport']", '//*[local-name()="tspan" and text()=$varProjectName and @dx="0"]/following-sibling::*[local-name()="tspan" and contains(text(),"(2) Normal")]/following-sibling::*[local-name()="tspan" and text()="1"]']
+                Report Tiles>Project Task Due: ["//iframe[@id='frmReport']", '//div[text()="Project Task Due"]']
+                Project Task Due>Matching Project Title: ["//iframe[@id='frmReport']", '//nobr[contains(normalize-space(descendant-or-self::node()),$varProjectName)]/input']
+                Project Task Due>Chart First Bar:  ["//iframe[@id='frmReport']", "//*[local-name()='g']/*[local-name()='rect' and not (./preceding-sibling::*[local-name()='text'])][1]"]
+                Project Task Due>Project Tasks bar with value 1: ["//iframe[@id='frmReport']", '//*[local-name()="tspan" and text()=$varProjectName]/following-sibling::*[local-name()="tspan" and contains(text(),"(5) Due Next Week")]/following-sibling::*[local-name()="tspan" and text()="1"]']
+                Report Tiles>Project Tasks by Assignee: ["//iframe[@id='frmReport']", '//div[text()="Project Tasks by Assignee"]']
+                Project Tasks by Assignee>Matching Project Title: ["//iframe[@id='frmReport']", '//nobr[contains(normalize-space(descendant-or-self::node()),$varProjectName)]/input']
+                Project Tasks by Assignee>Chart First Bar:  ["//iframe[@id='frmReport']", "//*[local-name()='g']/*[local-name()='rect' and not (./preceding-sibling::*[local-name()='text'])][1]"]
+                Project Tasks by Assignee>Project Tasks bar with value 1: ["//iframe[@id='frmReport']", '//*[local-name()="tspan" and text()=$varTeamMember and @dx="0"]/following-sibling::*[local-name()="tspan" and contains(text(),$varProjectName)]/following-sibling::*[local-name()="tspan" and text()="1"]']
+                Refresh Runtime: //input[contains(@id,"hidRuntime")]
+                Refresh Run Period: //input[contains(@id,"hidRunPeriod")]
+        Project List
+            selectors
+                Navigation: //span[@title="Navigation"]
+                Projects: //span[text()="Projects"]/ancestor::table[.//img[contains(@alt, 'Expand')]]|//span[@title="Navigation" and //span[text()="Projects"]/ancestor::table[.//img[contains(@alt, 'Collapse')]]]
+                Projects>Projects: //span[text()="Projects"]/ancestor::table[1]/following::a[text()="Projects"]
+                New Item: //span[text()="New Item"]
+                Project Center Search Icon: //span[@class="icon-search-3"]
+                Project Center Search Box: //input[@id="searchtext0Main"]
+                Project Center Search Button: //img[@onclick="doSearch0Main()"]
+                Project Row: //td[starts-with(text(),$varProjectName)]//parent::tr[contains(@class,"GMDataRow")]
+                Project Row Link: //a[starts-with(text(),$varProjectName)]/parent::td/parent::tr[contains(@class,"GMDataRow")]
+                Projects Grid View Drop-Down: //li[starts-with(@title,"View")]/a/span[starts-with(text(),"View")]/following-sibling::span[1]
+                All PIs in views Drop-Down: //ul[@id="ddlViewControl0Main_ul_menu"]//li/a/span[text()="All PIs"]
+                You have not been given access to this feature Message: //span[text()="You have not been given access to this feature"]
+                Ribbon> Edit Item: //a[starts-with(@id,"Ribbon.ListForm.Display.Manage.EditItem2")]
+        Project Form
+            selectors
+                Project Name: //input[@title="Project Name Required Field"]
+                Project Manager: //input[starts-with(@id, 'ProjectManagers') and @Title="Project Manager"]
+                Save Button: //input[@type="button" and @value="Save"]
+                Edit Plan: //a[starts-with(./@id, "Ribbon.ListItem.EPMLive.Planner")]
+                Edit Team: //a[starts-with(./@id, "Ribbon.ListItem.EPMLive.BuildTeam")]
+                Quick Details Section > show: //div[contains(@id, "divShowQuickDetailsHeader")]/span[text()="show"]
+                Quick Details Section > Actual Timesheet Hours Value: //td[text()="Actual Timesheet Hours"]/following-sibling::td
+                People Section> Project Manager Value: //td[text()="Project Manager"]/following-sibling::td[2]/a[text()=$varResourceDisplayName]
+        Build Team
+            selectors
+                Build Team Dialog: ["//iframe[starts-with(@id, 'DlgFrame')]", '//h1[@title="Build Team"]']
+                Right Grid Funnel Icon: ["//iframe[starts-with(@id, 'DlgFrame')]", '//div[text()="Resource Pool"]/following-sibling::div/ul/li[2]/a/span[@class="icon-filter-2"]']
+                Right Grid Title Filter Cell: ["//iframe[starts-with(@id, 'DlgFrame')]", '//div[@id="divResPool"]//td[contains(@class, "GMCellFilter") and @colspan="2" and position()=4]']
+                Edit Box: ["//iframe[starts-with(@id, 'DlgFrame')]", '//div[@class="GMEditCellInput"]/input[@type="text"]']
+                Right Grid Resource Row Check-Box: ["//iframe[starts-with(@id, 'DlgFrame')]", '//div[@id="divResPool"]//a[contains(text(), $varResourceDisplayName)]/parent::td/preceding-sibling::td[2]']
+                Add Button: ["//iframe[starts-with(@id, 'DlgFrame')]", '//input[@value="< Add"]']
+                Ribbon Save & Close: ["//iframe[starts-with(@id, 'DlgFrame')]", '//a[starts-with(./@id, "Ribbon.BuildTeam.StandardGroup.SaveCloseButton")]']
+        Project Planner
+            selectors
+                Project Planner: ["//iframe[starts-with(@id, 'DlgFrame')]", "//a[contains(@onclick, 'ProjectPlanner|Online')]"]
+                Blank Plan: ["//iframe[starts-with(@id, 'DlgFrame')]", "//a[contains(@onclick, 'ApplyTemplate')]"]
+                Add Task: //a[contains(@id, "AddTask")]/span/span
+                Grid Text-Box: //*[@id="Grid6FocusCursors"]/div[1]/div/input
+                Task Name: //*[@id="WorkPlannerGrid"]//td[contains(@class, "erroroncell") and not(contains(@class, "GSCellFilter"))][2]
+                First Team Member: //div[text()=$varTeamMember]
+                AssignmentOK: //button[contains(@class, "GSMenuButton") and text()="OK"]
+                Focused Cell: //*[@id="WorkPlannerGrid"]//td[contains(@class, "GSClassFocusedCell")]
+                Publish: //span[text()="Publish"]
+                Published: //span[starts-with(text(), "Last Published at:")]
+                Update waiting to be processed message: //span[starts-with(text(), "You have") and contains(text(), "update(s) waiting to be processed")]
+                Process Updates link: //a[text()="[Process Updates]"]
+                Process Updates popup: //h1[@title="Process Updates"]
+                Process Updates>Task Name cell: ['//iframe[contains(@src,"PlannerUpdates.aspx")]','//td[text()=$varTaskName]']
+                Timesheet Hours row>New Value cell:  //td[text()="Timesheet Hours"]/following-sibling::td[contains(@class, "HideCol1O")]/preceding-sibling::td[1]
+                Start row>New Value cell:  //td[text()="Start"]/following-sibling::td[contains(@class, "HideCol1O")]/preceding-sibling::td[1]
+                Task Details popup: //h1[@title="Task Details"]
+                Task Permissions popup: //h1[@title="Permissions"]
+                Task Row approve check-box: ['//iframe[contains(@src,"PlannerUpdates.aspx")]','//td[text()=$varTaskName]//preceding-sibling::td[2]']
+                Task Row reject check-box: ['//iframe[contains(@src,"PlannerUpdates.aspx")]','//td[text()=$varTaskName]//preceding-sibling::td[1]']
+                Process button: ['//iframe[contains(@src,"PlannerUpdates.aspx")]','//input[@value="Process"]']
+                Task Details popup Close icon: //h1[text()="Task Details"]/preceding-sibling::span//span/img[contains(@class,"ms-dlgCloseBtnImg")]
+                Planner Task cell: //td[text()=$varTaskName]/ancestor::div[@class="GSBodyLeft"]/parent::td/following::td[1]//tr[contains(@class,"GSDataRow") and count(./preceding::tr[contains(@class,"GSDataRow") and ./ancestor::div[contains(@class,"GSBodyMid")]])=count(//td[text()=$varTaskName]/ancestor::div[@class="GSBodyLeft"]//tr[contains(@class,"GSDataRow")][not(./preceding::td[text()=$varTaskName])])-1]/td[contains(@class,"GSCell") and not(contains(@class,"GSDateRight"))][position()=count(//td[text()=$varTaskCell and contains(@class,"GSNoRight")]/preceding-sibling::td[not(contains(@class,"GSHeaderButton")) and contains(@class,"GSCellHeader")]) + 1]
+                Close: //a[contains(@id, "CloseButton")]
+                Ribbon>TASKS Tab>Properties Section>Permissions: //a[contains(@id, "Ribbon.WorkPlanner.PropertiesGroup.Permissions")]/span[1]
+                Ribbon>PERMISSIONS Tab>Inheritance Section>Stop Inheritng Permissions:  ["//iframe[starts-with(@id, 'DlgFrame')]", '//a[contains(@id, "Ribbon.Permission.Manage.StopInherit")]/span[1]']
+                Ribbon>PERMISSIONS Tab>Inheritance Section>Grant Permissions:  ["//iframe[starts-with(@id, 'DlgFrame')]", '//a[contains(@id, "Ribbon.Permission.Add.AddUser")]/span[1]']
+                Share Task popup: //h1[@title=$varShareTitle]
+                PeoplePicker input box: ['//iframe[contains(@src,"aclinv.aspx")]', '//input[@id="ctl00_PlaceHolderMain_peoplePicker_TopSpan_EditorInput"]']
+                PeoplePicker share button: ['//iframe[contains(@src,"aclinv.aspx")]', '//input[@value="Share"]']
+                Ribbon>TASKS Tab>Tasks Section>Indent Right Arrow: //a[contains(@id, "Ribbon.WorkPlanner.ScheduleGroup.Indent")]
+                Expanded First Task: //td[contains(@class,"SummaryTask")]/following-sibling::td[text()=$varTaskName]
+                Ribbon>TASKS Tab>Properties Section>Details: //a[contains(@id, "Ribbon.WorkPlanner.PropertiesGroup.Details")]/span[1]
+                Details Section> Status row drop-down: //tr[contains(@onmousemove,'Grids[1].Rows["Status"]')]/td[text()="Status"]/following-sibling::td[1]
+                Completed task status: //div[text()=" Completed"]
+                Ribbon>TASKS Tab>Manage Section>Summary: //a[contains(@id, "Ribbon.WorkPlanner.InsertGroup.NewSummary")]/span[1]
+        Resource Form:
+            selectors
+                Invite Button: //span[text()="Invite"]
+                Firstname Box: //input[starts-with(@id, "FirstName_")]
+                Lastname Box: //input[starts-with(@id, "LastName_")]
+                Display Name Box: //input[starts-with(@id, "Title_")]
+                Email Box: //input[starts-with(@id, "Email_")]
+                Department Drop-Down: //img[@id="Department_ddlShowAll"]
+                First Department: //img[@id="Department_ddlShowAll"]/parent::td/parent::tr//table//td/div[2]/div[1]
+                Role Drop-Down: //img[@id="Role_ddlShowAll"]
+                First Role: //img[@id="Role_ddlShowAll"]/parent::td/parent::tr//table//td/div[2]/div[1]
+                Holiday Schedule Drop-Down: //img[@id="HolidaySchedule_ddlShowAll"]
+                First Holiday Schedule: //img[@id="HolidaySchedule_ddlShowAll"]/parent::td/parent::tr//table//td/div[2]/div[1]
+                Work Hours Drop-Down: //img[@id="WorkHours_ddlShowAll"]
+                First Work Hours: //img[@id="WorkHours_ddlShowAll"]/parent::td/parent::tr//table//td/div[2]/div[1]
+                Timesheet Manager Box: //input[starts-with(@id, 'TimesheetManager') and @Title="Timesheet Manager"]
+                Timesheet Delegates Box: //input[starts-with(@id, 'TimesheetDelegates') and @Title="Timesheet Delegates"]
+                Permissions Section Head: //span[text()="Permissions"]
+                Team Members: //label[normalize-space(descendant-or-self::node())="Team Members"]/preceding::input[1]
+                Project Managers: //label[normalize-space(descendant-or-self::node())="Project Managers"]/preceding::input[1]
+                Resource Managers: //label[normalize-space(descendant-or-self::node())="Resource Managers"]/preceding::input[1]
+                Administrators: //label[normalize-space(descendant-or-self::node())="Resource Managers"]/preceding::input[1]
+                License Type > Team Member: //label[normalize-space(descendant-or-self::node())="Team Member"]/preceding::input[1]
+                License Type > Full User: //label[normalize-space(descendant-or-self::node())="Full User"]/preceding::input[1]
+                License Type > No Access: //label[normalize-space(descendant-or-self::node())="No Access"]/preceding::input[1]
+                Temp Email Box: //a[contains(@class, "email-link")]
+                Close Ad: //a[@id="at-cv-lightbox-close"]
+                EPM Live Account Information Email: //span[text()="Your timesheet entry was rejected"]
+                Your timesheet entry was rejected Email: //span[text()="Your timesheet entry was rejected"]
+                Message Text: ["//iframe", '//h3[text()="Welcome to EPM Live!"]/parent::div[1]']
+                FakeMail Message Text: ["//iframe[@id='iframeMail']", '//h3[text()="Welcome to EPM Live!"]/parent::div[1]']
+                FakeMail Temp Email Box: //span[@id="email"]
+                FakeMail EPM Live Account Information Email: //td[text()="EPM Live Account Information"]
+                FakeMail Your timesheet entry was rejected Email: //td[text()="Your timesheet entry was rejected"]
+                FakeMail Back Icon: //span[contains(@class,"glyphicon-share")]
+                Ribbon>Actions>Favorite: //a[contains(@id, "Ribbon.ListItem.EPMLive.FavoriteStatus")]/span[1]
+                Popup>Ok: //div[contains(@class,"ms-dlgContent")]//input[@value="OK" and contains(@onclick,"getAddFavItemFromGridDynamicValue")]
+                Resource Name in Favorites: //ul[@id="epm-nav-sub-favorites-static-links"]//span[text()=$varResourceDisplayName]
+                Resource Form Close: //td[@class="ms-toolbar"][2]//input[@value="Close"]
+                Second Department: //img[@id="Department_ddlShowAll"]/parent::td/parent::tr//table//td/div[2]/div[2]
+                View Form Last Name: //span[text()="Last Name"]/parent::td/following-sibling::td
+                View Form Department: //span[text()="Department"]/parent::td/following-sibling::td/a
+                Edit Form Department: //img[@id="Department_ddlShowAll"]/parent::td/parent::tr/td/table/tbody/tr/td/div/span/span
+                Another resource with the same email address message: "//span[text()='Error (11008): Validation Errors: Another resource with the same email address already exists.']"
+                Generic Check-Box: //input[starts-with(@id,"Generic")]
+        Resource List
+            selectors
+
+                Projects>Resources: //span[text()="Projects"]/ancestor::table[1]/following::a[text()="Resources"][1]
+                Search: //a[@id="toolbar-search-icon"]
+                Search Text: //input[@id="toolBarResGridSelector"]
+                Filter Result: //a[text()=$varResourceDisplayName and @class="ui-corner-all"]
+                Resource Row: //td[text()=$varResourceDisplayName]/parent::*
+                Context Menu: //td/div/span[@class="epm-menu-btn"]/span
+                View Item: //a[text()="View Item"]
+                Edit Item: //a[text()="Edit Item"]
+                Delete Item: //a[text()="Delete Item"]
+                Resource Role: //a[@name="SPBookmark_Role"]//parent::*/parent::*/following::td[1]/child::a[1]
+        Reporting Settings
+            selectors
+                Settings: //span[@id="epm-nav-top-settings"]
+                Settings icon: //span[@id="epm-nav-top-settings"]
+                Enterprise Reporting: //span[text()="Enterprise Reporting"]/parent::div[1]/span[@class="epm-nav-node-collapsed"]|//span[@title="Settings" and //span[text()="Enterprise Reporting"]/parent::div[1]/span[@class="epm-nav-node-expanded"]]
+                Reporting Settings: //span[text()="Reporting Settings"]
+                Reporting>Settings: //a[@id="SettingsMenu"]
+                Refresh Schedule: //span[text()="Refresh Schedule"]/parent::div/parent::a
+                Run Now: //input[@value="Run Now"]
+                Enabled Run Now: //input[@value="Run Now"][not(@disabled)]
+                Last Result value: //span[@id="ctl00_PlaceHolderMain_InputFormSection1_InputFormControl3_lblMessages"]
+        Cost Management
+            selectors
+                Cost Management: //span[text()="Cost Management"]/parent::div[1]/span[@class="epm-nav-node-collapsed"]|//span[@title="Settings" and //span[text()="Cost Management"]/parent::div[1]/span[@class="epm-nav-node-expanded"]]
+                Cost Management>Cost Categories: //ul[starts-with(@id,"epm-nav-sub-settings-cost-management-links")]/child::li[2]/child::a[1]
+                Categories Resource Role: //td[text()=$varRoleLevel1]/parent::tr/following::tr/td[text()=$varRoleLevel2]/parent::tr/following::tr/td[text()=$varRoleLevel3]
+                Cost Management>Rates: //span[text()="Rates"]
+                Rates: //div[@id="btnRates"]
+                Rates>Add: //div[@id="idToolbarRatesDiv_0"]
+                Rates Last Row Effective Date: //table[contains(@id, "gridRates")]/tbody/tr[last()]/preceding::tr[4]/td[2]
+                Rates Last Row Value: //table[contains(@id, "gridRates")]/tbody/tr[last()]/preceding::tr[4]/td[4]
+                Rate With Effective Date: //table[contains(@id, "gridRates")]/tbody//tr/td[text()=$varMonth1st]|//input[@id="txtBaseRate"]
+                Rates Input: //div[@iswin="1"]//div[@class="GMEditCellInput"]/input[@type="text"]
+                Base Rate Input: //input[@id="txtBaseRate"]
+                Rates Delete: //span[text()="Delete"]
+                Rates OK: //input[@value="OK" and @id="Button1"]
+                Rates Dialog: //div[@iswin="1"]
+                Resource Named Rate: //tr[starts-with(@onmousemove, "Grids[1]")]/td[contains(text(),$varResourceDisplayName)]
+                New Named Rate: //tr[starts-with(@onmousemove, "Grids[1]")]/td[contains(text(),"New Rate")]
+                Named Rate Input: //div[@class="GMEditCellInput"]/input[@type="text"]
+                Named Rate Delete: //div[@id="btnDelete"]/span[text()="DELETE"]
+                Named Rates Add: //div[@id="btnAdd"]/span[text()="ADD"]/parent::div
+                Named Rates Resources: //span[text()="RESOURCES"]
+                Resource Option: 
+                    type: listbox
+                    open: //select[@name='FrmFieldsOut']
+                    value: //option[text()=$varResourceDisplayName]
+                Rates Save: //span[text()="SAVE"]
+                Move Right: //input[@value="> "]
+                Named Rates OK: //input[@id="Button2" and @value="OK"]
+        Utilities
+            selectors
+                Utilities: //span[text()="Utilities"]/parent::div[1]/span[@class="epm-nav-node-collapsed"]|//span[@title="Settings" and //span[text()="Utilities"]/parent::div[1]/span[@class="epm-nav-node-expanded"]]
+                Utilities> Portfolio Queue: //ul[starts-with(@id,"epm-nav-sub-settings-utilities")]/child::li[2]/child::a[1]
+                Toolbar> CHECK: //span[text()="CHECK"]
+                Utilities> Recycle Bin: //ul[starts-with(@id,"epm-nav-sub-settings-utilities")]/child::li[3]/child::a[1]
+                Deleted Resource email: //td[contains(text(),$varResourceEmail)]/preceding-sibling::td[2]/input[@type="checkbox"]
+        Timesheet
+            selectors
+                Resource Submitted Work value: //tr//child::span[text()=$varResourceName]//ancestor::tr[1]/td[9]
+                Task Submitted Work value: //tr//child::span[text()=$varResourceName]//ancestor::tr[1]/following-sibling::tr[1]/td[9]
+                Submitted Task name: //tr//child::span[text()="AutResource drhyh"]//ancestor::tr[1]/following-sibling::tr[1]/td[3]
+                Task Form popup: //h1[starts-with(@title,"Task Center") and contains(@title,$varTaskName)]
+                Task Form>Ribbon>Edit Item: "//iframe[starts-with(@id, 'DlgFrame')]", '//a[starts-with(@id,"Ribbon.ListForm.Display.Manage.EditItem")]/span[2]']
+                Work box: ["//iframe[starts-with(@id, 'DlgFrame')]", '//nobr[contains(normalize-space(descendant-or-self::node()),"Work")]/parent::span/parent::td/following-sibling::td/span/input']
+                Task Form>Ribbon>Save: //a[starts-with(@id,"Ribbon.ListForm.Edit.Commit.Publish")]/span[2]
+                Task Form>Close button: //table[@class="ms-formtoolbar" and contains(@id,"toolBarTbltop")]//input[@value="Close"]
+
+
+                Current Period drop-down: //div[contains(text(),"Current Period:")]/following-sibling::div/select
+                Current Period option: //option[@value=$varSelectedValue]
+                My Workplace: //span[@id="epm-nav-top-workplace"]
+                My Timesheet: //span[text()="My Timesheet"]
+                Created Task Row Check-Box:  ["//iframe[starts-with(@id, 'DlgFrame')]", "//td[text()=$varProjectName]/parent::tr/following::tr/td[text()=$varTaskName]/preceding::td[2]"]
+                Created Task Row: //td[text()=$varProjectName]/parent::tr/following-sibling::tr[1]//td[text()=$varTaskName]
+                Current Period: //select[@class="form-control"]
+                My Timesheet>Add Work: //a[contains(@id, "MyTimesheet.WorkGroup.AddWork")]/span[1]
+                My Timesheet>Other Timesheets: //a[contains(@id, "Ribbon.Timesheet.Delegate.Other")]/span[1]
+                Resource item in Other Timesheets drop-down: //a[contains(@id, "Ribbon.MyTimesheet.ChangeDelegate-Menu")]/span[text()=$varResourceDisplayName]
+                My Timesheet Work>Add Work:  ["//iframe[starts-with(@id, 'DlgFrame')]", "//a[contains(@id, 'MyTimesheetWork.ActionsGroup.AddWork')]/span[1]"]
+                My Timesheet Work>Search:  ["//iframe[starts-with(@id, 'DlgFrame')]", "//a[contains(@id, 'Ribbon.MyTimesheetWork.ActionsGroup.Search')]/span[1]"]
+                My Timesheet Work>Search Box: ["//iframe[starts-with(@id, 'DlgFrame')]", '//input[@id="txtSearch"]']
+                My Timesheet Work>Search Button: ["//iframe[starts-with(@id, 'DlgFrame')]", '//input[@value="Search"]']
+                Timesheet Task Cell: (//div[@class="GMBodyRight"]/div/table/tbody/tr[starts-with(@onmousemove, "Grids[0]")])[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/preceding-sibling::tr[starts-with(@onmousemove,"Grids[0]")])+1]//following::tr[1]//tr[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/following::tr[1]//tr/td[text()=$varTaskName]/parent::tr/preceding-sibling::tr) + 1]/td[count(//td[contains(@class,"GMWrap0 GMHeaderText GMCellHeader HideCol0P")][1]/preceding-sibling::td)+$varWeekDay]
+                Timesheet Today Task Cell: (//div[@class="GMBodyRight"]/div/table/tbody/tr[starts-with(@onmousemove, "Grids[0]")])[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/preceding-sibling::tr[starts-with(@onmousemove,"Grids[0]")])+1]//following::tr[1]//tr[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/following::tr[1]//tr/td[text()=$varTaskName]/parent::tr/preceding-sibling::tr) + 1]/td[position()=count(//td[normalize-space(.)=$varToday]/preceding-sibling::td) + 1]
+                Sick Leave Task cell: (//div[@class="GMBodyRight"]/div/table/tbody/tr[starts-with(@onmousemove, "Grids[0]")])[position()=count(//td[text()="Time Off"]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/preceding-sibling::tr[starts-with(@onmousemove,"Grids[0]")])+1]//following::tr[1]//tr[position()=count(//td[text()="Time Off"]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/following::tr[1]//tr/td[text()="Sick Leave"]/parent::tr/preceding-sibling::tr) + 1]/td[count(//td[contains(@class,"GMWrap0 GMHeaderText GMCellHeader HideCol0P")][1]/preceding-sibling::td)+$varWeekDay]
+                OK: //input[@class="tsOK" and @value="OK"]
+                Save: //a[not(@aria-disabled="true")]//span[text()="Save"]
+                Save Status: //span[@class="ms-bold ms-status-title" and text()="Save Status:"]
+                Timesheet Task Row: //td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/following::tr[1]//tr/td[text()=$varTaskName]
+                My Timesheet>Remove Item: //a[contains(@id, "MyTimesheet.WorkGroup.RemoveWork")]/span[1]
+                My Timesheet>Submit: //a[contains(@id, "Ribbon.MyTimesheet.ActionsGroup.Submit") and not(@aria-disabled="true")]/span[1]
+                My Timesheet>Un-Submit: //a[contains(@id, "Ribbon.MyTimesheet.ActionsGroup.Unsubmit") and not(@aria-disabled="true")]/span[1]
+                My Timesheet>Timesheet Manager: //a[contains(@id, "Ribbon.MyTimesheet.Approvals.TM") and not(@aria-disabled="true")]/span[1]
+                My Timesheet>Project Manager: //a[contains(@id, "Ribbon.MyTimesheet.Approvals.PM") and not(@aria-disabled="true")]/span[1]
+                Resource row check-box: //td[text()=$varResourceDisplayName]/preceding-sibling::td[5]
+                Resource row expand: //span[text()=$varResourceDisplayName]/preceding-sibling::img[2]
+                Task row check-box: //tr//child::span[text()=$varResourceDisplayName]/following::tr//a[text()=$varTaskName]/preceding::td[2]/img
+                Ribbon>Approve: //span[text()="Approve"]
+                Ribbon>Reject: //span[text()="Reject"]
+                Ribbon>Unlock: //span[text()="Unlock"]
+                Timesheets Ribbon TIMESHEETS tab: //li[starts-with(@id,"Ribbon.TimesheetPMApprovals")]//span[text()="Timesheets"]
+                Ribbon>Approve Lock: //a[contains(@id, "Ribbon.Timesheet.Approvals.Approve")]
+                Approved tick mark to the left of the resource name: //td[text()=$varResourceDisplayName]/preceding-sibling::td[3]/span[@class="icon-checkmark-circle-2"]
+                Rejected x mark to the left of the resource name: //td[text()=$varResourceDisplayName]/preceding-sibling::td[3]/span[@class="icon-cancel-circle-2"]
+                Approved tick mark to the left of the task name: //tr//child::span[text()=$varResourceDisplayName]/following::tr//a[text()=$varTaskName]/preceding::td[1]/img[contains(@src,"green.gif")]
+                Timesheet stop watch cell of the created task: (//div[@class="GMBodyRight"]/div/table/tbody/tr[starts-with(@onmousemove, "Grids[0]")])[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/preceding-sibling::tr[starts-with(@onmousemove,"Grids[0]")])+1]//following::tr[1]//tr[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/following::tr[1]//tr/td[text()=$varTaskName]/parent::tr/preceding-sibling::tr) + 1]/td[contains(@style,"tstimeroff.png")]
+                Timesheet blue stop watch cell of the created task: (//div[@class="GMBodyRight"]/div/table/tbody/tr[starts-with(@onmousemove, "Grids[0]")])[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/preceding-sibling::tr[starts-with(@onmousemove,"Grids[0]")])+1]//following::tr[1]//tr[position()=count(//td[text()=$varProjectName]/preceding-sibling::td[contains(@class, "GMNC")]/parent::tr/following::tr[1]//tr/td[text()=$varTaskName]/parent::tr/preceding-sibling::tr) + 1]/td[contains(@style,"tstimeron.png") and text()=$varWaitTime]
+                Timesheet Ribbon VIEWS tab: //li[starts-with(@id,"Ribbon.MyTimesheetViewsTab")]/a/span[text()="Views"]
+                Timesheet Ribbon View Section>Show Filters: //a[starts-with(@id,"Ribbon.MyTimesheetViews.ShowHideFilters")]/span[text()="Show Filters"]
+                Timesheet Grid filter row: //div[contains(@class, "GMHeadLeft")]//tr[contains(@class,"GMFilterRow")]
+                Timesheet Grid filter row first cell: //div[contains(@class, "GMHeadLeft")]//tr[contains(@class,"GMFilterRow")]/td[3]
+                Timesheet Grid filter input box: //div[@class="GMEditCellInput"]/input[@type="text"]
+                Timesheet Ribbon Selected View Drop-Down: //span[starts-with(@id,"Ribbon.MyTimesheetViews.CurrentViewDropDown")]/span/a
+                Timesheet Views Drop-Down>Ungrouped: //a[starts-with(@id,"Ribbon.MyTimesheet.ChangeView-Menu")]/span[text()="Ungrouped"]
+                Timesheet Ribbon View Section>Show Grouping: //a[starts-with(@id,"Ribbon.MyTimesheetViews.ShowHideGrouping")]/span[text()="Show Grouping"]
+                Timesheet Grid grouping cell: //td[contains(@class,"GMHeaderGroupCustom")]
+                Timesheet Grid Project Column Header: //td[contains(@class, "GMCellHeader") and text()="Project"]
+                Confirm Hours popup: //h1[@title="Confirm Hours"]
+                Confirm Hours popup Yes button: //div[@class="ms-dlgFrameContainer"]//input[@value="Yes"]
+                My Timesheet>Add Non-Work: //a[contains(@id, "MyTimesheet.WorkGroup.AddNonWork")]/span[1]
+                Sick Leave Task Row Check-Box:  ["//iframe[starts-with(@id, 'DlgFrame')]", "//td[text()='Sick Leave']/preceding::td[2]"]
+                Sick Leave Task Row: //td[text()="Time Off"]/parent::tr/following::tr/td[text()="Sick Leave"]
+                Next period right arrow: //span[contains(@onclick,"nextPeriodCommand")]
+                Created Task Completed cell: //td[text()=$varProjectName]/parent::tr/following-sibling::tr[1]//td[text()=$varTaskName]/following-sibling::td[contains(@class,"PercentComplete")]
+                Ribbon>Show All Work: ["//iframe[@class='ms-dlgFrame']",'//a[starts-with(@id,"Ribbon.MyTimesheetWorkViews.AllWork")]']
+                Notes text-area: //textarea[@id="txtTNotes"]
+        Timesheet Settings:
+            selectors
+                Timesheet Settings: //span[text()="Timesheet Settings"]/parent::div[1]/span[@class="epm-nav-node-collapsed"]/following-sibling::span[1]|//span[@title="Settings" and //span[text()="Timesheet Settings"]/parent::div[1]/span[@class="epm-nav-node-expanded"]]
+                Timesheet Settings>Timesheet Settings: //a/span[text()="Timesheet Settings"]
+                Allow Stop Watch Check-Box: //input[contains(@id,"chkAllowStopWatch")]
+                Disable Approvals Check-Box:  //input[contains(@id,"chkDisableApprovals")]
+                Timesheet Settings>Save Settings Button: //input[@value="Save Settings"]
+                Allow Unassigned Work in Timesheet: //h3[contains(text(),"Allow Unassigned Work in Timesheet")]/parent::td/parent::tr/parent::tbody/parent::table/parent::td/following-sibling::td[1]//input[@type="checkbox"]
+                Allow Notes: //input[contains(@id,"chkAllowNotes")]
+                Show Live Timesheets Hours: //input[contains(@id,"chkShowLiveHours")]
+                Add Type link: //a[text()="Add Type"]
+                Work Type Name box: //div[@id="mbd"]//input[@id="txtAddType"]
+                Add Work Type button: //div[@id="mbd"]//input[@value="Add Work Type"]
+                New Work Type row: //td[text()=$varWorkType]
+                New Work Type box: //td[starts-with(text(),$varWorkType)]/following-sibling::td/input
+                Timesheet Value Cancel button: //input[@value="Cancel" and @class="tsOK"]
+                New Work Type Delete link: //td[text()=$varWorkType]/following-sibling::td/a[contains(text(),"Delete")]
+        Primary
+            selectors
+                Username at top-right: '//div[@id="welcomeMenuBox"]//a[contains(@class, "ms-core-menu-root")]'
+                Sign Out: '//div[@id="zz3_ID_Logout"][span[text()="Sign Out"]]'
+                Resources: //a[text()="Resources"]
+                Project Type: //select[@title="Project Type Required Field"]
+                Work Category: //select[@title="Work Category Required Field"]
+                Profit Center/Business Segment: //select[@title="Profit Center/Business Segment Required Field"]
+                Portfolio: //span[@innerText="Type here to search..."]
+                Resource Edit Modal: //div[@role="dialog"]
+                Cancel: //a[@id="Ribbon.ListForm.Edit.Commit.Cancel-Large"]
+                Resources with this rate: //select[@id="idResourcesIn"]
+                Modify: //span[text()="MODIFY"]
+                Base Rate: //input[@id="txtBaseRate"]
+                Sharepoint Site Settings: //a[@innerHTML="<span>SharePoint Site settings</span>"]
+                Property Bag Settings: //a[@innerText="Property Bag Settings"]
+
+                Sharepoint Site Settings link: //a[.='SharePoint Site settings']
+
+                Property Bag Settings link: //a[.='Property Bag Settings']
+                Edit epktslasttsapprove Property: //a[@innerHTML="<img src="/_layouts/images/EDITITEM.GIF" border="0" alt="Edit epktslasttsapprove Property">"]
+                Edit epktslasttsapprove Property icon: //a/img[@alt='Edit epktslasttsapprove Property']
+                property Value: //input[@id="ctl00_PlaceHolderMain_txtValue"]
+                Value field in Property Bag Settings: ["//iframe[@class='ms-dlgFrame']","//input[contains(@id,'PlaceHolderMain_txtValue')]"]
+                property Save: //a[@title="Save"]
+                Save button in Property Bag Settings: ["//iframe[@class='ms-dlgFrame']","(//a[.='Save'])[1]"]
+                Close button in Property Bag Settings: ["//iframe[@class='ms-dlgFrame']","(//a[.='Close'])[1]"]
+                Utilities link: //div[@id='epm-nav-sub-settings-utilities']/span[@class='epm-nav-cat-title']
+                <logged in user Role>: //td[@innerHTML="Business Analyst General"]
+                Cost Categories: //span[text()="Cost Categories"]
+                Effective Date: //td[@class=" GMClassEdit GMAlignLeft GMDate GMCell GMNoRight HideCol1BC_EFFECTIVE_DATE"]
+                Rate: //td[@class=" GMClassEdit GMAlignLeft GMFloat GMCell HideCol1BC_RATE"]
+                Delete: //div[@title="Delete"]
+                Timesheet Costs link: //a[.='Timesheet Costs']
+                Run Sync Now button: //input[contains(@id,'PlaceHolderMain_btnRunNow')]
+                The property was modified: ["//iframe[@class='ms-dlgFrame']","//span[contains(.,'The property was modified')]"]
+                Modify Property Modal: //div[@role="dialog"]
+                property Close: //a[@title="Close"]
+                Timesheet Costs: //a[@innerHTML="<span style="">Timesheet Costs</span>"]
+                Run Synch Now: //input[@value="Run Synch Now"]
+                10082 Task 1: //tr[@onmousemove="Grids[0].ARow=Grids[0].Rows["AR6"];Grids[0].ASec=0;"]
+                Add: //a[@id="Ribbon.MyTimesheetWork.ActionsGroup.AddWork-Large"]
+                Tasks list: //table[@id="TS0Main"]
+                the first task entry: //td[@class=" GMClassEdit GMWrap0 GMAlignRight GMText GMCell HideCol0P637447104000000000"]
+                time: //input[@id="T1TypeValue"]
+                10082 Task 1 task: //td[@innerHTML="10082 Task 1"]
+                Remove Item: //a[@id="Ribbon.MyTimesheet.WorkGroup.RemoveWork-Large"]
+                any user from the Users opted out of notifications list-box: //select[@id='ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_lstNotificationOptedOutUsers']
+
+                the Users opted out of notifications list-box: //select[@id='ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_lstNotificationOptedOutUsers']
+                the same user we chose on step 3 from the Users receiving notifications list-box: //select[@id='ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_lstNotificationOptInUsers']
+
+                the Users receiving notifications list-box: //select[@id='ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_lstNotificationOptInUsers']
+                engqa1 user in notifications opt-out list-box (for SKYVERA-13895): '//select[@id="ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_lstNotificationOptedOutUsers"]/option[contains(text(),"engqa1")]'
+                engqa1 user in notifications opt-in list-box (for SKYVERA-13895): '//select[@id="ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_lstNotificationOptInUsers"]/option[contains(text(),"engqa1")]'
+
+                < Remove: //input[@value='< Remove']
+
+                Add >: //input[@value='Add >']
+
+                Run time section: //tr[@id='ctl00_PlaceHolderMain_InputFormSection1']
+
+                Cancel button in Notification Settings: '//input[@id="ctl00_PlaceHolderMain_ButtonSection1_BtnCancel"]'
+
+                Save Notifications: //input[@value='Save Notifications']
+
+                Collaboration Settings: '//div[@id="epm-nav-sub-settings-collaboration-settings"]/span[text()="Collaboration Settings"]'
+
+                Notification Settings: '//ul[@id="epm-nav-sub-settings-collaboration-settings-links"]//a[span[text()="Notification Settings"]]'
+                Notification Settings Panel: '//div[@id="ctl00_PlaceHolderMain_pnlMain"][//h3[text()="General Settings"]]'
+
+                Run Notifications Now: //input[@value='Run Notifications Now']
+                Refresh page browser button: //browser refresh button
+                the URL: //browser current tab url
+                Project Start: //input[@title="Project Start"]
+                Start: //td[@class="GSClassEdit GSDate GSCell GSNoRight HideCol6StartDate"]
+                OK for Change Project Date Popup: // popup confirmation button
+                Move Project to Date: //div[@id="DeltaPlaceHolderMain"]
+                OK for Move Project: //input[@value="OK"]
+                Submit: //a[@id="Ribbon.MyTimesheet.ActionsGroup.Submit-Large"]
+                You have 1 timesheet(s) pending for approval [Timesheet Manager]: //div[@id="pageStatusBar"]
+                Timesheet Manager: //span[@innerText="Timesheet Manager"]
+                Approve: //li[@title="Approve"]
+                Reports: //a[@title="Reports"]
+                Classic Reporting: //a[@id="classic"]
+                Expand for Reporting Services Reports: //img[@title="Reporting Services Reports"]
+                Expand for _IAT Standard Reports: //img[@title=" _IAT Standard Reports"]
+                IAT portfolio budget to forecast: //a[@title=" IAT portfolio budget to forecast"]
+                Report Year: //select[@id="m_sqlRsWebPart_ctl00_ctl19_ctl06_ctl03_ddValue"]
+                State: //input[@id="m_sqlRsWebPart_ctl00_ctl19_ctl06_ctl11_txtValue"]
+                Apply: //input[@value="Apply"]
+                Report Result: //div[@class="ms-WPBody"]
+
+                Report X Close Dialog: //a[@title="Close dialog"]
+
+                Unlock: //span[@innerText="Unlock"]
+
+                Un-Submit: //a[@id="Ribbon.MyTimesheet.ActionsGroup.Unsubmit-Large"]
+                Saving Plan loading panel: //div[id="mbox"]
+                Home Page: //div[@id='siteIcon']
+                Home Page header: //span[@id='DeltaPlaceHolderPageTitleInTitleArea']//a[.='Home']
+                Property Bag Settings header: //span[@id='DeltaPlaceHolderPageTitleInTitleArea'][contains(.,'Property Bag Settings')]
+                Timer Status header: //span[@id='DeltaPlaceHolderPageTitleInTitleArea'][contains(.,'Timer Status')]
+        MS Project
+            selectors
+                Blank Project
+                File
+                Save As
+                Sync with SharePoint
+                MS Project
+                Sync with
+                Site Address
+                Verify Site
+

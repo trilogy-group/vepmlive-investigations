@@ -193,10 +193,10 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
                 () => _testObject.Controls.Count.ShouldBe(2),
                 () => chart.ShouldNotBeNull(),
                 () => chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringPercentage),
-                () => chart.PlotArea.XAxis.MajorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeTrue());
+                () => chart.PlotArea.XAxis.MajorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.XAxis.MinorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.YAxis.MajorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.YAxis.MinorGridLines.Visible.Value.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -218,10 +218,10 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
                 () => _testObject.Controls.Count.ShouldBe(2),
                 () => chart.ShouldNotBeNull(),
                 () => chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringCurrency),
-                () => chart.PlotArea.XAxis.MajorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeTrue());
+                () => chart.PlotArea.XAxis.MajorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.XAxis.MinorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.YAxis.MajorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.YAxis.MinorGridLines.Visible.Value.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -242,10 +242,10 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
                 () => _testObject.Controls.Count.ShouldBe(2),
                 () => chart.ShouldNotBeNull(),
                 () => chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringNone),
-                () => chart.PlotArea.XAxis.MajorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeTrue(),
-                () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeTrue());
+                () => chart.PlotArea.XAxis.MajorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.XAxis.MinorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.YAxis.MajorGridLines.Visible.Value.ShouldBeTrue(),
+                () => chart.PlotArea.YAxis.MinorGridLines.Visible.Value.ShouldBeTrue());
         }
 
         [TestMethod]
@@ -266,10 +266,10 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
                 () => _testObject.Controls.Count.ShouldBe(2),
                 () => chart.ShouldNotBeNull(),
                 () => chart.PlotArea.YAxis.LabelsAppearance.DataFormatString.ShouldBe(FormatStringNone),
-                () => chart.PlotArea.XAxis.MajorGridLines.Visible.ShouldBeFalse(),
-                () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeFalse(),
-                () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeFalse(),
-                () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeFalse());
+                () => chart.PlotArea.XAxis.MajorGridLines.Visible.Value.ShouldBeFalse(),
+                () => chart.PlotArea.XAxis.MinorGridLines.Visible.Value.ShouldBeFalse(),
+                () => chart.PlotArea.YAxis.MajorGridLines.Visible.Value.ShouldBeFalse(),
+                () => chart.PlotArea.YAxis.MinorGridLines.Visible.Value.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -873,10 +873,10 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
             this.ShouldSatisfyAllConditions(
                 () => chart.PlotArea.Series.Count.ShouldBe(1),
                 () => AssertDonutSeries(chart.PlotArea.Series[0], FormatStringCurrency),
-                () => chart.PlotArea.XAxis.MajorGridLines.Visible.ShouldBeFalse(),
-                () => chart.PlotArea.XAxis.MinorGridLines.Visible.ShouldBeFalse(),
-                () => chart.PlotArea.YAxis.MajorGridLines.Visible.ShouldBeFalse(),
-                () => chart.PlotArea.YAxis.MinorGridLines.Visible.ShouldBeFalse());
+                () => chart.PlotArea.XAxis.MajorGridLines.Visible.Value.ShouldBeFalse(),
+                () => chart.PlotArea.XAxis.MinorGridLines.Visible.Value.ShouldBeFalse(),
+                () => chart.PlotArea.YAxis.MajorGridLines.Visible.Value.ShouldBeFalse(),
+                () => chart.PlotArea.YAxis.MinorGridLines.Visible.Value.ShouldBeFalse());
         }
 
         [TestMethod]
@@ -1465,6 +1465,12 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
         {
             var position = stacked ? BarColumnLabelsPosition.Center : BarColumnLabelsPosition.OutsideEnd;
             var bar = series as BarSeries;
+
+            if (!bar.Stacked.HasValue)
+            {
+                bar.Stacked = false;
+            }
+
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
@@ -1488,13 +1494,19 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
         private void AssertColumnSeries(SeriesBase series, string format)
         {
             var column = series as ColumnSeries;
+
+            if (!column.Stacked.HasValue)
+            {
+                column.Stacked = false;
+            }
+
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(DummyString),
                 () => series.Items.Count.ShouldBe(1),
                 () => column.ShouldNotBeNull(),
                 () => column.LabelsAppearance.DataFormatString.ShouldBe(format),
                 () => column.TooltipsAppearance.DataFormatString.ShouldBe(format),
-                () => column.Stacked.ShouldBeFalse(),
+                () => column.Stacked.Value.ShouldBeFalse(),
                 () => column.LabelsAppearance.Position.ShouldBe(BarColumnLabelsPosition.OutsideEnd));
         }
 
@@ -1502,6 +1514,12 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
         {
             var position = stacked ? BarColumnLabelsPosition.InsideEnd : BarColumnLabelsPosition.OutsideEnd;
             var column = series as ColumnSeries;
+
+            if (!column.Stacked.HasValue)
+            {
+                column.Stacked = false;
+            }
+
             series.ShouldSatisfyAllConditions(
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
@@ -1519,7 +1537,7 @@ namespace EPMLiveWebParts.Tests.ReportingChartTests
                 () => series.Name.ShouldBe(seriesName),
                 () => series.Items.Count.ShouldBe(1),
                 () => donut.ShouldNotBeNull(),
-                () => donut.LabelsAppearance.Position = PieLabelsPosition.Column,
+                () => donut.LabelsAppearance.Position = PieAndDonutLabelsPosition.OutsideEnd,
                 () => donut.LabelsAppearance.DataFormatString.ShouldBe(format),
                 () => donut.TooltipsAppearance.DataFormatString.ShouldBe($"{seriesName} = {{0:{format}}}"));
         }
