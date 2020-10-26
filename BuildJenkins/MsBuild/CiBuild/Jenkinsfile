@@ -40,7 +40,6 @@ pipeline {
             steps {
 				echo 'Clearing temp...'
                 powershell "${env.WORKSPACE}/BuildTeamCity/clearTemp.ps1"
-				error "Test failure"
                 echo 'Executing build...'
                 powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\""
             }
@@ -79,7 +78,7 @@ pipeline {
 		failure	{
 			echo 'Creating failure ticket'
 			dir ("${env.WORKSPACE}") {
-				powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/createTicket.ps1 -projectKey SKYVERA -jobName \"${env.JOB_NAME}\" -jobUrl \"${env.BUILD_URL}\" -error \"${currentBuild.rawBuild.getLog(10).join('\n')}\" "
+				powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/createTicket.ps1 -projectKey SKYVERA -jobName \"${env.JOB_NAME}\" -jobUrl \"${env.BUILD_URL}\" -error \"${currentBuild.rawBuild.getLog(30).join('\n')}\" "
 			}
 		}
 		cleanup {
