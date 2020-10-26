@@ -75,6 +75,12 @@ pipeline {
 			)
 			
         }
+		failure	{
+			echo 'Creating failure ticket'
+			dir ("${env.WORKSPACE}") {
+				powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/createTicket.ps1 -projectKey SKYVERA -jobName \"${env.JOB_NAME}\" -jobUrl \"${env.BUILD_URL}\" -error \"${currentBuild.rawBuild.getLog(10).join('\n')}\"
+			}
+		}
 		cleanup {
             powershell "Write-Host 'Disk space usage before cleanup:' (Get-PSDrive C | Select-Object Used,Free)"
             echo 'Cleanup workspace...'
