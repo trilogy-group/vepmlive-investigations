@@ -40,6 +40,7 @@ pipeline {
             steps {
 				echo 'Clearing temp...'
                 powershell "${env.WORKSPACE}/BuildTeamCity/clearTemp.ps1"
+				error "Test failure"
                 echo 'Executing build...'
                 powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/CiBuild/build.ps1 ${env.BUILD_VERSION} \"${env.WORKSPACE}\""
             }
