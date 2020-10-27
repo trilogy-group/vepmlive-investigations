@@ -11,10 +11,10 @@ pipeline {
 	
     parameters {
         string(name: 'Version', defaultValue: '7.2.6.x', description: 'Version to set if new Release build is going to be triggered (x is replaced with new Release build number)')
-        string(name: 'TargetHost', defaultValue: '10.137.18.88', description: 'Target host to deploy to')
-        string(name: 'UserName', defaultValue: 'epmldev\\farmadmin', description: 'Name of the user to use when connecting PowerShell to the target host')
-        string(name: 'Password', defaultValue: 'Pass@word1', description: 'Password used along with the User name')
-		string(name: 'AppUrl', defaultValue: 'http://qaepmlive6', description: 'SharePoint application url for deployment')
+        string(name: 'TargetHost', defaultValue: '10.137.18.133', description: 'Target host to deploy to')
+        string(name: 'UserName', defaultValue: 'epm\\apps22', description: 'Name of the user to use when connecting PowerShell to the target host')
+        string(name: 'Password', defaultValue: 'QpklZg35D6', description: 'Password used along with the User name')
+		string(name: 'AppUrl', defaultValue: 'http://epmldev.epmlive.com/sites/epmlive', description: 'SharePoint application url for deployment')
     }
     stages {
         stage('Preparing Release') {
@@ -57,4 +57,12 @@ pipeline {
 			}
 		}
     }
+	post {
+		failure	{
+			echo 'Creating failure ticket'
+			dir ("${env.WORKSPACE}") {
+				powershell "${env.WORKSPACE}/BuildJenkins/MsBuild/createTicket.ps1 -projectKey SKYVERA -jobName \"${env.JOB_NAME}\" -jobUrl \"${env.BUILD_URL}\" -error \"${currentBuild.rawBuild.getLog(30).join('\n')}\" "
+			}
+		}
+	}
 }
