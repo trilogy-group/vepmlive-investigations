@@ -31,8 +31,6 @@ namespace EPMLiveReporting.Tests.Jobs
     public class CollectJobTests
     {
         private const string DummyString = "dummyString";
-        private const string CheckReqSPMethodName = "CheckReqSP";
-        private const string CheckSchemaMethodName = "CheckSchema";
         private const string GetReportingConnectionMethodName = "getReportingConnection";
         private const string SetRPTSettingsMethodName = "setRPTSettings";
         private const string StringBuilderFieldName = "sbErrors";
@@ -156,8 +154,6 @@ namespace EPMLiveReporting.Tests.Jobs
             var processSecurityGroupsWasCalled = false;
             var setRPTSettingsWasCalled = false;
             var executeReportExtractWasCalled = false;
-            var checkReqSPWasCalled = false;
-            var checkSchemaWasCalled = false;
             var cleanTablesWasCalled = false;
             var removeSafelyWasCalled = false;
             var spSite = new ShimSPSite
@@ -251,8 +247,6 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => processSecurityGroupsWasCalled.ShouldBeTrue(),
                 () => setRPTSettingsWasCalled.ShouldBeFalse(),
                 () => executeReportExtractWasCalled.ShouldBeTrue(),
-                () => checkReqSPWasCalled.ShouldBeTrue(),
-                () => checkSchemaWasCalled.ShouldBeTrue(),
                 () => cleanTablesWasCalled.ShouldBeTrue(),
                 () => removeSafelyWasCalled.ShouldBeTrue(),
                 () => RefreshTimeSheetWasCalled.ShouldBeTrue());
@@ -270,8 +264,6 @@ namespace EPMLiveReporting.Tests.Jobs
                 "Updating reporting settings failed for site",
                 "Process TimeSheet Data failed for site",
                 "Error Processing PfE Reporting for site",
-                "Error while checking SPRequirement for site",
-                "Error while updating schema for site",
                 "Error while cleaning tables for site",
                 "Error updating status fields",
                 "Cleaning Cache Failed for site",
@@ -439,49 +431,7 @@ namespace EPMLiveReporting.Tests.Jobs
                 () => collectJob.bErrors.ShouldBeFalse());
         }
 
-        [TestMethod]
-        public void CheckReqSP_Should_ExecuteCorrectly()
-        {
-            // Arrange
-            const string ExpectedCommand = "IF NOT EXISTS (SELECT routine_name FROM " +
-                "INFORMATION_SCHEMA.routines WHERE routine_name = 'spGetWebs')";
-            var commandExecuted = string.Empty;
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
-            {
-                commandExecuted = command.CommandText;
-                return 1;
-            };
 
-            // Act
-            privateObject.Invoke(CheckReqSPMethodName, new SqlConnection());
-
-            // Assert
-            this.ShouldSatisfyAllConditions(
-                () => commandExecuted.ShouldNotBeNullOrEmpty(),
-                () => commandExecuted.ShouldContain(ExpectedCommand));
-        }
-
-        [TestMethod]
-        public void CheckSchema_Should_ExecuteCorrectly()
-        {
-            // Arrange
-            const string ExpectedCommand = "IF NOT EXISTS (SELECT TABLE_NAME FROM " +
-                "INFORMATION_SCHEMA.tables WHERE TABLE_NAME = 'ReportListIds')";
-            var commandExecuted = string.Empty;
-            ShimSqlCommand.AllInstances.ExecuteNonQuery = command =>
-            {
-                commandExecuted = command.CommandText;
-                return 1;
-            };
-
-            // Act
-            privateObject.Invoke(CheckSchemaMethodName, new SqlConnection());
-
-            // Assert
-            this.ShouldSatisfyAllConditions(
-                () => commandExecuted.ShouldNotBeNullOrEmpty(),
-                () => commandExecuted.ShouldContain(ExpectedCommand));
-        }
 
         [TestMethod]
         public void GetReportingConnection_Should_ReturnExpectedValue()
