@@ -62,7 +62,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", DateTime.UtcNow}
+                    {"ActivityTime", properties.Web.RegionalSettings.TimeZone.UTCToLocalTime(DateTime.UtcNow)}
                 };
 
                 GetAssociatedListItems(properties, data);
