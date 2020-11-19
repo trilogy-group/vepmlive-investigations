@@ -51,7 +51,8 @@ namespace EPMLiveReportsAdmin
             try
             {
                 if (InTransaction(properties)) return;
-
+                var regionalSettings = properties.Web.CurrentUser.RegionalSettings ??
+                    properties.Web.RegionalSettings;
                 var data = new Dictionary<string, object>
                 {
                     {"Id", properties.ListItemId},
@@ -62,7 +63,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", properties.Web.RegionalSettings.TimeZone.UTCToLocalTime(DateTime.UtcNow)}
+                    {"ActivityTime", regionalSettings.TimeZone.UTCToLocalTime(DateTime.UtcNow)}
                 };
 
                 GetAssociatedListItems(properties, data);
