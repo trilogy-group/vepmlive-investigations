@@ -11,5 +11,11 @@
     "inputFiles": [
       "Layouts/epmlive/MyWorkWebPart.js"
     ]
+  },
+  {
+    "outputFileName": "javascripts/EPMLive.SocialStream.min.js",
+    "inputFiles": [
+      "javascripts/EPMLive.SocialStream.js"
+    ]
   }
 ]
