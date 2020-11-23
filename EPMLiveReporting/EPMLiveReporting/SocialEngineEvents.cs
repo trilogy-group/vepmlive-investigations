@@ -51,18 +51,19 @@ namespace EPMLiveReportsAdmin
             try
             {
                 if (InTransaction(properties)) return;
-
+                var regionalSettings = properties.Web.CurrentUser.RegionalSettings ??
+                    properties.Web.RegionalSettings;
                 var data = new Dictionary<string, object>
                 {
-                    {"Id", properties.ListItemId},
-                    {"Title", GetTitle(properties)},
-                    {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
-                    {"ListTitle", properties.ListTitle},
-                    {"ListId", properties.ListId},
-                    {"WebId", properties.Web.ID},
-                    {"SiteId", properties.SiteId},
-                    {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", DateTime.UtcNow}
+                    { "Id", properties.ListItemId },
+                    { "Title", GetTitle(properties) },
+                    { "URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId },
+                    { "ListTitle", properties.ListTitle },
+                    { "ListId", properties.ListId },
+                    { "WebId", properties.Web.ID },
+                    { "SiteId", properties.SiteId },
+                    { "UserId", properties.Web.CurrentUser.ID },
+                    { "ActivityTime", regionalSettings.TimeZone.UTCToLocalTime(DateTime.UtcNow) },
                 };
 
                 GetAssociatedListItems(properties, data);

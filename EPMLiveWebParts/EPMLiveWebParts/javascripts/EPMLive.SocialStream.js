@@ -536,7 +536,7 @@
                                 isBulkOperation: false,
                                 key: new Date().getTime(),
                                 kind: 'Created',
-                                time: new Date().toUTCString(),
+                                time: new Date().toLocaleString("en-US", { timeZone: window.epmLive.currentUserTimeZone.olsonName }),
                                 userId: userId
                             }],
                             comments: [],
@@ -646,7 +646,7 @@
                                                     }, 500);
                                                     return;
                                                 } else {
-                                                    var time = moment.utc().format();
+                                                    var time = new Date().toLocaleString("en-US", { timeZone: window.epmLive.currentUserTimeZone.olsonName });
 
                                                     data.payload.lists = [{
                                                         icon: null,

@@ -1013,7 +1013,9 @@
     <Content Include="javascripts\EPMLive.SocialStream.js" />
     <Content Include="javascripts\EPMLive.SocialStream.Logs.js" />
     <Content Include="javascripts\EPMLive.SocialStream.Logs.min.js" />
-    <Content Include="javascripts\EPMLive.SocialStream.min.js" />
+    <Content Include="javascripts\EPMLive.SocialStream.min.js">
+      <DependentUpon>EPMLive.SocialStream.js</DependentUpon>
+    </Content>
     <Content Include="javascripts\EPMLiveGenericToolBar.js" />
     <Content Include="javascripts\libraries\amplify.js" />
     <Content Include="javascripts\libraries\amplify.min.js" />
