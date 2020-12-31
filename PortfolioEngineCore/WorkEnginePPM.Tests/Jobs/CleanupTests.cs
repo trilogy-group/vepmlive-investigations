@@ -66,7 +66,7 @@ namespace WorkEnginePPM.Jobs.Tests
                 ShimHttpUtility.HtmlEncodeString = (_str) => { return ""; };
                 var rowCounter = 0;
 
-
+                var ePKTSLastTSApprove = DateTime.Now.ToString("MM/dd/yyyy");
 
                 ShimSqlDataReader.AllInstances.Read = (sender) =>
                 {
@@ -157,13 +157,15 @@ namespace WorkEnginePPM.Jobs.Tests
                 };
                 ShimConfigFunctions.GetCleanUsernameSPWebString = (sweb, _str) => { return "epm\\chander.k"; };
                 ShimCoreFunctions.setConfigSettingSPWebStringString = (sweb, _str, _str1) =>
-                { };
+                {
+                    ePKTSLastTSApprove = _str1;
+                };
                 //ShimSqlCommand.AllInstances.ParametersGet = (scmd) => { return cmd.Parameters; };
                 ShimCoreFunctions.getConfigSettingSPWebString = (sweb, _str) =>
             {
                 if (_str == "EPKTSLastTSApprove")
                 {
-                    return DateTime.Now.ToString("MM/dd/yyyy");
+                    return ePKTSLastTSApprove;
                 }
                 else
                 {
@@ -182,7 +184,15 @@ namespace WorkEnginePPM.Jobs.Tests
                 //Assert
                 Assert.AreEqual(opencon, closecon);
                 Assert.IsNotNull(objToTestPrivateMethod.GetField("sbErrors"));
-
+                Assert.AreEqual(
+                    DateTime.Parse(
+                        EPMLiveCore.CoreFunctions
+                        .getConfigSetting(
+                            web, 
+                            "EPKTSLastTSApprove"))
+                            .ToString("MM/dd/yyyy hh"),
+                    DateTime.Now
+                    .ToString("MM/dd/yyyy hh"));
 
                 //when project_list_uid is null
                 //Act
@@ -191,6 +201,15 @@ namespace WorkEnginePPM.Jobs.Tests
                 //Assert
                 Assert.AreEqual(opencon, closecon);
                 Assert.IsNotNull(objToTestPrivateMethod.GetField("sbErrors"));
+                Assert.AreEqual(
+                    DateTime.Parse(
+                        EPMLiveCore.CoreFunctions
+                        .getConfigSetting(
+                            web,
+                            "EPKTSLastTSApprove"))
+                            .ToString("MM/dd/yyyy hh"),
+                    DateTime.Now
+                    .ToString("MM/dd/yyyy hh"));
             }
 
         }

@@ -1001,12 +1001,12 @@ namespace EPMLiveWebParts.ReportingChart
                         case "Currency":
                             sDonut.LabelsAppearance.DataFormatString = "c";
 
-                            sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieLabelsPosition.Column;
+                            sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieAndDonutLabelsPosition.OutsideEnd;
                             sDonut.TooltipsAppearance.DataFormatString = sDonut.Name + " = {0:c}";
                             break;
                         case "Percentage":
                             sDonut.LabelsAppearance.DataFormatString = "p";
-                            sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieLabelsPosition.Column;
+                            sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieAndDonutLabelsPosition.OutsideEnd;
                             sDonut.TooltipsAppearance.DataFormatString = sDonut.Name + " = {0:p}";
                             break;
                     }

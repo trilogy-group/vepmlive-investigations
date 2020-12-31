@@ -10,7 +10,7 @@ namespace EPMLive.TestFakes.Utility
     {
         public ShimRijndaelManaged RijndaelManagedShim { get; private set; }
         public ShimDeriveBytes DeriveBytesShim { get; private set; }
-        public ShimCryptoStream CryptoStreamShim { get; private set; }
+        //public ShimCryptoStream CryptoStreamShim { get; private set; }
 
         // (CC-75592, 2018-08-13) Some of the types from mscorlib can not be shimmed, if project is not targeting latest .NET Framework version
         // https://blogs.msdn.microsoft.com/harshjain/2016/12/29/generating-fakes-assembly-for-system-dll-for-test-project/
@@ -27,7 +27,7 @@ namespace EPMLive.TestFakes.Utility
         {
             RijndaelManagedShim = new ShimRijndaelManaged();
             DeriveBytesShim = new ShimDeriveBytes(new PasswordDeriveBytes(string.Empty, new byte[0]));
-            CryptoStreamShim = new ShimCryptoStream();
+            //CryptoStreamShim = new ShimCryptoStream();
 
             RijndaelManagedCreated = new List<RijndaelManaged>();
             SymmetricAlgorithmsDisposed = new List<SymmetricAlgorithm>();

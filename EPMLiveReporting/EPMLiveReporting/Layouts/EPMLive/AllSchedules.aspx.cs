@@ -8,6 +8,7 @@ using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveCore.ReportHelper;
 using System.Data;
+using System.Collections.Generic;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -16,7 +17,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected MenuItemTemplate MenuItemTemplate1;
         protected MenuItemTemplate MenuItemTemplateDelete;
         private EPMData _DAO;
-
+        static Dictionary<Guid, int> expectedRuntime = new Dictionary<Guid, int>();
         protected void Page_Init(object sender, EventArgs e)
         {
             _DAO = new EPMData(SPContext.Current.Web.Site.ID);
@@ -31,21 +32,21 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate
                     {
-                        using (
-                            var cn =
-                                new SqlConnection(
-                                    CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                    using (
+                        var cn =
+                            new SqlConnection(
+                                CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                    {
+                        cn.Open();
+
+                        var cmd =
+                            new SqlCommand(
+                                "select timerjobuid,runtime,percentComplete,status,dtfinished,result,dtcreated from vwQueueTimerLog where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                                cn);
+                        cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID);
+
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            cn.Open();
-
-                            var cmd =
-                                new SqlCommand(
-                                    "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
-                                    cn);
-                            cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID);
-
-                            using (SqlDataReader dr = cmd.ExecuteReader())
-                            {
                                 if (dr.Read())
                                 {
                                     if (!dr.IsDBNull(1))
@@ -55,11 +56,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                                     if (!dr.IsDBNull(3))
                                     {
-                                        if (dr.GetInt32(3) == 0)
+                                        int status = dr.GetInt32(3);
+                                        if (status == 0)
                                         {
                                             lblMessages.Text = "Queued";
                                         }
-                                        else if (dr.GetInt32(3) == 1)
+                                        else if (status == 1)
                                         {
                                             lblMessages.Text = "Processing (" + dr.GetInt32(2).ToString("##0") + "%)";
                                         }
@@ -72,9 +74,36 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                             lblMessages.Text = "No Results";
                                         }
                                     }
-
                                     if (!dr.IsDBNull(4))
+                                    {
+                                        TimeSpan runPeriod = dr.GetDateTime(4) - dr.GetDateTime(6);
+                                        if (runPeriod > new TimeSpan(0, 80, 0))
+                                            runPeriod = new TimeSpan(0, 80, 0);
+                                        if (expectedRuntime.ContainsKey(SPContext.Current.Site.ID))
+                                        {
+                                            expectedRuntime[SPContext.Current.Site.ID] = (int)runPeriod.TotalMinutes + 1;
+                                        }
+                                        else
+                                        {
+                                            expectedRuntime.Add(SPContext.Current.Site.ID, (int)runPeriod.TotalMinutes + 1);
+                                        }
                                         lblLastRun.Text = dr.GetDateTime(4).ToString();
+                                        hidRuntime.Value = "0";
+                                    }
+                                    else
+                                    {
+                                        if (!expectedRuntime.ContainsKey(SPContext.Current.Site.ID))
+                                        {
+                                            expectedRuntime.Add(SPContext.Current.Site.ID, 80);
+                                        }
+                                        int runtime = (DateTime.Now - dr.GetDateTime(6)).Minutes;
+                                        lblLastRun.Text = runtime + " Minutes";
+                                        hidRuntime.Value = (runtime).ToString();
+                                    }
+                                }
+                                if (expectedRuntime.ContainsKey(SPContext.Current.Site.ID))
+                                {
+                                    hidRunPeriod.Value = expectedRuntime[SPContext.Current.Site.ID].ToString();
                                 }
                             }
                         }

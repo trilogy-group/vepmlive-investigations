@@ -305,19 +305,18 @@ BEGIN
 	SELECT ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, 
 				WebUrl, ListId, ListName, ListIcon, ItemId, TotalActivities, TotalComments
 	FROM (
-			SELECT	TOP (@End - 1)
+			SELECT	 TOP (@End - 1) 
 					ROW_NUMBER() OVER (ORDER BY SS_Threads.LastActivityDateTime DESC) AS RowNum,
 					SS_Threads.Id AS ThreadId, SS_Threads.Title AS ThreadTitle, SS_Threads.URL AS ThreadUrl, 
 					SS_Threads.Kind AS ThreadKind, SS_Threads.LastActivityDateTime AS ThreadLastActivityOn, 
 					SS_Threads.FirstActivityDateTime AS ThreadFirstActivityOn, SS_Threads.WebId, dbo.RPTWeb.WebTitle, 
-					dbo.RPTWeb.WebUrl, SS_Threads.ListId, dbo.RPTList.ListName, dbo.ReportListIds.ListIcon AS ListIcon, 
+					dbo.RPTWeb.WebUrl, SS_Threads.ListId, dbo.RPTList.ListName, ReportListIds.ListIcon AS ListIcon, 
 					SS_Threads.ItemId, 
 					SS_Threads.TotalActivities,
                     SS_Threads.TotalComments, 
 					1 AS HasAccess
-							 
-			FROM	dbo.ReportListIds INNER JOIN dbo.RPTList ON dbo.ReportListIds.Id = dbo.RPTList.RPTListId RIGHT OUTER JOIN 
-							
+				 
+			FROM	(select distinct * from dbo.ReportListIds) ReportListIds INNER JOIN dbo.RPTList ON ReportListIds.Id = dbo.RPTList.RPTListId RIGHT OUTER JOIN 
 					(	SELECT ISNULL(SS_Threads1.TotalActivities, 0) TotalActivities, ISNULL(SS_Threads2.TotalComments, 0) TotalComments, SS_Threads3.*
 						FROM
 							(	SELECT SS_Threads.Id, COUNT(A1.ID) TotalActivities 
@@ -347,7 +346,7 @@ BEGIN
 					) SS_Threads
 					INNER JOIN dbo.RPTWeb ON SS_Threads.WebId = dbo.RPTWeb.WebId ON dbo.RPTList.RPTListId = SS_Threads.ListId
 			WHERE   (SS_Threads.Deleted = 0) AND (SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
-					AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + '/%', '//', '/'))
+					AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + ''/%'', ''//'', ''/''))
 					ORDER BY SS_Threads.LastActivityDateTime DESC
 					) AS DT1
 	WHERE RowNum > @Start AND RowNum < @End

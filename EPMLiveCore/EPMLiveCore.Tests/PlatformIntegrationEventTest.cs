@@ -11,6 +11,7 @@ using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using EPMLiveCore.Fakes;
 
 namespace EPMLiveCore.Tests
 {
@@ -161,6 +162,8 @@ namespace EPMLiveCore.Tests
 
         private void SetupShims()
         {
+            ShimCoreFunctions.getConnectionStringGuid = (_) => { return "Data Source=epmdb;Initial Catalog=PEPM_Dev_eelsayed_Fake;Integrated Security=True"; };
+
             ShimSqlConnection.AllInstances.Open = _ =>
             {
                 _connectionOpenedCallCount++;

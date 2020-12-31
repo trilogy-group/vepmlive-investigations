@@ -14,6 +14,8 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
     public partial class WE43Upgrader : LayoutsPageBase
     {
         protected string sText = "";
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -38,6 +40,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
                     {
                         using(WebClient webClient = new WebClient())
                         {
+                            webClient.Headers.Add(FBAHeader, FBAValue);
                             ServicePointManager.ServerCertificateValidationCallback +=
                             delegate(
                                 object sender2,

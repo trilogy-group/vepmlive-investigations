@@ -81,8 +81,6 @@ namespace EPMLiveReporting.Tests.Jobs
             var processSecurityGroupsWasCalled = false;
             var setRPTSettingsWasCalled = false;
             var executeReportExtractWasCalled = false;
-            var checkReqSPWasCalled = false;
-            var checkSchemaWasCalled = false;
             var cleanTablesWasCalled = false;
             var removeSafelyWasCalled = false;
             var spSite = new ShimSPSite
@@ -117,10 +115,6 @@ namespace EPMLiveReporting.Tests.Jobs
                 return DummyString;
             };
             string errMsg = string.Empty;
-            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
-                (_, connection) => checkReqSPWasCalled = true;
-            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
-                (_, connection) => checkSchemaWasCalled = true;
             ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRef;
             cleanTablesWasCalled = true;
             ShimDataSet.AllInstances.TablesGet = _ => new ShimDataTableCollection
@@ -147,11 +141,8 @@ namespace EPMLiveReporting.Tests.Jobs
 
             // Assert
             this.ShouldSatisfyAllConditions(
-                () => processSecurityGroupsWasCalled.ShouldBeTrue(),
                 () => setRPTSettingsWasCalled.ShouldBeTrue(),
                 () => executeReportExtractWasCalled.ShouldBeTrue(),
-                () => checkReqSPWasCalled.ShouldBeTrue(),
-                () => checkSchemaWasCalled.ShouldBeTrue(),
                 () => cleanTablesWasCalled.ShouldBeTrue(),
                 () => removeSafelyWasCalled.ShouldBeTrue(),
                 () => RefreshTimeSheetWasCalled.ShouldBeTrue());
@@ -226,10 +217,6 @@ namespace EPMLiveReporting.Tests.Jobs
                         return new SqlParameter();
                     }
                 };
-            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
-                (_, connection) => checkReqSPWasCalled = true;
-            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
-                (_, connection) => checkSchemaWasCalled = true;
             ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRef;
             cleanTablesWasCalled = true;
             ShimDataSet.AllInstances.TablesGet = _ => new ShimDataTableCollection
@@ -337,16 +324,6 @@ namespace EPMLiveReporting.Tests.Jobs
                 {
                     throw new Exception(DummyError);
                 };
-            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
-                (_, connection) =>
-                {
-                    throw new Exception(DummyError);
-                };
-            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
-                (_, connection) =>
-                {
-                    throw new Exception(DummyError);
-                };
             ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRefException;
 
             ShimDataSet.AllInstances.TablesGet = _ => null;
@@ -421,16 +398,6 @@ namespace EPMLiveReporting.Tests.Jobs
                 {
                     executeReportExtractWasCalled = true;
                     return DummyString;
-                };
-            ShimCollectJob.AllInstances.CheckReqSPSqlConnection =
-                (_, connection) =>
-                {
-
-                };
-            ShimCollectJob.AllInstances.CheckSchemaSqlConnection =
-                (_, connection) =>
-                {
-
                 };
             ShimDataScrubber.CleanTablesSPSiteEPMDataGuidStringRef = CleanTablesSPSiteEPMDataGuidStringRefFalse;
 

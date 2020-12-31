@@ -1216,6 +1216,11 @@ declare
 , @MaxThreads_type_2 int
 , @divisor int
 
+UPDATE  TSQUEUE SET Status = 3, Result=''Errors'', ResultText=''Timesheet Deleted'', PercentComplete=''100'', dtfinished=GETDATE(), QUEUE= CAST(@maxRetries AS nvarchar(1)) +''-'' + @servername
+FROM TSQUEUE 
+LEFT OUTER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
+WHERE dbo.TSTIMESHEET.TS_UID IS NULL
+
 set @divisor  = 2
 
 set @MaxThreads_type_2 = @maxthreads / @divisor 

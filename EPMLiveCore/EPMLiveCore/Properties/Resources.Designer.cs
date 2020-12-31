@@ -59,7 +59,58 @@ namespace EPMLiveCore.Properties {
                 resourceCulture = value;
             }
         }
-        
+        /// <summary>
+        ///   Looks up a localized string similar to DECLARE @creatoralter varchar(10)
+        ///IF NOT EXISTS (SELECT routine_name FROM INFORMATION_SCHEMA.routines WHERE routine_name = &apos;spGetWebs&apos;)
+        ///BEGIN
+        ///    PRINT &apos;Creating Stored Procedure spGetWebs&apos;
+        ///    SET @creatoralter = &apos;CREATE&apos;
+        ///END
+        ///ELSE
+        ///BEGIN
+        ///    PRINT &apos;Updating Stored Procedure spGetWebs&apos;
+        ///    SET @creatoralter = &apos;ALTER&apos;
+        ///END
+        ///EXEC(@creatoralter + &apos; PROCEDURE [dbo].[spGetWebs]
+        ///      -- Add the parameters for the stored procedure here
+        ///      @UserId AS INT,
+        ///      @SiteId AS UNIQUEIDENTIFIER
+        ///AS
+        ///BEGIN
+        ///      -- SET NOC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CheckReqSP
+        {
+            get
+            {
+                return ResourceManager.GetString("CheckReqSP", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ---------------TABLE: ReportListIds----------------------
+        ///IF NOT EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = &apos;ReportListIds&apos;)
+        ///BEGIN
+        ///	PRINT &apos;Creating Table ReportListIds&apos;
+        ///	CREATE TABLE [dbo].[ReportListIds] ( Id uniqueidentifier )
+        ///END
+        /// 
+        ///IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = &apos;ReportListIds&apos; AND COLUMN_NAME = &apos;ListIcon&apos;)
+        ///BEGIN
+        ///	PRINT &apos;Add Column ListIcon&apos;
+        ///	ALTER TABLE [dbo].[ReportListIds]
+        ///	ADD [ListIcon] [NVARCHAR](100) NULL
+        ///END
+        ///
+        ///- [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CheckSchema
+        {
+            get
+            {
+                return ResourceManager.GetString("CheckSchema", resourceCulture);
+            }
+        }
         /// <summary>
         ///   Looks up a localized string similar to 
         ///---------------TABLE: EPMLive_Log----------------------

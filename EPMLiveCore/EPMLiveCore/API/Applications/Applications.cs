@@ -1476,6 +1476,9 @@ namespace EPMLiveCore.API
 
         }
 
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
+
         public static ApplicationDef GetApplicationInfo(string id)
         {
             string storeurl = CoreFunctions.getFarmSetting("workenginestore");
@@ -1552,6 +1555,7 @@ namespace EPMLiveCore.API
                             {
                                 using (WebClient webClient = new WebClient())
                                 {
+                                    webClient.Headers.Add(FBAHeader, FBAValue);
                                     webClient.Credentials = CoreFunctions.GetStoreCreds();
                                     byte[] fileBytes = null;
                                     fileBytes = webClient.DownloadData(rootFilePath + "/Feature.xml");

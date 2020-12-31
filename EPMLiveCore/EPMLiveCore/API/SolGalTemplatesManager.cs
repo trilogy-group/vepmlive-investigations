@@ -32,6 +32,8 @@ namespace EPMLiveCore.API
         private const string COL_URL = "URL";
         private const string COL_INCLUDE_CONTENT = "IncludeContent";
         private const string COL_ATTACHMENT = "Attachments";
+        private const string FBAHeader = "X-FORMS_BASED_AUTH_ACCEPTED";
+        private const string FBAValue = "f";
 
         #region Read templates methods
 
@@ -551,6 +553,7 @@ namespace EPMLiveCore.API
             // read feature.xml with WebClient class
             using (WebClient webClient = new WebClient())
             {
+                webClient.Headers.Add(FBAHeader, FBAValue);
                 webClient.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
                 byte[] fileBytes = null;
                 fileBytes = webClient.DownloadData(rootFilePath + "/Feature.xml");
@@ -611,6 +614,7 @@ namespace EPMLiveCore.API
 
             using (WebClient client = new WebClient())
             {
+                client.Headers.Add(FBAHeader, FBAValue);
                 client.Credentials = new NetworkCredential("Solution1", @"J@(Djkhldk2", "EPM");
 
                 switch (file.Attribute("Type").Value)

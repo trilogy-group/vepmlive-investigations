@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static EPMLiveEnterprise.EPMLivePublisher;
 using static EPMLiveEnterprise.WebSvcProject.ProjectDataSet;
 using static EPMLiveEnterprise.WebSvcWssInterop.Fakes.ShimWssSettingsDataSet;
+using EPMLiveCore.Fakes;
 
 namespace EPMLivePS.Tests
 {
@@ -566,6 +567,8 @@ namespace EPMLivePS.Tests
 
         private void SetupShims(ICollection spArray = null)
         {
+            ShimCoreFunctions.getConnectionStringGuid = (_) => { return "Data Source=epmdb;Initial Catalog=PEPM_Dev_eelsayed_Fake;Integrated Security=True"; };
+
             var webApplication = new SPWebApplication()
             {
                 Id = Guid.Empty
