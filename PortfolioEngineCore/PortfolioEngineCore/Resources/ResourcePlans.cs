@@ -2564,9 +2564,9 @@ namespace PortfolioEngineCore
                 if (bRequireNewUIDs)
                 {
                     int lHighestUID = 0;
-                    const string sCommand = "SELECT MAX(CAT_CMT_UID) as HighestUID FROM EPGP_RP_CATEGORY_VALUES";
+                    const string CategoryValuesQuery = "SELECT MAX(CAT_CMT_UID) as HighestUID FROM EPGP_RP_CATEGORY_VALUES";
                     SqlDataReader reader;
-                    if (_dba.ExecuteReader(sCommand, (StatusEnum)99999, out reader) == StatusEnum.rsSuccess)
+                    if (_dba.ExecuteReader(CategoryValuesQuery, (StatusEnum)99999, out reader) == StatusEnum.rsSuccess)
                     {
                         if (reader.Read() == true)
                             lHighestUID = DBAccess.ReadIntValue(reader["HighestUID"]);
