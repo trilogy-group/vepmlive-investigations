@@ -21,18 +21,28 @@ namespace TimerService
             public string cn;
             public DataRow dr;
         }
-
+        protected int RunningThreads
+        {
+            get
+            {
+                return taskList.Count;
+            }
+        }
+        private static object threadsLock = new object();
         private int _maxThreads;
         protected int MaxThreads {
             get {
-                for (int i = taskList.Count - 1; i >= 0; i--)
+                lock (threadsLock)
                 {
-                    if (taskList[i].Status != TaskStatus.Running)
+                    for (int i = taskList.Count - 1; i >= 0; i--)
                     {
-                        taskList.RemoveAt(i);
+                        if (taskList[i].Wait(0))
+                        {
+                            taskList.RemoveAt(i);
+                        }
                     }
+                    return _maxThreads - taskList.Count;
                 }
-                return _maxThreads - taskList.Count;
             }
         }
         List<Task> taskList = new List<Task>();
@@ -41,13 +51,11 @@ namespace TimerService
             try
             {
                 Task newTask = Task.Run(() => DoWork(rd), token);
-                Thread.Sleep(500);
-                if (!newTask.IsCompleted)
+                lock (threadsLock)
                 {
                     taskList.Add(newTask);
-                    return true;
                 }
-                return false;
+                return true;
             }
             catch (Exception ex)
             {
@@ -107,7 +115,7 @@ namespace TimerService
         }
         public void HeartBeat()
         {
-            LogMessage("HTBT", "MNTH", "Dispatcher alive");
+            LogMessage("HTBT", "MNTH", "Dispatcher alive, running threads: " + RunningThreads + ", free threads: " + MaxThreads);
         }
         public virtual void Cancel()
         {

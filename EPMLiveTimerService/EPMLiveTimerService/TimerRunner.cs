@@ -27,6 +27,8 @@ namespace TimerService
         {
             try
             {
+                ThreadPool.SetMaxThreads(50, 100);
+                ThreadPool.SetMinThreads(0, 0);
                 bool queueJobs = ConfigurationManager.AppSettings["SecondaryTimer"] == null || ConfigurationManager.AppSettings["SecondaryTimer"].ToLower() != "true";
                 classes = new ClassItem[7];
 

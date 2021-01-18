@@ -61,7 +61,7 @@ namespace TimerService
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Queued " + processed + " jobs, running threads: " + RunningThreads);
 
                                         using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
                                         {
