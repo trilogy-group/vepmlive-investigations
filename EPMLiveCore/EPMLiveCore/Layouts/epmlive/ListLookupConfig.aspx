@@ -17,9 +17,7 @@
 	    ID="gvPlans"
 	    AutoGenerateColumns="false"
 	    width="600"
-	    AllowSorting="True"
-	    AllowPaging="True"
-	    PageSize="10">
+	    AllowSorting="True">
         <Columns>
 	        <SharePoint:SPMenuField HeaderText="Field" TextFields="displayname" MenuTemplateId="PropertyNameListMenu" TokenNameAndValueFields="NAME=internalname" ></SharePoint:SPMenuField>
 	        <SharePoint:SPBoundField DataField="enabled" HeaderText="Enabled"></SharePoint:SPBoundField>
