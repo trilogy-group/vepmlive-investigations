@@ -2,7 +2,6 @@
 using Microsoft.SharePoint.Administration;
 using System.Data;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 
@@ -25,7 +24,7 @@ namespace TimerService
         {
             get
             {
-                return taskList.Count;
+                return threadList.Count;
             }
         }
         private static object threadsLock = new object();
@@ -34,26 +33,44 @@ namespace TimerService
             get {
                 lock (threadsLock)
                 {
-                    for (int i = taskList.Count - 1; i >= 0; i--)
+                    for (int i = threadList.Count - 1; i >= 0; i--)
                     {
-                        if (taskList[i].Wait(0))
+                        if (!threadList[i].Item1.IsAlive)
                         {
-                            taskList.RemoveAt(i);
+                            threadList.RemoveAt(i);
+
                         }
+                        else if (Timeout > 0 && DateTime.Now - threadList[i].Item2 > new TimeSpan(0, Timeout, 0))
+                        {
+                            
+                                try
+                                {
+                                    threadList[i].Item1.Abort();
+                                    threadList[i].Item1.Join();
+                                }
+                                catch { }
+
+                                threadList.RemoveAt(i);
+
+                           
+                        }
+
                     }
-                    return _maxThreads - taskList.Count;
+                    return _maxThreads - threadList.Count;
                 }
             }
         }
-        List<Task> taskList = new List<Task>();
+        
+        List<Tuple<Thread, DateTime>> threadList = new List<Tuple<Thread, DateTime>>();
         protected bool startProcess(RunnerData rd)
         {
             try
             {
-                Task newTask = Task.Run(() => DoWork(rd), token);
+                Thread newThread = new Thread(new ParameterizedThreadStart(DoWork));
+                newThread.Start(rd);
                 lock (threadsLock)
                 {
-                    taskList.Add(newTask);
+                    threadList.Add(new Tuple<Thread,DateTime>(newThread,DateTime.Now));
                 }
                 return true;
             }
@@ -119,16 +136,28 @@ namespace TimerService
         }
         public virtual void Cancel()
         {
-            Task.WaitAll(taskList.ToArray(), new TimeSpan(0, 0, 5)); 
+            lock (threadsLock)
+            {
+                foreach (Tuple<Thread, DateTime> tuple in threadList)
+                {
+                    tuple.Item1.Abort();
+                }
+            }
             LogMessage("STOP", "STMR", "Stopped Timer Service");
         }
         protected abstract string LogName {
             get;
         }
-
+        protected virtual int Timeout
+        {
+            get
+            {
+                return 0;
+            }
+        }
         public abstract void RunTask();
 
-        protected abstract void DoWork(RunnerData rd);
+        protected abstract void DoWork(object rd);
 
         protected abstract string ThreadsProperty {
             get;

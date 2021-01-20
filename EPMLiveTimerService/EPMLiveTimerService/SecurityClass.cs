@@ -129,9 +129,9 @@ namespace TimerService
         }
 
 
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd) 
         {
-            DataRow dr = rd.dr;
+            DataRow dr = ((RunnerData)rd).dr;
 
             try
             {
@@ -149,7 +149,7 @@ namespace TimerService
                 }
 
 
-                using (var cn = new SqlConnection(rd.cn))
+                using (var cn = new SqlConnection(((RunnerData)rd).cn))
                 {
                     try
                     {
@@ -167,7 +167,7 @@ namespace TimerService
             }
             catch (Exception ex)
             {
-                using (var cn = new SqlConnection(rd.cn))
+                using (var cn = new SqlConnection(((RunnerData)rd).cn))
                 {
                     try
                     {

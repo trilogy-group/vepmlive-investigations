@@ -9,7 +9,7 @@ namespace TimerService
 {
     public class RunFaultyClass : ProcessorBase
     {
-        public override bool InitializeTask(CancellationToken token)
+        public override bool InitializeTask(CancellationToken token) 
         {
             if (!base.InitializeTask(false, token))
                 return false;
@@ -27,7 +27,7 @@ namespace TimerService
                 return "RunFaulty";
             }
         }
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
             throw new NotImplementedException();
         }

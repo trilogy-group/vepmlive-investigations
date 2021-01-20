@@ -84,7 +84,7 @@ namespace TimerService
                                         {
 
                                             var rd = new RunnerData { cn = sConn, dr = dr };
-                                            
+
                                             if (startProcess(rd))
                                             {
                                                 using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2,DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
@@ -92,12 +92,12 @@ namespace TimerService
                                                     cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                
+
                                             }
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Queued " + processed + " jobs, running threads: " + RunningThreads);
+                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
                                     }
 
                                     using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
@@ -121,20 +121,20 @@ namespace TimerService
             }
         }
 
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
-            DataRow dr = rd.dr;
-
-            try
+            DataRow dr = ((RunnerData)rd).dr;
+            using (SPSite site = new SPSite(new Guid(dr["SITE_UID"].ToString())))
             {
-                using (SPSite site = new SPSite(new Guid(dr["SITE_UID"].ToString())))
+
+                MethodInfo m;
+
+                Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
+                Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
+                object classObject = Activator.CreateInstance(thisClass);
+
+                try
                 {
-
-                    MethodInfo m;
-
-                    Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
-                    Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
-                    object classObject = Activator.CreateInstance(thisClass);
 
                     thisClass.GetField("QueueUid").SetValue(classObject, new Guid(dr["TSQUEUE_ID"].ToString()));
                     thisClass.GetField("TSUID").SetValue(classObject, new Guid(dr["TS_UID"].ToString()));
@@ -151,52 +151,48 @@ namespace TimerService
 
                     try
                     {
-
                         m = thisClass.GetMethod("execute");
                         m.Invoke(classObject, new object[] { site, dr["JOBDATA"].ToString() });
-
                     }
                     catch (Exception ex)
                     {
                         thisClass.GetField("bErrors").SetValue(classObject, true);
                         thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
                     }
-					if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
-					{
-						string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
-						LogMessage("ERR", "PROC", error);
-					}
-
-					m = thisClass.GetMethod("finishJob");
-                    m.Invoke(classObject, new object[] { });
-
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("could not be found"))
-                {
-                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
                     {
-                        try
-                        {
-                            cn.Open();
-                            using (SqlCommand cmd = new SqlCommand("DELETE FROM TSQUEUE WHERE TSQUEUE_ID=@id", cn))
-                            {
-                                cmd.Parameters.AddWithValue("@id", dr["TSQUEUE_ID"].ToString());
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                        catch (Exception exe) { LogMessage("ERR", "PROC", exe.Message); }
+                        string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
+                        LogMessage("ERROR", "PROC", error);
                     }
+                    LogMessage("PASS", "EXEC", "Job Successfully Finished");
+
                 }
-                else
+                catch (ThreadAbortException)
+                {
+                    thisClass.GetField("bErrors").SetValue(classObject, true);
+                    thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout + " minutes");
+                    LogMessage("ERROR", "EXEC", "Job Gracefully Finished");
+                }
+                catch (Exception ex)
                 {
                     LogMessage("ERR", "PROC", ex.Message);
                 }
+                finally
+                {
+                    m = thisClass.GetMethod("finishJob");
+                    m.Invoke(classObject, new object[] { });
+                }
             }
-
         }
+        protected override int Timeout
+        {
+            get
+
+            {
+                return 5;
+            }
+        }
+     
 
         protected override string LogName {
             get {

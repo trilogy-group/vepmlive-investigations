@@ -87,16 +87,16 @@ namespace TimerService
             }
         }
         
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
-            DataRow dr = rd.dr;
+            DataRow dr = ((RunnerData)rd).dr;
 
             try
             {
                 EPMLiveCore.API.Integration.IntegrationCore core = new EPMLiveCore.API.Integration.IntegrationCore(new Guid(dr["SITE_ID"].ToString()), new Guid(dr["WEB_ID"].ToString()));
                 core.ExecuteEvent(dr);
 
-                using (SqlConnection cn = new SqlConnection(rd.cn))
+                using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                 {
                     try
                     {
@@ -112,12 +112,12 @@ namespace TimerService
 
 
                 }
-            }
+            } 
             catch (Exception ex)
             {
                 if (ex.Message.Contains("could not be found"))
                 {
-                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                     {
                         try
                         {
