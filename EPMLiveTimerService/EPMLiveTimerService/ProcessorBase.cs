@@ -40,7 +40,7 @@ namespace TimerService
                             threadList.RemoveAt(i);
 
                         }
-                        else if (Timeout > 0 && DateTime.Now - threadList[i].Item2 > new TimeSpan(0, Timeout, 0))
+                        else if (Timeout > 0 && DateTime.Now - threadList[i].Item2 > new TimeSpan(0, Timeout * threadList[i].Item3, 0))
                         {
                             
                                 try
@@ -61,8 +61,8 @@ namespace TimerService
             }
         }
         
-        List<Tuple<Thread, DateTime>> threadList = new List<Tuple<Thread, DateTime>>();
-        protected bool startProcess(RunnerData rd)
+        List<Tuple<Thread, DateTime,int>> threadList = new List<Tuple<Thread, DateTime, int>>();
+        protected bool startProcess(RunnerData rd, int trialNumber = 1)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace TimerService
                 newThread.Start(rd);
                 lock (threadsLock)
                 {
-                    threadList.Add(new Tuple<Thread,DateTime>(newThread,DateTime.Now));
+                    threadList.Add(new Tuple<Thread,DateTime, int>(newThread,DateTime.Now, trialNumber));
                 }
                 return true;
             }
@@ -138,7 +138,7 @@ namespace TimerService
         {
             lock (threadsLock)
             {
-                foreach (Tuple<Thread, DateTime> tuple in threadList)
+                foreach (Tuple<Thread, DateTime, int> tuple in threadList)
                 {
                     tuple.Item1.Abort();
                 }

@@ -10,6 +10,7 @@ using System.Collections;
 using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Configuration;
 
 namespace TimerService
 {
@@ -84,8 +85,13 @@ namespace TimerService
                                         {
 
                                             var rd = new RunnerData { cn = sConn, dr = dr };
-
-                                            if (startProcess(rd))
+                                            string queue = dr["queue"].ToString();
+                                            int trial = 1;
+                                            if (int.TryParse(queue.Substring(0,1), out trial))
+                                            {
+                                                trial++;
+                                            }
+                                            if (startProcess(rd, trial))
                                             {
                                                 using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2,DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
                                                 {
@@ -167,10 +173,17 @@ namespace TimerService
                     LogMessage("PASS", "EXEC", "Job Successfully Finished");
 
                 }
-                catch (ThreadAbortException)
+                catch (ThreadAbortException e)
                 {
+                    string queue = dr["queue"].ToString();
+                    int trial = 1;
+                    if (int.TryParse(queue.Substring(0, 1), out trial))
+                    {
+                        trial++;
+                    }
                     thisClass.GetField("bErrors").SetValue(classObject, true);
-                    thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout + " minutes");
+
+                    thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout * trial + " minutes: " + e.StackTrace);
                     LogMessage("ERROR", "EXEC", "Job Gracefully Finished");
                 }
                 catch (Exception ex)
@@ -184,12 +197,25 @@ namespace TimerService
                 }
             }
         }
+
+        static int? timeout;
         protected override int Timeout
         {
             get
-
             {
-                return 5;
+                if (timeout == null)
+                {
+                    int configTimeout;
+                    if (!int.TryParse(ConfigurationManager.AppSettings["TimesheetTimeout"], out configTimeout))
+                    {
+                        timeout = 10;
+                    }
+                    else
+                    {
+                        timeout = configTimeout;
+                    }
+                }
+                return timeout.Value;
             }
         }
      
