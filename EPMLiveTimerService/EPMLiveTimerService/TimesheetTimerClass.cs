@@ -183,8 +183,8 @@ namespace TimerService
                     }
                     thisClass.GetField("bErrors").SetValue(classObject, true);
 
-                    thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout * trial + " minutes: " + e.StackTrace);
-                    LogMessage("ERROR", "EXEC", "Job Gracefully Finished");
+                    thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout * trial + " minutes");
+                    LogMessage("ERROR", "EXEC", "Job Gracefully Finished:" + e.StackTrace);
                 }
                 catch (Exception ex)
                 {
