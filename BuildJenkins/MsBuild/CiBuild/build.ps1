@@ -24,6 +24,11 @@ Set-Location -Path $rootDir
 
 Write-Host "Write build number"
 "[assembly:System.Reflection.AssemblyFileVersion(""$version"")]" > CommonAssemblyInfo.cs
+(Get-Content ProjectPublisher2016\ProjectPublisher2016\Properties\AssemblyInfo.cs) `
+    -replace '(\[assembly: AssemblyVersion\(")(\d+.\d+.\d+.\d+)("\)\])', "`${1}$version`${3}" `
+    -replace '(\[assembly: AssemblyFileVersion\(")(\d+.\d+.\d+.\d+)("\)\])', "`${1}$version`${3}" |
+  Out-File ProjectPublisher2016\ProjectPublisher2016\Properties\AssemblyInfo.cs
+  
 
 Write-Host "Execute builds"
 

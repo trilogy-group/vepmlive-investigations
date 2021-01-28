@@ -13,7 +13,7 @@
   <?define MyUpgradeCode = "7EBAB977-20B6-452F-86C1-02CAD8E23901" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
-  <Product Id="$(var.MyProductCode)" Name="Project Publisher 2016 $(var.Platform)" Language="1033" Version="7.1.0" Manufacturer="EPM Live"  UpgradeCode="$(var.MyUpgradeCode)">
+  <Product Id="$(var.MyProductCode)" Name="Project Publisher 2016 $(var.Platform)" Language="1033" Version="!(bind.fileVersion.MyDLL)" Manufacturer="EPM Live"  UpgradeCode="$(var.MyUpgradeCode)">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
     <MediaTemplate EmbedCab="yes" />
@@ -63,7 +63,7 @@
       <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
       <Component Id="FilesComponent" Win64="$(var.Win64)" Guid="0089E29C-E076-4723-9067-FEA0231835D5" KeyPath="yes">
         <!-- TODO: Insert files, registry keys, and other resources here. -->
-        <File Source="$(var.ProjectPublisher2016.TargetPath)" />
+        <File Id="MyDLL" Name="ProjectPublisher2016.dll" Source="$(var.ProjectPublisher2016.TargetPath)" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.dll.manifest" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.dll.config" />
         <File Source="$(var.ProjectPublisher2016.TargetDir)ProjectPublisher2016.vsto"/>
