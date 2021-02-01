@@ -26,11 +26,10 @@ namespace TimerService
         }
 
         
-        public override bool InitializeTask(CancellationToken token)
+        public override void InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask(token))
-                return false;
-
+            base.InitializeTask(token);
+              
             LogMessage("INIT", "STMR", "Clearing Queue");
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
@@ -40,33 +39,23 @@ namespace TimerService
                 {
                     using (var cn = new SqlConnection(sConn))
                     {
-                        try
+                        cn.Open();
+                        using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 24", cn))
                         {
-                            cn.Open();
-                            using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 24", cn))
-                            {
-                                cmd.ExecuteNonQuery();
-                            }
-                            using (var cmd1 = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and queueserver=@servername", cn))
-                            {
-                                cmd1.Parameters.Clear();
-                                cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                cmd1.ExecuteNonQuery();
-                            }
+                            cmd.ExecuteNonQuery();
                         }
-                        catch
+                        using (var cmd1 = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and queueserver=@servername", cn))
                         {
-                            return false;
+                            cmd1.Parameters.Clear();
+                            cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                            cmd1.ExecuteNonQuery();
                         }
-
                     }
                 }
             }
-
-            return true;
         }
         DateTime lastRun = DateTime.Now;
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             try
             {

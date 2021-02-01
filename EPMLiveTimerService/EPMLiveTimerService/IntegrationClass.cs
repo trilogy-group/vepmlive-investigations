@@ -16,7 +16,7 @@ namespace TimerService
     public class IntegrationClass : ProcessorBase
     {
         
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             try
             {

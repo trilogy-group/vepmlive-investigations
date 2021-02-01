@@ -16,10 +16,9 @@ namespace TimerService
 {
     public class RollupClass : ProcessorBase
     {
-        public override bool InitializeTask(CancellationToken token)
+        public override void InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask(token))
-                return false;
+            base.InitializeTask(token);
 
             LogMessage("INIT", "STMR", "Clearing Queue");
             SPWebApplicationCollection _webcolections = GetWebApplications();
@@ -30,30 +29,24 @@ namespace TimerService
                 {
                     using (var cn = new SqlConnection(sConn))
                     {
-                        try
+                        cn.Open();
+                        using (var cmd = new SqlCommand("update rollupqueue set status = 0, queueserver=NULL  where DATEDIFF(HH,EVENTTIME,getdate()) > 24 and (status = 1 OR STATUS = 2)", cn))
                         {
-                            cn.Open();
-                            using (var cmd = new SqlCommand("update rollupqueue set status = 0, queueserver=NULL  where DATEDIFF(HH,EVENTTIME,getdate()) > 24 and (status = 1 OR STATUS = 2)", cn))
-                            {
-                                cmd.ExecuteNonQuery();
-                            }
-                            using (var cmd1 = new SqlCommand("update rollupqueue set status = 0, queueserver=NULL  where queueserver=@servername and (status = 1 OR STATUS = 2)", cn))
-                            {
-                                cmd1.Parameters.Clear();
-                                cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                cmd1.ExecuteNonQuery();
-                            }
+                            cmd.ExecuteNonQuery();
                         }
-                        catch { return false; }
+                        using (var cmd1 = new SqlCommand("update rollupqueue set status = 0, queueserver=NULL  where queueserver=@servername and (status = 1 OR STATUS = 2)", cn))
+                        {
+                            cmd1.Parameters.Clear();
+                            cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                            cmd1.ExecuteNonQuery();
+                        }
                     }
                 }
             }
-
-            return true;
         }
 
 
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             try
             {

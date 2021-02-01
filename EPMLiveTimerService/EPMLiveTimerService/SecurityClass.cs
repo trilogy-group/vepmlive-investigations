@@ -17,11 +17,10 @@ namespace TimerService
     {
 
 
-        public override bool InitializeTask(CancellationToken token)
+        public override void InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask(token))
-                return false;
-
+            base.InitializeTask(token);
+              
             //EPML-5787
             LogMessage("INIT", "STMR", "Clearing Queue");
 
@@ -52,11 +51,10 @@ namespace TimerService
                     }
                 }
             }
-            return true;
         }
 
 
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             try
             {

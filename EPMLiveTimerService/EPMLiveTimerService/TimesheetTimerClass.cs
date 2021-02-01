@@ -16,10 +16,9 @@ namespace TimerService
 {
     class TimesheetTimerClass : ProcessorBase
     {
-        public override bool InitializeTask(CancellationToken token)
+        public override void InitializeTask(CancellationToken token)
         {
-            if (!base.InitializeTask(token))
-                return false;
+            base.InitializeTask(token);
 
             SPWebApplicationCollection _webcolections = GetWebApplications();
             foreach (SPWebApplication webApp in _webcolections)
@@ -47,11 +46,9 @@ namespace TimerService
                     }
                 }
             }
-
-            return true;
         }
 
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             try
             {
@@ -69,7 +66,7 @@ namespace TimerService
                             try
                             {
                                 cn.Open();
-
+                                int processed = 0;
                                 using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
@@ -80,7 +77,7 @@ namespace TimerService
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
                                         da.Fill(ds);
-                                        int processed = 0;
+
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
 
@@ -103,14 +100,29 @@ namespace TimerService
                                             processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) LogMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
-                                    }
-
-                                    using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
-                                    {
-                                        cmd1.ExecuteNonQuery();
                                     }
                                 }
+                                if (processed > 0)
+                                    LogMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
+                                else
+                                {
+                                    using (SqlCommand cmd = new SqlCommand(@";
+                                                with oldestAborted as 
+                                                (select TOP 1 * from tsqueue where status = 3 and resulttext like '%aborted%')
+                                                update oldestAborted set status=0,queue=CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) - 1) AS nvarchar(1)) + '-' +  @servername
+                                                ", cn))
+                                    {
+                                        cmd.CommandType = CommandType.Text;
+                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                        cmd.ExecuteNonQuery();
+                                    }
+                                }
+
+                                using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
+                                {
+                                    cmd1.ExecuteNonQuery();
+                                }
+
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
                             {
@@ -184,7 +196,7 @@ namespace TimerService
                     thisClass.GetField("bErrors").SetValue(classObject, true);
 
                     thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout * trial + " minutes");
-                    LogMessage("ERROR", "EXEC", "Job Gracefully Finished:" + e.StackTrace);
+                    LogMessage("ERROR", "EXEC", "Job Gracefully Finished:" + e.StackTrace.Replace('\n','|'));
                 }
                 catch (Exception ex)
                 {

@@ -9,13 +9,7 @@ namespace TimerService
 {
     public class RunFaultyClass : ProcessorBase
     {
-        public override bool InitializeTask(CancellationToken token) 
-        {
-            if (!base.InitializeTask(false, token))
-                return false;
-            return true;
-        }
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             token.ThrowIfCancellationRequested();
             Thread.Sleep(new TimeSpan(0, 0, 5));

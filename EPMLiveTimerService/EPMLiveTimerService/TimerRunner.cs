@@ -8,14 +8,7 @@ namespace TimerService
 {
     public class TimerRunner
     {
-        protected class ClassItem
-        {
-            public ProcessorBase Processor;
-            public IProgress<int> Progress;
-            public string PollingProperty = "PollingInterval";
-            public bool Initialized = false;
-        }
-        protected ClassItem[] classes;
+        protected ProcessorBase[] classes;
         protected Task mainWorker;
 
         protected CancellationTokenSource _cts;
@@ -30,50 +23,22 @@ namespace TimerService
                 ThreadPool.SetMaxThreads(50, 100);
                 ThreadPool.SetMinThreads(0, 0);
                 bool queueJobs = ConfigurationManager.AppSettings["SecondaryTimer"] == null || ConfigurationManager.AppSettings["SecondaryTimer"].ToLower() != "true";
-                classes = new ClassItem[7];
+                classes = new ProcessorBase[7];
 
-                classes[0] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new TimerClass(false, false)
-                };
+                classes[0] = new TimerClass(false, false);
 
-                classes[1] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new TimerClass(true, queueJobs)
-                };
+                classes[1] = new TimerClass(true, queueJobs);
 
-                classes[2] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new TimesheetTimerClass()
-                };
+                classes[2] = new TimesheetTimerClass();
 
-                classes[3] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new SecurityClass()
-                };
+                classes[3] = new SecurityClass();
 
-                classes[4] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new NotificationClass(),
-                    PollingProperty = "NotificationInterval"
-                };
+                classes[4] = new NotificationClass();
 
-                classes[5] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new RollupClass()
-                };
+                classes[5] = new RollupClass();
 
-                classes[6] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new IntegrationClass()
-                };
+                classes[6] = new IntegrationClass();
+                
                 _cts = new CancellationTokenSource();
                 token = _cts.Token;
                 mainWorker = new Task(DoWork, token);
@@ -95,7 +60,7 @@ namespace TimerService
                 DateTime lastHeartBeat = DateTime.Now;
                 List<TimeSpan> pollPeriods = new List<TimeSpan>();
                 List<DateTime> lastTimeExecutions = new List<DateTime>();
-                foreach (ClassItem currentClass in classes)
+                foreach (ProcessorBase currentClass in classes)
                 {
                     int waitPeriod = WAIT;
                     try
@@ -127,16 +92,16 @@ namespace TimerService
                         {
                             minimumSleep = expectedSleep;
                         }
-                        ClassItem currentClass = classes[index];
+                        ProcessorBase currentClass = classes[index];
                         try
                         {
                             if (!currentClass.Initialized)
                             {
-                                currentClass.Initialized = currentClass.Processor.InitializeTask(token);
+                                currentClass.InitializeTask(token);
 
                             }
                             if (beatNow)
-                                currentClass.Processor.HeartBeat();
+                                currentClass.HeartBeat();
 
                             if (newHeartBeat - lastExecution < pollPeriod)
                             {
@@ -148,12 +113,12 @@ namespace TimerService
                             }
                             if (currentClass.Initialized)
                             {
-                                currentClass.Processor.RunTask();
+                                currentClass.ProcessJobs();
                             }
                         }
                         catch(Exception ex) when (!(ex is OperationCanceledException))
                         {
-                            currentClass.Processor.LogMessage("ERR", "RUNT", ex.ToString());
+                            currentClass.LogMessage("ERR", "RUNT", ex.ToString());
                         }
                     }
                     if (minimumSleep < TimeSpan.MaxValue)
@@ -164,9 +129,9 @@ namespace TimerService
             }
             catch (OperationCanceledException)
             {
-                foreach (ClassItem currentClass in classes)
+                foreach (ProcessorBase currentClass in classes)
                 {
-                    currentClass.Processor.Cancel();
+                    currentClass.Cancel();
                 }
                 throw;
             }

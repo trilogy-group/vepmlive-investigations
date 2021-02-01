@@ -97,12 +97,12 @@ namespace TimerService
         }
 
         protected CancellationToken token;
-        public virtual bool InitializeTask(CancellationToken token)
+        public virtual void InitializeTask(CancellationToken token)
         {
-            return InitializeTask(true, token);
+            InitializeTask(true, token);
         }
 
-        public virtual bool InitializeTask(bool initializeThreads, CancellationToken token)
+        public virtual void InitializeTask(bool initializeThreads, CancellationToken token)
         {
             this.token = token;
             try
@@ -113,7 +113,10 @@ namespace TimerService
 
             LogMessage("INIT", "STMR", "Starting Timer Service");
             if (!initializeThreads)
-                return true;
+            {
+                initialized = true;
+                return;
+            }
             int maxThreads = 0;
             try
             {
@@ -124,11 +127,11 @@ namespace TimerService
                 LogMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
             }
             if (maxThreads < 1)
-                return false;
+                return;
 
             LogMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
             _maxThreads = maxThreads;
-            return true;
+            initialized = true;
         }
         public void HeartBeat()
         {
@@ -155,7 +158,27 @@ namespace TimerService
                 return 0;
             }
         }
-        public abstract void RunTask();
+        public abstract void ProcessJobs();
+
+        public virtual string PollingProperty
+        {
+            get
+            {
+                return "PollingInterval";
+            }
+
+        }
+        bool initialized = false;
+        public bool Initialized
+        {
+            get
+            {
+                return initialized;
+            }
+
+
+        }
+           
 
         protected abstract void DoWork(object rd);
 

@@ -13,19 +13,12 @@ namespace TimerService
         {
             try
             {
-                classes = new ClassItem[2];
+                classes = new ProcessorBase[2];
 
-                classes[0] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new InitFaultyClass()
-                };
-                classes[1] = new ClassItem
-                {
-                    Progress = new Progress<int>(value => { }),
-                    Processor = new RunFaultyClass()
-                };
+                classes[0] = new InitFaultyClass();
 
+                classes[1] = new RunFaultyClass();
+               
                 _cts = new CancellationTokenSource();
                 token = _cts.Token;
                 mainWorker = new Task(DoWork, token);

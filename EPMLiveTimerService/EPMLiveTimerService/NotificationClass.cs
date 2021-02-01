@@ -15,11 +15,11 @@ namespace TimerService
 {
     public class NotificationClass : ProcessorBase
     {
-        public override bool InitializeTask(CancellationToken token)
+        public override void InitializeTask(CancellationToken token)
         {
-            return base.InitializeTask(false, token);
+            base.InitializeTask(false, token);
         }
-        public override void RunTask()
+        public override void ProcessJobs()
         {
             try
             {
@@ -149,6 +149,13 @@ namespace TimerService
         protected override string ThreadsProperty {
             get {
                 throw new NotImplementedException();
+            }
+        }
+        public override string PollingProperty
+        {
+            get
+            {
+                return "NotificationInterval";
             }
         }
     }
