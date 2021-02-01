@@ -10,6 +10,7 @@ using System.Linq;
 using EPMLiveCore;
 using EPMLiveCore.PfeData;
 using System.Data.Common;
+using System.Collections.Concurrent;
 
 namespace TimeSheets
 {
@@ -58,6 +59,8 @@ namespace TimeSheets
             }
             return impersonate;
         }
+        private static readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
+
 
         public static string processActualWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
         {
@@ -116,78 +119,82 @@ namespace TimeSheets
                                 iList = iWeb.Lists[lGuid];
                                 listGuid = iList.ID;
                             }
-                            iWeb.AllowUnsafeUpdates = true;
-                            SPListItem li = null;
-                            try
+                            string itemId = dr["ITEM_ID"].ToString();
+                            lock (_locks.GetOrAdd(itemId, _ => new object()))
                             {
-                                li = iList.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
-                            }
-                            catch { }
-                            if (li != null)
-                            {
-                                //If the project server feature is not active and it is in approval mode then process actual work.
-                                if (iWeb.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null && bApprovalScreen)
+                                iWeb.AllowUnsafeUpdates = true;
+                                SPListItem li = null;
+                                try
                                 {
-                                    SPField f = null;
-                                    try
-                                    {
-                                        f = iList.Fields.GetFieldByInternalName("TimesheetHours");
-                                    }
-                                    catch { }
-                                    if (f != null)
-                                    {
-                                        li[f.Id] = dr["TotalHours"].ToString();
-
-                                        li.Update();
-
-                                        //processProject(dsProjects, wGuid, iWeb);
-
-                                    }
+                                    li = iList.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
                                 }
-                                else
+                                catch { }
+                                if (li != null)
                                 {
-                                    SPField f = null;
-                                    try
+                                    //If the project server feature is not active and it is in approval mode then process actual work.
+                                    if (iWeb.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null && bApprovalScreen)
                                     {
-                                        f = iList.Fields.GetFieldByInternalName("TimesheetHours");
-                                    }
-                                    catch { }
-                                    if (f != null)
-                                    {
-                                        string taskuid = "";
+                                        SPField f = null;
                                         try
                                         {
-                                            taskuid = li["taskuid"].ToString();
+                                            f = iList.Fields.GetFieldByInternalName("TimesheetHours");
                                         }
                                         catch { }
-                                        //if the item has a taskuid (Meaning this item is a Project Task)
-                                        if (taskuid != "" && taskuid.Contains("."))
-                                        {
-                                            string login = "";
-                                            try
-                                            {
-                                                SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)li[iList.Fields.GetFieldByInternalName("AssignedTo").Id];
-                                                if (uvc.Count > 0)
-                                                {
-                                                    login = uvc[0].User.LoginName.ToLower();
-                                                }
-                                            }
-                                            catch { }
-                                            if (login != "")//if we found a user
-                                            {
-                                                if (login == SPContext.Current.Web.CurrentUser.LoginName.ToLower())
-                                                {
-                                                    li[f.Id] = dr["SubmittedHours"].ToString();
-                                                    li.Update();
-                                                    //processProject(dsProjects, wGuid, iWeb);
-                                                }
-                                            }
-                                        }
-                                        else if (bApprovalScreen)//otherwise it must be in approval mode
+                                        if (f != null)
                                         {
                                             li[f.Id] = dr["TotalHours"].ToString();
+
                                             li.Update();
+
                                             //processProject(dsProjects, wGuid, iWeb);
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        SPField f = null;
+                                        try
+                                        {
+                                            f = iList.Fields.GetFieldByInternalName("TimesheetHours");
+                                        }
+                                        catch { }
+                                        if (f != null)
+                                        {
+                                            string taskuid = "";
+                                            try
+                                            {
+                                                taskuid = li["taskuid"].ToString();
+                                            }
+                                            catch { }
+                                            //if the item has a taskuid (Meaning this item is a Project Task)
+                                            if (taskuid != "" && taskuid.Contains("."))
+                                            {
+                                                string login = "";
+                                                try
+                                                {
+                                                    SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)li[iList.Fields.GetFieldByInternalName("AssignedTo").Id];
+                                                    if (uvc.Count > 0)
+                                                    {
+                                                        login = uvc[0].User.LoginName.ToLower();
+                                                    }
+                                                }
+                                                catch { }
+                                                if (login != "")//if we found a user
+                                                {
+                                                    if (login == SPContext.Current.Web.CurrentUser.LoginName.ToLower())
+                                                    {
+                                                        li[f.Id] = dr["SubmittedHours"].ToString();
+                                                        li.Update();
+                                                        //processProject(dsProjects, wGuid, iWeb);
+                                                    }
+                                                }
+                                            }
+                                            else if (bApprovalScreen)//otherwise it must be in approval mode
+                                            {
+                                                li[f.Id] = dr["TotalHours"].ToString();
+                                                li.Update();
+                                                //processProject(dsProjects, wGuid, iWeb);
+                                            }
                                         }
                                     }
                                 }
@@ -267,17 +274,20 @@ namespace TimeSheets
                                     iList = iWeb.Lists[lGuid];
                                     listGuid = iList.ID;
                                 }
-                                iWeb.AllowUnsafeUpdates = true;
                                 string project = drProject["Project_id"].ToString();
                                 if (project != "0")
                                 {
-                                    try
+                                    lock (_locks.GetOrAdd(project, _ => new object()))
                                     {
-                                        SPListItem liProject = iList.GetItemById(int.Parse(project));
-                                        liProject["TimesheetHours"] = drProject["Hours"].ToString();
-                                        liProject.SystemUpdate();
+                                        iWeb.AllowUnsafeUpdates = true;
+                                        try
+                                        {
+                                            SPListItem liProject = iList.GetItemById(int.Parse(project));
+                                            liProject["TimesheetHours"] = drProject["Hours"].ToString();
+                                            liProject.SystemUpdate();
+                                        }
+                                        catch { }
                                     }
-                                    catch { }
                                 }
                             }
                         }
@@ -326,15 +336,19 @@ namespace TimeSheets
                             projectCenter = iWeb.Lists[pcGuid];
 
                         string project = drProject["Project_id"].ToString();
+
                         if (project != "0")
                         {
-                            try
+                            lock (_locks.GetOrAdd(project, _ => new object()))
                             {
-                                SPListItem liProject = projectCenter.GetItemById(int.Parse(project));
-                                liProject["TimesheetHours"] = drProject["Hours"].ToString();
-                                liProject.SystemUpdate();
+                                try
+                                {
+                                    SPListItem liProject = projectCenter.GetItemById(int.Parse(project));
+                                    liProject["TimesheetHours"] = drProject["Hours"].ToString();
+                                    liProject.SystemUpdate();
+                                }
+                                catch { }
                             }
-                            catch { }
                         }
                     }
                     catch { }

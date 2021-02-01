@@ -11,7 +11,7 @@ namespace TimeSheets
 {
     class SaveDataJob : BaseJob
     {
-        private const int MaxTaskFailures = 32;
+        private const int MaxTaskFailures = 2;
         private const int SaveConflictErrorCode = unchecked((int)0x81020037);
 
         private string NonUpdatingColumns = "Project,AssignedTo";
@@ -215,63 +215,63 @@ namespace TimeSheets
                                     var failures = 0;
                                     while (true)
                                     {
-                                    try
-                                    {
                                         try
                                         {
-                                                li = SaveDataJobExecuteCache.Cache.GetListItem(web.ServerRelativeUrl, list.ID, int.Parse(itemid), refresh: failures > 0);
-                                        }
-                                        catch
-                                        {
-                                        }
-
-                                        if (li != null)
-                                        {
-                                            int projectid = 0;
-                                            string project = "";
-                                            string projectlist = "";
                                             try
                                             {
-                                                SPFieldLookupValue lv =
-                                                    new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
-                                                projectid = lv.LookupId;
-                                                project = lv.LookupValue;
+                                                li = SaveDataJobExecuteCache.Cache.GetListItem(web.ServerRelativeUrl, list.ID, int.Parse(itemid), refresh: failures > 0);
                                             }
                                             catch
                                             {
                                             }
 
-                                            if (liveHours)
+                                            if (li != null)
                                             {
-                                                if (!processLiveHours(li, list.ID))
+                                                int projectid = 0;
+                                                string project = "";
+                                                string projectlist = "";
+                                                try
                                                 {
-                                                    return;
+                                                    SPFieldLookupValue lv =
+                                                        new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
+                                                    projectid = lv.LookupId;
+                                                    project = lv.LookupValue;
+                                                }
+                                                catch
+                                                {
                                                 }
 
-                                                if (li.Fields.ContainsFieldWithInternalName("PercentComplete") &&
-                                                    li.Fields.ContainsFieldWithInternalName("Status"))
+                                                if (liveHours)
                                                 {
-                                                    SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
-                                                    SPField statusField = li.Fields.GetFieldByInternalName("Status");
-                                                    if (percentCompleteField != null && statusField != null)
+                                                    if (!processLiveHours(li, list.ID))
                                                     {
-                                                        Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
-                                                        if (value == 0)
-                                                        {
-                                                            li[statusField.InternalName] = "Not Started";
-                                                        }
-                                                        else if (value > 0 & value < 1)
-                                                        {
-                                                            li[statusField.InternalName] = "In Progress";
-                                                        }
-                                                        else if (value == 1)
-                                                        {
-                                                            li[statusField.InternalName] = "Completed";
-                                                        }
+                                                        return;
                                                     }
 
+                                                    if (li.Fields.ContainsFieldWithInternalName("PercentComplete") &&
+                                                        li.Fields.ContainsFieldWithInternalName("Status"))
+                                                    {
+                                                        SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
+                                                        SPField statusField = li.Fields.GetFieldByInternalName("Status");
+                                                        if (percentCompleteField != null && statusField != null)
+                                                        {
+                                                            Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
+                                                            if (value == 0)
+                                                            {
+                                                                li[statusField.InternalName] = "Not Started";
+                                                            }
+                                                            else if (value > 0 & value < 1)
+                                                            {
+                                                                li[statusField.InternalName] = "In Progress";
+                                                            }
+                                                            else if (value == 1)
+                                                            {
+                                                                li[statusField.InternalName] = "Completed";
+                                                            }
+                                                        }
+
+                                                    }
                                                 }
-                                            }
 
                                                 SPSecurity.RunWithElevatedPrivileges(delegate { li.Update(); });
                                             }
@@ -279,12 +279,12 @@ namespace TimeSheets
                                         catch (SPException ex) when (ex.HResult == SaveConflictErrorCode && ++failures < MaxTaskFailures)
                                         {
                                             continue;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        bErrors = true;
-                                        sErrors += "Item (" + id + ") Error: " + ex.ToString();
-                                    }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            bErrors = true;
+                                            sErrors += "Item (" + id + ") Error: " + ex.ToString();
+                                        }
 
                                         break;
                                     }
