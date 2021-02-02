@@ -104,7 +104,7 @@ namespace TimerService
                                 }
                                 if (processed > 0)
                                     LogMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
-                                else
+                                else if (RunningThreads == 0)
                                 {
                                     using (SqlCommand cmd = new SqlCommand(@";
                                                 with oldestAborted as 
