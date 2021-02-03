@@ -108,7 +108,7 @@ namespace TimerService
                                 {
                                     using (SqlCommand cmd = new SqlCommand(@";
                                                 with oldestAborted as 
-                                                (select TOP 1 * from tsqueue where status = 3 and resulttext like '%aborted%')
+                                                (select TOP 1 * from tsqueue where status = 3 and result = 'errors' order by dtstarted)
                                                 update oldestAborted set status=0,queue=CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) - 1) AS nvarchar(1)) + '-' +  @servername
                                                 ", cn))
                                     {
