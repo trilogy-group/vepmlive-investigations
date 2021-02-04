@@ -35,7 +35,7 @@ namespace TimerService
                             {
                                 cmd.ExecuteNonQuery();
                             }
-                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where queue=@servername and (status = 1 OR STATUS = 2)", cn))
+                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where (queue=@servername OR QUEUE like '%-' + @servername) and (status = 1 OR STATUS = 2)", cn))
                             {
                                 cmd1.Parameters.Clear();
                                 cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
@@ -57,6 +57,12 @@ namespace TimerService
                 SPWebApplicationCollection _webcolections = GetWebApplications();
                 foreach (SPWebApplication webApp in _webcolections)
                 {
+                    var maxThreads = MaxThreads;
+                    if (maxThreads <= 0)
+                    {
+                        continue;
+                    }
+
                     string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                     if (sConn != "")
                     {
@@ -65,42 +71,49 @@ namespace TimerService
                             try
                             {
                                 cn.Open();
-
+                                var processed = 0;
                                 using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
                                     cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", MaxThreads);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
                                     DataSet ds = new DataSet();
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
                                         da.Fill(ds);
-                                        int processed = 0;
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
-
                                             var rd = new RunnerData { cn = sConn, dr = dr };
-                                            
+
+                                            var queue = dr["queue"].ToString();
+                                            var trial = 1;
+                                            if (int.TryParse(queue.Substring(0, 1), out trial))
+                                            {
+                                                trial++;
+                                            }
+
                                             if (startProcess(rd))
                                             {
-                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id and status = 1", cn))
+                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }
-                                                processed++;
                                             }
-                                            
+                                            processed++;
                                             token.ThrowIfCancellationRequested();
                                         }
-                                        if (processed > 0) logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
                                     }
+                                }
+                                if (processed > 0)
+                                {
+                                    logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                }
 
-                                    using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
-                                    {
-                                        cmd1.ExecuteNonQuery();
-                                    }
+                                using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
+                                {
+                                    cmd1.ExecuteNonQuery();
                                 }
                             }
                             catch (Exception ex) when (!(ex is OperationCanceledException))
