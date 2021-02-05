@@ -26,7 +26,7 @@ namespace TimerService
                 return "InitFaulty";
             }
         }
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
             throw new NotImplementedException();
         }

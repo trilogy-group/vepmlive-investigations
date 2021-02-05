@@ -149,9 +149,9 @@ namespace TimerService
             }
         }
 
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
-            DataRow dr = rd.dr;
+            DataRow dr = ((RunnerData)rd).dr;
 
             try
             {
@@ -225,7 +225,7 @@ namespace TimerService
             {
                 if (ex.Message.Contains("could not be found"))
                 {
-                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                     {
                         try
                         {

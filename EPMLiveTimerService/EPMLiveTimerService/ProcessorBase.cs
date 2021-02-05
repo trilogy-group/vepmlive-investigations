@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace TimerService
 {
@@ -21,16 +22,56 @@ namespace TimerService
             public DataRow dr;
         }
 
+        protected int RunningThreads
+        {
+            get
+            {
+                return threadList.Count;
+            }
+        }
+        private static object threadsLock = new object();
         private int _maxThreads;
         protected int MaxThreads {
-            get { return _maxThreads; }
+            get
+            {
+                lock (threadsLock)
+                {
+                    for (int i = threadList.Count - 1; i >= 0; i--)
+                    {
+                        if (!threadList[i].Item1.IsAlive)
+                        {
+                            threadList.RemoveAt(i);
+                        }
+                        else if (Timeout > 0 && DateTime.Now - threadList[i].Item2 > new TimeSpan(0, Timeout * threadList[i].Item3, 0))
+                        {
+
+                            try
+                            {
+                                threadList[i].Item1.Abort();
+                                threadList[i].Item1.Join();
+                            }
+                            catch { }
+
+                            threadList.RemoveAt(i);
+                        }
+
+                    }
+                    return _maxThreads - threadList.Count;
+                }
+            }
         }
-  
-        protected bool startProcess(RunnerData rd)
+
+        List<Tuple<Thread, DateTime, int>> threadList = new List<Tuple<Thread, DateTime, int>>();
+        protected bool startProcess(RunnerData rd, int trialNumber = 1)
         {
             try
             {
-                Task.Run(() => DoWork(rd));
+                Thread newThread = new Thread(new ParameterizedThreadStart(DoWork));
+                newThread.Start(rd);
+                lock (threadsLock)
+                {
+                    threadList.Add(new Tuple<Thread, DateTime, int>(newThread, DateTime.Now, trialNumber));
+                }
                 return true;
             }
             catch (Exception ex)
@@ -99,9 +140,17 @@ namespace TimerService
             get;
         }
 
+        protected virtual int Timeout
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         public abstract void RunTask(CancellationToken token);
 
-        protected abstract void DoWork(RunnerData rd);
+        protected abstract void DoWork(object rd);
 
         protected abstract string ThreadsProperty {
             get;
