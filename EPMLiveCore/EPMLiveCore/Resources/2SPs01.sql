@@ -1221,6 +1221,8 @@ FROM TSQUEUE
 LEFT OUTER JOIN dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID
 WHERE dbo.TSTIMESHEET.TS_UID IS NULL AND Status <> 3
 
+set @maxthreads = @maxthreads - (select count(*) from TSQUEUE where (QUEUE = @servername OR QUEUE like ''%-'' + @servername) and (status = 1 OR status = 2))
+
 set @divisor  = 2
 
 set @MaxThreads_type_2 = @maxthreads / @divisor 

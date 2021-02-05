@@ -10,6 +10,7 @@ using System.Collections;
 using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Configuration;
 
 namespace TimerService
 {
@@ -108,7 +109,20 @@ namespace TimerService
                                 }
                                 if (processed > 0)
                                 {
-                                    logMessage("HTBT", "PRCS", "Processed " + processed + " jobs");
+                                    logMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
+                                }
+                                else if (RunningThreads == 0)
+                                {
+                                    using (SqlCommand cmd = new SqlCommand(@";
+                                                with oldestAborted as 
+                                                (select TOP 1 * from tsqueue where status = 3 and result = 'errors' order by dtstarted)
+                                                update oldestAborted set status=0,queue=CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) - 1) AS nvarchar(1)) + '-' +  @servername
+                                                ", cn))
+                                    {
+                                        cmd.CommandType = CommandType.Text;
+                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                        cmd.ExecuteNonQuery();
+                                    }
                                 }
 
                                 using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
@@ -131,21 +145,19 @@ namespace TimerService
             }
         }
 
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
-            DataRow dr = rd.dr;
-
-            try
+            DataRow dr = ((RunnerData)rd).dr;
+            using (SPSite site = new SPSite(new Guid(dr["SITE_UID"].ToString())))
             {
-                using (SPSite site = new SPSite(new Guid(dr["SITE_UID"].ToString())))
+                MethodInfo m;
+
+                Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
+                Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
+                object classObject = Activator.CreateInstance(thisClass);
+
+                try
                 {
-
-                    MethodInfo m;
-
-                    Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
-                    Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
-                    object classObject = Activator.CreateInstance(thisClass);
-
                     thisClass.GetField("QueueUid").SetValue(classObject, new Guid(dr["TSQUEUE_ID"].ToString()));
                     thisClass.GetField("TSUID").SetValue(classObject, new Guid(dr["TS_UID"].ToString()));
                     thisClass.GetField("jobtype").SetValue(classObject, int.Parse(dr["jobtype_id"].ToString()));
@@ -161,51 +173,66 @@ namespace TimerService
 
                     try
                     {
-
                         m = thisClass.GetMethod("execute");
                         m.Invoke(classObject, new object[] { site, dr["JOBDATA"].ToString() });
-
                     }
                     catch (Exception ex)
                     {
                         thisClass.GetField("bErrors").SetValue(classObject, true);
                         thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
                     }
-					if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
-					{
-						string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
-						logMessage("ERR", "PROC", error);
-					}
-
-					m = thisClass.GetMethod("finishJob");
-                    m.Invoke(classObject, new object[] { });
-
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("could not be found"))
-                {
-                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    if ((bool)thisClass.GetField("bErrors").GetValue(classObject))
                     {
-                        try
-                        {
-                            cn.Open();
-                            using (SqlCommand cmd = new SqlCommand("DELETE FROM TSQUEUE WHERE TSQUEUE_ID=@id", cn))
-                            {
-                                cmd.Parameters.AddWithValue("@id", dr["TSQUEUE_ID"].ToString());
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                        catch (Exception exe) { logMessage("ERR", "PROC", exe.Message); }
+                        string error = (string)thisClass.GetField("sErrors").GetValue(classObject);
+                        logMessage("ERR", "PROC", error);
                     }
+                    logMessage("PASS", "EXEC", "Job Successfully Finished");
                 }
-                else
+                catch (ThreadAbortException e)
+                {
+                    string queue = dr["queue"].ToString();
+                    int trial = 1;
+                    if (int.TryParse(queue.Substring(0, 1), out trial))
+                    {
+                        trial++;
+                    }
+                    thisClass.GetField("bErrors").SetValue(classObject, true);
+
+                    thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout * trial + " minutes");
+                    logMessage("ERROR", "EXEC", "Job Gracefully Finished:" + e.StackTrace.Replace('\n', '|'));
+                }
+                catch (Exception ex)
                 {
                     logMessage("ERR", "PROC", ex.Message);
                 }
-            }
+                finally
+                {
+                    m = thisClass.GetMethod("finishJob");
+                    m.Invoke(classObject, new object[] { });
+                }
 
+            }
+        }
+
+        static int? timeout;
+        protected override int Timeout
+        {
+            get
+            {
+                if (timeout == null)
+                {
+                    int configTimeout;
+                    if (!int.TryParse(ConfigurationManager.AppSettings["TimesheetTimeout"], out configTimeout))
+                    {
+                        timeout = 10;
+                    }
+                    else
+                    {
+                        timeout = configTimeout;
+                    }
+                }
+                return timeout.Value;
+            }
         }
 
         protected override string LogName {
