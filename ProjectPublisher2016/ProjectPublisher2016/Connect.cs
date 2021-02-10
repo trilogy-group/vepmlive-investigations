@@ -452,12 +452,15 @@ namespace ProjectPublisher2016
             {
                 app.DisplayAlerts = false;
                 Microsoft.Office.Interop.MSProject.Project pj = app.ActiveProject;
-                var title = Connection.getProjectName(pj);
-                if (!string.IsNullOrWhiteSpace(title) && title != pj.Title)
+                if (pj != null)
                 {
-                    pj.Title = title;
-                    if (!pj.ReadOnly)
-                        app.FileSave();                    
+                    var title = Connection.getProjectName(pj);
+                    if (!string.IsNullOrWhiteSpace(title) && title != pj.Title)
+                    {
+                        pj.Title = title;
+                        if (!pj.ReadOnly)
+                            app.FileSave();
+                    }
                 }
             }
             catch (Exception ex)
