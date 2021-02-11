@@ -72,41 +72,7 @@ namespace TimerService
                             try
                             {
                                 cn.Open();
-                                var processed = 0;
-                                using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
-                                {
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
-
-                                    DataSet ds = new DataSet();
-                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                                    {
-                                        da.Fill(ds);
-                                        foreach (DataRow dr in ds.Tables[0].Rows)
-                                        {
-                                            var rd = new RunnerData { cn = sConn, dr = dr };
-
-                                            var queue = dr["queue"].ToString();
-                                            var trial = 1;
-                                            if (int.TryParse(queue.Substring(0, 1), out trial))
-                                            {
-                                                trial++;
-                                            }
-
-                                            if (startProcess(rd))
-                                            {
-                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
-                                                {
-                                                    cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
-                                                    cmd1.ExecuteNonQuery();
-                                                }
-                                            }
-                                            processed++;
-                                            token.ThrowIfCancellationRequested();
-                                        }
-                                    }
-                                }
+                                var processed = ProcessTimesheetQueue(ref token, maxThreads, sConn, cn);
                                 if (processed > 0)
                                 {
                                     logMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
@@ -120,7 +86,7 @@ namespace TimerService
                                                 ", cn))
                                     {
                                         cmd.CommandType = CommandType.Text;
-                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                        cmd.Parameters.AddWithValue("@servername", Environment.MachineName);
                                         cmd.ExecuteNonQuery();
                                     }
                                 }
@@ -137,12 +103,52 @@ namespace TimerService
                         }
                     }
                 }
-
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 logMessage("ERR", "RUN", ex.Message);
             }
+        }
+
+        private int ProcessTimesheetQueue(ref CancellationToken token, int maxThreads, string sConn, SqlConnection cn)
+        {
+            var processed = 0;
+            using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@servername", Environment.MachineName);
+                cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+
+                DataSet ds = new DataSet();
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                {
+                    da.Fill(ds);
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        var rd = new RunnerData { cn = sConn, dr = dr };
+
+                        var queue = dr["queue"].ToString();
+                        var trial = 1;
+                        if (int.TryParse(queue.Substring(0, 1), out trial))
+                        {
+                            trial++;
+                        }
+
+                        if (startProcess(rd))
+                        {
+                            using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
+                            {
+                                cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
+                                cmd1.ExecuteNonQuery();
+                            }
+                        }
+                        processed++;
+                        token.ThrowIfCancellationRequested();
+                    }
+                }
+            }
+
+            return processed;
         }
 
         protected override void DoWork(object rd)
@@ -199,7 +205,7 @@ namespace TimerService
                     thisClass.GetField("bErrors").SetValue(classObject, true);
 
                     thisClass.GetField("sErrors").SetValue(classObject, "Aborted after " + Timeout * trial + " minutes");
-                    logMessage("ERROR", "EXEC", "Job Gracefully Finished:" + e.StackTrace.Replace('\n', '|'));
+                    logMessage("ERROR", "EXEC", "Job Gracefully Finished:" + e.ToString().Replace('\n', '|'));
                 }
                 catch (Exception ex)
                 {
