@@ -1,10 +1,9 @@
 ﻿using System;
-using Microsoft.SharePoint.Administration;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
-using System.Collections.Generic;
+using Microsoft.SharePoint.Administration;
 
 namespace TimerService
 {
@@ -29,14 +28,14 @@ namespace TimerService
                 return threadList.Count;
             }
         }
-        private static object threadsLock = new object();
+        private static readonly object threadsLock = new object();
         private int _maxThreads;
         protected int MaxThreads {
             get
             {
                 lock (threadsLock)
                 {
-                    for (int i = threadList.Count - 1; i >= 0; i--)
+                    for (var i = threadList.Count - 1; i >= 0; i--)
                     {
                         if (!threadList[i].Item1.IsAlive)
                         {
@@ -44,24 +43,25 @@ namespace TimerService
                         }
                         else if (Timeout > 0 && DateTime.Now - threadList[i].Item2 > new TimeSpan(0, Timeout * threadList[i].Item3, 0))
                         {
-
                             try
                             {
                                 threadList[i].Item1.Abort();
                                 threadList[i].Item1.Join();
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                logMessage("ERR", "MXTD", $"Exception suppressed: {ex}");
+                            }
 
                             threadList.RemoveAt(i);
                         }
-
                     }
                     return _maxThreads - threadList.Count;
                 }
             }
         }
 
-        List<Tuple<Thread, DateTime, int>> threadList = new List<Tuple<Thread, DateTime, int>>();
+        readonly List<Tuple<Thread, DateTime, int>> threadList = new List<Tuple<Thread, DateTime, int>>();
         protected bool startProcess(RunnerData rd, int trialNumber = 1)
         {
             try
