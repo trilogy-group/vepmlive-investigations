@@ -28,12 +28,12 @@ namespace TimerService
                 return threadList.Count;
             }
         }
-        private static readonly object threadsLock = new object();
+        private static readonly object ThreadsLock = new object();
         private int _maxThreads;
         protected int MaxThreads {
             get
             {
-                lock (threadsLock)
+                lock (ThreadsLock)
                 {
                     for (var i = threadList.Count - 1; i >= 0; i--)
                     {
@@ -61,14 +61,14 @@ namespace TimerService
             }
         }
 
-        readonly List<Tuple<Thread, DateTime, int>> threadList = new List<Tuple<Thread, DateTime, int>>();
+        private readonly List<Tuple<Thread, DateTime, int>> threadList = new List<Tuple<Thread, DateTime, int>>();
         protected bool startProcess(RunnerData rd, int trialNumber = 1)
         {
             try
             {
                 Thread newThread = new Thread(new ParameterizedThreadStart(DoWork));
                 newThread.Start(rd);
-                lock (threadsLock)
+                lock (ThreadsLock)
                 {
                     threadList.Add(new Tuple<Thread, DateTime, int>(newThread, DateTime.Now, trialNumber));
                 }
