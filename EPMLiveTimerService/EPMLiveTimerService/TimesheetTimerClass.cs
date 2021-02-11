@@ -72,7 +72,7 @@ namespace TimerService
                             try
                             {
                                 cn.Open();
-                                var processed = ProcessTimesheetQueue(ref token, maxThreads, sConn, cn);
+                                var processed = ProcessTimesheetQueue(maxThreads, sConn, cn, token);
                                 if (processed > 0)
                                 {
                                     logMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
@@ -110,7 +110,7 @@ namespace TimerService
             }
         }
 
-        private int ProcessTimesheetQueue(ref CancellationToken token, int maxThreads, string sConn, SqlConnection cn)
+        private int ProcessTimesheetQueue(int maxThreads, string sConn, SqlConnection cn, CancellationToken token)
         {
             var processed = 0;
             using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
@@ -119,7 +119,7 @@ namespace TimerService
                 cmd.Parameters.AddWithValue("@servername", Environment.MachineName);
                 cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
-                DataSet ds = new DataSet();
+                var ds = new DataSet();
                 using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                 {
                     da.Fill(ds);
