@@ -1,16 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.ComponentModel;
-using System.Data.SqlClient;
-using Microsoft.SharePoint.Administration;
-using Microsoft.SharePoint;
-using System.Collections;
-using System.Data;
-using System.IO;
-using System.Reflection;
 using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Reflection;
+using System.Threading;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 
 namespace TimerService
 {
@@ -75,7 +70,7 @@ namespace TimerService
                                 var processed = ProcessTimesheetQueue(maxThreads, sConn, cn, token);
                                 if (processed > 0)
                                 {
-                                    logMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
+                                    logMessage("HTBT", "PRCS", $"Requested {maxThreads} Queued {processed} jobs, running threads: {RunningThreads}");
                                 }
                                 else if (RunningThreads == 0)
                                 {
@@ -119,13 +114,13 @@ namespace TimerService
                 cmd.Parameters.AddWithValue("@servername", Environment.MachineName);
                 cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
-                var ds = new DataSet();
-                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                var dataSet = new DataSet();
+                using (SqlDataAdapter dataAdapter = new SqlDataAdapter(cmd))
                 {
-                    da.Fill(ds);
-                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    dataAdapter.Fill(dataSet);
+                    foreach (DataRow dr in dataSet.Tables[0].Rows)
                     {
-                        var rd = new RunnerData { cn = sConn, dr = dr };
+                        var runnerData = new RunnerData { cn = sConn, dr = dr };
 
                         var queue = dr["queue"].ToString();
                         var trial = 1;
@@ -134,7 +129,7 @@ namespace TimerService
                             trial++;
                         }
 
-                        if (startProcess(rd))
+                        if (startProcess(runnerData))
                         {
                             using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
                             {
