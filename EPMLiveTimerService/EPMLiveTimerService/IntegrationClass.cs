@@ -45,7 +45,7 @@ namespace TimerService
                                             RunnerData rd = new RunnerData();
                                             rd.cn = sConn;
                                             rd.dr = dr;
-                                            if (startProcess(rd))
+                                            if (StartProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
                                                 {

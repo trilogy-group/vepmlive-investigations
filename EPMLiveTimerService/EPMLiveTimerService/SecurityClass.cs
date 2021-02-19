@@ -90,7 +90,7 @@ namespace TimerService
                                             {
                                                 var rd = new RunnerData { cn = sConn, dr = dr };
                                                
-                                                if (startProcess(rd))
+                                                if (StartProcess(rd))
                                                 {
                                                     using (var cmd1 = new SqlCommand("UPDATE ITEMSEC set status=2 where ITEM_SEC_ID=@id", cn))
                                                     {

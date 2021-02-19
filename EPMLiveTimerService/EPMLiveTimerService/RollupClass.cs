@@ -87,7 +87,7 @@ namespace TimerService
                                             RunnerData rd = new RunnerData();
                                             rd.cn = sConn;
                                             rd.dr = dr;
-                                            if (startProcess(rd))
+                                            if (StartProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id", cn))
                                                 {
