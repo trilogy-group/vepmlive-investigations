@@ -62,11 +62,11 @@ namespace TimerService
         }
 
         private readonly List<Tuple<Thread, DateTime, int>> threadList = new List<Tuple<Thread, DateTime, int>>();
-        protected bool startProcess(RunnerData rd, int trialNumber = 1)
+        protected bool StartProcess(RunnerData rd, int trialNumber = 1)
         {
             try
             {
-                Thread newThread = new Thread(new ParameterizedThreadStart(DoWork));
+                var newThread = new Thread(new ParameterizedThreadStart(DoWork));
                 newThread.Start(rd);
                 lock (ThreadsLock)
                 {

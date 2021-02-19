@@ -105,7 +105,11 @@ namespace TimerService
             }
         }
 
-        private int ProcessTimesheetQueue(int maxThreads, string sConn, SqlConnection cn, CancellationToken token)
+        private int ProcessTimesheetQueue(
+            int maxThreads, 
+            string sConn, 
+            SqlConnection cn, 
+            CancellationToken token)
         {
             var processed = 0;
             using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
@@ -129,7 +133,7 @@ namespace TimerService
                             trial++;
                         }
 
-                        if (startProcess(runnerData))
+                        if (StartProcess(runnerData))
                         {
                             using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, DTSTARTED=ISNULL(DTSTARTED,GETDATE()) where tsqueue_id=@id and status = 1", cn))
                             {
@@ -211,11 +215,10 @@ namespace TimerService
                     m = thisClass.GetMethod("finishJob");
                     m.Invoke(classObject, new object[] { });
                 }
-
             }
         }
 
-        static int? timeout;
+        private static int? timeout;
         protected override int Timeout
         {
             get
@@ -223,13 +226,13 @@ namespace TimerService
                 if (timeout == null)
                 {
                     int configTimeout;
-                    if (!int.TryParse(ConfigurationManager.AppSettings["TimesheetTimeout"], out configTimeout))
+                    if (int.TryParse(ConfigurationManager.AppSettings["TimesheetTimeout"], out configTimeout))
                     {
-                        timeout = 10;
+                        timeout = configTimeout;
                     }
                     else
                     {
-                        timeout = configTimeout;
+                        timeout = 10;
                     }
                 }
                 return timeout.Value;

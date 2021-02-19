@@ -15,6 +15,7 @@ namespace TimerService
                 return false;
             return true;
         }
+
         public override void RunTask(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -27,10 +28,12 @@ namespace TimerService
                 return "RunFaulty";
             }
         }
+
         protected override void DoWork(object rd)
         {
             throw new NotImplementedException();
         }
+
         protected override string ThreadsProperty {
             get {
                 throw new NotImplementedException();

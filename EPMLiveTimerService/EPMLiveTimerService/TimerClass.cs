@@ -113,7 +113,7 @@ namespace TimerService
                                             rd.cn = sConn;
                                             rd.dr = dr;
                                             
-                                            if (startProcess(rd))
+                                            if (StartProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
                                                 {
