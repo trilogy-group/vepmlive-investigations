@@ -104,19 +104,19 @@ namespace TimerService
                                 }
                                 if (processed > 0)
                                     LogMessage("HTBT", "PRCS", "Requested " + maxThreads + " Queued " + processed + " jobs, running threads: " + RunningThreads);
-                                else if (RunningThreads == 0)
-                                {
-                                    using (SqlCommand cmd = new SqlCommand(@";
-                                                with oldestAborted as 
-                                                (select TOP 1 * from tsqueue where status = 3 and result = 'errors' order by dtstarted)
-                                                update oldestAborted set status=0,queue=CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) - 1) AS nvarchar(1)) + '-' +  @servername
-                                                ", cn))
-                                    {
-                                        cmd.CommandType = CommandType.Text;
-                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
+                                //else if (RunningThreads == 0)
+                                //{
+                                //    using (SqlCommand cmd = new SqlCommand(@";
+                                //                with oldestAborted as 
+                                //                (select TOP 1 * from tsqueue where status = 3 and result = 'errors' order by dtstarted)
+                                //                update oldestAborted set status=0,queue=CAST((TRY_PARSE(SUBSTRING(QUEUE, 1, 1) AS INT) - 1) AS nvarchar(1)) + '-' +  @servername
+                                //                ", cn))
+                                //    {
+                                //        cmd.CommandType = CommandType.Text;
+                                //        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                //        cmd.ExecuteNonQuery();
+                                //    }
+                                //}
 
                                 using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
                                 {
