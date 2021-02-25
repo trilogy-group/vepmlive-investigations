@@ -113,7 +113,7 @@ namespace TimerService
                                             rd.cn = sConn;
                                             rd.dr = dr;
                                             
-                                            if (startProcess(rd))
+                                            if (StartProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
                                                 {
@@ -149,9 +149,9 @@ namespace TimerService
             }
         }
 
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
-            DataRow dr = rd.dr;
+            DataRow dr = ((RunnerData)rd).dr;
 
             try
             {
@@ -225,7 +225,7 @@ namespace TimerService
             {
                 if (ex.Message.Contains("could not be found"))
                 {
-                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                     {
                         try
                         {

@@ -87,7 +87,7 @@ namespace TimerService
                                             RunnerData rd = new RunnerData();
                                             rd.cn = sConn;
                                             rd.dr = dr;
-                                            if (startProcess(rd))
+                                            if (StartProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id", cn))
                                                 {
@@ -121,10 +121,10 @@ namespace TimerService
             }
         }
 
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
 
-            DataRow dr = rd.dr;
+            DataRow dr = ((RunnerData)rd).dr;
 
             try
             {
@@ -137,7 +137,7 @@ namespace TimerService
                     }
                 }
 
-                using (SqlConnection cn = new SqlConnection(rd.cn))
+                using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                 {
                     try
                     {
@@ -158,7 +158,7 @@ namespace TimerService
             }
             catch (Exception ex)
             {
-                using (SqlConnection cn = new SqlConnection(rd.cn))
+                using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                 {
                     try
                     {

@@ -15,6 +15,7 @@ namespace TimerService
                 return false;
             throw new Exception("InitFaultyClass: deliberate failure");
         }
+
         public override void RunTask(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -26,10 +27,12 @@ namespace TimerService
                 return "InitFaulty";
             }
         }
-        protected override void DoWork(RunnerData rd)
+
+        protected override void DoWork(object rd)
         {
             throw new NotImplementedException();
         }
+
         protected override string ThreadsProperty {
             get {
                 throw new NotImplementedException();

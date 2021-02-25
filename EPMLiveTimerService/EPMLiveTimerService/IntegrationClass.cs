@@ -45,7 +45,7 @@ namespace TimerService
                                             RunnerData rd = new RunnerData();
                                             rd.cn = sConn;
                                             rd.dr = dr;
-                                            if (startProcess(rd))
+                                            if (StartProcess(rd))
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
                                                 {
@@ -83,16 +83,16 @@ namespace TimerService
             }
         }
         
-        protected override void DoWork(RunnerData rd)
+        protected override void DoWork(object rd)
         {
-            DataRow dr = rd.dr;
+            DataRow dr = ((RunnerData)rd).dr;
 
             try
             {
                 EPMLiveCore.API.Integration.IntegrationCore core = new EPMLiveCore.API.Integration.IntegrationCore(new Guid(dr["SITE_ID"].ToString()), new Guid(dr["WEB_ID"].ToString()));
                 core.ExecuteEvent(dr);
 
-                using (SqlConnection cn = new SqlConnection(rd.cn))
+                using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                 {
                     try
                     {
@@ -113,7 +113,7 @@ namespace TimerService
             {
                 if (ex.Message.Contains("could not be found"))
                 {
-                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    using (SqlConnection cn = new SqlConnection(((RunnerData)rd).cn))
                     {
                         try
                         {
