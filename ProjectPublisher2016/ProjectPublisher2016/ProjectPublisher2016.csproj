@@ -862,6 +862,31 @@
     <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">	
+    <DebugSymbols>true</DebugSymbols>	
+    <DebugType>full</DebugType>	
+    <Optimize>false</Optimize>	
+    <OutputPath>bin\x86\Debug\</OutputPath>	
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>	
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>	
+    <WarningLevel>4</WarningLevel>	
+    <Prefer32Bit>true</Prefer32Bit>	
+    <PlatformTarget>x86</PlatformTarget>	
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>	
+    <SGenToolPath>C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.2 Tools</SGenToolPath>	
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">	
+    <DebugType>pdbonly</DebugType>	
+    <Optimize>true</Optimize>	
+    <OutputPath>bin\x86\Release\</OutputPath>	
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>	
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>	
+    <WarningLevel>4</WarningLevel>	
+    <PlatformTarget>x86</PlatformTarget>	
+    <Prefer32Bit>true</Prefer32Bit>	
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>	
+    <SGenToolPath>C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.2 Tools</SGenToolPath>	
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>;TRACE</DefineConstants>
