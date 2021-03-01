@@ -14,6 +14,39 @@ using System.Collections.Concurrent;
 
 namespace TimeSheets
 {
+    public class SPRunWithoutEventsFiringEventReceiver : SPItemEventReceiver
+    {
+        #region Methods
+        public void DisableEvents()
+        {
+            this.EventFiringEnabled = false;
+        }
+
+        public void EnableEvents()
+        {
+            this.EventFiringEnabled = true;
+        }
+        #endregion
+    }
+    public static class SPUtilities
+    {
+        public delegate void RunWithoutEventsFiringDelegate();
+
+        public static void RunWithoutEventsFiring(RunWithoutEventsFiringDelegate code)
+        {
+            SPRunWithoutEventsFiringEventReceiver eventReceiver = new SPRunWithoutEventsFiringEventReceiver();
+            try
+            {
+                eventReceiver.DisableEvents();
+                code();
+            }
+            finally
+            {
+                eventReceiver.EnableEvents();
+            }
+        }
+    }
+
     public class SharedFunctions
     {
         private const string DefaultDateFormat = "yyyy-MM-dd";
@@ -142,10 +175,12 @@ namespace TimeSheets
                                         catch { }
                                         if (f != null)
                                         {
-                                            li[f.Id] = dr["TotalHours"].ToString();
+                                            SPUtilities.RunWithoutEventsFiring(delegate ()
+                                            {
+                                                li[f.Id] = dr["TotalHours"].ToString();
 
-                                            li.Update();
-
+                                                li.Update();
+                                            });
                                             //processProject(dsProjects, wGuid, iWeb);
 
                                         }
@@ -183,16 +218,22 @@ namespace TimeSheets
                                                 {
                                                     if (login == SPContext.Current.Web.CurrentUser.LoginName.ToLower())
                                                     {
-                                                        li[f.Id] = dr["SubmittedHours"].ToString();
-                                                        li.Update();
+                                                        SPUtilities.RunWithoutEventsFiring(delegate ()
+                                                        {
+                                                            li[f.Id] = dr["SubmittedHours"].ToString();
+                                                            li.Update();
+                                                        });
                                                         //processProject(dsProjects, wGuid, iWeb);
                                                     }
                                                 }
                                             }
                                             else if (bApprovalScreen)//otherwise it must be in approval mode
                                             {
-                                                li[f.Id] = dr["TotalHours"].ToString();
-                                                li.Update();
+                                                SPUtilities.RunWithoutEventsFiring(delegate ()
+                                                {
+                                                    li[f.Id] = dr["TotalHours"].ToString();
+                                                    li.Update();
+                                                });
                                                 //processProject(dsProjects, wGuid, iWeb);
                                             }
                                         }
